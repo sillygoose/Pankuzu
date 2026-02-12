@@ -1,0 +1,171 @@
+import Foundation
+import OSLog
+
+import SQLiteData
+//import Sharing
+
+import DokoSharing
+import DokoTypes
+import DokoLogging
+import DokoSharing
+import Vehicles
+import VehicleInterface
+import UndeterminedVehicle
+import FordElectrics
+
+extension SharedKey where Self == InMemoryKey<ConnectedVehicleInterface>.Default {
+  public static var connectedVehicleInterface: Self {
+    Self[.inMemory("DokoVehicleManager-ConnectedVehicleInterface"), default: UndeterminedVehicle()]
+  }
+}
+
+public final class DokoVehicleManager: Sendable {
+  private let logger = Logger(subsystem: "com.unchan.doko", category: "DokoVehicleManager")
+
+  public static let shared = DokoVehicleManager()
+
+  private func startAccessoryNameObservation() {
+    @Shared(.connectedAccessory) var observedAccessoryName
+    @Shared(.connectedVehicleInterface) var connectedVehicleInterface
+    @Shared(.connectedVehicleModel) var connectedVehicleModel
+    Task { [weak self] in
+      guard let self else { return }
+      var oldAccessoryName: String? = nil
+      for await newAccessoryName in $observedAccessoryName.publisher.values {
+        if Task.isCancelled { break }
+        guard oldAccessoryName != newAccessoryName else { continue }
+//        self.logger.info("\(timestamp()) VM: Accessory changed to \(newAccessoryName ?? "nil")")
+//        DokoLogging.shared.postLoggingResponse(.info("VM: Accessory changed from \(oldAccessoryName ?? "nil") to \(newAccessoryName ?? "nil")"))
+        if newAccessoryName == nil {
+          $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: nil) }
+          $connectedVehicleModel.withLock { $0 = nil }
+        }
+        oldAccessoryName = newAccessoryName
+      }
+    }
+  }
+
+  private func startVehicleInterfaceObservation() {
+    @Shared(.connectedVehicleInterface) var connectedVehicleInterface
+    @Shared(.connectedVehicleModel) var connectedVehicleModel
+    Task { [weak self] in
+      guard let self else { return }
+      for await newInterface in $connectedVehicleInterface.publisher.values {
+        if Task.isCancelled { break }
+        self.logger.info("\(timestamp()) VM: \(newInterface.name)")
+        DokoLogging.shared.postLoggingResponse(.info("VM: \(newInterface.name)"))
+        $connectedVehicleModel.withLock { $0 = newInterface.vehicle?.model }
+      }
+    }
+  }
+
+  private init() {
+    startAccessoryNameObservation()
+    startVehicleInterfaceObservation()
+  }
+
+  public var connectedVehicle: Vehicle? {
+    @Shared(.connectedVehicleInterface) var connectedVehicleInterface
+    return connectedVehicleInterface.vehicle
+  }
+
+  public var vehicleIsConnected: Bool {
+    @Shared(.connectedVehicleInterface) var connectedVehicleInterface
+    return connectedVehicleInterface.vehicle != nil
+  }
+
+  public func addVehicle(newVehicle: Vehicle) -> Vehicle.ID? {
+    @Dependency(\.defaultDatabase) var database
+    let id: Vehicle.ID? = withErrorReporting {
+      try database.write { db in
+        let id = try Vehicle.upsert { newVehicle }.returning(\.id).fetchOne(db)
+        return id
+      }
+    }
+    return id
+  }
+
+  public func removeVehicle(vehicleID: Vehicle.ID) {
+    @Dependency(\.defaultDatabase) var database
+    @Shared(.connectedVehicleInterface) var connectedVehicleInterface
+    if let connectedVehicle = connectedVehicleInterface.vehicle, connectedVehicle.id == vehicleID { return }
+    withErrorReporting {
+      try database.write { db in
+        try Vehicle.where { $0.id == vehicleID }.delete().execute(db)
+      }
+    }
+  }
+
+  public func lookup(id: Vehicle.ID) -> Vehicle? {
+    @FetchAll var vehicles: [Vehicle]
+    guard let vehicle = vehicles.first(where: { $0.id == id }) else {
+      return nil
+    }
+    return vehicle
+  }
+}
+
+extension DokoVehicleManager {
+  public enum VehicleType: CaseIterable {
+    case undetermined
+    case fordElectric
+    //  case vwElectric
+    public var description: String {
+      switch self {
+      case .undetermined: return "Undetermined"
+      case .fordElectric: return "Ford Electric"
+      }
+    }
+  }
+
+  private func setVehicleInterface(to vehicle: Vehicle?) -> ConnectedVehicleInterface {
+    self.logger.info("\(timestamp()) VM.setVehicleInterface(\(vehicle?.makeModel ?? "nil"))")
+    DokoLogging.shared.postLoggingResponse(.info("VM.setVehicleInterface(\(vehicle?.makeModel ?? "nil"))"))
+    guard let vehicle = vehicle else { return UndeterminedVehicle() }
+    let vehicleInterface: ConnectedVehicleInterface = {
+      switch lookupVehicleType(modelIdentifier: vehicle.modelIdentifier) {
+      case .undetermined:
+        return UndeterminedVehicle()
+      case .fordElectric:
+        return FordElectrics(vehicle: vehicle)
+      }
+    }()
+    return vehicleInterface
+  }
+
+  public func setVin(vin: String?) {
+    @FetchAll var vehicles: [Vehicle]
+    @Shared(.connectedVehicleInterface) var connectedVehicleInterface
+    guard let vin = vin else {
+      self.logger.debug("\(timestamp()) VM.setVin(nil)")
+      $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: nil) }
+      return
+    }
+    self.logger.debug("\(timestamp()) VM.setVin(\(vin))")
+    if let vehicle = vehicles.first(where: { $0.vin == vin }) {
+      let vehicleType = lookupVehicleType(modelIdentifier: vehicle.modelIdentifier)
+      self.logger.debug("\(timestamp()) VM.setVin: \(vehicle.modelIdentifier.description), \(vehicleType.description)")
+      $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: vehicle) }
+      return
+    }
+
+    let newVehicle = Vehicle(vin: vin)
+    guard let _ = addVehicle(newVehicle: newVehicle) else {
+      DokoLogging.shared.postLoggingResponse(.error("VM.setVin: could not add new vehicle"))
+      return
+    }
+    let vehicleType = lookupVehicleType(modelIdentifier: newVehicle.modelIdentifier)
+    self.logger.debug("\(timestamp()) VM.setVin: \(newVehicle.modelIdentifier.description), \(vehicleType.description)")
+    $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: newVehicle) }
+  }
+
+  private func lookupVehicleType(modelIdentifier: ModelIdentifier) -> VehicleType {
+    let vehicleTypeDictionary: [ModelIdentifier: VehicleType] = [
+      .tk1r: .fordElectric, .tk1s: .fordElectric, .tk2r: .fordElectric, .tk3r: .fordElectric, .tk3s: .fordElectric, .tk4s: .fordElectric,
+      .sw3l: .fordElectric, .vw1e: .fordElectric, .vw1b: .fordElectric, .vw3l: .fordElectric, .vw5l: .fordElectric, .vw7l: .fordElectric
+      //      ,
+      //      .fmpe: .vwElectric, .vmpe: .vwElectric, .gnpe: .vwElectric, .tmpe: .vwElectric, .cmpe: .vwElectric
+    ]
+    return vehicleTypeDictionary[modelIdentifier] ?? .undetermined
+  }
+}

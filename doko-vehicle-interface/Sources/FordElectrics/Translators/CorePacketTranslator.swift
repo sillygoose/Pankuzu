@@ -1,0 +1,99 @@
+import OSLog
+
+import DokoTypes
+import ObdLinkCore
+
+extension FordElectrics {
+  public func vehicleDokoResponsePacket(_ responsePacket: ObdResponsePacket) async -> DokoResponsePacket {
+    switch responsePacket.type {
+    case .idle:
+      return idleResponsePacket(responsePacket)
+    case .pluggedIn:
+      return pluggedInResponsePacket(responsePacket)
+      
+    case .tripStarting:
+      return tripStartingResponsePacket(responsePacket)
+    case .tripInProgress:
+      return tripInProgressResponsePacket(responsePacket)
+    case .tripUpdate:
+      return tripUpdateResponsePacket(responsePacket)
+    case .tripEnergy:
+      return tripEnergyResponsePacket(responsePacket)
+//    case .tripPosition:
+//      return tripPositionResponsePacket(responsePacket)
+    case .tripData:
+      return tripDataResponsePacket(responsePacket)
+    case .tripWeather:
+      return tripWeatherResponsePacket(responsePacket)
+    case .tripEnding:
+      return tripEndingResponsePacket(responsePacket)
+
+    case .acChargeStarting:
+      return acChargeStartingResponsePacket(responsePacket)
+    case .acChargeInProgress:
+      return acChargeInProgressResponsePacket(responsePacket)
+    case .acChargeUpdate:
+      return acChargeUpdateResponsePacket(responsePacket)
+    case .acChargeEnergy:
+      return acChargeEnergyResponsePacket(responsePacket)
+    case .acChargeHistory:
+      return acChargeHistoryResponsePacket(responsePacket)
+    case .acChargeEnding:
+      return acChargeEndingResponsePacket(responsePacket)
+
+    case .dcChargeStarting:
+      return dcChargeStartingResponsePacket(responsePacket)
+    case .dcChargeInProgress:
+      return dcChargeInProgressResponsePacket(responsePacket)
+    case .dcChargeUpdate:
+      return dcChargeUpdateResponsePacket(responsePacket)
+    case .dcChargeEnergy:
+      return dcChargeEnergyResponsePacket(responsePacket)
+    case .dcChargeHistory:
+      return dcChargeHistoryPacket(responsePacket)
+    case .dcChargeEnding:
+      return dcChargeEndingResponsePacket(responsePacket)
+
+    default:
+      return DokoResponsePacket(type: responsePacket.type, responses: [:])
+    }
+  }
+  
+  func idleResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+    var dokoResponses: DokoResponseDictionary = [:]
+    guard
+      let gearSelected = responsePacket.gearSelected,
+      let pluggedIn = responsePacket.pluggedIn
+    else {
+      return DokoResponsePacket(type: .idle, responses: dokoResponses)
+    }
+    var nextState: VehicleState {
+      if gearSelected { return .tripStarting }
+      if pluggedIn { return .pluggedIn }
+      return .idle
+    }
+    dokoResponses[.nextState] = DokoCommandResponse(command: .idle, response: .nextState(nextState))
+    return DokoResponsePacket(type: .idle, responses: dokoResponses)
+  }
+  
+  func pluggedInResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+    var dokoResponses: DokoResponseDictionary = [:]
+    guard
+      let pluggedIn = responsePacket.pluggedIn,
+      let acChargerStatus = responsePacket.acChargerStatus,
+      let dcChargerStatus = responsePacket.dcChargerStatus
+    else {
+      return DokoResponsePacket(type: .pluggedIn, responses: dokoResponses)
+    }
+    var nextState: VehicleState {
+      if !pluggedIn { return .idle }
+      if acChargerStatus { return .acChargeStarting }
+      if dcChargerStatus { return .dcChargeStarting }
+      return .pluggedIn
+    }
+    let chargeStatus = acChargerStatus || dcChargerStatus
+    dokoResponses[.nextState] = DokoCommandResponse(command: .pluggedIn, response: .nextState(nextState))
+    dokoResponses[.chargerStatus] = DokoCommandResponse(command: .pluggedIn, response: .chargerStatus(chargeStatus))
+    return DokoResponsePacket(type: .pluggedIn, responses: dokoResponses)
+  }
+}

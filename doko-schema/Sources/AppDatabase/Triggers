@@ -1,0 +1,175 @@
+DROP TABLE IF EXISTS locations;
+DROP TABLE IF EXISTS trips;
+DROP TABLE IF EXISTS charges;
+
+CREATE TABLE "locations" (
+  "id" TEXT PRIMARY KEY NOT NULL ON CONFLICT REPLACE DEFAULT (uuid()),
+  "deleted" TEXT,
+  "name" TEXT
+) STRICT;
+
+CREATE TABLE "trips" (
+  "id" TEXT PRIMARY KEY NOT NULL ON CONFLICT REPLACE DEFAULT (uuid()),
+  "deleted" TEXT,
+  "originID" TEXT NOT NULL,
+  "destinationID" TEXT NOT NULL,
+  "timeStart" TEXT NOT NULL,
+  "duration" REAL NOT NULL,
+  FOREIGN KEY("originID") REFERENCES "locations"("id")
+  FOREIGN KEY("destinationID") REFERENCES "locations"("id")
+) STRICT;
+
+CREATE TABLE "charges" (
+  "id" TEXT PRIMARY KEY NOT NULL ON CONFLICT REPLACE DEFAULT (uuid()),
+  "deleted" TEXT,
+  "locationID" TEXT NOT NULL,
+  "timeStart" TEXT NOT NULL,
+  "duration" REAL NOT NULL,
+  FOREIGN KEY("locationID") REFERENCES "locations"("id")
+) STRICT;
+
+-- Trigger to mark location as deleted when last referencing trip is soft deleted
+CREATE TRIGGER mark_location_deleted_after_trip_soft_delete
+AFTER UPDATE OF deleted ON trips
+WHEN NEW.deleted IS NOT NULL AND OLD.deleted IS NULL
+BEGIN
+  UPDATE locations
+    SET deleted = NEW.deleted
+    WHERE id = NEW.originID
+      AND deleted IS NULL
+      AND (
+        (SELECT COUNT(*) FROM trips WHERE (originID = NEW.originID OR destinationID = NEW.originID) AND deleted IS NULL) = 0
+        AND (SELECT COUNT(*) FROM charges WHERE locationID = NEW.originID AND deleted IS NULL) = 0
+      );
+  UPDATE locations
+    SET deleted = NEW.deleted
+    WHERE id = NEW.destinationID
+      AND deleted IS NULL
+      AND (
+        (SELECT COUNT(*) FROM trips WHERE (originID = NEW.destinationID OR destinationID = NEW.destinationID) AND deleted IS NULL) = 0
+        AND (SELECT COUNT(*) FROM charges WHERE locationID = NEW.destinationID AND deleted IS NULL) = 0
+      );
+END;
+
+-- Trigger to mark location as deleted when last referencing charge is soft deleted
+CREATE TRIGGER mark_location_deleted_after_charge_soft_delete
+AFTER UPDATE OF deleted ON charges
+WHEN NEW.deleted IS NOT NULL AND OLD.deleted IS NULL
+BEGIN
+  UPDATE locations
+    SET deleted = NEW.deleted
+    WHERE id = NEW.locationID
+      AND deleted IS NULL
+      AND (
+        (SELECT COUNT(*) FROM trips WHERE (originID = NEW.locationID OR destinationID = NEW.locationID) AND deleted IS NULL) = 0
+        AND (SELECT COUNT(*) FROM charges WHERE locationID = NEW.locationID AND deleted IS NULL) = 0
+      );
+END;
+
+-- Trigger to undelete location on new trip insert
+CREATE TRIGGER undelete_location_on_trip_insert
+AFTER INSERT ON trips
+BEGIN
+  UPDATE locations SET deleted = NULL WHERE id = NEW.originID AND deleted IS NOT NULL;
+  UPDATE locations SET deleted = NULL WHERE id = NEW.destinationID AND deleted IS NOT NULL;
+END;
+
+-- Trigger to undelete location on new charge insert
+CREATE TRIGGER undelete_location_on_charge_insert
+AFTER INSERT ON charges
+BEGIN
+  UPDATE locations SET deleted = NULL WHERE id = NEW.locationID AND deleted IS NOT NULL;
+END;
+
+-- Trigger to undelete location if any referencing trip is restored (deleted goes from non-null to null)
+CREATE TRIGGER undelete_location_on_trip_restore
+AFTER UPDATE OF deleted ON trips
+WHEN OLD.deleted IS NOT NULL AND NEW.deleted IS NULL
+BEGIN
+  UPDATE locations SET deleted = NULL WHERE id = NEW.originID AND deleted IS NOT NULL;
+  UPDATE locations SET deleted = NULL WHERE id = NEW.destinationID AND deleted IS NOT NULL;
+END;
+
+-- Trigger to undelete location if any referencing charge is restored (deleted goes from non-null to null)
+CREATE TRIGGER undelete_location_on_charge_restore
+AFTER UPDATE OF deleted ON charges
+WHEN OLD.deleted IS NOT NULL AND NEW.deleted IS NULL
+BEGIN
+  UPDATE locations SET deleted = NULL WHERE id = NEW.locationID AND deleted IS NOT NULL;
+END;
+
+-- Hard delete locations when last referencing trip is deleted (on trip delete)
+CREATE TRIGGER hard_delete_location_after_trip_delete
+AFTER DELETE ON trips
+BEGIN
+  DELETE FROM locations WHERE id = OLD.originID
+    AND (
+      (SELECT COUNT(*) FROM trips WHERE (originID = OLD.originID OR destinationID = OLD.originID)) = 0
+      AND (SELECT COUNT(*) FROM charges WHERE locationID = OLD.originID) = 0
+    );
+  DELETE FROM locations WHERE id = OLD.destinationID
+    AND (
+      (SELECT COUNT(*) FROM trips WHERE (originID = OLD.destinationID OR destinationID = OLD.destinationID)) = 0
+      AND (SELECT COUNT(*) FROM charges WHERE locationID = OLD.destinationID) = 0
+    );
+END;
+
+-- Hard delete locations when last referencing charge is deleted (on charge delete)
+CREATE TRIGGER hard_delete_location_after_charge_delete
+AFTER DELETE ON charges
+BEGIN
+  DELETE FROM locations WHERE id = OLD.locationID
+    AND (
+      (SELECT COUNT(*) FROM trips WHERE (originID = OLD.locationID OR destinationID = OLD.locationID)) = 0
+      AND (SELECT COUNT(*) FROM charges WHERE locationID = OLD.locationID) = 0
+    );
+END;
+
+-- End of triggers
+
+-- Add some locations
+INSERT INTO locations (id, name, deleted) VALUES ('locA', 'Kwik Fill', NULL);
+INSERT INTO locations (id, name, deleted) VALUES ('locB', 'Byrne Dairy', NULL);
+
+-- Add a trip referencing both locations
+INSERT INTO trips (id, originID, destinationID, timeStart, duration, deleted) VALUES ('trip1', 'locA', 'locB', '2025-08-15T08:00:00Z', 1.5, NULL);
+INSERT INTO trips (id, originID, destinationID, timeStart, duration, deleted) VALUES ('trip2', 'locB', 'locA', '2025-08-15T08:30:00Z', 1.5, NULL);
+
+-- Add a charge referencing locA
+INSERT INTO charges (id, locationID, timeStart, duration, deleted) VALUES ('charge1', 'locB', '2025-08-15T08:10:00Z', 0.5, NULL);
+
+-- Check that locations are not deleted
+SELECT * FROM locations;
+
+-- Soft-delete the trip (locA is still referenced by the charge, so stays undeleted)
+UPDATE trips SET deleted = '2025-08-15T10:00:00Z' WHERE id = 'trip1';
+--UPDATE trips SET deleted = '2025-08-15T10:00:00Z' WHERE id = 'trip2';
+SELECT * FROM locations;
+SELECT * FROM trips;
+
+-- Soft-delete the charge (now locA has no non-deleted referencing trips or charges, so should become soft-deleted)
+UPDATE charges SET deleted = '2025-08-15T11:00:00Z' WHERE id = 'charge1';
+SELECT * FROM locations;
+SELECT * FROM trips;
+SELECT * FROM charges;
+
+-- Restore the trip (location should also be undeleted)
+UPDATE trips SET deleted = NULL WHERE id = 'trip1';
+UPDATE trips SET deleted = NULL WHERE id = 'trip2';
+SELECT * FROM locations;
+
+-- First, soft-delete the trip again so the location will be soft-deleted
+UPDATE trips SET deleted = '2025-08-15T12:00:00Z' WHERE id = 'trip1';
+UPDATE trips SET deleted = '2025-08-15T12:00:00Z' WHERE id = 'trip2';
+
+-- Now, hard-delete the trip (should hard-delete locA if it's the last ref)
+DELETE FROM trips WHERE id = 'trip1';
+DELETE FROM trips WHERE id = 'trip2';
+-- DELETE FROM charges WHERE id = 'charge1';
+SELECT * FROM locations;
+
+-- Re-insert a deleted location and see it undeletes
+INSERT INTO locations (id, name, deleted) VALUES ('locA', 'Kwik Fill', '2025-08-15T13:00:00Z');
+SELECT * FROM locations;
+INSERT INTO trips (id, originID, destinationID, timeStart, duration, deleted) VALUES ('trip2', 'locA', 'locB', '2025-08-15T14:00:00Z', 2.0, NULL);
+SELECT * FROM locations;

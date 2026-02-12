@@ -1,0 +1,177 @@
+import OSLog
+
+import DokoTypes
+import DokoLogging
+import VehicleInterface
+import ObdLinkCore
+import Vehicles
+
+public actor FordElectrics: ConnectedVehicleInterface {
+  let logger = Logger(subsystem: "com.unchan.doko", category: "FordElectrics")
+
+  nonisolated public let vehicle: Vehicle?
+  nonisolated public let name: String = "FordElectrics"
+
+  public var batteryPower: Double = 0.0
+  public var batteryEnergy: Double = 0.0
+  public var lastEnergyUpdateTime: Date?
+  public var lastBatteryPower: Double?
+
+  public init(vehicle: Vehicle?) {
+    self.vehicle = vehicle
+  }
+
+  public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
+    typealias CommandLookupDictionary = [ObdCommand: String]
+    let commandLookupDictionary: CommandLookupDictionary = [
+      .pluggedIn:                       "STPX h:07E2, d:224843",
+      .gearSelected:                    "STPX h:07E2, d:221E12",
+
+      .energyToEmpty:                   "STPX h:07E4, d:224848",
+      .stateOfCharge:                   "STPX h:07E4, d:224845",
+      .stateOfHealth:                   "STPX h:07E4, d:22490C",
+      .batteryTemperature:              "STPX h:07E4, d:224800",
+      .batteryVoltage:                  "STPX h:07E4, d:22480D",
+      .batteryCurrent:                  "STPX h:07E4, d:2248F9",
+
+      .acChargerStatus:                 "STPX h:07E4, d:22484F",
+      .acChargerCouplerTemperature:     "STPX h:07E2, d:224888",
+
+      .dcChargerStatus:                 "STPX h:07E4, d:22489E",
+      .dcChargerCouplerTemperature:     "STPX h:07E2, d:224897",
+
+      .odometer:                        "01A6",
+
+      .position:                        "STPR",
+      .weather:                         "STPR",
+      .meanTemperature:                 "STPR",
+    ]
+    guard let obdLinkCommand = commandLookupDictionary[command] else {
+      return nil
+    }
+    return obdLinkCommand
+  }
+
+  public func translateDokoCommandPacket(using packetType: DokoPacketType) async -> ObdCommandPacket? {
+    switch packetType {
+    case .idle:
+      return ObdCommandPacket(type: .idle, commands: [
+        .gearSelected, .pluggedIn
+      ])
+    case .pluggedIn:
+      return ObdCommandPacket(type: .pluggedIn, commands: [
+        .pluggedIn, .acChargerStatus, .dcChargerStatus
+      ])
+      
+    case .tripStarting:
+      return ObdCommandPacket(type: .tripStarting, commands: [
+        .odometer, .energyToEmpty, .stateOfCharge,
+        .stateOfHealth, .batteryTemperature,
+        .position, .weather,
+      ])
+    case .tripInProgress:
+      return ObdCommandPacket(type: .tripInProgress, commands: [
+        .gearSelected
+      ])
+    case .tripUpdate:
+      return ObdCommandPacket(type: .tripUpdate, commands: [
+        .odometer, .energyToEmpty, .stateOfCharge,
+        .batteryTemperature,
+        .position,
+      ])
+    case .tripEnding:
+      return ObdCommandPacket(type: .tripEnding, commands: [
+        .weather, .meanTemperature,
+        .odometer, .energyToEmpty, .stateOfCharge,
+        .stateOfHealth, .batteryTemperature,
+        .position,
+      ])
+//    case .tripPosition:
+//      return ObdCommandPacket(type: .tripPosition, commands: [
+//        .position
+//      ])
+    case .tripData:
+      return ObdCommandPacket(type: .tripData, commands: [
+        .odometer, .stateOfCharge, .energyToEmpty, .batteryTemperature
+      ])
+    case .tripWeather:
+      return ObdCommandPacket(type: .tripWeather, commands: [
+        .weather
+      ])
+
+    case .acChargeStarting:
+      return ObdCommandPacket(type: .acChargeStarting, commands: [
+        .odometer, .energyToEmpty, .stateOfCharge,
+        .stateOfHealth, .batteryTemperature, .acChargerCouplerTemperature,
+        .position, .weather,
+      ])
+    case .acChargeInProgress:
+      return ObdCommandPacket(type: .acChargeInProgress, commands: [
+        .acChargerStatus
+      ])
+    case .acChargeUpdate:
+      return ObdCommandPacket(type: .acChargeUpdate, commands: [
+        .stateOfCharge, .energyToEmpty,
+        .batteryTemperature, .acChargerCouplerTemperature
+      ])
+    case .acChargeEnding:
+      return ObdCommandPacket(type: .acChargeEnding, commands: [
+        .energyToEmpty, .stateOfCharge,
+        .stateOfHealth, .batteryTemperature, .acChargerCouplerTemperature
+      ])
+
+    case .dcChargeStarting:
+      return ObdCommandPacket(type: .dcChargeStarting, commands: [
+        .odometer, .energyToEmpty, .stateOfCharge,
+        .stateOfHealth, .batteryTemperature, .dcChargerCouplerTemperature,
+        .position, .weather,
+      ])
+    case .dcChargeInProgress:
+      return ObdCommandPacket(type: .dcChargeInProgress, commands: [
+        .dcChargerStatus
+      ])
+    case .dcChargeUpdate:
+      return ObdCommandPacket(type: .dcChargeUpdate, commands: [
+        .stateOfCharge, .energyToEmpty,
+        .batteryTemperature, .dcChargerCouplerTemperature
+      ])
+    case .dcChargeEnding:
+      return ObdCommandPacket(type: .dcChargeEnding, commands: [
+        .energyToEmpty, .stateOfCharge,
+        .stateOfHealth, .batteryTemperature, .dcChargerCouplerTemperature
+      ])
+
+    case .acChargeHistory:
+      return ObdCommandPacket(
+        type: .acChargeHistory,
+        commands: [
+        .energyToEmpty, .stateOfCharge,
+        .batteryTemperature, .acChargerCouplerTemperature
+      ])
+    case .dcChargeHistory:
+      return ObdCommandPacket(
+        type: .dcChargeHistory,
+        commands: [
+        .energyToEmpty, .stateOfCharge,
+        .batteryTemperature, .dcChargerCouplerTemperature
+      ])
+
+    case .tripEnergy:
+      return ObdCommandPacket(type: .tripEnergy, commands: [
+        .batteryVoltage, .batteryCurrent
+      ])
+    case .acChargeEnergy:
+      return ObdCommandPacket(type: .acChargeEnergy, commands: [
+        .batteryVoltage, .batteryCurrent
+      ])
+    case .dcChargeEnergy:
+      return ObdCommandPacket(type: .dcChargeEnergy, commands: [
+        .batteryVoltage, .batteryCurrent
+      ])
+
+    default:
+      DokoLogging.shared.postLoggingResponse(.error("FE.translateDokoCommandPacket: No packet translation for '\(packetType.description)'"))
+      return nil
+    }
+  }
+}
