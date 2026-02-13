@@ -47,7 +47,7 @@ public final class DokoNotificationManager: NSObject, Sendable {
   public func accessoryConnectedNotification(accessoryName: String) async {
     let content = UNMutableNotificationContent()
     content.title = "Scan Tool Connected"
-    content.body = "Cconnected to the \(accessoryName) scan tool."
+    content.body = "Connected to the \(accessoryName) scan tool."
     content.sound = .default
     await sendNotification(content: content)
   }
