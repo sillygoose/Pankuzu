@@ -34,8 +34,8 @@ public final class DokoVehicleManager: Sendable {
       for await newAccessoryName in $observedAccessoryName.publisher.values {
         if Task.isCancelled { break }
         guard oldAccessoryName != newAccessoryName else { continue }
-//        self.logger.info("\(timestamp()) VM: Accessory changed to \(newAccessoryName ?? "nil")")
-//        DokoLogging.shared.postLoggingResponse(.info("VM: Accessory changed from \(oldAccessoryName ?? "nil") to \(newAccessoryName ?? "nil")"))
+//        self.logger.info("\(timestamp()) DVM: Accessory changed to \(newAccessoryName ?? "nil")")
+//        DokoLogging.shared.postLoggingResponse(.info("DVM: Accessory changed from \(oldAccessoryName ?? "nil") to \(newAccessoryName ?? "nil")"))
         if newAccessoryName == nil {
           $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: nil) }
           $connectedVehicleModel.withLock { $0 = nil }
@@ -52,8 +52,8 @@ public final class DokoVehicleManager: Sendable {
       guard let self else { return }
       for await newInterface in $connectedVehicleInterface.publisher.values {
         if Task.isCancelled { break }
-        self.logger.info("\(timestamp()) VM: \(newInterface.name)")
-        DokoLogging.shared.postLoggingResponse(.info("VM: \(newInterface.name)"))
+        self.logger.info("\(timestamp()) DVM: \(newInterface.name)")
+        DokoLogging.shared.postLoggingResponse(.info("DVM: \(newInterface.name)"))
         $connectedVehicleModel.withLock { $0 = newInterface.vehicle?.model }
       }
     }
@@ -109,18 +109,19 @@ extension DokoVehicleManager {
   public enum VehicleType: CaseIterable {
     case undetermined
     case fordElectric
-    //  case vwElectric
+//    case vwElectric
     public var description: String {
       switch self {
       case .undetermined: return "Undetermined"
       case .fordElectric: return "Ford Electric"
+//      case .vwEletric: return "VW Electric"
       }
     }
   }
 
   private func setVehicleInterface(to vehicle: Vehicle?) -> ConnectedVehicleInterface {
-    self.logger.info("\(timestamp()) VM.setVehicleInterface(\(vehicle?.makeModel ?? "nil"))")
-    DokoLogging.shared.postLoggingResponse(.info("VM.setVehicleInterface(\(vehicle?.makeModel ?? "nil"))"))
+    self.logger.info("\(timestamp()) DVM.setVehicleInterface(\(vehicle?.makeModel ?? "nil"))")
+    DokoLogging.shared.postLoggingResponse(.info("DVM.setVehicleInterface(\(vehicle?.makeModel ?? "nil"))"))
     guard let vehicle = vehicle else { return UndeterminedVehicle() }
     let vehicleInterface: ConnectedVehicleInterface = {
       switch lookupVehicleType(modelIdentifier: vehicle.modelIdentifier) {
@@ -128,6 +129,8 @@ extension DokoVehicleManager {
         return UndeterminedVehicle()
       case .fordElectric:
         return FordElectrics(vehicle: vehicle)
+//      case .vwElectric:
+//        return VwElectrics(vicle: vehicle)
       }
     }()
     return vehicleInterface
@@ -137,35 +140,42 @@ extension DokoVehicleManager {
     @FetchAll var vehicles: [Vehicle]
     @Shared(.connectedVehicleInterface) var connectedVehicleInterface
     guard let vin = vin else {
-      self.logger.debug("\(timestamp()) VM.setVin(nil)")
+      self.logger.debug("\(timestamp()) DVM.setVin(nil)")
       $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: nil) }
       return
     }
-    self.logger.debug("\(timestamp()) VM.setVin(\(vin))")
+    self.logger.debug("\(timestamp()) DVM.setVin(\(vin))")
     if let vehicle = vehicles.first(where: { $0.vin == vin }) {
       let vehicleType = lookupVehicleType(modelIdentifier: vehicle.modelIdentifier)
-      self.logger.debug("\(timestamp()) VM.setVin: \(vehicle.modelIdentifier.description), \(vehicleType.description)")
+      self.logger.debug("\(timestamp()) DVM.setVin: \(vehicle.modelIdentifier.description), \(vehicleType.description)")
       $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: vehicle) }
       return
     }
 
     let newVehicle = Vehicle(vin: vin)
     guard let _ = addVehicle(newVehicle: newVehicle) else {
-      DokoLogging.shared.postLoggingResponse(.error("VM.setVin: could not add new vehicle"))
+      DokoLogging.shared.postLoggingResponse(.error("DVM.setVin: could not add new vehicle"))
       return
     }
     let vehicleType = lookupVehicleType(modelIdentifier: newVehicle.modelIdentifier)
-    self.logger.debug("\(timestamp()) VM.setVin: \(newVehicle.modelIdentifier.description), \(vehicleType.description)")
+    self.logger.debug("\(timestamp()) DVM.setVin: \(newVehicle.modelIdentifier.description), \(vehicleType.description)")
+    DokoLogging.shared.postLoggingResponse(.connect("DVM.setVin(\(vehicleType))"))
     $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: newVehicle) }
   }
 
   private func lookupVehicleType(modelIdentifier: ModelIdentifier) -> VehicleType {
     let vehicleTypeDictionary: [ModelIdentifier: VehicleType] = [
-      .tk1r: .fordElectric, .tk1s: .fordElectric, .tk2r: .fordElectric, .tk3r: .fordElectric, .tk3s: .fordElectric, .tk4s: .fordElectric,
-      .sw3l: .fordElectric, .vw1e: .fordElectric, .vw1b: .fordElectric, .vw3l: .fordElectric, .vw5l: .fordElectric, .vw7l: .fordElectric
-      //      ,
-      //      .fmpe: .vwElectric, .vmpe: .vwElectric, .gnpe: .vwElectric, .tmpe: .vwElectric, .cmpe: .vwElectric
+      .miTK1R: .fordElectric, .miTK1S: .fordElectric, .miTK2R: .fordElectric, .miTK3R: .fordElectric, .miTK3S: .fordElectric, .miTK4S: .fordElectric,
+      .mi6W1E: .fordElectric, .mi6W3L: .fordElectric, .miVW1E: .fordElectric, .miVW1B: .fordElectric,
+      .miVW3L: .fordElectric, .miVW5L: .fordElectric, .miVW7L: .fordElectric,
+//      .mi5MPE: .vwElectric, .mi5NPE: .vwElectric, .miVMPE: .vwElectric, .miVNPE: .vwElectric, .miDMPE: .vwElectric,
+//      .miDNPE: .vwElectric, .miGMPE: .vwElectric, .miGNPE: .vwElectric, .miTMPE: .vwElectric, .miTNPE: .vwElectric,
+//      .miCMPE: .vwElectric, .miCNPE: .vwElectric
     ]
-    return vehicleTypeDictionary[modelIdentifier] ?? .undetermined
+    guard let vehicleType = vehicleTypeDictionary[modelIdentifier] else {
+      DokoLogging.shared.postLoggingResponse(.error("DVM.lookupVehicleType(.undetermined)"))
+      return .undetermined
+    }
+    return vehicleType
   }
 }

@@ -44,67 +44,68 @@ public enum WorldManufacturerIdentifier: String, Equatable {
 }
 
 public enum ModelIdentifier: String, Equatable {
-  case unknown
+  case miUNKNOWN
 
-  case tk1r = "TK1R"
-  case tk1s = "TK1S"
-  case tk2r = "TK2R"
-  case tk3r = "TK3R"
-  case tk3s = "TK3S"
-  case tk4s = "TK4S"
+  case miTK1R = "TK1R"    // Mustang-Mach-E
+  case miTK1S = "TK1S"
+  case miTK2R = "TK2R"
+  case miTK3R = "TK3R"
+  case miTK3S = "TK3S"
+  case miTK4S = "TK4S"
 
-  case vw1e = "VW1E"
-  case vw1b = "VW1B"
-  case sw3l = "6W3L"
-  case vw3l = "VW3L"
-  case vw5l = "VW5L"
-  case vw7l = "VW7L"
+  case mi6W1E = "6W1E"    // F-150 Lightning
+  case mi6W3L = "6W3L"
+  case miVW1E = "VW1E"
+  case miVW1B = "VW1B"
+  case miVW3L = "VW3L"
+  case miVW5L = "VW5L"
+  case miVW7L = "VW7L"
 
-  case fmpe = "5MPE"
-  case fnpe = "5NPE"
-  case vmpe = "VMPE"
-  case vnpe = "VNPE"
-  case dmpe = "DMPE"
-  case dnpe = "DNPE"
-  case gmpe = "GMPE"
-  case gnpe = "GNPE"
-  case tmpe = "TMPE"
-  case tnpe = "TNPE"
-  case cmpe = "CMPE"
-  case cnpe = "CNPE"
+  case mi5MPE = "5MPE"    // VW ID.4
+  case mi5NPE = "5NPE"
+  case miVMPE = "VMPE"
+  case miVNPE = "VNPE"
+  case miDMPE = "DMPE"
+  case miDNPE = "DNPE"
+  case miGMPE = "GMPE"
+  case miGNPE = "GNPE"
+  case miTMPE = "TMPE"
+  case miTNPE = "TNPE"
+  case miCMPE = "CMPE"
+  case miCNPE = "CNPE"
 
   public var description: String {
     switch self {
-    case .tk1r, .tk1s:
+    case .miTK1R, .miTK1S:
       return "Mustang Mach-E Select"
-    case .tk2r:
+    case .miTK2R:
       return "Mustang Mach-E Cal RT1"
-    case .tk3r, .tk3s:
+    case .miTK3R, .miTK3S:
       return "Mustang Mach-E Premium"
-    case .tk4s:
+    case .miTK4S:
       return "Mustang Mach-E GT"
 
-    case .vw1e:
+    case .miVW1E:
       return "F-150 Lightning"
-    case .vw1b:
+    case .miVW1B:
       return "F-150 Lightning Pro"
-    case .vw3l:
+    case .miVW3L:
       return "F-150 Lightning XLT"
-    case .sw3l:
+    case .mi6W3L:
       return "F-150 Lightning Flash"
-    case .vw5l:
+    case .mi6W1E, .miVW5L:
       return "F-150 Lightning Lariat"
-    case .vw7l:
+    case .miVW7L:
       return "F-150 Lightning Platinum"
 
-    case .fmpe, .fnpe:
+    case .mi5MPE, .mi5NPE:
       return "ID.4 S"
-    case .vmpe, .vnpe, .cmpe, .cnpe, .dmpe, .dnpe:
+    case .miVMPE, .miVNPE, .miCMPE, .miCNPE, .miDMPE, .miDNPE:
       return "ID.4 Pro"
-    case .gmpe, .gnpe, .tmpe, .tnpe:
+    case .miGMPE, .miGNPE, .miTMPE, .miTNPE:
       return "ID.4 Pro S"
 
-    case .unknown:
+    case .miUNKNOWN:
       return "Unknown"
     }
   }
@@ -115,7 +116,7 @@ extension VehicleProtocol {
     let start = vin.index(vin.startIndex, offsetBy: 3)
     let end = vin.index(vin.startIndex, offsetBy: 7)
     let modelIdentifierString = String(vin[start..<end])
-    let modelIdentifier = ModelIdentifier(rawValue: modelIdentifierString) ?? .unknown
+    let modelIdentifier = ModelIdentifier(rawValue: modelIdentifierString) ?? .miUNKNOWN
     return modelIdentifier
   }
   

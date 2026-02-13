@@ -73,13 +73,13 @@ public final class TripsModel {
     let (queryStart, queryEnd): (Date?, Date?) = {
       switch tripsDisplayPeriod {
       case .today:
-        return setDisplayPeriod(DisplayPeriod.todayDefault)
-      case .pastWeek(_, _):
-        return setDisplayPeriod(DisplayPeriod.pastWeekDefault)
-      case .pastMonth(_, _):
-        return setDisplayPeriod(DisplayPeriod.pastMonthDefault)
-      case let .custom(start, end):
-        return (start, end)
+        return setDisplayPeriod(.today)
+      case .pastWeek:
+        return setDisplayPeriod(.pastWeek)
+      case .pastMonth:
+        return setDisplayPeriod(.pastMonth)
+      case .custom:
+        return tripsDisplayPeriod.dateRange
       }
     }()
     
@@ -137,19 +137,10 @@ public final class TripsModel {
   @discardableResult
   func setDisplayPeriod(_ newPeriod: DisplayPeriod) -> (Date?, Date?) {
     $tripsDisplayPeriod.withLock { $0 = newPeriod }
-    if case .custom(_, _) = newPeriod {
+    if case .custom = newPeriod {
       $tripsCustomDisplayPeriod.withLock { $0 = newPeriod }
     }
-    switch newPeriod {
-    case .today:
-      return (DisplayPeriod.startOfToday, DisplayPeriod.endOfToday)
-    case .pastWeek(_, _):
-      return (DisplayPeriod.startOfPastWeek, DisplayPeriod.endOfToday)
-    case .pastMonth(_, _):
-      return (DisplayPeriod.startOfPastMonth, DisplayPeriod.endOfToday)
-    case let .custom(start, end):
-      return (start, end)
-    }
+    return newPeriod.dateRange
   }
   
   func setVehicleMenu(vehicleID: Vehicle.ID?) {
