@@ -2,8 +2,10 @@ import Foundation
 import SwiftUI
 
 public enum DisplayPeriod: Codable, Hashable, Identifiable, Sendable {
-  case today(Date, Date), pastWeek(Date, Date), pastMonth(Date, Date), custom(Date?, Date?)
+  case today, pastWeek, pastMonth, custom(Date?, Date?)
+
   public var id: String { name }
+
   public var name: String {
     switch self {
     case .today: return "Today"
@@ -13,19 +15,27 @@ public enum DisplayPeriod: Codable, Hashable, Identifiable, Sendable {
     }
   }
 
-  static public var startOfToday: Date { Calendar.current.startOfDay(for: Date.now) }
-  static public var endOfToday: Date { Calendar.current.date(byAdding: .day, value: 1, to: startOfToday)! }
-  static public var startOfPastWeek: Date { Calendar.current.date(byAdding: .day, value: -7, to: startOfToday)! }
-  static public var startOfPastMonth: Date { Calendar.current.date(byAdding: .day, value: -30, to: startOfToday)! }
-
-  static public var todayDefault: DisplayPeriod { .today(startOfToday, endOfToday) }
-  static public var pastWeekDefault: DisplayPeriod { .pastWeek(startOfPastWeek, endOfToday) }
-  static public var pastMonthDefault: DisplayPeriod { .pastMonth(startOfPastMonth, endOfToday) }
+  public var dateRange: (Date?, Date?) {
+    let startOfToday = Calendar.current.startOfDay(for: Date.now)
+    let endOfToday = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday)!
+    switch self {
+    case .today:
+      return (startOfToday, endOfToday)
+    case .pastWeek:
+      let startOfPastWeek = Calendar.current.date(byAdding: .day, value: -7, to: startOfToday)!
+      return (startOfPastWeek, endOfToday)
+    case .pastMonth:
+      let startOfPastMonth = Calendar.current.date(byAdding: .day, value: -30, to: startOfToday)!
+      return (startOfPastMonth, endOfToday)
+    case let .custom(start, end):
+      return (start, end)
+    }
+  }
 }
 
 extension DisplayPeriod {
-  public static var defaultDisplayPeriod: DisplayPeriod { todayDefault }
-  public static let defaultCustomDisplayPeriod = DisplayPeriod.custom(nil, nil)
+  public static let defaultDisplayPeriod: DisplayPeriod = .today
+  public static let defaultCustomDisplayPeriod: DisplayPeriod = .custom(nil, nil)
 }
 
 public struct DisplayPeriodPicker: View {
@@ -96,20 +106,13 @@ public struct DisplayPeriodPicker: View {
         pickerName,
         selection: $datePicker
       ) {
-        let startOfToday = Calendar.current.startOfDay(for: Date.now)
-        let endOfToday = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday)!
-        let startOfPastWeek = Calendar.current.date(byAdding: .day, value: -7, to: startOfToday)!
-        let startOfPastMonth = Calendar.current.date(byAdding: .day, value: -30, to: startOfToday)!
-        let today: DisplayPeriod = .today(startOfToday, endOfToday)
-        let pastWeek: DisplayPeriod = .pastWeek(startOfPastWeek, endOfToday)
-        let pastMonth: DisplayPeriod = .pastMonth(startOfPastMonth, endOfToday)
         let custom: DisplayPeriod = {
           if case let .custom(start, end) = datePicker {
             return .custom(start, end)
           }
           return customDisplayPeriod
         }()
-        ForEach([today, pastWeek, pastMonth, custom], id: \.self) { displayPeriod in
+        ForEach([DisplayPeriod.today, .pastWeek, .pastMonth, custom], id: \.self) { displayPeriod in
           Text(displayPeriod.name)
             .fixedSize(horizontal: false, vertical: true)
             .tag(displayPeriod)
@@ -203,19 +206,13 @@ public struct DisplayPeriodPicker: View {
             customDisplayPeriod: customDisplayPeriod
           )
 
-          switch displayPeriod {
-          case let .today(start, end), let .pastWeek(start, end), let .pastMonth(start, end):
+          let (start, end) = displayPeriod.dateRange
+          if let start = start, let end = end {
             let startPeriodString = String("\(start.formatted(date: .numeric, time: .omitted))")
             let endPeriodString = String("\(end.formatted(date: .numeric, time: .omitted))")
             Text("\(startPeriodString), \(endPeriodString)")
-          case let .custom(start, end):
-            if let start = start, let end = end {
-              let startPeriodString = String("\(start.formatted(date: .numeric, time: .omitted))")
-              let endPeriodString = String("\(end.formatted(date: .numeric, time: .omitted))")
-              Text("\(startPeriodString), \(endPeriodString)")
-            } else {
-              Text("nil, nil")
-            }
+          } else {
+            Text("nil, nil")
           }
         }
       }

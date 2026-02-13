@@ -72,6 +72,7 @@
 		5692F1A72F09FC6A00D9F0AA /* doko-state-engine */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-state-engine"; sourceTree = "<group>"; };
 		5692F1A82F09FC9D00D9F0AA /* doko-components */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-components"; sourceTree = "<group>"; };
 		5692F1A92F09FCF800D9F0AA /* doko-vehicle-interface */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-vehicle-interface"; sourceTree = "<group>"; };
+		569BF1B72F3EBC2B001E0A37 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
 		56A31D062F0A000700E4F1B4 /* doko-sharing */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-sharing"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -175,6 +176,7 @@
 				566710AA2F1FBBD20084A371 /* LiveActivityWidget */,
 				56BBBFF82F0A0869008C2BFE /* Frameworks */,
 				566DA7242F05ACDB0044D201 /* Products */,
+				569BF1B72F3EBC2B001E0A37 /* Shared.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -419,8 +421,8 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = "";
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = 3FWWMRTJCH;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = LiveActivityWidget/Info.plist;
@@ -454,8 +456,8 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = "";
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = 3FWWMRTJCH;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = LiveActivityWidget/Info.plist;
@@ -485,6 +487,7 @@
 		};
 		566DA7422F05ACDC0044D201 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 569BF1B72F3EBC2B001E0A37 /* Shared.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -518,7 +521,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -550,6 +552,7 @@
 		};
 		566DA7432F05ACDC0044D201 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 569BF1B72F3EBC2B001E0A37 /* Shared.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -583,7 +586,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -613,8 +615,8 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Pankuzu/Pankuzu.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = "";
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = 3FWWMRTJCH;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Pankuzu/Info.plist;
@@ -657,8 +659,8 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Pankuzu/Pankuzu.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = "";
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = 3FWWMRTJCH;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Pankuzu/Info.plist;
@@ -699,8 +701,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = "";
+				CURRENT_PROJECT_VERSION = 6;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 2026.02;
@@ -721,8 +722,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = "";
+				CURRENT_PROJECT_VERSION = 6;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 2026.02;
