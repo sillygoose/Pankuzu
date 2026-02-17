@@ -180,7 +180,7 @@ public struct SettingsView: View {
           )
         }
       }
-      .navigationTitle("Settings")
+      .navigationTitle("")
     }
   }
   

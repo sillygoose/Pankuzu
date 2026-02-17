@@ -166,7 +166,7 @@ extension DokoVehicleManager {
   private func lookupVehicleType(modelIdentifier: ModelIdentifier) -> VehicleType {
     let vehicleTypeDictionary: [ModelIdentifier: VehicleType] = [
       .miTK1R: .fordElectric, .miTK1S: .fordElectric, .miTK2R: .fordElectric, .miTK3R: .fordElectric, .miTK3S: .fordElectric, .miTK4S: .fordElectric,
-      .mi6W1E: .fordElectric, .mi6W3L: .fordElectric, .miVW1E: .fordElectric, .miVW1B: .fordElectric,
+      .mi6W1E: .fordElectric, .mi6W3L: .fordElectric, .mi6W5L: .fordElectric, .miVW1E: .fordElectric, .miVW1B: .fordElectric,
       .miVW3L: .fordElectric, .miVW5L: .fordElectric, .miVW7L: .fordElectric,
 //      .mi5MPE: .vwElectric, .mi5NPE: .vwElectric, .miVMPE: .vwElectric, .miVNPE: .vwElectric, .miDMPE: .vwElectric,
 //      .miDNPE: .vwElectric, .miGMPE: .vwElectric, .miGNPE: .vwElectric, .miTMPE: .vwElectric, .miTNPE: .vwElectric,

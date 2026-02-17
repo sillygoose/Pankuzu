@@ -55,6 +55,7 @@ public enum ModelIdentifier: String, Equatable {
 
   case mi6W1E = "6W1E"    // F-150 Lightning
   case mi6W3L = "6W3L"
+  case mi6W5L = "6W5L"
   case miVW1E = "VW1E"
   case miVW1B = "VW1B"
   case miVW3L = "VW3L"
@@ -93,7 +94,7 @@ public enum ModelIdentifier: String, Equatable {
       return "F-150 Lightning XLT"
     case .mi6W3L:
       return "F-150 Lightning Flash"
-    case .mi6W1E, .miVW5L:
+    case .mi6W1E, .miVW5L, .mi6W5L:
       return "F-150 Lightning Lariat"
     case .miVW7L:
       return "F-150 Lightning Platinum"
