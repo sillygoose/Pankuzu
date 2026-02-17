@@ -108,7 +108,9 @@ struct TripActiveView: View {
       VStack(spacing: 2) {
         HStack(spacing: 4) {
           Image(systemName: conditions)
-          Text(temperature.formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(0)))))
+          Text(
+            temperature.formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(0))))
+          )
         }
         .font(DesignTokens.Font.title)
 

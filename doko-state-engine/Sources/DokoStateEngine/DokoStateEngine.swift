@@ -246,19 +246,6 @@ public final class DokoStateEngine {
             }
             $vehicleState.withLock { $0 = nextState }
 
-//          case .tripPosition:
-//            guard case .tripInProgress = vehicleState else {
-//              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-//            }
-//            guard let tripID = tripInProgress?.id else {
-//              throw StateEngineError.missingTripID
-//            }
-//            do {
-//              try Trip.postTripPositionRecord(tripID: tripID, tripPositionPacket: dokoResponsePacket)
-//            } catch {
-//              DokoLogging.shared.postLoggingResponse(.error("\(String(describing: error))"))
-//            }
-
           case .tripCorePosition:
             guard case .tripInProgress = vehicleState else {
               throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
