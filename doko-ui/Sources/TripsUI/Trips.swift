@@ -28,19 +28,14 @@ extension SharedKey where Self == AppStorageKey<DisplayPeriod>.Default {
 @MainActor
 @Observable
 public final class TripsModel {
-  @ObservationIgnored
-  @FetchAll var vehicles: [Vehicle]
-  @ObservationIgnored
-  @FetchAll var locations: [Location]
+  @ObservationIgnored @FetchAll var vehicles: [Vehicle]
+  @ObservationIgnored @FetchAll var locations: [Location]
 
-  @ObservationIgnored
-  @FetchAll(Trip.none) var trips: [Trip]
-  
-  @ObservationIgnored
-  @FetchOne var tripStats: TripStats = TripStats()
+  @ObservationIgnored @FetchAll(Trip.none) var trips: [Trip]
 
-  @ObservationIgnored
-  @FetchOne(Trip.select { Stats.Columns(count: $0.count(filter: !$0.isDeleted)) })
+  @ObservationIgnored @FetchOne var tripStats: TripStats = TripStats()
+
+  @ObservationIgnored @FetchOne(Trip.select { Stats.Columns(count: $0.count(filter: !$0.isDeleted)) })
   var myStats = Stats()
   @Selection
   struct Stats: Equatable {
@@ -361,6 +356,11 @@ public struct TripsView: View {
           TripDetailView(
             model: TripDetailModel(tripID: trip.id)
           )
+        }
+      }
+      .onChange(of: model.vehicles.count) { oldCount, newCount in
+        if newCount < oldCount {
+          path = NavigationPath()
         }
       }
     }

@@ -39,53 +39,35 @@ extension SharedKey where Self == AppStorageKey<DisplayPeriod>.Default {
 @MainActor
 @Observable
 public final class ChargesModel {
-  @ObservationIgnored
-  @FetchAll var vehicles: [Vehicle]
+  @ObservationIgnored @FetchAll var vehicles: [Vehicle]
+  @ObservationIgnored @FetchAll var locations: [Location]
 
-  @ObservationIgnored
-  @FetchAll var locations: [Location]
+  @ObservationIgnored @FetchAll(Charge.none) var charges: [Charge]
+  @ObservationIgnored @FetchOne var chargeStats: ChargeStats = ChargeStats()
 
-  @ObservationIgnored
-  @FetchAll(Charge.none) var charges: [Charge]
-
-  @ObservationIgnored
-  @FetchOne var chargeStats: ChargeStats = ChargeStats()
-
-  @ObservationIgnored
-  @FetchOne(Charge.select { Stats.Columns(count: $0.count(filter: !$0.isDeleted)) })
+  @ObservationIgnored @FetchOne(Charge.select { Stats.Columns(count: $0.count(filter: !$0.isDeleted)) })
   var myStats = Stats()
   @Selection
   struct Stats: Equatable {
     var count = 0
   }
 
-  @ObservationIgnored
-  @Shared(.displayVehicleID) var displayVehicleID
+  @ObservationIgnored @Shared(.displayVehicleID) var displayVehicleID
 
-  @ObservationIgnored
-  @Shared(.connectedAccessory) var connectedAccessory
-  @ObservationIgnored
-  @Shared(.connectedVehicleModel) var connectedVehicleModel
-  @ObservationIgnored
-  @Shared(.activeSession) var activeSession
+  @ObservationIgnored @Shared(.connectedAccessory) var connectedAccessory
+  @ObservationIgnored @Shared(.connectedVehicleModel) var connectedVehicleModel
+  @ObservationIgnored @Shared(.activeSession) var activeSession
 
-  @ObservationIgnored
-  @Shared(.showAcCharges) var showAcCharges
-  @ObservationIgnored
-  @Shared(.showDcCharges) var showDcCharges
+  @ObservationIgnored @Shared(.showAcCharges) var showAcCharges
+  @ObservationIgnored @Shared(.showDcCharges) var showDcCharges
 
-  @ObservationIgnored
-  @Shared(.chargesDisplayPeriod) var displayPeriod
-  @ObservationIgnored
-  @Shared(.chargesCustomDisplayPeriod) var customDisplayPeriod
+  @ObservationIgnored @Shared(.chargesDisplayPeriod) var displayPeriod
+  @ObservationIgnored @Shared(.chargesCustomDisplayPeriod) var customDisplayPeriod
 
-  @ObservationIgnored
-  @Shared(.metric) var metric
+  @ObservationIgnored @Shared(.metric) var metric
 
-  @ObservationIgnored
-  @Dependency(\.defaultDatabase) var database
-  @ObservationIgnored
-  @Dependency(\.date.now) var now
+  @ObservationIgnored @Dependency(\.defaultDatabase) var database
+  @ObservationIgnored @Dependency(\.date.now) var now
 
   var vehicleButtonTitle: String = ""
   var vehicleButtonImage: String = ""
@@ -397,6 +379,11 @@ public struct ChargesView: View {
           ChargeDetailView(
             model: ChargeDetailModel(chargeID: charge.id)
           )
+        }
+      }
+      .onChange(of: model.vehicles.count) { oldCount, newCount in
+        if newCount < oldCount {
+          path = NavigationPath()
         }
       }
     }

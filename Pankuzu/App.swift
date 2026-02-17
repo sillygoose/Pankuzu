@@ -24,7 +24,12 @@ struct AppView: View {
 
   var body: some View {
     TipView(WelcomeTip())
-    TabView(selection: $model.selectedTab) {
+    TabView(selection: Binding(
+      get: { model.selectedTab },
+      set: { newTab in
+        withAnimation(.smooth) { model.selectedTab = newTab }
+      }
+    )) {
       TripsView(
         model: TripsModel()
       )
