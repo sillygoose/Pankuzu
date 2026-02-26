@@ -81,6 +81,8 @@ class ApplicationSettingsModel {
   @ObservationIgnored @Shared(.maximumTripElevationDistance) var maximumTripElevationDistance
   @ObservationIgnored @Shared(.minimumTripElevationChange) var minimumTripElevationChange
 
+  @ObservationIgnored @Shared(.deletedRecordRetentionDays) var deletedRecordRetentionDays
+
   func metricToggleChanged(isOn: Bool) {
     $metric.withLock { $0 = isOn }
   }
@@ -131,6 +133,10 @@ class ApplicationSettingsModel {
 
   func setMinimumTripElevationChange(_ elevation: Double) {
     $minimumTripElevationChange.withLock { $0 = elevation }
+  }
+
+  func setDeletedRecordRetentionDays(_ days: Int) {
+    $deletedRecordRetentionDays.withLock { $0 = days }
   }
 }
 
@@ -311,6 +317,23 @@ struct ApplicationSettingsView: View {
             set: { isOn, _ in model.setShowElevationOnPathToggleChanged(isOn: isOn) }
           )
         )
+
+        Section {
+          HStack {
+            Slider(
+              value: Binding(
+                get: { Double(model.deletedRecordRetentionDays) },
+                set: { model.setDeletedRecordRetentionDays(Int($0)) }
+              ),
+              in: 1.0...30.0,
+              step: 1.0
+            )
+            Spacer()
+            Text("\(model.deletedRecordRetentionDays) days")
+          }
+        } header: {
+          Text("Keep Deleted Trip/Charge For")
+        }
 
         DisclosureGroup(
           isExpanded: Binding(

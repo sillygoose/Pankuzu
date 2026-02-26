@@ -11,6 +11,7 @@ let package = Package(
     .library(name: "VehicleInterface", targets: ["VehicleInterface"]),
     .library(name: "UndeterminedVehicle", targets: ["UndeterminedVehicle"]),
     .library(name: "FordElectrics", targets: ["FordElectrics"]),
+    .library(name: "VwElectrics", targets: ["VwElectrics"]),
     .library(name: "ParsingHelpers", targets: ["ParsingHelpers"]),
   ],
   dependencies: [
@@ -48,6 +49,21 @@ let package = Package(
     ),
     .target(
       name: "FordElectrics",
+      dependencies: [
+        "VehicleInterface",
+        "ParsingHelpers",
+        .product(name: "ObdLinkCore", package: "obdlink-core"),
+        .product(name: "Vehicles", package: "doko-schema"),
+        .product(name: "DokoTypes", package: "doko-core"),
+        .product(name: "CoreLocationManager", package: "doko-managers"),
+        .product(name: "DokoWeatherManager", package: "doko-managers"),
+        .product(name: "DokoSharing", package: "doko-sharing"),
+        .product(name: "DokoDebug", package: "doko-debug"),
+        .product(name: "DokoLogging", package: "doko-logging"),
+      ]
+    ),
+    .target(
+      name: "VwElectrics",
       dependencies: [
         "VehicleInterface",
         "ParsingHelpers",

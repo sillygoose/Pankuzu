@@ -178,7 +178,7 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
             continue
           }
 
-          let obdCommandResponse = await connectedVehicleInterface.vehicleObdCommandResponse(command, commandResponse)
+          let obdCommandResponse = await connectedVehicleInterface.vehicleObdCommandResponse(command, commandResponse, rawCommand: obdLinkCommand)
           switch obdCommandResponse.result {
           case .ok:
             obdResponseDictionary[command] = obdCommandResponse
@@ -224,7 +224,8 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
   }
 
   private func waitForObdCommandResponse() async -> String? {
-    var iterator = obdResponseStream.makeAsyncIterator()
+    guard let stream = obdResponseStream else { return nil }
+    var iterator = stream.makeAsyncIterator()
     return await iterator.next()
   }
 

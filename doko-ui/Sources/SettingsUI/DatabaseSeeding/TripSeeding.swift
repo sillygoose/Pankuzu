@@ -65,18 +65,18 @@ extension DatabaseSeedingModel {
     return tripElevations
   }
 
-  func tripBatteryEnergy(_ tripStart: Date) -> [DokoDataPoint] { //### needs fixing
+  func tripBatteryEnergy(_ tripStart: Date) -> [DokoDataPoint] {
     let tripBatteryEnergy: [DokoDataPoint] = [
-      DokoDataPoint(timestamp: tripStart.addingTimeInterval(0), double: 82.64 - 82.64),
-      DokoDataPoint(timestamp: tripStart.addingTimeInterval(30), double: 82.566 - 82.64),
-      DokoDataPoint(timestamp: tripStart.addingTimeInterval(60), double: 82.472 - 82.566),
-      DokoDataPoint(timestamp: tripStart.addingTimeInterval(90), double: 82.412 - 82.472),
-      DokoDataPoint(timestamp: tripStart.addingTimeInterval(120), double: 82.234 - 82.412),
-      DokoDataPoint(timestamp: tripStart.addingTimeInterval(150), double: 82.078 - 82.234),
-      DokoDataPoint(timestamp: tripStart.addingTimeInterval(180), double: 82.068 - 82.078),
-      DokoDataPoint(timestamp: tripStart.addingTimeInterval(210), double: 82.014 - 82.068),
-      DokoDataPoint(timestamp: tripStart.addingTimeInterval(240), double: 82.06 - 82.014),
-      DokoDataPoint(timestamp: tripStart.addingTimeInterval(255), double: 82.052 - 82.06),
+      DokoDataPoint(timestamp: tripStart.addingTimeInterval(0), double: 0.0),
+      DokoDataPoint(timestamp: tripStart.addingTimeInterval(30), double: -0.074),
+      DokoDataPoint(timestamp: tripStart.addingTimeInterval(60), double: -0.094),
+      DokoDataPoint(timestamp: tripStart.addingTimeInterval(90), double: -0.06),
+      DokoDataPoint(timestamp: tripStart.addingTimeInterval(120), double: -0.178),
+      DokoDataPoint(timestamp: tripStart.addingTimeInterval(150), double: -0.156),
+      DokoDataPoint(timestamp: tripStart.addingTimeInterval(180), double: -0.01),
+      DokoDataPoint(timestamp: tripStart.addingTimeInterval(210), double: -0.054),
+      DokoDataPoint(timestamp: tripStart.addingTimeInterval(240), double: 0.046),
+      DokoDataPoint(timestamp: tripStart.addingTimeInterval(255), double: -0.008),
     ]
     return tripBatteryEnergy
   }

@@ -2,10 +2,10 @@ import SwiftUI
 import OSLog
 import UniformTypeIdentifiers
 
-import Sharing
 import CasePaths
 import SwiftUINavigation
 
+import DokoSharing
 import DokoSchema
 import TripsUI
 import ChargesUI
@@ -29,19 +29,15 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
   }
 }
 
-@MainActor
-@Observable
-class DatabaseSettingsModel {
-  @ObservationIgnored
-  @FetchAll(
+@MainActor @Observable class DatabaseSettingsModel {
+  @ObservationIgnored @FetchAll(
     Trip
       .where { $0.isDeleted }
       .order { $0.deletedOrdering },
     animation: .default
   ) var deletedTrips
   
-  @ObservationIgnored
-  @FetchAll(
+  @ObservationIgnored @FetchAll(
     Charge
       .where { $0.isDeleted }
       .order { $0.deletedOrdering },
@@ -65,10 +61,9 @@ class DatabaseSettingsModel {
   ) {
     self.destination = destination
   }
-  
-  @ObservationIgnored
-  @Dependency(\.defaultDatabase) var database
-  
+
+  @ObservationIgnored @Dependency(\.defaultDatabase) var database
+
   func alertButtonTapped(_ action: AlertAction?) async {
     switch action {
     case .confirmDeleteDatabase:
@@ -153,7 +148,8 @@ struct DatabaseSettingsView: View {
   @Shared(.deletedTripsExpanded) var deletedTripsExpanded
   @Shared(.deletedChargesExpanded) var deletedChargesExpanded
   @Shared(.databaseSaveRestoreExpanded) var databaseSaveRestoreExpanded
-  
+  @Shared(.deletedRecordRetentionDays) var deletedRecordRetentionDays
+
   @State var showFileImporter: Bool = false
   @State var showFileExporter: Bool = false
   
@@ -222,42 +218,56 @@ struct DatabaseSettingsView: View {
       }
       
       Section {
-        ForEach(model.deletedTrips.enumerated(), id: \.element.id) { index, trip in
-          NavigationLink(
-            destination:
-              TripDetailView(
-                model: TripDetailModel(tripID: trip.id)
-              )
-          ) {
-            TripRow(trip: trip)
-              .rowFormatter(index)
+        DisclosureGroup(
+          isExpanded: Binding(
+            get: { deletedTripsExpanded },
+            set: { newValue in $deletedTripsExpanded.withLock { $0 = newValue } }
+          )
+        ) {
+          ForEach(model.deletedTrips.enumerated(), id: \.element.id) { index, trip in
+            NavigationLink(
+              destination:
+                TripDetailView(
+                  model: TripDetailModel(tripID: trip.id)
+                )
+            ) {
+              TripRow(trip: trip)
+                .rowFormatter(index)
+            }
           }
+        } label: {
+          Text("Deleted Trips (\(model.deletedTrips.count))")
+            .font(.headline)
         }
-      } header: {
-        Text("Deleted Trips (\(model.deletedTrips.count))")
-          .font(.headline)
       } footer: {
-        Text("Deleted trips are available here for 30 days. After that time, they will be permanently deleted.")
+        Text("Deleted trips are available here for \(deletedRecordRetentionDays) days. After that time, they will be permanently deleted.")
           .font(.caption)
       }
-      
+
       Section {
-        ForEach(model.deletedCharges.enumerated(), id: \.element.id) { index, charge in
-          NavigationLink(
-            destination:
-              ChargeDetailView(
-                model: ChargeDetailModel(chargeID: charge.id)
-              )
-          ) {
-            ChargeRow(charge: charge)
-              .rowFormatter(index)
+        DisclosureGroup(
+          isExpanded: Binding(
+            get: { deletedChargesExpanded },
+            set: { newValue in $deletedChargesExpanded.withLock { $0 = newValue } }
+          )
+        ) {
+          ForEach(model.deletedCharges.enumerated(), id: \.element.id) { index, charge in
+            NavigationLink(
+              destination:
+                ChargeDetailView(
+                  model: ChargeDetailModel(chargeID: charge.id)
+                )
+            ) {
+              ChargeRow(charge: charge)
+                .rowFormatter(index)
+            }
           }
+        } label: {
+          Text("Deleted Charges (\(model.deletedCharges.count))")
+            .font(.headline)
         }
-      } header: {
-        Text("Deleted Charges (\(model.deletedCharges.count))")
-          .font(.headline)
       } footer: {
-        Text("Deleted charges are available here for 30 days. After that time, they will be permanently deleted.")
+        Text("Deleted charges are available here for \(deletedRecordRetentionDays) days. After that time, they will be permanently deleted.")
           .font(.caption)
       }
     }
@@ -271,6 +281,7 @@ struct DatabaseSettingsView: View {
         if editMode?.wrappedValue == .active {
           Button {
             model.undeleteSelectedItems()
+            editMode?.wrappedValue = .inactive
           } label: {
             Text("Restore")
             Image(systemName: "list.bullet.clipboard.fill")
@@ -291,6 +302,9 @@ struct DatabaseSettingsView: View {
     }
     .alert($model.destination.alert) { action in
       await model.alertButtonTapped(action)
+      if action == .confirmDeleteTripsAndCharges {
+        await MainActor.run { editMode?.wrappedValue = .inactive }
+      }
     }
     .task(id: backupFilename) {
       guard let _ = backupFilename else { return }
@@ -440,8 +454,8 @@ extension AlertState where Action == DatabaseSettingsModel.AlertAction {
 
 #Preview("Default") {
   let _ = prepareDependencies {
-    try! $0.bootstrapDatabase()
-    try! $0.defaultDatabase.seedPreviews()
+    try? $0.bootstrapDatabase()
+    try? $0.defaultDatabase.seedPreviews()
   }
   NavigationStack {
     DatabaseSettingsView(
@@ -451,10 +465,24 @@ extension AlertState where Action == DatabaseSettingsModel.AlertAction {
   }
 }
 
+#Preview("Edit Mode") {
+  let _ = prepareDependencies {
+    try? $0.bootstrapDatabase()
+    try? $0.defaultDatabase.seedPreviews()
+  }
+  NavigationStack {
+    DatabaseSettingsView(
+      model: DatabaseSettingsModel()
+    )
+    .environment(\.editMode, .constant(.active))
+    .preferredColorScheme(.dark)
+  }
+}
+
 #Preview("Trip/Charge Delete") {
   let _ = prepareDependencies {
-    try! $0.bootstrapDatabase()
-    try! $0.defaultDatabase.seedPreviews()
+    try? $0.bootstrapDatabase()
+    try? $0.defaultDatabase.seedPreviews()
   }
   NavigationStack {
     DatabaseSettingsView(
@@ -468,8 +496,8 @@ extension AlertState where Action == DatabaseSettingsModel.AlertAction {
 
 #Preview("Database Deletion") {
   let _ = prepareDependencies {
-    try! $0.bootstrapDatabase()
-    try! $0.defaultDatabase.seedPreviews()
+    try? $0.bootstrapDatabase()
+    try? $0.defaultDatabase.seedPreviews()
   }
   NavigationStack {
     DatabaseSettingsView(

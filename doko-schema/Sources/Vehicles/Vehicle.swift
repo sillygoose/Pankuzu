@@ -74,6 +74,7 @@ public enum ModelIdentifier: String, Equatable {
   case miTNPE = "TNPE"
   case miCMPE = "CMPE"
   case miCNPE = "CNPE"
+  case miJSPE = "JSPE"
 
   public var description: String {
     switch self {
@@ -103,7 +104,7 @@ public enum ModelIdentifier: String, Equatable {
       return "ID.4 S"
     case .miVMPE, .miVNPE, .miCMPE, .miCNPE, .miDMPE, .miDNPE:
       return "ID.4 Pro"
-    case .miGMPE, .miGNPE, .miTMPE, .miTNPE:
+    case .miGMPE, .miGNPE, .miTMPE, .miTNPE, .miJSPE:
       return "ID.4 Pro S"
 
     case .miUNKNOWN:

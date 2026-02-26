@@ -4,7 +4,7 @@ import DokoLogging
 import ObdLinkCore
 
 extension UndeterminedVehicle {
-  public func vehicleObdCommandResponse(_ command: ObdCommand, _ response: String) async -> ObdCommandResponse {
+  public func vehicleObdCommandResponse(_ command: ObdCommand, _ response: String, rawCommand: String) async -> ObdCommandResponse {
     self.logger.info("\(timestamp()) UV.parsedResponse(\(command.description), \(response))")
     let result: ObdResult = .ok
     do {
@@ -22,15 +22,13 @@ extension UndeterminedVehicle {
         commandResponse = .ats0
       case .stcsegr1:
         commandResponse = .stcsegr1
-      case .stp33:
-        commandResponse = .stp33
-      case .stp34:
-        commandResponse = .stp34
-
-      case .odometerAvailable:
-        let odometerAvailable = try parseOdometerAvailable(response)
-        commandResponse = .odometerAvailable(odometerAvailable)
-
+      case .atsp0:
+        commandResponse = .atsp0
+      case .stprs:
+        commandResponse = .stprs(response)
+        
+      case .extendedDiagnosticSession:
+        commandResponse = .extendedDiagnosticSession
       case .vin:
         let vin = try parseVin(response)
         commandResponse = .vin(vin)
@@ -38,12 +36,12 @@ extension UndeterminedVehicle {
       default:
         throw ParsedResponseError.unexpectedCommand(command, response)
       }
-      return ObdCommandResponse(command: command, result: result, response: commandResponse)
+      return ObdCommandResponse(command: command, result: result, response: commandResponse, rawCommand: rawCommand, rawResponse: response)
     } catch {
       let errorResult = ObdResult.getObdError(errorString: response)
       DokoLogging.shared.postLoggingResponse(.error("\(command.description)(\(errorResult.description))"))
       let errorResponse: ObdResponse = .obdError(command.description, errorResult.description)
-      return ObdCommandResponse(command: command, result: errorResult, response: errorResponse)
+      return ObdCommandResponse(command: command, result: errorResult, response: errorResponse, rawCommand: rawCommand, rawResponse: response)
     }
   }
 }

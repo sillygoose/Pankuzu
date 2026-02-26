@@ -82,6 +82,12 @@ extension SharedKey where Self == AppStorageKey<Double>.Default {
   }
 }
 
+extension SharedKey where Self == AppStorageKey<Int>.Default {
+  public static var deletedRecordRetentionDays: Self {
+    Self[.appStorage("ApplicationSettings-deletedRecordRetentionDays"), default: 30]
+  }
+}
+
 public enum DisplayMapStyle: String, CaseIterable, Equatable, Identifiable, Sendable {
   case standard
   case hybrid

@@ -2,16 +2,17 @@ import Foundation
 import OSLog
 
 import SQLiteData
-//import Sharing
 
 import DokoSharing
 import DokoTypes
 import DokoLogging
 import DokoSharing
+
 import Vehicles
 import VehicleInterface
 import UndeterminedVehicle
 import FordElectrics
+import VwElectrics
 
 extension SharedKey where Self == InMemoryKey<ConnectedVehicleInterface>.Default {
   public static var connectedVehicleInterface: Self {
@@ -109,12 +110,12 @@ extension DokoVehicleManager {
   public enum VehicleType: CaseIterable {
     case undetermined
     case fordElectric
-//    case vwElectric
+    case vwElectric
     public var description: String {
       switch self {
       case .undetermined: return "Undetermined"
       case .fordElectric: return "Ford Electric"
-//      case .vwEletric: return "VW Electric"
+      case .vwElectric: return "VW Electric"
       }
     }
   }
@@ -129,38 +130,39 @@ extension DokoVehicleManager {
         return UndeterminedVehicle()
       case .fordElectric:
         return FordElectrics(vehicle: vehicle)
-//      case .vwElectric:
-//        return VwElectrics(vicle: vehicle)
+      case .vwElectric:
+        return VwElectrics(vehicle: vehicle)
       }
     }()
     return vehicleInterface
   }
 
-  public func setVin(vin: String?) {
+  public func setVin(vin: String?) -> Vehicle? {
     @FetchAll var vehicles: [Vehicle]
     @Shared(.connectedVehicleInterface) var connectedVehicleInterface
     guard let vin = vin else {
       self.logger.debug("\(timestamp()) DVM.setVin(nil)")
       $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: nil) }
-      return
+      return nil
     }
     self.logger.debug("\(timestamp()) DVM.setVin(\(vin))")
     if let vehicle = vehicles.first(where: { $0.vin == vin }) {
       let vehicleType = lookupVehicleType(modelIdentifier: vehicle.modelIdentifier)
       self.logger.debug("\(timestamp()) DVM.setVin: \(vehicle.modelIdentifier.description), \(vehicleType.description)")
       $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: vehicle) }
-      return
+      return vehicle
     }
 
     let newVehicle = Vehicle(vin: vin)
     guard let _ = addVehicle(newVehicle: newVehicle) else {
       DokoLogging.shared.postLoggingResponse(.error("DVM.setVin: could not add new vehicle"))
-      return
+      return nil
     }
     let vehicleType = lookupVehicleType(modelIdentifier: newVehicle.modelIdentifier)
     self.logger.debug("\(timestamp()) DVM.setVin: \(newVehicle.modelIdentifier.description), \(vehicleType.description)")
     DokoLogging.shared.postLoggingResponse(.connect("DVM.setVin(\(vehicleType))"))
     $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: newVehicle) }
+    return newVehicle
   }
 
   private func lookupVehicleType(modelIdentifier: ModelIdentifier) -> VehicleType {
@@ -168,9 +170,10 @@ extension DokoVehicleManager {
       .miTK1R: .fordElectric, .miTK1S: .fordElectric, .miTK2R: .fordElectric, .miTK3R: .fordElectric, .miTK3S: .fordElectric, .miTK4S: .fordElectric,
       .mi6W1E: .fordElectric, .mi6W3L: .fordElectric, .mi6W5L: .fordElectric, .miVW1E: .fordElectric, .miVW1B: .fordElectric,
       .miVW3L: .fordElectric, .miVW5L: .fordElectric, .miVW7L: .fordElectric,
-//      .mi5MPE: .vwElectric, .mi5NPE: .vwElectric, .miVMPE: .vwElectric, .miVNPE: .vwElectric, .miDMPE: .vwElectric,
-//      .miDNPE: .vwElectric, .miGMPE: .vwElectric, .miGNPE: .vwElectric, .miTMPE: .vwElectric, .miTNPE: .vwElectric,
-//      .miCMPE: .vwElectric, .miCNPE: .vwElectric
+      
+      .mi5MPE: .vwElectric, .mi5NPE: .vwElectric, .miVMPE: .vwElectric, .miVNPE: .vwElectric, .miDMPE: .vwElectric,
+      .miDNPE: .vwElectric, .miGMPE: .vwElectric, .miGNPE: .vwElectric, .miTMPE: .vwElectric, .miTNPE: .vwElectric,
+      .miCMPE: .vwElectric, .miCNPE: .vwElectric, .miJSPE: .vwElectric
     ]
     guard let vehicleType = vehicleTypeDictionary[modelIdentifier] else {
       DokoLogging.shared.postLoggingResponse(.error("DVM.lookupVehicleType(.undetermined)"))

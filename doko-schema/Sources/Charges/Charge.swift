@@ -132,9 +132,9 @@ extension Charge.TableColumns {
   public var isNoCharge: some QueryExpression<Bool> { return chargerType == Charge.ChargerType.none }
   public var isDeleted: some QueryExpression<Bool> {  return deleted != nil  }
   public var deletedOrdering: some QueryExpression { return deleted.desc()  }
-  public var readyForDeletion: some QueryExpression<Bool> {
+  public func readyForDeletion(days: Int = 30) -> some QueryExpression<Bool> {
     @Dependency(\.date.now) var now
-    let shouldDelete = Calendar.current.date(byAdding: .day, value: -1, to: now)! //### 1 day for testing
+    let shouldDelete = Calendar.current.date(byAdding: .day, value: -days, to: now)!
     return #sql("coalesce(date(\(deleted)) > date(\(shouldDelete)), 0)")
   }
 }

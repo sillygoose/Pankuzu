@@ -27,20 +27,23 @@ extension ObdResponsePacket {
     guard case .stcsegr1? = responses[.stcsegr1]?.response else { return nil }
     return ".stcsegr1"
   }
-  
-  public var stp33: String? {
-    guard case .stp33? = responses[.stp33]?.response else { return nil }
+  public var atsp0: String? {
+    guard case .atsp0? = responses[.atsp0]?.response else { return nil }
     return ".stp33"
   }
-  public var stp34: String? {
-    guard case .stp34? = responses[.stp34]?.response else { return nil }
-    return ".stp34"
-  }
-  
-  public var odometerAvailable: Bool? {
-    guard case let .odometerAvailable(v)? = responses[.odometerAvailable]?.response else { return nil }
+  public var stprs: String? {
+    guard case let .stprs(v)? = responses[.stprs]?.response else { return nil }
     return v
   }
+
+//  public var stp33: String? {
+//    guard case .stp33? = responses[.stp33]?.response else { return nil }
+//    return ".stp33"
+//  }
+//  public var stp34: String? {
+//    guard case .stp34? = responses[.stp34]?.response else { return nil }
+//    return ".stp34"
+//  }
   
   public var vin: String? {
     guard case let .vin(v)? = responses[.vin]?.response else { return nil }
@@ -52,16 +55,21 @@ extension ObdResponsePacket {
     return v
   }
   
-  public var pluggedIn: Bool? {
-    guard case let .pluggedIn(v)? = responses[.pluggedIn]?.response else { return nil }
+//  public var pluggedIn: Bool? {
+//    guard case let .pluggedIn(v)? = responses[.pluggedIn]?.response else { return nil }
+//    return v
+//  }
+  
+  public var obdOdometer: Double? {
+    guard case let .obdOdometer(v)? = responses[.obdOdometer]?.response else { return nil }
     return v
   }
-  
+
   public var odometer: Double? {
     guard case let .odometer(v)? = responses[.odometer]?.response else { return nil }
     return v
   }
-  
+
   public var stateOfCharge: Double? {
     guard case let .stateOfCharge(v)? = responses[.stateOfCharge]?.response else { return nil }
     return v

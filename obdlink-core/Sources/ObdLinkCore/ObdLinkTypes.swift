@@ -9,13 +9,14 @@ public enum ObdCommand: Equatable, Sendable {
   case ath0
   case atcaf1
   case ats0
+  case atsp0
   case stcsegr1
-  case stp33, stp34
+  case stprs
+  case extendedDiagnosticSession
   
-  case odometerAvailable
-  case vin, odometer
+  case vin
+  case odometer, obdOdometer
 
-  case pluggedIn
   case gearSelected
   case distanceToEmpty
 
@@ -54,20 +55,20 @@ public enum ObdCommand: Equatable, Sendable {
         return ".atcaf1"
       case .ats0:
         return ".ats0"
+      case .atsp0:
+        return ".atsp0"
       case .stcsegr1:
         return ".stcsegr1"
-      case .stp33:
-        return ".stp33"
-      case .stp34:
-        return ".stp34"
-      case .odometerAvailable:
-        return ".odometerAvailable"
+      case .stprs:
+        return ".stprs"
+      case .extendedDiagnosticSession:
+        return ".extendedDiagnosticSession"
       case .vin:
         return ".vin"
       case .odometer:
         return ".odometer"
-      case .pluggedIn:
-        return ".pluggedIn"
+      case .obdOdometer:
+        return ".obdOdometer"
       case .gearSelected:
         return ".gearSelected"
       case .distanceToEmpty:
@@ -185,14 +186,15 @@ public enum ObdResponse: Equatable, Sendable {
   case ath0
   case atcaf1
   case ats0
-  case stp33, stp34
+  case atsp0
+  case stprs(String)
   case stcsegr1
+  case extendedDiagnosticSession
 
-  case odometerAvailable(Bool)
   case vin(String)
   case odometer(Double)
+  case obdOdometer(Double)
 
-  case pluggedIn(Bool)
   case gearSelected(Bool)
   case distanceToEmpty(Double)
 
@@ -233,22 +235,22 @@ public enum ObdResponse: Equatable, Sendable {
         return ".atcaf1"
       case .ats0:
         return ".ats0"
-      case .stp33:
-        return ".stp33"
-      case .stp34:
-        return ".stp34"
+      case .atsp0:
+        return ".atsp0"
+      case .stprs(let pstring):
+        return ".stprs(\(pstring))"
       case .stcsegr1:
         return ".stcsegr1"
+      case .extendedDiagnosticSession:
+        return ".extendedDiagnosticSession"
         
-      case .odometerAvailable(let odometerAvailable):
-        return ".odometerAvailable(\(odometerAvailable))"
       case .vin(let vin):
         return ".vin(\(vin))"
       case .odometer(let odometer):
         return String(format: ".odometer(%.1f)", odometer)
+      case .obdOdometer(let obdOdometer):
+        return String(format: ".obdOdometer(%.1f)", obdOdometer)
 
-      case .pluggedIn(let pluggedIn):
-        return ".pluggedIn(\(pluggedIn))"
       case .gearSelected(let gear):
         return ".gearSelected(\(gear))"
       case .distanceToEmpty(let dte):
@@ -292,11 +294,15 @@ public struct ObdCommandResponse: Equatable, Sendable {
   public let command: ObdCommand
   public let result: ObdResult
   public let response: ObdResponse
+  public let rawCommand: String
+  public let rawResponse: String
 
-  public init(command: ObdCommand, result: ObdResult, response: ObdResponse) {
+  public init(command: ObdCommand, result: ObdResult, response: ObdResponse, rawCommand: String, rawResponse: String) {
     self.command = command
     self.result = result
     self.response = response
+    self.rawCommand = rawCommand
+    self.rawResponse = rawResponse
   }
 }
 

@@ -118,21 +118,21 @@ public final class DokoStateEngine {
             let nextState = dokoResponsePacket.nextState ?? .reset
             $vehicleState.withLock { $0 = nextState }
 
-          case .protocolCheck(_):
-            guard case .protocolCheck(_) = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
-            let nextState = dokoResponsePacket.nextState ?? .protocolCheck(.iso15765_11bit)
-            $vehicleState.withLock { $0 = nextState }
-
           case .vin:
             guard case .vin = vehicleState else {
               throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
             }
-            let nextState = dokoResponsePacket.nextState ?? .vin
-            if let vin = dokoResponsePacket.vin {
-              DokoVehicleManager.shared.setVin(vin: vin)
+            var nextState: VehicleState = .vin
+            if let vin = dokoResponsePacket.vin, let _ = DokoVehicleManager.shared.setVin(vin: vin) {
+              nextState = dokoResponsePacket.nextState ?? .vin
             }
+            $vehicleState.withLock { $0 = nextState }
+
+          case .vehicleCapabilities:
+            guard case .vehicleCapabilities = vehicleState else {
+              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
+            }
+            let nextState = dokoResponsePacket.nextState ?? .vehicleCapabilities
             $vehicleState.withLock { $0 = nextState }
             
           case .idle:
@@ -144,22 +144,24 @@ public final class DokoStateEngine {
               await CoreLocationManager.shared.startLocationUpdates()
               DokoWeatherManager.shared.startWeatherService()
               await DokoNotificationManager.shared.startTripNotification(vehicle: connectedVehicle.vehicle?.makeModel ?? "Unknown")
-            }
-            if nextState != .idle {
-              $vehicleState.withLock { $0 = nextState }
-            }
-
-          case .pluggedIn:
-            guard case .pluggedIn = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
-            let nextState = dokoResponsePacket.nextState ?? .pluggedIn
-            if nextState == .acChargeStarting || nextState == .dcChargeStarting {
+            } else if nextState == .acChargeStarting || nextState == .dcChargeStarting {
               await CoreLocationManager.shared.startLocationUpdates()
               DokoWeatherManager.shared.startWeatherService()
               await DokoNotificationManager.shared.startChargeNotification(vehicle: connectedVehicle.vehicle?.makeModel ?? "Unknown")
             }
-            if nextState != .pluggedIn { $vehicleState.withLock { $0 = nextState } }
+            if nextState != .idle { $vehicleState.withLock { $0 = nextState } }
+
+//          case .pluggedIn:
+//            guard case .pluggedIn = vehicleState else {
+//              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
+//            }
+//            let nextState = dokoResponsePacket.nextState ?? .pluggedIn
+//            if nextState == .acChargeStarting || nextState == .dcChargeStarting {
+//              await CoreLocationManager.shared.startLocationUpdates()
+//              DokoWeatherManager.shared.startWeatherService()
+//              await DokoNotificationManager.shared.startChargeNotification(vehicle: connectedVehicle.vehicle?.makeModel ?? "Unknown")
+//            }
+//            if nextState != .pluggedIn { $vehicleState.withLock { $0 = nextState } }
 
           case .tripStarting:
             guard case .tripStarting = vehicleState else {
@@ -333,7 +335,7 @@ public final class DokoStateEngine {
               throw StateEngineError.chargeArgumentError
             }
             var nextState = dokoResponsePacket.nextState ?? .acChargeEnding
-            if nextState == .pluggedIn {
+            if nextState == .idle {
               do {
                 try Charge.postChargeEndRecord(chargeDraft: chargeDraft, chargeEndResponse: dokoResponsePacket)
                 self.chargeInProgress = nil
@@ -385,7 +387,7 @@ public final class DokoStateEngine {
               throw StateEngineError.chargeArgumentError
             }
             var nextState = dokoResponsePacket.nextState ?? .dcChargeEnding
-            if nextState == .pluggedIn {
+            if nextState == .idle {
               do {
                 try Charge.postChargeEndRecord(chargeDraft: chargeDraft, chargeEndResponse: dokoResponsePacket)
                 self.chargeInProgress = nil

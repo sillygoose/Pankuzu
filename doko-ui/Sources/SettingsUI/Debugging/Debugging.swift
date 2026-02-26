@@ -76,7 +76,7 @@ class DebuggingModel {
         text = "\(timestamp(responsePacket.completedAt)) \(responsePacket.type.description)"
       case .obd(let responsePacket):
         let responseCount = responsePacket.responses.count
-        let response = responsePacket.responses.compactMap { _, response in response.response.description }.joined(separator: "\n  ")
+        let response = responsePacket.responses.compactMap { _, response in "\(response.response.description) [\(response.rawCommand) → \(response.rawResponse)]" }.joined(separator: "\n  ")
         if responseCount < 2 {
           text = "\(timestamp(responsePacket.completedAt)) \(responsePacket.type.description)(\(response))"
         } else {
@@ -132,48 +132,54 @@ struct DebuggingView: View {
           set: { newValue in $loggingExpanded.withLock { $0 = newValue } }
         )
       ) {
-        Toggle(
-          "Log Packets",
-          isOn: Binding(
-            get: { model.logDokoPackets },
-            set: { isOn, _ in model.$logDokoPackets.withLock { $0 = isOn } }
+        Section {
+          Toggle(
+            "Application",
+            isOn: Binding(
+              get: { model.logDokoPackets },
+              set: { isOn, _ in model.$logDokoPackets.withLock { $0 = isOn } }
+            )
           )
-        )
-        Toggle(
-          "Log Device Packets",
-          isOn: Binding(
-            get: { model.logObdPackets },
-            set: { isOn, _ in model.$logObdPackets.withLock { $0 = isOn } }
+          Toggle(
+            "OBDLink Device",
+            isOn: Binding(
+              get: { model.logObdPackets },
+              set: { isOn, _ in model.$logObdPackets.withLock { $0 = isOn } }
+            )
           )
-        )
-        Toggle(
-          "Info",
-          isOn: Binding(
-            get: { model.logInfoPackets },
-            set: { isOn, _ in model.$logInfoPackets.withLock { $0 = isOn } }
+          Toggle(
+            "Info",
+            isOn: Binding(
+              get: { model.logInfoPackets },
+              set: { isOn, _ in model.$logInfoPackets.withLock { $0 = isOn } }
+            )
           )
-        )
-        Toggle(
-          "State/Schedulers",
-          isOn: Binding(
-            get: { model.logStatePackets },
-            set: { isOn, _ in model.$logStatePackets.withLock { $0 = isOn } }
+          Toggle(
+            "State/Schedulers",
+            isOn: Binding(
+              get: { model.logStatePackets },
+              set: { isOn, _ in model.$logStatePackets.withLock { $0 = isOn } }
+            )
           )
-        )
-        Toggle(
-          "Location",
-          isOn: Binding(
-            get: { model.logLocationPackets },
-            set: { isOn, _ in model.$logLocationPackets.withLock { $0 = isOn } }
+          Toggle(
+            "Location",
+            isOn: Binding(
+              get: { model.logLocationPackets },
+              set: { isOn, _ in model.$logLocationPackets.withLock { $0 = isOn } }
+            )
           )
-        )
-        Toggle(
-          "Live Activity",
-          isOn: Binding(
-            get: { model.logLiveActivityPackets },
-            set: { isOn, _ in model.$logLiveActivityPackets.withLock { $0 = isOn } }
+          Toggle(
+            "Live Activity",
+            isOn: Binding(
+              get: { model.logLiveActivityPackets },
+              set: { isOn, _ in model.$logLiveActivityPackets.withLock { $0 = isOn } }
+            )
           )
-        )
+        } footer: {
+          Text(
+            "Enable log entries to help solve specific problems. Errors and connections are always logged but others should be disabled when not required."
+          )
+        }
       } label: {
         Text("Logging")
       }
@@ -276,7 +282,7 @@ struct DebuggingView: View {
                 case .obd(let responsePacket):
                   let responseCount = responsePacket.responses.count
                   let response = responsePacket.responses
-                    .compactMap { _, response in response.response.description }.joined(separator: "\n  ")
+                    .compactMap { _, response in "\(response.response.description) [\(response.rawCommand) → \(response.rawResponse)]" }.joined(separator: "\n  ")
                   if responseCount < 2 {
                     Text("\(timestamp(responsePacket.completedAt)) \(responsePacket.type.description)(\(response))")
                       .frame(maxWidth: .infinity, alignment: .leading)

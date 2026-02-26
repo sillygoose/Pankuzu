@@ -8,14 +8,14 @@ public struct ChargeRow: View {
   let charge: Charge
 
   var vehicle: Vehicle?
-  var location: Location?
+  var location: Location
 
   public init(
     charge: Charge
   ) {
     self.charge = charge
     self.vehicle = DokoVehicleManager.shared.lookup(id: charge.vehicleID)
-    self.location = DokoLocationManager.shared.lookup(id: charge.locationID) //### honest Location
+    self.location = DokoLocationManager.shared.lookup(id: charge.locationID)
   }
 
   public var body: some View {
@@ -23,13 +23,9 @@ public struct ChargeRow: View {
       VStack(alignment: .leading) {
         Text("\(charge.timeStart.formatted(date: .numeric, time: .shortened))")
         Spacer()
-        if let location = location {
-          Text("\(location.placeName), \(location.cityState)")
-            .multilineTextAlignment(.leading)
-            .fixedSize(horizontal: false, vertical: true)
-        } else {
-          Text("In Progress")
-        }
+        Text("\(location.placeName), \(location.cityState)")
+          .multilineTextAlignment(.leading)
+          .fixedSize(horizontal: false, vertical: true)
       }
       .font(.headline)
       Spacer()

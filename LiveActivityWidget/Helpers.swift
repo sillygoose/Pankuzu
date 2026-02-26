@@ -11,7 +11,7 @@ struct MeasurementValueView<U: Dimension>: View {
   var body: some View {
     HStack(alignment: .firstTextBaseline, spacing: spacing) {
       Text(
-        measurement.formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(1))))
+        measurement.value.formatted(.number.precision(.fractionLength(1)))
       )
       Text(measurement.unit.symbol)
         .font(DesignTokens.Font.body)

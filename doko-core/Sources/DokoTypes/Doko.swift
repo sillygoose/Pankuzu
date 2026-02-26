@@ -86,8 +86,8 @@ public enum CanbusProtocol: Equatable, Hashable, Sendable {
 
 public enum VehicleState: Equatable, Hashable, Sendable {
   case reset
-  case protocolCheck(CanbusProtocol), vin
-  case idle, pluggedIn,
+  case vin, vehicleCapabilities
+  case idle,
        tripStarting, tripInProgress, tripEnding,
        acChargeStarting, acChargeInProgress, acChargeEnding,
        dcChargeStarting, dcChargeInProgress, dcChargeEnding
@@ -95,10 +95,9 @@ public enum VehicleState: Equatable, Hashable, Sendable {
   public var description: String {
     switch self {
     case .reset: return ".reset"
-    case .protocolCheck(let busProtocol): return ".iso15765(\(busProtocol.description))"
     case .vin: return ".vin"
+    case .vehicleCapabilities: return ".vehicleCapabilities"
     case .idle: return ".idle"
-    case .pluggedIn: return ".pluggedIn"
     case .tripStarting: return ".tripStarting"
     case .tripInProgress: return ".tripInProgress"
     case .tripEnding: return ".tripEnding"
@@ -113,9 +112,10 @@ public enum VehicleState: Equatable, Hashable, Sendable {
 }
 
 public enum DokoPacketType: Equatable, Hashable, Sendable {
-  case reset, protocolCheck(CanbusProtocol)
+  case reset
   case vin
-  case idle, pluggedIn
+  case vehicleCapabilities
+  case idle
 
   case tripStarting, tripInProgress, tripEnergy, tripUpdate, tripEnding
   case tripCorePosition, tripCoreElevation, tripData, tripWeather
@@ -128,15 +128,15 @@ public enum DokoPacketType: Equatable, Hashable, Sendable {
     switch self {
     case .reset:
       ".reset"
-    case .protocolCheck(let busProtocol):
-      ".protocol(\(busProtocol.description))"
     case .vin:
       ".vin"
+    case .vehicleCapabilities:
+      ".vehicleCapabilities"
 
     case .idle:
       ".idle"
-    case .pluggedIn:
-      ".pluggedIn"
+//    case .pluggedIn:
+//      ".pluggedIn"
 
     case .tripStarting:
       ".tripStarting"
@@ -195,13 +195,14 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case error
   
   case reset
-  case protocolCheck
-  case odometerAvailable
+  case stprs
   case vin
+  case vehicleCapabilities
 
   case idle
-  case pluggedIn, inGear
-  case chargerStatus
+//  case pluggedIn, inGear
+//  case inGear
+//  case chargerStatus
   
   case tripStarting, tripInProgress, tripUpdate, tripEnding
   case tripEnergy, tripPosition, tripData, tripWeather
@@ -214,7 +215,7 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
 
   case position
   case weather, meanTemperature
-  case odometer
+  case odometer, obdOdometer
   case energyToEmpty
   case stateOfCharge
   case distanceToEmpty
@@ -240,21 +241,21 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
 
       case .reset:
         return ".reset"
-      case .protocolCheck:
-        return ".protocolCheck"
-      case .odometerAvailable:
-        return ".odometerAvailable"
+      case .stprs:
+        return ".stprs"
       case .vin:
         return ".vin"
+      case .vehicleCapabilities:
+        return ".vehicleCapabilities"
 
       case .idle:
         return ".idle"
-      case .pluggedIn:
-        return ".pluggedIn"
-      case .inGear:
-        return ".inGear"
-      case .chargerStatus:
-        return ".chargerStatus"
+//      case .pluggedIn:
+//        return ".pluggedIn"
+//      case .inGear:
+//        return ".inGear"
+//      case .chargerStatus:
+//        return ".chargerStatus"
 
       case .tripStarting:
         return ".tripStarting"
@@ -307,7 +308,9 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".meanTemperature"
       case .odometer:
         return ".odometer"
-        
+      case .obdOdometer:
+        return ".obdOdometer"
+
       case .energyToEmpty:
         return ".energyToEmpty"
       case .stateOfCharge:
@@ -342,23 +345,23 @@ public struct DokoCommandResponse: Equatable, Sendable {
 }
 
 public enum DokoResponse: Equatable, Sendable {
-
   case nextState(VehicleState)
   case error(String)
   
   case reset(String)
-  case odometerAvailable(Bool)
+  case stprs(String)
   case vin(String)
 
-  case pluggedIn(Bool)
-  case inGear(Bool)
-  case chargerStatus(Bool)
+//  case pluggedIn(Bool)
+//  case inGear(Bool)
+//  case chargerStatus(Bool)
 
   case position(DokoPosition)
   case weather(DokoCurrentWeather)
   case meanTemperature(Double)
   case odometer(Double)
-  
+  case obdOdometer(Double)
+
   case energyToEmpty(Double)
   case stateOfCharge(Double)
   case distanceToEmpty(Double)
@@ -380,17 +383,17 @@ public enum DokoResponse: Equatable, Sendable {
 
       case .reset(let version):
         return ".reset(\(version))"
-      case .odometerAvailable(let odometerAvailable):
-        return ".odometerAvailable(\(odometerAvailable))"
+      case .stprs(let protocolString):
+        return ".stprs(\(protocolString))"
       case .vin(let vin):
         return ".vin(\(vin))"
 
-      case .pluggedIn(let state):
-        return ".pluggedIn(\(state))"
-      case .inGear(let state):
-        return ".inGear(\(state))"
-      case .chargerStatus(let state):
-        return ".chargerStatus(\(state))"
+//      case .pluggedIn(let state):
+//        return ".pluggedIn(\(state))"
+//      case .inGear(let state):
+//        return ".inGear(\(state))"
+//      case .chargerStatus(let state):
+//        return ".chargerStatus(\(state))"
 
       case let .position(position):
         return String(format: ".position(%.5f, %.5f, %.0f)", position.latitude, position.longitude, position.elevation)
@@ -400,7 +403,9 @@ public enum DokoResponse: Equatable, Sendable {
         return ".meanTemperature(\(String(format: "%.0f℃", temp)))"
       case .odometer(let odometer):
         return String(format: ".odometer(%.1f)", odometer)
-        
+      case .obdOdometer(let obdOdometer):
+        return String(format: ".obdOdometer(%.1f)", obdOdometer)
+
       case .energyToEmpty(let ete):
         return String(format: ".energyToEmpty(%.1f)", ete)
       case .stateOfCharge(let soc):
@@ -439,11 +444,6 @@ public struct DokoResponsePacket: Equatable, Sendable {
 extension DokoResponsePacket {
   public var nextState: VehicleState? {
     guard case let .nextState(v)? = responses[.nextState]?.response else { return nil }
-    return v
-  }
-
-  public var odometerAvailable: Bool? {
-    guard case let .odometerAvailable(v)? = responses[.odometerAvailable]?.response else { return nil }
     return v
   }
 

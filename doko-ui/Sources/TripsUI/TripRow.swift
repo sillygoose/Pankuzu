@@ -8,38 +8,30 @@ public struct TripRow: View {
   let trip: Trip
 
   var vehicle: Vehicle?
-  var fromLocation: Location?
-  var toLocation: Location?
+  var fromLocation: Location
+  var toLocation: Location
 
   public init(
     trip: Trip
   ) {
     self.trip = trip
     self.vehicle = DokoVehicleManager.shared.lookup(id: trip.vehicleID)
-    self.fromLocation = DokoLocationManager.shared.lookup(id: trip.originID) //### honest Location
-    self.toLocation = DokoLocationManager.shared.lookup(id: trip.destinationID) //### honest Location
+    self.fromLocation = DokoLocationManager.shared.lookup(id: trip.originID)
+    self.toLocation = DokoLocationManager.shared.lookup(id: trip.destinationID)
   }
-  
+
   public var body: some View {
     HStack {
       VStack(alignment: .leading) {
         Text("\(trip.timeStart.formatted(date: .numeric, time: .shortened))")
         Spacer()
-        if let fromLocation = fromLocation {
-          Text("\(fromLocation.placeNameCityState)")
-            .multilineTextAlignment(.leading)
-            .fixedSize(horizontal: false, vertical: true)
-        } else {
-          Text("Error: expected honest origin")
-        }
+        Text("\(fromLocation.placeNameCityState)")
+          .multilineTextAlignment(.leading)
+          .fixedSize(horizontal: false, vertical: true)
         Spacer()
-        if let toLocation = toLocation {
-          Text("\(toLocation.placeNameCityState)")
-            .multilineTextAlignment(.leading)
-            .fixedSize(horizontal: false, vertical: true)
-        } else {
-          Text("Error: expected honest destination")
-        }
+        Text("\(toLocation.placeNameCityState)")
+          .multilineTextAlignment(.leading)
+          .fixedSize(horizontal: false, vertical: true)
       }
       .font(.body)
       Spacer()

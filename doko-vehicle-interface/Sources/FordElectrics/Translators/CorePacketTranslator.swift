@@ -6,10 +6,10 @@ import ObdLinkCore
 extension FordElectrics {
   public func vehicleDokoResponsePacket(_ responsePacket: ObdResponsePacket) async -> DokoResponsePacket {
     switch responsePacket.type {
+    case .vehicleCapabilities:
+      return vehicleCapabilitiesResponsePacket(responsePacket)
     case .idle:
       return idleResponsePacket(responsePacket)
-    case .pluggedIn:
-      return pluggedInResponsePacket(responsePacket)
       
     case .tripStarting:
       return tripStartingResponsePacket(responsePacket)
@@ -19,8 +19,6 @@ extension FordElectrics {
       return tripUpdateResponsePacket(responsePacket)
     case .tripEnergy:
       return tripEnergyResponsePacket(responsePacket)
-//    case .tripPosition:
-//      return tripPositionResponsePacket(responsePacket)
     case .tripData:
       return tripDataResponsePacket(responsePacket)
     case .tripWeather:
@@ -58,42 +56,34 @@ extension FordElectrics {
       return DokoResponsePacket(type: responsePacket.type, responses: [:])
     }
   }
-  
+
+  private func vehicleCapabilitiesResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+    var dokoResponses: DokoResponseDictionary = [:]
+    guard let odometer = responsePacket.odometer else {
+      return DokoResponsePacket(type: .vehicleCapabilities, responses: dokoResponses)
+    }
+    dokoResponses[.nextState] = DokoCommandResponse(command: .vehicleCapabilities, response: .nextState(.idle))
+    dokoResponses[.odometer] = DokoCommandResponse(command: .vehicleCapabilities, response: .odometer(odometer))
+    return DokoResponsePacket(type: .vehicleCapabilities, responses: dokoResponses)
+  }
+
   func idleResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
     guard
       let gearSelected = responsePacket.gearSelected,
-      let pluggedIn = responsePacket.pluggedIn
+      let acChargerStatus = responsePacket.acChargerStatus,
+      let dcChargerStatus = responsePacket.dcChargerStatus
     else {
       return DokoResponsePacket(type: .idle, responses: dokoResponses)
     }
     var nextState: VehicleState {
       if gearSelected { return .tripStarting }
-      if pluggedIn { return .pluggedIn }
+      if acChargerStatus { return .acChargeStarting }
+      if dcChargerStatus { return .dcChargeStarting }
       return .idle
     }
     dokoResponses[.nextState] = DokoCommandResponse(command: .idle, response: .nextState(nextState))
     return DokoResponsePacket(type: .idle, responses: dokoResponses)
   }
-  
-  func pluggedInResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
-    var dokoResponses: DokoResponseDictionary = [:]
-    guard
-      let pluggedIn = responsePacket.pluggedIn,
-      let acChargerStatus = responsePacket.acChargerStatus,
-      let dcChargerStatus = responsePacket.dcChargerStatus
-    else {
-      return DokoResponsePacket(type: .pluggedIn, responses: dokoResponses)
-    }
-    var nextState: VehicleState {
-      if !pluggedIn { return .idle }
-      if acChargerStatus { return .acChargeStarting }
-      if dcChargerStatus { return .dcChargeStarting }
-      return .pluggedIn
-    }
-    let chargeStatus = acChargerStatus || dcChargerStatus
-    dokoResponses[.nextState] = DokoCommandResponse(command: .pluggedIn, response: .nextState(nextState))
-    dokoResponses[.chargerStatus] = DokoCommandResponse(command: .pluggedIn, response: .chargerStatus(chargeStatus))
-    return DokoResponsePacket(type: .pluggedIn, responses: dokoResponses)
-  }
+ 
 }

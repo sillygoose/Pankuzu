@@ -7,23 +7,16 @@ import CommonUI
 import DokoSchema
 import DokoSharing
 
-@MainActor
-@Observable
-public final class SettingsModel {
-  @ObservationIgnored
-  @FetchOne(Vehicle.select { Stats.Columns(count: $0.count()) })
+@MainActor @Observable public final class SettingsModel {
+  @ObservationIgnored @FetchOne(Vehicle.select { Stats.Columns(count: $0.count()) })
   var vehicleStats = Stats()
 
-  @ObservationIgnored
-  @FetchOne(Location.where { !$0.isDeleted && !$0.isHidden }.select { Stats.Columns(count: $0.count()) })
+  @ObservationIgnored @FetchOne(Location.where { !$0.isDeleted && !$0.isHidden }.select { Stats.Columns(count: $0.count()) })
   var locationStats = Stats()
 
-  @ObservationIgnored
-  @Shared(.connectedAccessory) var connectedAccessory
-  @ObservationIgnored
-  @Shared(.connectedVehicleModel) var connectedVehicleModel
-  @ObservationIgnored
-  @Shared(.activeSession) var activeSession
+  @ObservationIgnored @Shared(.connectedAccessory) var connectedAccessory
+  @ObservationIgnored @Shared(.connectedVehicleModel) var connectedVehicleModel
+  @ObservationIgnored @Shared(.activeSession) var activeSession
 
   public init() {}
 
@@ -32,20 +25,6 @@ public final class SettingsModel {
     var count = 0
   }
 }
-
-//extension View {
-//  func sessionToolbar(
-//    connectedAccessory: String?,
-//    connectedVehicleModel: String?,
-//    activeSession: ActiveSession?
-//  ) -> some View {
-//    modifier(SessionToolbar(
-//      connectedAccessory: connectedAccessory,
-//      connectedVehicleModel: connectedVehicleModel,
-//      activeSession: activeSession
-//    ))
-//  }
-//}
 
 public struct SettingsView: View {
   @Bindable var model: SettingsModel
@@ -197,8 +176,8 @@ public struct SettingsView: View {
 
 #Preview {
   let _ = prepareDependencies {
-    try! $0.bootstrapDatabase()
-    try! $0.defaultDatabase.seedPreviews()
+    try? $0.bootstrapDatabase()
+    try? $0.defaultDatabase.seedPreviews()
   }
   NavigationStack {
     SettingsView(

@@ -55,6 +55,7 @@ public struct UInt16ToDouble: Parser {
 }
 
 public struct HexTripleToDouble: Parser {
+  public init() {}
   public func parse(_ input: inout Substring.UTF8View) throws -> Double {
     let prefix = input.prefix(6)
     guard
@@ -77,3 +78,18 @@ public struct UInt32ToDouble: Parser {
     return Double(uint32)
   }
 }
+
+public struct Int32ToDouble: Parser {
+  public init() {}
+  public func parse(_ input: inout Substring.UTF8View) throws -> Double {
+    let prefix = input.prefix(8)
+    guard
+      prefix.count == 8,
+      let uint32 = UInt32(String(decoding: prefix, as: UTF8.self), radix: 16)
+    else { throw ParsingError() }
+    input.removeFirst(8)
+    let int16 = uint32 > 2147483647 ? Int32(Int(uint32) - 65536) : Int32(uint32)
+    return Double(int16)
+  }
+}
+

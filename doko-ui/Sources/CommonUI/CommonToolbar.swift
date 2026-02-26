@@ -26,14 +26,6 @@ public struct SessionToolbar: ViewModifier {
               .foregroundStyle(.blue)
           }
         }
-//        if let vehicleName = connectedVehicleModel {
-//          ToolbarItem(placement: .principal) {
-//            Text(vehicleName)
-//              .font(.headline)
-//              .lineLimit(1)
-//              .truncationMode(.tail)
-//          }
-//        }
       }
   }
 }

@@ -215,18 +215,7 @@ public func appDatabase() throws -> any DatabaseWriter {
   }
   try migrator.migrate(database)
   
-  //  #if DEBUG
-  //  try database.write { db in
-  //    switch context {
-  //    case .preview:
-  //      try db.seedInitialData()
-  //    case .live, .test:
-  //      break
-  //    }
-  //  }
-  //  #endif
-
-  // Default location entry
+  // Default location placefolder
   try database.write { db in
     try Location.upsert { Location.defaultLocation }.execute(db)
   }

@@ -7,7 +7,7 @@ import DokoWeatherManager
 import CoreLocationManager
 
 extension FordElectrics {
-  public func vehicleObdCommandResponse(_ command: ObdCommand, _ response: String) async -> ObdCommandResponse {
+  public func vehicleObdCommandResponse(_ command: ObdCommand, _ response: String, rawCommand: String) async -> ObdCommandResponse {
     //self.logger.info("\(timestamp()) FE.parsedResponse(\(command.description), \(response))")
     let result: ObdResult = .ok
     do {
@@ -41,9 +41,6 @@ extension FordElectrics {
       case .odometer:
         let odometer = try parseOdometer(response)
         commandResponse = .odometer(odometer)
-      case .pluggedIn:
-        let pluggedIn = try parsePluggedInState(response)
-        commandResponse = .pluggedIn(pluggedIn)
       case .gearSelected:
         let gearSelected = try parseGearSelected(response)
         commandResponse = .gearSelected(gearSelected)
@@ -84,12 +81,12 @@ extension FordElectrics {
       default:
         throw ParsedResponseError.unexpectedCommand(command, response)
       }
-      return ObdCommandResponse(command: command, result: result, response: commandResponse)
+      return ObdCommandResponse(command: command, result: result, response: commandResponse, rawCommand: rawCommand, rawResponse: response)
     } catch {
       let errorResult = ObdResult.getObdError(errorString: response)
       DokoLogging.shared.postLoggingResponse(.error("\(command.description)(\(errorResult.description))"))
       let errorResponse: ObdResponse = .obdError(command.description, errorResult.description)
-      return ObdCommandResponse(command: command, result: errorResult, response: errorResponse)
+      return ObdCommandResponse(command: command, result: errorResult, response: errorResponse, rawCommand: rawCommand, rawResponse: response)
     }
   }
 }

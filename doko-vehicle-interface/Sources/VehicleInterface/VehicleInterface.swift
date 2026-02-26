@@ -14,6 +14,6 @@ public protocol ConnectedVehicleInterface: Sendable {
 
   func vehicleObdCommand(_ command: ObdCommand) async -> String?
   func vehicleDokoResponsePacket(_ responsePacket: ObdResponsePacket) async -> DokoResponsePacket
-  func vehicleObdCommandResponse(_ command: ObdCommand, _ response: String) async -> ObdCommandResponse
+  func vehicleObdCommandResponse(_ command: ObdCommand, _ response: String, rawCommand: String) async -> ObdCommandResponse
 }
 

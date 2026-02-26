@@ -6,7 +6,7 @@ import DokoSchema
 struct PowerBin: Identifiable {
   let id: Int
   let timestamp: Date
-  let power: Double  // in kW
+  let power_kW: Double
 }
 
 @MainActor
@@ -33,7 +33,7 @@ public final class ChargeDetailPowerChartModel {
 
     var maxValue: Double = 0
     for bin in powerBins {
-      maxValue = max(maxValue, bin.power)
+      maxValue = max(maxValue, bin.power_kW)
     }
     maxPower = ceil(maxValue)
   }
@@ -73,7 +73,7 @@ public final class ChargeDetailPowerChartModel {
       bins.append(PowerBin(
         id: i,
         timestamp: Date(timeIntervalSince1970: binCenter),
-        power: meanPower
+        power_kW: meanPower
       ))
     }
 
@@ -92,7 +92,7 @@ public struct ChargeDetailPowerChartView: View {
         ForEach(model.powerBins) { bin in
           BarMark(
             x: .value("Time", bin.timestamp),
-            y: .value("Power", bin.power),
+            y: .value("Power", bin.power_kW),
             width: .fixed(3)
           )
           .foregroundStyle(.green)
@@ -105,7 +105,7 @@ public struct ChargeDetailPowerChartView: View {
 
           PointMark(
             x: .value("time", selected.timestamp),
-            y: .value("power", selected.power)
+            y: .value("power", selected.power_kW)
           )
           .foregroundStyle(.green)
           .symbolSize(100)
@@ -113,7 +113,7 @@ public struct ChargeDetailPowerChartView: View {
             VStack(spacing: 2) {
               Text(selected.timestamp, style: .time)
                 .font(.caption2)
-              Text(String(format: "%.1f kW", selected.power))
+              Text(String(format: "%.1f kW", selected.power_kW))
                 .font(.caption)
                 .fontWeight(.semibold)
             }

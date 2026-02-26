@@ -1,6 +1,7 @@
 import OSLog
 
 import DokoTypes
+import DokoLogging
 import ObdLinkCore
 import VehicleInterface
 import Vehicles
@@ -18,19 +19,20 @@ public actor UndeterminedVehicle: ConnectedVehicleInterface {
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
     typealias CommandLookupDictionary = [ObdCommand: String]
     let commandLookupDictionary: CommandLookupDictionary = [
-      .atz:                 "ATZ",
-      .ate0:                "ATE0",
-      .ath0:                "ATH0",
-      .atcaf1:              "ATCAF1",
-      .ats0:                "ATS0",
-      .stcsegr1:            "STCSEGR1",
-      .stp33:               "STP33",
-      .stp34:               "STP34",
-      
-      .odometerAvailable:   "01A0",
-      .vin:                 "0902",
+      .atz:                         "ATZ",
+      .ate0:                        "ATE0",
+      .ath0:                        "ATH0",
+      .atcaf1:                      "ATCAF1",
+      .ats0:                        "ATS0",
+      .stcsegr1:                    "STCSEGR1",
+      .atsp0:                       "ATSP0",
+      .stprs:                       "STPRS",
+
+      .extendedDiagnosticSession:   "1003",
+      .vin:                         "0902",
     ]
     guard let obdLinkCommand = commandLookupDictionary[command] else {
+      DokoLogging.shared.postLoggingResponse(.error("vehicleObdCommand: \(command.description) not found"))
       return nil
     }
     return obdLinkCommand
@@ -42,31 +44,18 @@ public actor UndeterminedVehicle: ConnectedVehicleInterface {
       return ObdCommandPacket(
         type: .reset,
         commands: [
-          .atz, .ate0, .ath0, .atcaf1, .ats0, .stcsegr1
+          .atz, .ate0, .ath0, .atcaf1, .ats0, .stcsegr1, .atsp0
         ])
-    case .protocolCheck(let busProtocol):
-      switch busProtocol {
-      case .iso15765_11bit:
-        return ObdCommandPacket(
-          type: .protocolCheck(.iso15765_11bit),
-          commands: [
-            .stp33, .odometerAvailable
-          ])
-      case .iso15765_29bit:
-        return ObdCommandPacket(
-          type: .protocolCheck(.iso15765_29bit),
-          commands: [
-            .stp34, .odometerAvailable
-          ])
-      }
+
     case .vin:
       return ObdCommandPacket(
         type: .vin,
         commands: [
-          .vin
+          .vin, .stprs, .extendedDiagnosticSession
         ])
-      
+
     default:
+      DokoLogging.shared.postLoggingResponse(.error("translateDokoCommandPacket: unexpected \(packetType.description) packet"))
       return nil
     }
   }

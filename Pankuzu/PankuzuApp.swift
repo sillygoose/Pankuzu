@@ -5,6 +5,7 @@ import CoreLocation
 import TipKit
 
 import CoreLocationManager
+import DokoSharing
 import DokoSchema
 import ObdLinkManager
 import DokoPacketManager
@@ -94,11 +95,12 @@ struct PankuzuApp: App {
     }
     .backgroundTask(.appRefresh(dbPruningTaskIdentifier)) {
       @Dependency(\.defaultDatabase) var database
+      @Shared(.deletedRecordRetentionDays) var deletedRecordRetentionDays
       scheduleDatabasePruning()
       withErrorReporting {
         try database.write { db in
           try Trip
-            .where { $0.readyForDeletion }
+            .where { $0.readyForDeletion(days: deletedRecordRetentionDays) }
             .delete()
             .execute(db)
         }
@@ -106,7 +108,7 @@ struct PankuzuApp: App {
       withErrorReporting {
         try database.write { db in
           try Charge
-            .where { $0.readyForDeletion }
+            .where { $0.readyForDeletion(days: deletedRecordRetentionDays) }
             .delete()
             .execute(db)
         }

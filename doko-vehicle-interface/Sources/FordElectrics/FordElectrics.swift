@@ -24,21 +24,19 @@ public actor FordElectrics: ConnectedVehicleInterface {
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
     typealias CommandLookupDictionary = [ObdCommand: String]
     let commandLookupDictionary: CommandLookupDictionary = [
-      .pluggedIn:                       "STPX h:07E2, d:224843",
-      .gearSelected:                    "STPX h:07E2, d:221E12",
+      .gearSelected:                    "STPX h:7E2, d:221E12",
 
-      .energyToEmpty:                   "STPX h:07E4, d:224848",
-      .stateOfCharge:                   "STPX h:07E4, d:224845",
-      .stateOfHealth:                   "STPX h:07E4, d:22490C",
-      .batteryTemperature:              "STPX h:07E4, d:224800",
-      .batteryVoltage:                  "STPX h:07E4, d:22480D",
-      .batteryCurrent:                  "STPX h:07E4, d:2248F9",
+      .energyToEmpty:                   "STPX h:7E4, d:224848",
+      .stateOfCharge:                   "STPX h:7E4, d:224845",
+      .stateOfHealth:                   "STPX h:7E4, d:22490C",
+      .batteryTemperature:              "STPX h:7E4, d:224800",
+      .batteryVoltage:                  "STPX h:7E4, d:22480D",
+      .batteryCurrent:                  "STPX h:7E4, d:2248F9",
 
-      .acChargerStatus:                 "STPX h:07E4, d:22484F",
-      .acChargerCouplerTemperature:     "STPX h:07E2, d:224888",
-
-      .dcChargerStatus:                 "STPX h:07E4, d:22489E",
-      .dcChargerCouplerTemperature:     "STPX h:07E2, d:224897",
+      .acChargerStatus:                 "STPX h:7E4, d:22484F",
+      .acChargerCouplerTemperature:     "STPX h:7E2, d:224888",
+      .dcChargerStatus:                 "STPX h:7E4, d:22489E",
+      .dcChargerCouplerTemperature:     "STPX h:7E2, d:224897",
 
       .odometer:                        "01A6",
 
@@ -47,6 +45,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
       .meanTemperature:                 "STPR",
     ]
     guard let obdLinkCommand = commandLookupDictionary[command] else {
+      DokoLogging.shared.postLoggingResponse(.error("FE.translateDokoCommandPacket(\(command.description)): dictionary empty"))
       return nil
     }
     return obdLinkCommand
@@ -54,13 +53,14 @@ public actor FordElectrics: ConnectedVehicleInterface {
 
   public func translateDokoCommandPacket(using packetType: DokoPacketType) async -> ObdCommandPacket? {
     switch packetType {
+    case .vehicleCapabilities:
+      return ObdCommandPacket(type: .vehicleCapabilities, commands: [
+        .odometer
+      ])
+
     case .idle:
       return ObdCommandPacket(type: .idle, commands: [
-        .gearSelected, .pluggedIn
-      ])
-    case .pluggedIn:
-      return ObdCommandPacket(type: .pluggedIn, commands: [
-        .pluggedIn, .acChargerStatus, .dcChargerStatus
+        .gearSelected, .acChargerStatus, .dcChargerStatus
       ])
       
     case .tripStarting:
@@ -86,10 +86,6 @@ public actor FordElectrics: ConnectedVehicleInterface {
         .stateOfHealth, .batteryTemperature,
         .position,
       ])
-//    case .tripPosition:
-//      return ObdCommandPacket(type: .tripPosition, commands: [
-//        .position
-//      ])
     case .tripData:
       return ObdCommandPacket(type: .tripData, commands: [
         .odometer, .stateOfCharge, .energyToEmpty, .batteryTemperature
@@ -170,7 +166,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
       ])
 
     default:
-      DokoLogging.shared.postLoggingResponse(.error("FE.translateDokoCommandPacket: No packet translation for '\(packetType.description)'"))
+      DokoLogging.shared.postLoggingResponse(.error("FE.translateDokoCommandPacket: no packet translation for '\(packetType.description)'"))
       return nil
     }
   }

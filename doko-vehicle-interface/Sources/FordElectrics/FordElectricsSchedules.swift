@@ -8,10 +8,13 @@ extension FordElectrics {
   public func createStateScheduler(for state: VehicleState) async -> StateEngineDokoSchedule? {
     self.logger.info("\(timestamp()) FE.createStateScheduler(\(state.description))")
     switch state {
+    case .vehicleCapabilities:
+      return FordElectrics.vehicleCapabilitiesDokoCommandSchedule
+
     case .idle:
       return FordElectrics.idleDokoCommandSchedule
-    case .pluggedIn:
-      return FordElectrics.pluggedInDokoCommandSchedule
+//    case .pluggedIn:
+//      return FordElectrics.pluggedInDokoCommandSchedule
 
     case .tripStarting:
       return FordElectrics.tripStartingDokoCommandSchedule
@@ -43,26 +46,33 @@ extension FordElectrics {
 }
 
 extension FordElectrics {
-  public static let idleDokoCommandSchedule: StateEngineDokoSchedule = [
+  private static let vehicleCapabilitiesDokoCommandSchedule: StateEngineDokoSchedule = [
+    StateEngineDokoCommandPacket(
+      schedulerType: .oneShotWithDelay(1),
+      packetType: .vehicleCapabilities
+    )
+  ]
+
+  private static let idleDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .firesThenDelays(2),
       packetType: .idle
     )
   ]
-  public static let pluggedInDokoCommandSchedule: StateEngineDokoSchedule = [
-    StateEngineDokoCommandPacket(
-      schedulerType: .firesThenDelays(2),
-      packetType: .pluggedIn
-    )
-  ]
+//  private static let pluggedInDokoCommandSchedule: StateEngineDokoSchedule = [
+//    StateEngineDokoCommandPacket(
+//      schedulerType: .firesThenDelays(2),
+//      packetType: .pluggedIn
+//    )
+//  ]
 
-  public static let tripStartingDokoCommandSchedule: StateEngineDokoSchedule = [
+  private static let tripStartingDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .oneShotWithDelay(2),
       packetType: .tripStarting
     )
   ]
-  public static let tripInProgressDokoCommandSchedule: StateEngineDokoSchedule = [
+  private static let tripInProgressDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .delaysThenFires(2),
       packetType: .tripInProgress
@@ -75,10 +85,6 @@ extension FordElectrics {
       schedulerType: .delaysThenFires(10),
       packetType: .tripUpdate
     ),
-//    StateEngineDokoCommandPacket(
-//      schedulerType: .delaysThenFires(3),
-//      packetType: .tripPosition //###
-//    ),
     StateEngineDokoCommandPacket(
       schedulerType: .delaysThenFires(30),
       packetType: .tripData
@@ -88,20 +94,20 @@ extension FordElectrics {
       packetType: .tripWeather
     ),
   ]
-  public static let tripEndingDokoCommandSchedule: StateEngineDokoSchedule = [
+  private static let tripEndingDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .oneShot,
       packetType: .tripEnding
     )
   ]
  
-  public static let acChargeStartingDokoCommandSchedule: StateEngineDokoSchedule = [
+  private static let acChargeStartingDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .oneShotWithDelay(2),
       packetType: .acChargeStarting
     )
   ]
-  public static let acChargeInProgressDokoCommandSchedule: StateEngineDokoSchedule = [
+  private static let acChargeInProgressDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .delaysThenFires(2),
       packetType: .acChargeInProgress
@@ -119,20 +125,20 @@ extension FordElectrics {
       packetType: .acChargeHistory
     ),
   ]
-  public static let acChargeEndingDokoCommandSchedule: StateEngineDokoSchedule = [
+  private static let acChargeEndingDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .oneShot,
       packetType: .acChargeEnding
     )
   ]
 
-  public static let dcChargeStartingDokoCommandSchedule: StateEngineDokoSchedule = [
+  private static let dcChargeStartingDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .oneShotWithDelay(2),
       packetType: .dcChargeStarting
     )
   ]
-  public static let dcChargeInProgressDokoCommandSchedule: StateEngineDokoSchedule = [
+  private static let dcChargeInProgressDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .delaysThenFires(2),
       packetType: .dcChargeInProgress
@@ -150,7 +156,7 @@ extension FordElectrics {
       packetType: .dcChargeHistory
     ),
   ]
-  public static let dcChargeEndingDokoCommandSchedule: StateEngineDokoSchedule = [
+  private static let dcChargeEndingDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .oneShot,
       packetType: .dcChargeEnding

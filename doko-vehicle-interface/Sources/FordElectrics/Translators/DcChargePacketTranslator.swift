@@ -8,7 +8,6 @@ extension FordElectrics {
     var dokoResponses: DokoResponseDictionary = [:]
     guard
       let position = responsePacket.position,
-      let weather = responsePacket.weather,
       let odometer = responsePacket.odometer,
       let energyToEmpty = responsePacket.energyToEmpty,
       let stateOfCharge = responsePacket.stateOfCharge,
@@ -25,7 +24,6 @@ extension FordElectrics {
     lastBatteryPower = nil
     dokoResponses[.nextState] = DokoCommandResponse(command: .dcChargeStarting, response: .nextState(.dcChargeInProgress))
     dokoResponses[.position] = DokoCommandResponse(command: .dcChargeStarting, response: .position(position))
-    dokoResponses[.weather] = DokoCommandResponse(command: .dcChargeStarting, response: .weather(weather))
     dokoResponses[.odometer] = DokoCommandResponse(command: .dcChargeStarting, response: .odometer(odometer))
     dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .dcChargeStarting, response: .batteryEnergy(batteryEnergy))
     dokoResponses[.energyToEmpty] = DokoCommandResponse(command: .dcChargeStarting, response: .energyToEmpty(energyToEmpty))
@@ -33,6 +31,9 @@ extension FordElectrics {
     dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .dcChargeStarting, response: .batteryStateOfHealth(stateOfHealth))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .dcChargeStarting, response: .batteryTemperature(batteryTemperature))
     dokoResponses[.couplerTemperature] = DokoCommandResponse(command: .dcChargeStarting, response: .couplerTemperature(couplerTemperature))
+    if let weather = responsePacket.weather {
+      dokoResponses[.weather] = DokoCommandResponse(command: .dcChargeStarting, response: .weather(weather))
+    }
     return DokoResponsePacket(type: .dcChargeStarting, responses: dokoResponses)
   }
   
@@ -83,7 +84,7 @@ extension FordElectrics {
       dokoResponses[.error] = DokoCommandResponse(command: .dcChargeEnding, response: .error("agruments"))
       return DokoResponsePacket(type: .dcChargeEnding, responses: dokoResponses)
     }
-    dokoResponses[.nextState] = DokoCommandResponse(command: .dcChargeEnding, response: .nextState(.pluggedIn))
+    dokoResponses[.nextState] = DokoCommandResponse(command: .dcChargeEnding, response: .nextState(.idle))
     dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .dcChargeEnding, response: .batteryEnergy(batteryEnergy))
     dokoResponses[.energyToEmpty] = DokoCommandResponse(command: .dcChargeEnding, response: .energyToEmpty(energyToEmpty))
     dokoResponses[.stateOfCharge] = DokoCommandResponse(command: .dcChargeEnding, response: .stateOfCharge(stateOfCharge))
@@ -105,7 +106,6 @@ extension FordElectrics {
     batteryPower = batteryVoltage * batteryCurrent * 0.001
     if let lastTime = lastEnergyUpdateTime, let lastPower = lastBatteryPower {
       let deltaHours = responsePacket.completedAt.timeIntervalSince(lastTime) / 3600.0
-      // Trapezoid integration: average of last and current power
       batteryEnergy += (lastPower + batteryPower) / 2.0 * deltaHours
     }
     lastEnergyUpdateTime = responsePacket.completedAt

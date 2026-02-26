@@ -36,7 +36,7 @@ public final class DokoLocationManager: Sendable {
     @FetchAll var locations: [Location]
     @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
     if let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold) {
-      //DokoLogging.shared.postLoggingResponse(.info(String(format: "Location exists at (%.5f, %.5f)", latitude, longitude)))
+      DokoLogging.shared.postLoggingResponse(.location(String(format: "Location exists at (%.5f, %.5f)", latitude, longitude)))
       return locationID
     }
     @Dependency(\.defaultDatabase) var database
