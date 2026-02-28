@@ -26,7 +26,6 @@ let package = Package(
         .product(name: "DokoSharing", package: "doko-sharing"),
         .product(name: "DokoLogging", package: "doko-logging"),
         .product(name: "DokoPacketManager", package: "doko-managers"),
-        .product(name: "DokoWeatherManager", package: "doko-managers"),
         .product(name: "DokoNotificationManager", package: "doko-managers"),
         .product(name: "DokoVehicleManager", package: "doko-managers"),
         .product(name: "CoreLocationManager", package: "doko-managers"),

@@ -19,6 +19,8 @@ extension VwElectrics {
     batteryEnergy = 0.0
     lastEnergyUpdateTime = responsePacket.completedAt
     lastBatteryPower = nil
+    meanTemperatureSum = 0.0
+    meanTemperatureCount = 0
     dokoResponses[.nextState] = DokoCommandResponse(command: .tripStarting, response: .nextState(.tripInProgress))
     dokoResponses[.position] = DokoCommandResponse(command: .tripStarting, response: .position(position))
     dokoResponses[.odometer] = DokoCommandResponse(command: .tripStarting, response: .odometer(odometer))
@@ -26,6 +28,8 @@ extension VwElectrics {
     dokoResponses[.stateOfCharge] = DokoCommandResponse(command: .tripStarting, response: .stateOfCharge(stateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripStarting, response: .batteryTemperature(batteryTemperature))
     if let weather = responsePacket.weather {
+      meanTemperatureSum += weather.temperature
+      meanTemperatureCount += 1
       dokoResponses[.weather] = DokoCommandResponse(command: .tripStarting, response: .weather(weather))
     }
     return DokoResponsePacket(type: .tripStarting, responses: dokoResponses)
@@ -61,11 +65,14 @@ extension VwElectrics {
     dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripEnding, response: .batteryEnergy(-batteryEnergy))
     dokoResponses[.stateOfCharge] = DokoCommandResponse(command: .tripEnding, response: .stateOfCharge(stateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripEnding, response: .batteryTemperature(batteryTemperature))
-    if let meanTemperature = responsePacket.meanTemperature {
-      dokoResponses[.meanTemperature] = DokoCommandResponse(command: .tripEnding, response: .meanTemperature(meanTemperature))
-    }
     if let weather = responsePacket.weather {
+      meanTemperatureSum += weather.temperature
+      meanTemperatureCount += 1
       dokoResponses[.weather] = DokoCommandResponse(command: .tripEnding, response: .weather(weather))
+    }
+    if meanTemperatureCount > 0 {
+      let meanTemperature = meanTemperatureSum / Double(meanTemperatureCount)
+      dokoResponses[.meanTemperature] = DokoCommandResponse(command: .tripEnding, response: .meanTemperature(meanTemperature))
     }
     return DokoResponsePacket(type: .tripEnding, responses: dokoResponses)
   }
@@ -135,6 +142,8 @@ extension VwElectrics {
       dokoResponses[.error] = DokoCommandResponse(command: .tripWeather, response: .error("agruments"))
       return DokoResponsePacket(type: .tripWeather, responses: dokoResponses)
     }
+    meanTemperatureSum += weather.temperature
+    meanTemperatureCount += 1
     dokoResponses[.weather] = DokoCommandResponse(command: .tripWeather, response: .weather(weather))
     return DokoResponsePacket(type: .tripWeather, responses: dokoResponses)
   }

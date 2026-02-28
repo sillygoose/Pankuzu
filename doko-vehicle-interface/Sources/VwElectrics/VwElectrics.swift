@@ -17,6 +17,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
   public var lastEnergyUpdateTime: Date?
   public var lastBatteryPower: Double?
 
+  public var meanTemperatureSum: Double = 0.0
+  public var meanTemperatureCount: Int = 0
+
   public init(vehicle: Vehicle?) {
     self.vehicle = vehicle
   }
@@ -40,7 +43,6 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
       .position:                        "",
       .weather:                         "",
-      .meanTemperature:                 "",
     ]
     guard let obdLinkCommand = commandLookupDictionary[command] else {
       DokoLogging.shared.postLoggingResponse(.error("VWE.vehicleObdCommand(\(command.description)): dictionary empty"))
@@ -96,7 +98,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
       ])
     case .tripEnding:
       return ObdCommandPacket(type: .tripEnding, commands: [
-        .weather, .meanTemperature,
+        .weather,
         .odometer,
         .stateOfCharge,
         .batteryTemperature,
