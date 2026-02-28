@@ -12,7 +12,9 @@ public enum ObdCommand: Equatable, Sendable {
   case atsp0
   case stcsegr1
   case stprs
+  
   case extendedDiagnosticSession
+  case testerPresent
   
   case vin
   case odometer, obdOdometer
@@ -63,6 +65,8 @@ public enum ObdCommand: Equatable, Sendable {
         return ".stprs"
       case .extendedDiagnosticSession:
         return ".extendedDiagnosticSession"
+      case .testerPresent:
+        return ".testerPresent"
       case .vin:
         return ".vin"
       case .odometer:
@@ -189,8 +193,10 @@ public enum ObdResponse: Equatable, Sendable {
   case atsp0
   case stprs(String)
   case stcsegr1
+  
   case extendedDiagnosticSession
-
+  case testerPresent
+  
   case vin(String)
   case odometer(Double)
   case obdOdometer(Double)
@@ -241,9 +247,12 @@ public enum ObdResponse: Equatable, Sendable {
         return ".stprs(\(pstring))"
       case .stcsegr1:
         return ".stcsegr1"
+        
       case .extendedDiagnosticSession:
         return ".extendedDiagnosticSession"
-        
+      case .testerPresent:
+        return ".testerPresent"
+
       case .vin(let vin):
         return ".vin(\(vin))"
       case .odometer(let odometer):

@@ -68,11 +68,9 @@ struct AboutView: View {
     """
     \(displayName) is an EV utility application that records your trips and charges \
     and aggregates the data to let you make the most of your vehicle's performance \
-    and history.\
-    \n
-    Special thanks for the following Swift packages that made this app possible:
+    and history.
     """
-    
+
     ScrollView {
       VStack(alignment: .leading) {
         Section {
@@ -82,6 +80,16 @@ struct AboutView: View {
 
         Section {
           Text("\(aboutText)")
+        }
+        .padding([.bottom], 20)
+
+        Section {
+          Text("Pankuzu is open source software, code, issues, discussions, and more are on [GitHub](https://github.com/sillygoose/Pankuzu).")
+        }
+        .padding([.bottom], 20)
+
+        Section {
+          Text("Special thanks for the following Swift packages that made this app possible:")
         }
         .padding([.bottom], 20)
 

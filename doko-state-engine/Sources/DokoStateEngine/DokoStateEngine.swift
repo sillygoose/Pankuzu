@@ -135,6 +135,9 @@ public final class DokoStateEngine {
             let nextState = dokoResponsePacket.nextState ?? .vehicleCapabilities
             $vehicleState.withLock { $0 = nextState }
             
+          case .testerPresent:
+            break
+            
           case .idle:
             guard case .idle = vehicleState else {
               throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
@@ -150,18 +153,6 @@ public final class DokoStateEngine {
               await DokoNotificationManager.shared.startChargeNotification(vehicle: connectedVehicle.vehicle?.makeModel ?? "Unknown")
             }
             if nextState != .idle { $vehicleState.withLock { $0 = nextState } }
-
-//          case .pluggedIn:
-//            guard case .pluggedIn = vehicleState else {
-//              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-//            }
-//            let nextState = dokoResponsePacket.nextState ?? .pluggedIn
-//            if nextState == .acChargeStarting || nextState == .dcChargeStarting {
-//              await CoreLocationManager.shared.startLocationUpdates()
-//              DokoWeatherManager.shared.startWeatherService()
-//              await DokoNotificationManager.shared.startChargeNotification(vehicle: connectedVehicle.vehicle?.makeModel ?? "Unknown")
-//            }
-//            if nextState != .pluggedIn { $vehicleState.withLock { $0 = nextState } }
 
           case .tripStarting:
             guard case .tripStarting = vehicleState else {

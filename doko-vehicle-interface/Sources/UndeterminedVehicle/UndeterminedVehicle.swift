@@ -28,7 +28,6 @@ public actor UndeterminedVehicle: ConnectedVehicleInterface {
       .atsp0:                       "ATSP0",
       .stprs:                       "STPRS",
 
-      .extendedDiagnosticSession:   "1003",
       .vin:                         "0902",
     ]
     guard let obdLinkCommand = commandLookupDictionary[command] else {
@@ -51,7 +50,7 @@ public actor UndeterminedVehicle: ConnectedVehicleInterface {
       return ObdCommandPacket(
         type: .vin,
         commands: [
-          .vin, .stprs, .extendedDiagnosticSession
+          .vin, .stprs
         ])
 
     default:

@@ -62,7 +62,7 @@ public final class DokoPacketManager {
   private func startCommandStream() {
     do {
       self.logger.debug("\(timestamp()) PM.startCommandStream")
-      DokoLogging.shared.postLoggingResponse(.info("PM.startCommandStream"))
+      DokoLogging.shared.postLoggingResponse(.packetManager("startCommandStream"))
       guard dokoCommandStream == nil else { throw PacketManagerError.commandStreamExists }
       var dokoCommandContinuation: AsyncStream<DokoPacketType>.Continuation!
       self.dokoCommandStream = AsyncStream(bufferingPolicy: .unbounded) { continuation in
@@ -78,7 +78,7 @@ public final class DokoPacketManager {
     do {
       self.logger.debug("\(timestamp()) PM.startResponseStream")
       guard dokoResponseStream == nil else { throw PacketManagerError.responseStreamExists }
-      DokoLogging.shared.postLoggingResponse(.info("PM.startResponseStream"))
+      DokoLogging.shared.postLoggingResponse(.packetManager("startResponseStream"))
       var rawResponseContinuation: AsyncStream<DokoResponsePacket>.Continuation!
       self.dokoResponseStream = AsyncStream(bufferingPolicy: .unbounded) { continuation in
         rawResponseContinuation = continuation
@@ -100,7 +100,7 @@ public final class DokoPacketManager {
     self.dokoCommandStreamContinuation = nil
     self.dokoCommandStream = nil
     self.logger.debug("\(timestamp()) PM.stopCommandStream")
-    DokoLogging.shared.postLoggingResponse(.info("PM.stopCommandStream"))
+    DokoLogging.shared.postLoggingResponse(.packetManager("stopCommandStream"))
   }
   
   private func stopResponseStream() {
@@ -108,22 +108,28 @@ public final class DokoPacketManager {
     self.dokoResponseStreamContinuation = nil
     self.dokoResponseStream = nil
     self.logger.debug("\(timestamp()) PM.stopResponseStream")
-    DokoLogging.shared.postLoggingResponse(.info("PM.stopResponseStream"))
+    DokoLogging.shared.postLoggingResponse(.packetManager("stopResponseStream"))
   }
   
   public func appendDokoPacket(_ packet: DokoPacketType) async {
     self.logger.debug("\(timestamp()) ObdLinkPacketManager.appendDokoPacket(\(packet.description))")
+    DokoLogging.shared.postLoggingResponse(.packetManager("appendDokoPacket(\(packet.description))"))
     dokoCommandStreamContinuation?.yield(packet)
   }
   
   public func removeDokoPacket() async -> DokoPacketType? {
     guard let dokoCommandStream else { return nil }
     var iterator = dokoCommandStream.makeAsyncIterator()
-    if let next = await iterator.next() { return next }
+    if let next = await iterator.next() {
+      DokoLogging.shared.postLoggingResponse(.packetManager("removeDokoPacket(\(next.description))"))
+      return next
+    }
+    DokoLogging.shared.postLoggingResponse(.error("PM.removeDokoPacket(nil)"))
     return nil
   }
   
   public func appendDokoResponsePacket(_ responsePacket: DokoResponsePacket) {
+    DokoLogging.shared.postLoggingResponse(.packetManager("appendDokoResponsePacket(\(responsePacket.type.description))"))
     dokoResponseStreamContinuation?.yield(responsePacket)
   }
 
@@ -131,8 +137,10 @@ public final class DokoPacketManager {
     guard let dokoResponseStream else { return nil }
     var iterator = dokoResponseStream.makeAsyncIterator()
     if let next = await iterator.next() {
+      DokoLogging.shared.postLoggingResponse(.packetManager("removeDokoResponsePacket(\(next.type.description))"))
       return next
     }
+    DokoLogging.shared.postLoggingResponse(.error("PM.removeDokoResponsePacket(nil)"))
     return nil
   }
 }

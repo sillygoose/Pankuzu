@@ -27,8 +27,6 @@ extension UndeterminedVehicle {
       case .stprs:
         commandResponse = .stprs(response)
         
-      case .extendedDiagnosticSession:
-        commandResponse = .extendedDiagnosticSession
       case .vin:
         let vin = try parseVin(response)
         commandResponse = .vin(vin)

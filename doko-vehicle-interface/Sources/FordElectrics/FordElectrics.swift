@@ -24,6 +24,9 @@ public actor FordElectrics: ConnectedVehicleInterface {
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
     typealias CommandLookupDictionary = [ObdCommand: String]
     let commandLookupDictionary: CommandLookupDictionary = [
+      .extendedDiagnosticSession:       "1003",
+      .testerPresent:                   "3E80",
+
       .gearSelected:                    "STPX h:7E2, d:221E12",
 
       .energyToEmpty:                   "STPX h:7E4, d:224848",
@@ -40,14 +43,21 @@ public actor FordElectrics: ConnectedVehicleInterface {
 
       .odometer:                        "01A6",
 
-      .position:                        "STPR",
-      .weather:                         "STPR",
-      .meanTemperature:                 "STPR",
+      .position:                        "",
+      .weather:                         "",
+      .meanTemperature:                 "",
     ]
     guard let obdLinkCommand = commandLookupDictionary[command] else {
-      DokoLogging.shared.postLoggingResponse(.error("FE.translateDokoCommandPacket(\(command.description)): dictionary empty"))
+      DokoLogging.shared.postLoggingResponse(.error("FE.vehicleObdCommand(\(command.description)): dictionary empty"))
       return nil
     }
+#if DEBUG
+    @Shared(.simIdle) var simIdle
+    if simIdle {
+      if command == .extendedDiagnosticSession { return "" }
+      if command == .testerPresent { return "" }
+    }
+#endif
     return obdLinkCommand
   }
 
@@ -55,7 +65,12 @@ public actor FordElectrics: ConnectedVehicleInterface {
     switch packetType {
     case .vehicleCapabilities:
       return ObdCommandPacket(type: .vehicleCapabilities, commands: [
+        .extendedDiagnosticSession,
         .odometer
+      ])
+    case .testerPresent:
+      return ObdCommandPacket(type: .testerPresent, commands: [
+        .testerPresent
       ])
 
     case .idle:
@@ -67,7 +82,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
       return ObdCommandPacket(type: .tripStarting, commands: [
         .odometer, .energyToEmpty, .stateOfCharge,
         .stateOfHealth, .batteryTemperature,
-        .position, .weather,
+        .position, .weather
       ])
     case .tripInProgress:
       return ObdCommandPacket(type: .tripInProgress, commands: [
@@ -75,16 +90,16 @@ public actor FordElectrics: ConnectedVehicleInterface {
       ])
     case .tripUpdate:
       return ObdCommandPacket(type: .tripUpdate, commands: [
-        .odometer, .energyToEmpty, .stateOfCharge,
-        .batteryTemperature,
         .position,
+        .odometer, .energyToEmpty, .stateOfCharge,
+        .batteryTemperature
       ])
     case .tripEnding:
       return ObdCommandPacket(type: .tripEnding, commands: [
         .weather, .meanTemperature,
         .odometer, .energyToEmpty, .stateOfCharge,
         .stateOfHealth, .batteryTemperature,
-        .position,
+        .position
       ])
     case .tripData:
       return ObdCommandPacket(type: .tripData, commands: [
@@ -99,7 +114,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
       return ObdCommandPacket(type: .acChargeStarting, commands: [
         .odometer, .energyToEmpty, .stateOfCharge,
         .stateOfHealth, .batteryTemperature, .acChargerCouplerTemperature,
-        .position, .weather,
+        .position, .weather
       ])
     case .acChargeInProgress:
       return ObdCommandPacket(type: .acChargeInProgress, commands: [
@@ -120,7 +135,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
       return ObdCommandPacket(type: .dcChargeStarting, commands: [
         .odometer, .energyToEmpty, .stateOfCharge,
         .stateOfHealth, .batteryTemperature, .dcChargerCouplerTemperature,
-        .position, .weather,
+        .position, .weather
       ])
     case .dcChargeInProgress:
       return ObdCommandPacket(type: .dcChargeInProgress, commands: [

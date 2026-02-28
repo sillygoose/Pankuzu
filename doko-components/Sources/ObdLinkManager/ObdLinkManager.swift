@@ -168,14 +168,19 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
             errorPackets += 1
             continue
           }
-          let commandData = "\(obdLinkCommand)\r".data(using: .ascii)!
-          _ = writeAll(commandData, to: outputStream)
+          
+          var commandResponse: String = ""
+          if !obdLinkCommand.isEmpty {
+            let commandData = "\(obdLinkCommand)\r".data(using: .ascii)!
+            _ = writeAll(commandData, to: outputStream)
 
-          guard let commandResponse = await self.waitForObdCommandResponse() else {
-            self.logger.error("\(timestamp()) ObdLinkManager.commandProcessingTask: error reading response for: '\(command.description)'")
-            DokoLogging.shared.postLoggingResponse(.error("ObdDokoVehicleManager.commandProcessingTask: error reading response for: '\(command.description)'"))
-            errorPackets += 1
-            continue
+            guard let trueCommandResponse = await self.waitForObdCommandResponse() else {
+              self.logger.error("\(timestamp()) ObdLinkManager.commandProcessingTask: error reading response for: '\(command.description)'")
+              DokoLogging.shared.postLoggingResponse(.error("ObdLinkManager..commandProcessingTask: error reading response for: '\(command.description)'"))
+              errorPackets += 1
+              continue
+            }
+            commandResponse = trueCommandResponse
           }
 
           let obdCommandResponse = await connectedVehicleInterface.vehicleObdCommandResponse(command, commandResponse, rawCommand: obdLinkCommand)

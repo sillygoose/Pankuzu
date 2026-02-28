@@ -18,6 +18,7 @@ public enum LoggingPacketType: Sendable {
   case disconnect(String)
   case location(String)
   case liveActivity(String)
+  case packetManager(String)
 
   public var description: String {
     switch self {
@@ -29,6 +30,7 @@ public enum LoggingPacketType: Sendable {
     case .disconnect(let disconnect): return ".disconnect(\(disconnect))"
     case .location(let location): return ".location(\(location))"
     case .liveActivity(let liveActivity): return ".liveActivity(\(liveActivity))"
+    case .packetManager(let packetManager): return ".packetManager(\(packetManager))"
     }
   }
 }
@@ -56,6 +58,7 @@ public final class DokoLogging: Sendable {
     @Shared(.logStatePackets) var logStatePackets
     @Shared(.logLocationPackets) var logLocationPackets
     @Shared(.logLiveActivityPackets) var logLiveActivityPackets
+    @Shared(.logPacketManagerPackets) var logPacketManagerPackets
 
     switch response {
     case .logging(let packet):
@@ -66,6 +69,7 @@ public final class DokoLogging: Sendable {
       case .location: shouldLog = logLocationPackets
       case .liveActivity: shouldLog = logLiveActivityPackets
       case .state, .schedulers: shouldLog = logStatePackets
+      case .packetManager: shouldLog = logPacketManagerPackets
       }
       if shouldLog {
         $responseHistory.withLock { $0.prepend(response) }

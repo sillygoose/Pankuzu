@@ -114,7 +114,7 @@ public enum VehicleState: Equatable, Hashable, Sendable {
 public enum DokoPacketType: Equatable, Hashable, Sendable {
   case reset
   case vin
-  case vehicleCapabilities
+  case vehicleCapabilities, testerPresent
   case idle
 
   case tripStarting, tripInProgress, tripEnergy, tripUpdate, tripEnding
@@ -128,15 +128,17 @@ public enum DokoPacketType: Equatable, Hashable, Sendable {
     switch self {
     case .reset:
       ".reset"
-    case .vin:
-      ".vin"
+
     case .vehicleCapabilities:
       ".vehicleCapabilities"
+    case .testerPresent:
+      ".testerPresent"
+      
+    case .vin:
+      ".vin"
 
     case .idle:
       ".idle"
-//    case .pluggedIn:
-//      ".pluggedIn"
 
     case .tripStarting:
       ".tripStarting"

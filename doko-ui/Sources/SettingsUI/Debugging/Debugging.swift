@@ -38,6 +38,7 @@ class DebuggingModel {
   @ObservationIgnored @Shared(.logStatePackets) var logStatePackets
   @ObservationIgnored @Shared(.logLocationPackets) var logLocationPackets
   @ObservationIgnored @Shared(.logLiveActivityPackets) var logLiveActivityPackets
+  @ObservationIgnored @Shared(.logPacketManagerPackets) var logPacketManagerPackets
   
 #if DEBUG
   @ObservationIgnored @Shared(.simIdle) var simIdle
@@ -173,6 +174,13 @@ struct DebuggingView: View {
             isOn: Binding(
               get: { model.logLiveActivityPackets },
               set: { isOn, _ in model.$logLiveActivityPackets.withLock { $0 = isOn } }
+            )
+          )
+          Toggle(
+            "Packet Manager",
+            isOn: Binding(
+              get: { model.logPacketManagerPackets },
+              set: { isOn, _ in model.$logPacketManagerPackets.withLock { $0 = isOn } }
             )
           )
         } footer: {
