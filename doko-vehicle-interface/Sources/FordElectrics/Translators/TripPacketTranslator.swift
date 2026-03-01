@@ -2,6 +2,7 @@ import OSLog
 
 import DokoTypes
 import ObdLinkCore
+import DokoWeatherManager
 
 extension FordElectrics {
   func tripStartingResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
@@ -85,7 +86,7 @@ extension FordElectrics {
     return DokoResponsePacket(type: .tripEnding, responses: dokoResponses)
   }
 
-  func tripUpdateResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+  func tripUpdateResponsePacket(_ responsePacket: ObdResponsePacket) async -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
     guard
       let position = responsePacket.position,
@@ -103,6 +104,9 @@ extension FordElectrics {
     dokoResponses[.energyToEmpty] = DokoCommandResponse(command: .tripUpdate, response: .energyToEmpty(energyToEmpty))
     dokoResponses[.stateOfCharge] = DokoCommandResponse(command: .tripUpdate, response: .stateOfCharge(stateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripUpdate, response: .batteryTemperature(batteryTemperature))
+    if let latestWeather = await DokoWeatherManager.shared.latestWeather() {
+      dokoResponses[.weather] = DokoCommandResponse(command: .tripUpdate, response: .weather(latestWeather))
+    }
     return DokoResponsePacket(type: .tripUpdate, responses: dokoResponses)
   }
 

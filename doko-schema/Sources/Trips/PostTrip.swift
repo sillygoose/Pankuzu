@@ -169,6 +169,17 @@ extension Trip {
     tripDraft.stateOfChargeEnd = tripUpdateResponse.stateOfCharge
     tripDraft.batteryTempEnd = tripUpdateResponse.batteryTemperature
 
+    if let weather = tripUpdateResponse.weather {
+      tripDraft.weatherTempEnd = weather.temperature
+      tripDraft.weatherConditionsEnd = weather.conditionSymbol
+      if tripDraft.weatherTempStart == nil {
+        tripDraft.weatherTempStart = weather.temperature
+      }
+      if tripDraft.weatherConditionsStart == nil {
+        tripDraft.weatherConditionsStart = weather.conditionSymbol
+      }
+    }
+
     @Dependency(\.defaultDatabase) var database
     withErrorReporting {
       try database.write { db in
