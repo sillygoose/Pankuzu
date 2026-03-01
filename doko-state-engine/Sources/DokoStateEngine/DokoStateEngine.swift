@@ -200,7 +200,7 @@ public final class DokoStateEngine {
                     tripState: .active,
                     duration: .seconds(tripDraft.duration),
                     distance: .init(value: tripDraft.distance, unit: metric ? .kilometers : .miles),
-                    rangeConsumed: nil,
+                    rangeConsumed: tripDraft.range == nil ? nil :.init(value: tripDraft.range!, unit: metric ? .kilometers : .miles),
                     windSock: WindSock(
                       course: .init(value: position.course, unit: .degrees),
                       temperature: .init(value: weather.temperature, unit: .celsius).converted(to: metric ? .celsius : .fahrenheit),
