@@ -35,14 +35,6 @@ extension VwElectrics {
         }
         commandResponse = .weather(currentWeather)
 
-      case .meanTemperature:
-        guard
-          let meanTemperature = await DokoWeatherManager.shared.meanTemperature
-        else {
-          throw ParsedResponseError.meanTemperatureUnavailable
-        }
-        commandResponse = .meanTemperature(meanTemperature)
-
       case .gearSelected:
         let gearSelected = try parseGearSelected(response)
         commandResponse = .gearSelected(gearSelected)

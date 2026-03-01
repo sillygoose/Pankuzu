@@ -2,7 +2,7 @@
 import SwiftUI
 import WidgetKit
 
-import LiveActivityCore
+import DokoLiveActivityManager
 
 struct TripLiveActivityWidget: Widget {
   var body: some WidgetConfiguration {

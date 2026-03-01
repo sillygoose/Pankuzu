@@ -35,14 +35,6 @@ extension FordElectrics {
         }
         commandResponse = .weather(currentWeather)
 
-      case .meanTemperature:
-        guard
-          let meanTemperature = await DokoWeatherManager.shared.meanTemperature
-        else {
-          throw ParsedResponseError.meanTemperatureUnavailable
-        }
-        commandResponse = .meanTemperature(meanTemperature)
-
       case .odometer:
         let odometer = try parseOdometer(response)
         commandResponse = .odometer(odometer)

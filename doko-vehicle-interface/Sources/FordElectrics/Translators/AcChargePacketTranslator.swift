@@ -52,23 +52,20 @@ extension FordElectrics {
 
   func acChargeUpdateResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
-    guard
-      let energyToEmpty = responsePacket.energyToEmpty,
-      let stateOfCharge = responsePacket.stateOfCharge,
-      let stateOfHealth = responsePacket.stateOfHealth,
-      let batteryTemperature = responsePacket.batteryTemperature,
-      let couplerTemperature = responsePacket.acChargerCouplerTemperature
-    else {
-      dokoResponses[.error] = DokoCommandResponse(command: .acChargeUpdate, response: .error("agruments"))
-      return DokoResponsePacket(type: .acChargeUpdate, responses: dokoResponses)
-    }
     dokoResponses[.batteryPower] = DokoCommandResponse(command: .acChargeUpdate, response: .batteryPower(batteryPower))
     dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .acChargeUpdate, response: .batteryEnergy(batteryEnergy))
-    dokoResponses[.energyToEmpty] = DokoCommandResponse(command: .acChargeUpdate, response: .energyToEmpty(energyToEmpty))
-    dokoResponses[.stateOfCharge] = DokoCommandResponse(command: .acChargeUpdate, response: .stateOfCharge(stateOfCharge))
-    dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .acChargeUpdate, response: .batteryStateOfHealth(stateOfHealth))
-    dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .acChargeUpdate, response: .batteryTemperature(batteryTemperature))
-    dokoResponses[.couplerTemperature] = DokoCommandResponse(command: .acChargeUpdate, response: .couplerTemperature(couplerTemperature))
+    if let energyToEmpty = responsePacket.energyToEmpty {
+      dokoResponses[.energyToEmpty] = DokoCommandResponse(command: .acChargeUpdate, response: .energyToEmpty(energyToEmpty))
+    }
+    if let stateOfCharge = responsePacket.stateOfCharge {
+      dokoResponses[.stateOfCharge] = DokoCommandResponse(command: .acChargeUpdate, response: .stateOfCharge(stateOfCharge))
+    }
+    if let batteryTemperature = responsePacket.batteryTemperature {
+      dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .acChargeUpdate, response: .batteryTemperature(batteryTemperature))
+    }
+    if let couplerTemperature = responsePacket.acChargerCouplerTemperature {
+      dokoResponses[.couplerTemperature] = DokoCommandResponse(command: .acChargeUpdate, response: .couplerTemperature(couplerTemperature))
+    }
     return DokoResponsePacket(type: .acChargeUpdate, responses: dokoResponses)
   }
 

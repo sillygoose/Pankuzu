@@ -17,6 +17,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
   public var lastEnergyUpdateTime: Date?
   public var lastBatteryPower: Double?
 
+  public var meanTemperatureSum: Double = 0.0
+  public var meanTemperatureCount: Int = 0
+
   public init(vehicle: Vehicle?) {
     self.vehicle = vehicle
   }
@@ -30,17 +33,16 @@ public actor VwElectrics: ConnectedVehicleInterface {
       .gearSelected:                    "STPX h:17FC0076, d:22210E",  //0x17fc0076 03 22 21 0e 55 55 55 55
       .odometer:                        "STPX h:17FC0076, d:22295A",  //0x17fe0076 06 62 29 5a XX YY ZZ aa  (XX*2^16+YY*2^8+ZZ) = km in decimal
 
-      .stateOfCharge:                   "STPX h:17FC007B, d:222028C",  //0x17fc007b 03 22 02 8c 55 55 55 55
-      .batteryTemperature:              "STPX h:17FC007B, d:2222A0B",  //0x17fc007b 03 22 2a 0b
-      .batteryVoltage:                  "STPX h:17FC007B, d:2221E3B",  //0x17fc007b 03 22 1e 3b 55 55 55 55
-      .batteryCurrent:                  "STPX h:17FC007B, d:2221E3D",  //0x17fc007b 03 22 1e 3d 55 55 55 55
+      .stateOfCharge:                   "STPX h:17FC007B, d:22028C",  //0x17fc007b 03 22 02 8c 55 55 55 55
+      .batteryTemperature:              "STPX h:17FC007B, d:222A0B",  //0x17fc007b 03 22 2a 0b
+      .batteryVoltage:                  "STPX h:17FC007B, d:221E3B",  //0x17fc007b 03 22 1e 3b 55 55 55 55
+      .batteryCurrent:                  "STPX h:17FC007B, d:221E3D",  //0x17fc007b 03 22 1e 3d 55 55 55 55
 
       .acChargerStatus:                 "STPX h:17FC007B, d:227448",  //0x17fc007b 03 22 74 48 55 55 55 55
       .dcChargerStatus:                 "STPX h:17FC007B, d:227448",  //0x17fc007b 03 22 74 48 55 55 55 55
 
       .position:                        "",
       .weather:                         "",
-      .meanTemperature:                 "",
     ]
     guard let obdLinkCommand = commandLookupDictionary[command] else {
       DokoLogging.shared.postLoggingResponse(.error("VWE.vehicleObdCommand(\(command.description)): dictionary empty"))
@@ -96,7 +98,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
       ])
     case .tripEnding:
       return ObdCommandPacket(type: .tripEnding, commands: [
-        .weather, .meanTemperature,
+        .weather,
         .odometer,
         .stateOfCharge,
         .batteryTemperature,

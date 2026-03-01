@@ -9,7 +9,6 @@ extension VwElectrics {
     case unexpectedState(VehicleState)
     case locationUnavailable
     case weatherUnavailable
-    case meanTemperatureUnavailable
 
     public var errorDescription: String {
       switch self {
@@ -21,8 +20,6 @@ extension VwElectrics {
         "Request for location failed"
       case .weatherUnavailable:
         "Request for weather failed"
-      case .meanTemperatureUnavailable:
-        "Request for mean temperature failed"
       }
     }
   }

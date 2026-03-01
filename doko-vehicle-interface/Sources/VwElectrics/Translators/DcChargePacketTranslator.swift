@@ -46,17 +46,14 @@ extension VwElectrics {
   
   func dcChargeUpdateResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
-    guard
-      let stateOfCharge = responsePacket.stateOfCharge,
-      let batteryTemperature = responsePacket.batteryTemperature
-    else {
-      dokoResponses[.error] = DokoCommandResponse(command: .dcChargeUpdate, response: .error("agruments"))
-      return DokoResponsePacket(type: .dcChargeUpdate, responses: dokoResponses)
-    }
     dokoResponses[.batteryPower] = DokoCommandResponse(command: .dcChargeUpdate, response: .batteryPower(batteryPower))
     dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .dcChargeUpdate, response: .batteryEnergy(batteryEnergy))
-    dokoResponses[.stateOfCharge] = DokoCommandResponse(command: .dcChargeUpdate, response: .stateOfCharge(stateOfCharge))
-    dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .dcChargeUpdate, response: .batteryTemperature(batteryTemperature))
+    if let stateOfCharge = responsePacket.stateOfCharge {
+      dokoResponses[.stateOfCharge] = DokoCommandResponse(command: .dcChargeUpdate, response: .stateOfCharge(stateOfCharge))
+    }
+    if let batteryTemperature = responsePacket.batteryTemperature {
+      dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .dcChargeUpdate, response: .batteryTemperature(batteryTemperature))
+    }
     return DokoResponsePacket(type: .dcChargeUpdate, responses: dokoResponses)
   }
 

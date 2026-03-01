@@ -8,9 +8,8 @@ import DokoLogging
 import CoreLocationManager
 import DokoPacketManager
 import DokoVehicleManager
-import DokoWeatherManager
 import DokoNotificationManager
-import LiveActivityCore
+import DokoLiveActivityManager
 
 import Trips
 import Charges
@@ -35,6 +34,7 @@ public final class DokoStateEngine {
 
   var tripInProgress: Trip.Draft?
   var chargeInProgress: Charge.Draft?
+  var latestTripWeather: DokoCurrentWeather?
 
   private init() {
     accessoryNameObservation()
@@ -145,11 +145,9 @@ public final class DokoStateEngine {
             let nextState = dokoResponsePacket.nextState ?? .idle
             if nextState == .tripStarting {
               await CoreLocationManager.shared.startLocationUpdates()
-              DokoWeatherManager.shared.startWeatherService()
               await DokoNotificationManager.shared.startTripNotification(vehicle: connectedVehicle.vehicle?.makeModel ?? "Unknown")
             } else if nextState == .acChargeStarting || nextState == .dcChargeStarting {
               await CoreLocationManager.shared.startLocationUpdates()
-              DokoWeatherManager.shared.startWeatherService()
               await DokoNotificationManager.shared.startChargeNotification(vehicle: connectedVehicle.vehicle?.makeModel ?? "Unknown")
             }
             if nextState != .idle { $vehicleState.withLock { $0 = nextState } }
@@ -195,7 +193,7 @@ public final class DokoStateEngine {
             }
             do {
               self.tripInProgress = try Trip.postTripUpdateRecord(tripDraft: tripDraft, tripUpdateResponse: dokoResponsePacket)
-              if let tripDraft = self.tripInProgress, let position = await CoreLocationManager.shared.currentLocation, let weather = DokoWeatherManager.shared.latestWeather {
+              if let tripDraft = self.tripInProgress, let position = await CoreLocationManager.shared.currentLocation, let weather = self.latestTripWeather {
                 @Shared(.metric) var metric
                 await LiveActivityManager.shared.updateTrip(
                   state: TripActivityAttributes.ContentState(
@@ -228,9 +226,9 @@ public final class DokoStateEngine {
               do {
                 try Trip.postTripEndRecord(tripDraft: tripDraft, tripEndResponse: dokoResponsePacket)
                 await CoreLocationManager.shared.stopLocationUpdates()
-                DokoWeatherManager.shared.stopWeatherService()
                 await LiveActivityManager.shared.endTrip()
                 self.tripInProgress = nil
+                self.latestTripWeather = nil
                 $activeSession.withLock { $0 = nil }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".tripEnding: \(String(describing: error))"))
@@ -283,6 +281,9 @@ public final class DokoStateEngine {
             guard let tripID = self.tripInProgress?.id else { throw StateEngineError.missingTripID }
             do {
               try Trip.postTripWeatherRecord(tripID: tripID, tripWeatherPacket: dokoResponsePacket)
+              if let weather = dokoResponsePacket.weather {
+                self.latestTripWeather = weather
+              }
             } catch {
               DokoLogging.shared.postLoggingResponse(.error(".tripWeather: \(String(describing: error))"))
             }
@@ -301,7 +302,6 @@ public final class DokoStateEngine {
                   chargeStartResponse: dokoResponsePacket
                 )
                 await CoreLocationManager.shared.stopLocationUpdates()
-                DokoWeatherManager.shared.stopWeatherService()
                 await LiveActivityManager.shared.startCharge()
                 $activeSession.withLock { $0 = .acCharge }
               } catch {
@@ -353,7 +353,6 @@ public final class DokoStateEngine {
                   chargeStartResponse: dokoResponsePacket
                 )
                 await CoreLocationManager.shared.stopLocationUpdates()
-                DokoWeatherManager.shared.stopWeatherService()
                 await LiveActivityManager.shared.startCharge()
                 $activeSession.withLock { $0 = .dcCharge }
               } catch {

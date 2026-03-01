@@ -20,8 +20,8 @@
 		56BBC0062F0A08C4008C2BFE /* DokoStateEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 56BBC0052F0A08C4008C2BFE /* DokoStateEngine */; };
 		56BBC00A2F0A0AFD008C2BFE /* DokoUI in Frameworks */ = {isa = PBXBuildFile; productRef = 56BBC0092F0A0AFD008C2BFE /* DokoUI */; };
 		56DC448E2F1734700093A5C9 /* DokoNotificationManager in Frameworks */ = {isa = PBXBuildFile; productRef = 56DC448D2F1734700093A5C9 /* DokoNotificationManager */; };
-		56E516952F1FD59B00D816AA /* LiveActivityCore in Frameworks */ = {isa = PBXBuildFile; productRef = 56E516942F1FD59B00D816AA /* LiveActivityCore */; };
-		56E516972F1FD60B00D816AA /* LiveActivityCore in Frameworks */ = {isa = PBXBuildFile; productRef = 56E516962F1FD60B00D816AA /* LiveActivityCore */; };
+		56E516952F1FD59B00D816AA /* DokoLiveActivityManager in Frameworks */ = {isa = PBXBuildFile; productRef = 56E516942F1FD59B00D816AA /* DokoLiveActivityManager */; };
+		56E516972F1FD60B00D816AA /* DokoLiveActivityManager in Frameworks */ = {isa = PBXBuildFile; productRef = 56E516962F1FD60B00D816AA /* DokoLiveActivityManager */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,7 +57,6 @@
 
 /* Begin PBXFileReference section */
 		565E9EE72F0A00E400FE33AF /* doko-ui */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-ui"; sourceTree = "<group>"; };
-		566710A02F1FB9170084A371 /* doko-live-activities */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-live-activities"; sourceTree = "<group>"; };
 		566710A52F1FBBD20084A371 /* LiveActivityWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LiveActivityWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		566710A62F1FBBD20084A371 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		566710A82F1FBBD20084A371 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -122,7 +121,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				56E516952F1FD59B00D816AA /* LiveActivityCore in Frameworks */,
+				56E516952F1FD59B00D816AA /* DokoLiveActivityManager in Frameworks */,
 				566710A92F1FBBD20084A371 /* SwiftUI.framework in Frameworks */,
 				566710A72F1FBBD20084A371 /* WidgetKit.framework in Frameworks */,
 			);
@@ -136,7 +135,7 @@
 				56BBC0002F0A0899008C2BFE /* DokoLocationManager in Frameworks */,
 				56BBBFFE2F0A0893008C2BFE /* DokoPacketManager in Frameworks */,
 				56BBC0062F0A08C4008C2BFE /* DokoStateEngine in Frameworks */,
-				56E516972F1FD60B00D816AA /* LiveActivityCore in Frameworks */,
+				56E516972F1FD60B00D816AA /* DokoLiveActivityManager in Frameworks */,
 				56BBC00A2F0A0AFD008C2BFE /* DokoUI in Frameworks */,
 				56BBC0022F0A089E008C2BFE /* DokoVehicleManager in Frameworks */,
 				56BBC0042F0A08A3008C2BFE /* DokoWeatherManager in Frameworks */,
@@ -159,7 +158,6 @@
 		566DA71A2F05ACDB0044D201 = {
 			isa = PBXGroup;
 			children = (
-				566710A02F1FB9170084A371 /* doko-live-activities */,
 				565E9EE72F0A00E400FE33AF /* doko-ui */,
 				56A31D062F0A000700E4F1B4 /* doko-sharing */,
 				5692F1A92F09FCF800D9F0AA /* doko-vehicle-interface */,
@@ -219,7 +217,7 @@
 			);
 			name = LiveActivityWidget;
 			packageProductDependencies = (
-				56E516942F1FD59B00D816AA /* LiveActivityCore */,
+				56E516942F1FD59B00D816AA /* DokoLiveActivityManager */,
 			);
 			productName = LiveActivityWidgetExtension;
 			productReference = 566710A52F1FBBD20084A371 /* LiveActivityWidget.appex */;
@@ -255,7 +253,7 @@
 				56BBC0052F0A08C4008C2BFE /* DokoStateEngine */,
 				56BBC0092F0A0AFD008C2BFE /* DokoUI */,
 				56DC448D2F1734700093A5C9 /* DokoNotificationManager */,
-				56E516962F1FD60B00D816AA /* LiveActivityCore */,
+				56E516962F1FD60B00D816AA /* DokoLiveActivityManager */,
 			);
 			productName = Pankuzu;
 			productReference = 566DA7232F05ACDB0044D201 /* Pankuzu.app */;
@@ -421,7 +419,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = 3FWWMRTJCH;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -457,7 +455,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = 3FWWMRTJCH;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -619,7 +617,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Pankuzu/Pankuzu.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = 3FWWMRTJCH;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -663,7 +661,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Pankuzu/Pankuzu.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = 3FWWMRTJCH;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -705,7 +703,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 2026.02;
@@ -726,7 +724,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 2026.02;
@@ -836,13 +834,13 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = DokoNotificationManager;
 		};
-		56E516942F1FD59B00D816AA /* LiveActivityCore */ = {
+		56E516942F1FD59B00D816AA /* DokoLiveActivityManager */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = LiveActivityCore;
+			productName = DokoLiveActivityManager;
 		};
-		56E516962F1FD60B00D816AA /* LiveActivityCore */ = {
+		56E516962F1FD60B00D816AA /* DokoLiveActivityManager */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = LiveActivityCore;
+			productName = DokoLiveActivityManager;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

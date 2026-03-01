@@ -14,7 +14,7 @@ import DokoNotificationManager
 import DokoWeatherManager
 import DokoLocationManager
 import DokoStateEngine
-import LiveActivityCore
+import DokoLiveActivityManager
 
 /*
  NB: Only one refresh task permitted

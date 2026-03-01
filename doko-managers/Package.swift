@@ -14,6 +14,7 @@ let package = Package(
     .library(name: "DokoVehicleManager", targets: ["DokoVehicleManager"]),
     .library(name: "DokoWeatherManager", targets: ["DokoWeatherManager"]),
     .library(name: "DokoNotificationManager", targets: ["DokoNotificationManager"]),
+    .library(name: "DokoLiveActivityManager", targets: ["DokoLiveActivityManager"]),
   ],
   dependencies: [
     .package(path: "../doko-core"),
@@ -78,6 +79,13 @@ let package = Package(
         .product(name: "FordElectrics", package: "doko-vehicle-interface"),
         .product(name: "VwElectrics", package: "doko-vehicle-interface"),
         .product(name: "SQLiteData", package: "sqlite-data"),
+      ]
+    ),
+    .target(
+      name: "DokoLiveActivityManager",
+      dependencies: [
+        .product(name: "DokoSharing", package: "doko-sharing"),
+        .product(name: "DokoLogging", package: "doko-logging"),
       ]
     ),
   ],

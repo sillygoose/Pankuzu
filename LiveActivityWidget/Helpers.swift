@@ -1,6 +1,6 @@
 import SwiftUI
 
-import LiveActivityCore
+import DokoLiveActivityManager
 
 struct MeasurementValueView<U: Dimension>: View {
   let measurement: Measurement<U>

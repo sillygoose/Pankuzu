@@ -15,7 +15,6 @@ let package = Package(
     .package(path: "../doko-sharing"),
     .package(path: "../doko-logging"),
     .package(path: "../doko-managers"),
-    .package(path: "../doko-live-activities"),
     .package(path: "../doko-schema"),
   ],
   targets: [
@@ -26,11 +25,10 @@ let package = Package(
         .product(name: "DokoSharing", package: "doko-sharing"),
         .product(name: "DokoLogging", package: "doko-logging"),
         .product(name: "DokoPacketManager", package: "doko-managers"),
-        .product(name: "DokoWeatherManager", package: "doko-managers"),
         .product(name: "DokoNotificationManager", package: "doko-managers"),
         .product(name: "DokoVehicleManager", package: "doko-managers"),
         .product(name: "CoreLocationManager", package: "doko-managers"),
-        .product(name: "LiveActivityCore", package: "doko-live-activities"),
+        .product(name: "DokoLiveActivityManager", package: "doko-managers"),
         .product(name: "DokoSchema", package: "doko-schema"),
       ]
     ),

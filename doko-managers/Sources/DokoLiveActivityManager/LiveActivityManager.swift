@@ -2,12 +2,15 @@ import Foundation
 @preconcurrency import ActivityKit
 
 import DokoLogging
+import DokoSharing
 
 @MainActor
 public final class LiveActivityManager {
   public static let shared = LiveActivityManager()
 
-  private init() {}
+  private init() {
+    startAccessoryNameObservation()
+  }
 
   private enum AnyManagedActivity {
     case trip(Activity<TripActivityAttributes>)
@@ -37,6 +40,25 @@ public final class LiveActivityManager {
 
   private var managedActivity: AnyManagedActivity?
 
+  private func startAccessoryNameObservation() {
+    @Shared(.connectedAccessory) var observedAccessoryName
+    Task { [weak self] in
+      guard let self else { return }
+      var oldAccessoryName: String? = nil
+      for await newAccessoryName in $observedAccessoryName.publisher.values {
+        if Task.isCancelled { break }
+        guard oldAccessoryName != newAccessoryName else { continue }
+        if newAccessoryName == nil {
+          guard let activity = self.managedActivity else { continue }
+          DokoLogging.shared.postLoggingResponse(.liveActivity("ending activity due to disconnect"))
+          await activity.endImmediately()
+          self.managedActivity = nil
+        }
+        oldAccessoryName = newAccessoryName
+      }
+    }
+  }
+
   public func startTrip() async {
     guard ActivityAuthorizationInfo().areActivitiesEnabled else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startTrip: Live Activities not enabled"))
@@ -47,16 +69,18 @@ public final class LiveActivityManager {
       await currentActivity.endImmediately()
     }
     let initial = TripActivityAttributes.ContentState(tripState: .starting)
-    guard let activity = try? Activity.request(
-      attributes: TripActivityAttributes(),
-      content: ActivityContent(state: initial, staleDate: Date.now.addingTimeInterval(15))
-    )
-    else {
-      DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startTrip: Activity.request() failed"))
+    let activity: Activity<TripActivityAttributes>
+    do {
+      activity = try Activity.request(
+        attributes: TripActivityAttributes(),
+        content: ActivityContent(state: initial, staleDate: Date.now.addingTimeInterval(15))
+      )
+    } catch {
+      DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startTrip: \(error.localizedDescription)"))
       return
     }
     self.managedActivity = .trip(activity)
-    DokoLogging.shared.postLoggingResponse(.liveActivity("LiveActivityManager.startTrip"))
+    DokoLogging.shared.postLoggingResponse(.liveActivity(".startTrip"))
   }
 
   public func updateTrip(state: TripActivityAttributes.ContentState, staleAfter seconds: TimeInterval = 60) async {
@@ -66,7 +90,7 @@ public final class LiveActivityManager {
     }
     let content = ActivityContent(state: state, staleDate: Date.now.addingTimeInterval(seconds))
     await activity.update(content)
-    DokoLogging.shared.postLoggingResponse(.liveActivity("LiveActivityManager.updateTrip"))
+    DokoLogging.shared.postLoggingResponse(.liveActivity(".updateTrip"))
   }
 
   public func endTrip(removeAfter seconds: TimeInterval = 15) async {
@@ -77,7 +101,7 @@ public final class LiveActivityManager {
     let content = ActivityContent(state: TripActivityAttributes.ContentState(tripState: .ended), staleDate: nil)
     await activity.end(content, dismissalPolicy: .after(Date.now.addingTimeInterval(seconds)))
     self.managedActivity = nil
-    DokoLogging.shared.postLoggingResponse(.liveActivity("LiveActivityManager.endTrip"))
+    DokoLogging.shared.postLoggingResponse(.liveActivity(".endTrip"))
   }
 
   public func startCharge() async {
@@ -90,16 +114,18 @@ public final class LiveActivityManager {
       await currentActivity.endImmediately()
     }
     let initial = ChargeActivityAttributes.ContentState(chargeState: .starting)
-    guard let activity = try? Activity.request(
-      attributes: ChargeActivityAttributes(),
-      content: ActivityContent(state: initial, staleDate: Date.now.addingTimeInterval(15))
-    )
-    else {
-      DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startCharge: Activity.request() failed"))
+    let activity: Activity<ChargeActivityAttributes>
+    do {
+      activity = try Activity.request(
+        attributes: ChargeActivityAttributes(),
+        content: ActivityContent(state: initial, staleDate: Date.now.addingTimeInterval(15))
+      )
+    } catch {
+      DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startCharge: \(error.localizedDescription)"))
       return
     }
     self.managedActivity = .charge(activity)
-    DokoLogging.shared.postLoggingResponse(.liveActivity("LiveActivityManager.startCharge"))
+    DokoLogging.shared.postLoggingResponse(.liveActivity(".startCharge"))
 }
 
   public func updateCharge(state: ChargeActivityAttributes.ContentState, staleAfter seconds: TimeInterval = 60) async {
@@ -109,7 +135,7 @@ public final class LiveActivityManager {
     }
     let content = ActivityContent(state: state, staleDate: Date.now.addingTimeInterval(seconds))
     await activity.update(content)
-    DokoLogging.shared.postLoggingResponse(.liveActivity("LiveActivityManager.updateCharge"))
+    DokoLogging.shared.postLoggingResponse(.liveActivity(".updateCharge"))
   }
 
   public func endCharge(removeAfter seconds: TimeInterval = 15) async {
@@ -120,6 +146,6 @@ public final class LiveActivityManager {
     let content = ActivityContent(state: ChargeActivityAttributes.ContentState(chargeState: .ended), staleDate: nil)
     await activity.end(content, dismissalPolicy: .after(Date.now.addingTimeInterval(seconds)))
     self.managedActivity = nil
-    DokoLogging.shared.postLoggingResponse(.liveActivity("LiveActivityManager.endCharge"))
+    DokoLogging.shared.postLoggingResponse(.liveActivity(".endCharge"))
   }
 }
