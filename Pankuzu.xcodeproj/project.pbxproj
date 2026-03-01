@@ -20,8 +20,8 @@
 		56BBC0062F0A08C4008C2BFE /* DokoStateEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 56BBC0052F0A08C4008C2BFE /* DokoStateEngine */; };
 		56BBC00A2F0A0AFD008C2BFE /* DokoUI in Frameworks */ = {isa = PBXBuildFile; productRef = 56BBC0092F0A0AFD008C2BFE /* DokoUI */; };
 		56DC448E2F1734700093A5C9 /* DokoNotificationManager in Frameworks */ = {isa = PBXBuildFile; productRef = 56DC448D2F1734700093A5C9 /* DokoNotificationManager */; };
-		56E516952F1FD59B00D816AA /* LiveActivityCore in Frameworks */ = {isa = PBXBuildFile; productRef = 56E516942F1FD59B00D816AA /* LiveActivityCore */; };
-		56E516972F1FD60B00D816AA /* LiveActivityCore in Frameworks */ = {isa = PBXBuildFile; productRef = 56E516962F1FD60B00D816AA /* LiveActivityCore */; };
+		56E516952F1FD59B00D816AA /* DokoLiveActivityManager in Frameworks */ = {isa = PBXBuildFile; productRef = 56E516942F1FD59B00D816AA /* DokoLiveActivityManager */; };
+		56E516972F1FD60B00D816AA /* DokoLiveActivityManager in Frameworks */ = {isa = PBXBuildFile; productRef = 56E516962F1FD60B00D816AA /* DokoLiveActivityManager */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,7 +122,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				56E516952F1FD59B00D816AA /* LiveActivityCore in Frameworks */,
+				56E516952F1FD59B00D816AA /* DokoLiveActivityManager in Frameworks */,
 				566710A92F1FBBD20084A371 /* SwiftUI.framework in Frameworks */,
 				566710A72F1FBBD20084A371 /* WidgetKit.framework in Frameworks */,
 			);
@@ -136,7 +136,7 @@
 				56BBC0002F0A0899008C2BFE /* DokoLocationManager in Frameworks */,
 				56BBBFFE2F0A0893008C2BFE /* DokoPacketManager in Frameworks */,
 				56BBC0062F0A08C4008C2BFE /* DokoStateEngine in Frameworks */,
-				56E516972F1FD60B00D816AA /* LiveActivityCore in Frameworks */,
+				56E516972F1FD60B00D816AA /* DokoLiveActivityManager in Frameworks */,
 				56BBC00A2F0A0AFD008C2BFE /* DokoUI in Frameworks */,
 				56BBC0022F0A089E008C2BFE /* DokoVehicleManager in Frameworks */,
 				56BBC0042F0A08A3008C2BFE /* DokoWeatherManager in Frameworks */,
@@ -219,7 +219,7 @@
 			);
 			name = LiveActivityWidget;
 			packageProductDependencies = (
-				56E516942F1FD59B00D816AA /* LiveActivityCore */,
+				56E516942F1FD59B00D816AA /* DokoLiveActivityManager */,
 			);
 			productName = LiveActivityWidgetExtension;
 			productReference = 566710A52F1FBBD20084A371 /* LiveActivityWidget.appex */;
@@ -255,7 +255,7 @@
 				56BBC0052F0A08C4008C2BFE /* DokoStateEngine */,
 				56BBC0092F0A0AFD008C2BFE /* DokoUI */,
 				56DC448D2F1734700093A5C9 /* DokoNotificationManager */,
-				56E516962F1FD60B00D816AA /* LiveActivityCore */,
+				56E516962F1FD60B00D816AA /* DokoLiveActivityManager */,
 			);
 			productName = Pankuzu;
 			productReference = 566DA7232F05ACDB0044D201 /* Pankuzu.app */;
@@ -836,13 +836,13 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = DokoNotificationManager;
 		};
-		56E516942F1FD59B00D816AA /* LiveActivityCore */ = {
+		56E516942F1FD59B00D816AA /* DokoLiveActivityManager */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = LiveActivityCore;
+			productName = DokoLiveActivityManager;
 		};
-		56E516962F1FD60B00D816AA /* LiveActivityCore */ = {
+		56E516962F1FD60B00D816AA /* DokoLiveActivityManager */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = LiveActivityCore;
+			productName = DokoLiveActivityManager;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

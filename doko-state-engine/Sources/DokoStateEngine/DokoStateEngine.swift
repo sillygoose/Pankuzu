@@ -9,7 +9,7 @@ import CoreLocationManager
 import DokoPacketManager
 import DokoVehicleManager
 import DokoNotificationManager
-import LiveActivityCore
+import DokoLiveActivityManager
 
 import Trips
 import Charges

@@ -7,7 +7,7 @@ let package = Package(
     .iOS(.v26)
   ],
   products: [
-    .library(name: "LiveActivityCore", targets: ["LiveActivityCore"])
+    .library(name: "DokoLiveActivityManager", targets: ["DokoLiveActivityManager"])
   ],
   dependencies: [
     .package(path: "../doko-logging"),
@@ -15,7 +15,7 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "LiveActivityCore",
+      name: "DokoLiveActivityManager",
       dependencies: [
         .product(name: "DokoLogging", package: "doko-logging"),
         .product(name: "DokoWeatherManager", package: "doko-managers"),

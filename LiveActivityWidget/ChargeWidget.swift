@@ -2,7 +2,7 @@
 import SwiftUI
 import WidgetKit
 
-import LiveActivityCore
+import DokoLiveActivityManager
 
 struct ChargeLiveActivityWidget: Widget {
   var body: some WidgetConfiguration {
