@@ -110,7 +110,7 @@ extension Trip {
     tripDraft.energyToEmptyEnd = tripEndResponse.energyToEmpty
 
     tripDraft.distanceToEmptyEnd = tripEndResponse.distanceToEmpty
-    if let dteStart = tripDraft.energyToEmptyStart, let dteEnd = tripEndResponse.distanceToEmpty {
+    if let dteStart = tripDraft.distanceToEmptyStart, let dteEnd = tripEndResponse.distanceToEmpty {
       tripDraft.range = dteStart - dteEnd
     }
 
@@ -162,7 +162,7 @@ extension Trip {
     tripDraft.energyToEmptyEnd = tripUpdateResponse.energyToEmpty
 
     tripDraft.distanceToEmptyEnd = tripUpdateResponse.distanceToEmpty
-    if let dteStart = tripDraft.energyToEmptyStart, let dteEnd = tripUpdateResponse.distanceToEmpty {
+    if let dteStart = tripDraft.distanceToEmptyStart, let dteEnd = tripUpdateResponse.distanceToEmpty {
       tripDraft.range = dteStart - dteEnd
     }
 
