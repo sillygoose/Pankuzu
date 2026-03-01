@@ -15,8 +15,10 @@ public final class DokoWeatherManager: Sendable {
   private var _latestWeatherUpdate: DokoCurrentWeather?
 
   public var latestWeather: DokoCurrentWeather? {
-    guard let latest = _latestWeatherUpdate,
-          Date.now.timeIntervalSince(latest.timestamp) < 600 else { return nil }
+    guard
+      let latest = _latestWeatherUpdate,
+      Date.now.timeIntervalSince(latest.timestamp) < 660
+    else { return nil }
     return latest
   }
 

@@ -24,7 +24,7 @@ extension FordElectrics {
     case .tripWeather:
       return tripWeatherResponsePacket(responsePacket)
     case .tripEnding:
-      return tripEndingResponsePacket(responsePacket)
+      return await tripEndingResponsePacket(responsePacket)
 
     case .acChargeStarting:
       return acChargeStartingResponsePacket(responsePacket)
