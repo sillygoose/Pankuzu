@@ -57,7 +57,6 @@
 
 /* Begin PBXFileReference section */
 		565E9EE72F0A00E400FE33AF /* doko-ui */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-ui"; sourceTree = "<group>"; };
-		566710A02F1FB9170084A371 /* doko-live-activities */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-live-activities"; sourceTree = "<group>"; };
 		566710A52F1FBBD20084A371 /* LiveActivityWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LiveActivityWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		566710A62F1FBBD20084A371 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		566710A82F1FBBD20084A371 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -159,7 +158,6 @@
 		566DA71A2F05ACDB0044D201 = {
 			isa = PBXGroup;
 			children = (
-				566710A02F1FB9170084A371 /* doko-live-activities */,
 				565E9EE72F0A00E400FE33AF /* doko-ui */,
 				56A31D062F0A000700E4F1B4 /* doko-sharing */,
 				5692F1A92F09FCF800D9F0AA /* doko-vehicle-interface */,
