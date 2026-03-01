@@ -47,12 +47,14 @@ public final class LiveActivityManager {
       await currentActivity.endImmediately()
     }
     let initial = TripActivityAttributes.ContentState(tripState: .starting)
-    guard let activity = try? Activity.request(
-      attributes: TripActivityAttributes(),
-      content: ActivityContent(state: initial, staleDate: Date.now.addingTimeInterval(15))
-    )
-    else {
-      DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startTrip: Activity.request() failed"))
+    let activity: Activity<TripActivityAttributes>
+    do {
+      activity = try Activity.request(
+        attributes: TripActivityAttributes(),
+        content: ActivityContent(state: initial, staleDate: Date.now.addingTimeInterval(15))
+      )
+    } catch {
+      DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startTrip: \(error.localizedDescription)"))
       return
     }
     self.managedActivity = .trip(activity)
@@ -90,12 +92,14 @@ public final class LiveActivityManager {
       await currentActivity.endImmediately()
     }
     let initial = ChargeActivityAttributes.ContentState(chargeState: .starting)
-    guard let activity = try? Activity.request(
-      attributes: ChargeActivityAttributes(),
-      content: ActivityContent(state: initial, staleDate: Date.now.addingTimeInterval(15))
-    )
-    else {
-      DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startCharge: Activity.request() failed"))
+    let activity: Activity<ChargeActivityAttributes>
+    do {
+      activity = try Activity.request(
+        attributes: ChargeActivityAttributes(),
+        content: ActivityContent(state: initial, staleDate: Date.now.addingTimeInterval(15))
+      )
+    } catch {
+      DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startCharge: \(error.localizedDescription)"))
       return
     }
     self.managedActivity = .charge(activity)
