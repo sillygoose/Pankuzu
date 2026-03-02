@@ -87,7 +87,6 @@ struct TripActiveView: View {
       }
     }
     .padding()
-    .frame(height: 160)
   }
 
   private struct WindIndicator: View {
