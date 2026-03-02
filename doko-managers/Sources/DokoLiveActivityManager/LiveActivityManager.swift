@@ -10,6 +10,7 @@ public final class LiveActivityManager {
 
   private init() {
     startAccessoryNameObservation()
+    startForegroundObservation()
   }
 
   private enum AnyManagedActivity {
@@ -40,6 +41,26 @@ public final class LiveActivityManager {
 
   private var managedActivity: AnyManagedActivity?
 
+  private enum PendingActivity {
+    case trip
+    case charge
+  }
+
+  private var pendingActivity: PendingActivity?
+
+  private func startForegroundObservation() {
+    Task {
+      for await _ in NotificationCenter.default.notifications(named: Notification.Name("UIApplicationDidBecomeActiveNotification")) {
+        guard let pending = self.pendingActivity else { continue }
+        self.pendingActivity = nil
+        switch pending {
+        case .trip: await self.startTrip()
+        case .charge: await self.startCharge()
+        }
+      }
+    }
+  }
+
   private func startAccessoryNameObservation() {
     @Shared(.connectedAccessory) var observedAccessoryName
     Task { [weak self] in
@@ -53,6 +74,7 @@ public final class LiveActivityManager {
           DokoLogging.shared.postLoggingResponse(.liveActivity("ending activity due to disconnect"))
           await activity.endImmediately()
           self.managedActivity = nil
+          self.pendingActivity = nil
         }
         oldAccessoryName = newAccessoryName
       }
@@ -77,6 +99,7 @@ public final class LiveActivityManager {
       )
     } catch {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startTrip: \(error.localizedDescription)"))
+      pendingActivity = .trip
       return
     }
     self.managedActivity = .trip(activity)
@@ -101,6 +124,7 @@ public final class LiveActivityManager {
     let content = ActivityContent(state: TripActivityAttributes.ContentState(tripState: .ended), staleDate: nil)
     await activity.end(content, dismissalPolicy: .after(Date.now.addingTimeInterval(seconds)))
     self.managedActivity = nil
+    self.pendingActivity = nil
     DokoLogging.shared.postLoggingResponse(.liveActivity(".endTrip"))
   }
 
@@ -122,6 +146,7 @@ public final class LiveActivityManager {
       )
     } catch {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startCharge: \(error.localizedDescription)"))
+      pendingActivity = .charge
       return
     }
     self.managedActivity = .charge(activity)
@@ -146,6 +171,7 @@ public final class LiveActivityManager {
     let content = ActivityContent(state: ChargeActivityAttributes.ContentState(chargeState: .ended), staleDate: nil)
     await activity.end(content, dismissalPolicy: .after(Date.now.addingTimeInterval(seconds)))
     self.managedActivity = nil
+    self.pendingActivity = nil
     DokoLogging.shared.postLoggingResponse(.liveActivity(".endCharge"))
   }
 }
