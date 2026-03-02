@@ -34,7 +34,6 @@ public final class DokoStateEngine {
 
   var tripInProgress: Trip.Draft?
   var chargeInProgress: Charge.Draft?
-  var latestTripWeather: DokoCurrentWeather?
 
   private init() {
     accessoryNameObservation()
@@ -192,26 +191,30 @@ public final class DokoStateEngine {
               throw StateEngineError.tripDraftError
             }
             do {
-              self.tripInProgress = try Trip.postTripUpdateRecord(tripDraft: tripDraft, tripUpdateResponse: dokoResponsePacket)
-              if let tripDraft = self.tripInProgress, let position = await CoreLocationManager.shared.currentLocation, let weather = self.latestTripWeather {
-                @Shared(.metric) var metric
-                await LiveActivityManager.shared.updateTrip(
-                  state: TripActivityAttributes.ContentState(
-                    tripState: .active,
-                    duration: .seconds(tripDraft.duration),
-                    distance: .init(value: tripDraft.distance, unit: metric ? .kilometers : .miles),
-                    rangeConsumed: tripDraft.range == nil ? nil :.init(value: tripDraft.range!, unit: metric ? .kilometers : .miles),
-                    windSock: WindSock(
-                      course: .init(value: position.course, unit: .degrees),
-                      temperature: .init(value: weather.temperature, unit: .celsius).converted(to: metric ? .celsius : .fahrenheit),
-                      conditions: weather.conditionSymbol,
-                      windSpeed: .init(value: weather.windSpeed, unit: .metersPerSecond).converted(to: metric ? .metersPerSecond : .milesPerHour),
-                      windDirection: .init(value: weather.windDirection, unit: .degrees),
-                      windCompassDirection: weather.windCompassDirection
-                    )
-                  )
+              let tripDraft = try Trip.postTripUpdateRecord(tripDraft: tripDraft, tripUpdateResponse: dokoResponsePacket)
+              self.tripInProgress = tripDraft
+              let position = await CoreLocationManager.shared.currentLocation
+              let weather = dokoResponsePacket.weather
+              @Shared(.metric) var metric
+              let windSock: WindSock? = if let position, let weather {
+                WindSock(
+                  course: .init(value: position.course, unit: .degrees),
+                  temperature: .init(value: weather.temperature, unit: .celsius).converted(to: metric ? .celsius : .fahrenheit),
+                  conditions: weather.conditionSymbol,
+                  windSpeed: .init(value: weather.windSpeed, unit: .metersPerSecond).converted(to: metric ? .metersPerSecond : .milesPerHour),
+                  windDirection: .init(value: weather.windDirection, unit: .degrees),
+                  windCompassDirection: weather.windCompassDirection
                 )
-              }
+              } else { nil }
+              await LiveActivityManager.shared.updateTrip(
+                state: TripActivityAttributes.ContentState(
+                  tripState: .active,
+                  duration: .seconds(tripDraft.duration),
+                  distance: .init(value: tripDraft.distance, unit: metric ? .kilometers : .miles),
+                  rangeConsumed: tripDraft.range.map { .init(value: $0, unit: metric ? .kilometers : .miles) },
+                  windSock: windSock
+                )
+              )
             } catch {
               DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(String(describing: error))"))
             }
@@ -228,7 +231,6 @@ public final class DokoStateEngine {
                 await CoreLocationManager.shared.stopLocationUpdates()
                 await LiveActivityManager.shared.endTrip()
                 self.tripInProgress = nil
-                self.latestTripWeather = nil
                 $activeSession.withLock { $0 = nil }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".tripEnding: \(String(describing: error))"))
@@ -281,9 +283,6 @@ public final class DokoStateEngine {
             guard let tripID = self.tripInProgress?.id else { throw StateEngineError.missingTripID }
             do {
               try Trip.postTripWeatherRecord(tripID: tripID, tripWeatherPacket: dokoResponsePacket)
-              if let weather = dokoResponsePacket.weather {
-                self.latestTripWeather = weather
-              }
             } catch {
               DokoLogging.shared.postLoggingResponse(.error(".tripWeather: \(String(describing: error))"))
             }
