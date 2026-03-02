@@ -7,30 +7,30 @@ import DokoSharing
 @MainActor
 public final class LiveActivityManager {
   public static let shared = LiveActivityManager()
-
+  
   private init() {
     startAccessoryNameObservation()
     startForegroundObservation()
   }
-
+  
   private enum AnyManagedActivity {
     case trip(Activity<TripActivityAttributes>)
     case charge(Activity<ChargeActivityAttributes>)
-
+    
     var id: String {
       switch self {
       case .trip(let trip): return trip.id
       case .charge(let charge): return charge.id
       }
     }
-
+    
     func endImmediately() async {
       switch self {
       case .trip(let activity):
         let final = TripActivityAttributes.ContentState(tripState: .ended)
         let content = ActivityContent(state: final, staleDate: nil)
         await activity.end(content, dismissalPolicy: .immediate)
-
+        
       case .charge(let activity):
         let final = ChargeActivityAttributes.ContentState(chargeState: .ended)
         let content = ActivityContent(state: final, staleDate: nil)
@@ -38,16 +38,16 @@ public final class LiveActivityManager {
       }
     }
   }
-
+  
   private var managedActivity: AnyManagedActivity?
-
+  
   private enum PendingActivity {
     case trip
     case charge
   }
-
+  
   private var pendingActivity: PendingActivity?
-
+  
   private func startForegroundObservation() {
     Task {
       for await _ in NotificationCenter.default.notifications(named: Notification.Name("UIApplicationDidBecomeActiveNotification")) {
@@ -60,7 +60,7 @@ public final class LiveActivityManager {
       }
     }
   }
-
+  
   private func startAccessoryNameObservation() {
     @Shared(.connectedAccessory) var observedAccessoryName
     Task { [weak self] in
@@ -80,7 +80,7 @@ public final class LiveActivityManager {
       }
     }
   }
-
+  
   public func startTrip() async {
     guard ActivityAuthorizationInfo().areActivitiesEnabled else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startTrip: Live Activities not enabled"))
@@ -98,15 +98,16 @@ public final class LiveActivityManager {
         content: ActivityContent(state: initial, staleDate: Date.now.addingTimeInterval(15))
       )
     } catch {
-      DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startTrip: \(error.localizedDescription)"))
+      DokoLogging.shared.postLoggingResponse(.liveActivity("pending trip live activities"))
       pendingActivity = .trip
       return
     }
     self.managedActivity = .trip(activity)
     DokoLogging.shared.postLoggingResponse(.liveActivity(".startTrip"))
   }
-
+  
   public func updateTrip(state: TripActivityAttributes.ContentState, staleAfter seconds: TimeInterval = 60) async {
+    if pendingActivity == .trip { return }
     guard case .trip(let activity)? = managedActivity else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.updateTrip: no activity"))
       return
@@ -115,8 +116,9 @@ public final class LiveActivityManager {
     await activity.update(content)
     DokoLogging.shared.postLoggingResponse(.liveActivity(".updateTrip"))
   }
-
+  
   public func endTrip(removeAfter seconds: TimeInterval = 15) async {
+    if pendingActivity == .trip { pendingActivity = nil; return }
     guard case .trip(let activity)? = managedActivity else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.endTrip: no activity"))
       return
@@ -127,7 +129,7 @@ public final class LiveActivityManager {
     self.pendingActivity = nil
     DokoLogging.shared.postLoggingResponse(.liveActivity(".endTrip"))
   }
-
+  
   public func startCharge() async {
     guard ActivityAuthorizationInfo().areActivitiesEnabled else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startCharge: Live Activities not enabled"))
@@ -145,15 +147,16 @@ public final class LiveActivityManager {
         content: ActivityContent(state: initial, staleDate: Date.now.addingTimeInterval(15))
       )
     } catch {
-      DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startCharge: \(error.localizedDescription)"))
+      DokoLogging.shared.postLoggingResponse(.liveActivity("pending charge live activities"))
       pendingActivity = .charge
       return
     }
     self.managedActivity = .charge(activity)
     DokoLogging.shared.postLoggingResponse(.liveActivity(".startCharge"))
-}
-
+  }
+  
   public func updateCharge(state: ChargeActivityAttributes.ContentState, staleAfter seconds: TimeInterval = 60) async {
+    if pendingActivity == .charge { return }
     guard case .charge(let activity)? = managedActivity else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.updateCharge: no activity"))
       return
@@ -162,8 +165,9 @@ public final class LiveActivityManager {
     await activity.update(content)
     DokoLogging.shared.postLoggingResponse(.liveActivity(".updateCharge"))
   }
-
+  
   public func endCharge(removeAfter seconds: TimeInterval = 15) async {
+    if pendingActivity == .charge { pendingActivity = nil; return }
     guard case .charge(let activity)? = managedActivity else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.endCharge: no activity"))
       return
