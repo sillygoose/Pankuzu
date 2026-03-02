@@ -210,8 +210,8 @@ public final class DokoStateEngine {
                 state: TripActivityAttributes.ContentState(
                   tripState: .active,
                   duration: .seconds(tripDraft.duration),
-                  distance: .init(value: tripDraft.distance, unit: metric ? .kilometers : .miles),
-                  rangeConsumed: tripDraft.range.map { .init(value: $0, unit: metric ? .kilometers : .miles) },
+                  distance: Measurement(value: tripDraft.distance, unit: UnitLength.kilometers).converted(to: metric ? .kilometers : .miles),
+                  rangeConsumed: tripDraft.range.map { Measurement(value: $0, unit: UnitLength.kilometers).converted(to: metric ? .kilometers : .miles) },
                   windSock: windSock
                 )
               )
