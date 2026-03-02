@@ -17,7 +17,7 @@ extension VwElectrics {
     case .tripInProgress:
       return tripInProgressResponsePacket(responsePacket)
     case .tripUpdate:
-      return tripUpdateResponsePacket(responsePacket)
+      return await tripUpdateResponsePacket(responsePacket)
     case .tripEnergy:
       return tripEnergyResponsePacket(responsePacket)
     case .tripData:
@@ -25,7 +25,7 @@ extension VwElectrics {
     case .tripWeather:
       return tripWeatherResponsePacket(responsePacket)
     case .tripEnding:
-      return tripEndingResponsePacket(responsePacket)
+      return await tripEndingResponsePacket(responsePacket)
 
     case .acChargeStarting:
       return acChargeStartingResponsePacket(responsePacket)

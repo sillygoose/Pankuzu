@@ -110,7 +110,7 @@ extension Trip {
     tripDraft.energyToEmptyEnd = tripEndResponse.energyToEmpty
 
     tripDraft.distanceToEmptyEnd = tripEndResponse.distanceToEmpty
-    if let dteStart = tripDraft.energyToEmptyStart, let dteEnd = tripEndResponse.distanceToEmpty {
+    if let dteStart = tripDraft.distanceToEmptyStart, let dteEnd = tripEndResponse.distanceToEmpty {
       tripDraft.range = dteStart - dteEnd
     }
 
@@ -162,12 +162,23 @@ extension Trip {
     tripDraft.energyToEmptyEnd = tripUpdateResponse.energyToEmpty
 
     tripDraft.distanceToEmptyEnd = tripUpdateResponse.distanceToEmpty
-    if let dteStart = tripDraft.energyToEmptyStart, let dteEnd = tripUpdateResponse.distanceToEmpty {
+    if let dteStart = tripDraft.distanceToEmptyStart, let dteEnd = tripUpdateResponse.distanceToEmpty {
       tripDraft.range = dteStart - dteEnd
     }
 
     tripDraft.stateOfChargeEnd = tripUpdateResponse.stateOfCharge
     tripDraft.batteryTempEnd = tripUpdateResponse.batteryTemperature
+
+    if let weather = tripUpdateResponse.weather {
+      tripDraft.weatherTempEnd = weather.temperature
+      tripDraft.weatherConditionsEnd = weather.conditionSymbol
+      if tripDraft.weatherTempStart == nil {
+        tripDraft.weatherTempStart = weather.temperature
+      }
+      if tripDraft.weatherConditionsStart == nil {
+        tripDraft.weatherConditionsStart = weather.conditionSymbol
+      }
+    }
 
     @Dependency(\.defaultDatabase) var database
     withErrorReporting {

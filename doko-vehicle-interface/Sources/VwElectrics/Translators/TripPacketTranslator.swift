@@ -2,6 +2,7 @@ import OSLog
 
 import DokoTypes
 import ObdLinkCore
+import DokoWeatherManager
 
 extension VwElectrics {
   func tripStartingResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
@@ -48,7 +49,7 @@ extension VwElectrics {
     return DokoResponsePacket(type: .tripInProgress, responses: dokoResponses)
   }
   
-  func tripEndingResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+  func tripEndingResponsePacket(_ responsePacket: ObdResponsePacket) async -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
     guard
       let position = responsePacket.position,
@@ -70,6 +71,11 @@ extension VwElectrics {
       meanTemperatureCount += 1
       dokoResponses[.weather] = DokoCommandResponse(command: .tripEnding, response: .weather(weather))
     }
+    else if let latestWeather = await DokoWeatherManager.shared.latestWeather {
+      meanTemperatureSum += latestWeather.temperature
+      meanTemperatureCount += 1
+      dokoResponses[.weather] = DokoCommandResponse(command: .tripEnding, response: .weather(latestWeather))
+    }
     if meanTemperatureCount > 0 {
       let meanTemperature = meanTemperatureSum / Double(meanTemperatureCount)
       dokoResponses[.meanTemperature] = DokoCommandResponse(command: .tripEnding, response: .meanTemperature(meanTemperature))
@@ -77,7 +83,7 @@ extension VwElectrics {
     return DokoResponsePacket(type: .tripEnding, responses: dokoResponses)
   }
 
-  func tripUpdateResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+  func tripUpdateResponsePacket(_ responsePacket: ObdResponsePacket) async -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
     guard
       let position = responsePacket.position,
@@ -93,6 +99,9 @@ extension VwElectrics {
     dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripUpdate, response: .batteryEnergy(-batteryEnergy))
     dokoResponses[.stateOfCharge] = DokoCommandResponse(command: .tripUpdate, response: .stateOfCharge(stateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripUpdate, response: .batteryTemperature(batteryTemperature))
+    if let latestWeather = await DokoWeatherManager.shared.latestWeather {
+      dokoResponses[.weather] = DokoCommandResponse(command: .tripUpdate, response: .weather(latestWeather))
+    }
     return DokoResponsePacket(type: .tripUpdate, responses: dokoResponses)
   }
 

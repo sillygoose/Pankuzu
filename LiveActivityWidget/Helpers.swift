@@ -10,9 +10,8 @@ struct MeasurementValueView<U: Dimension>: View {
 
   var body: some View {
     HStack(alignment: .firstTextBaseline, spacing: spacing) {
-      Text(
-        measurement.value.formatted(.number.precision(.fractionLength(1)))
-      )
+      let formattedMeasurement = String(format: "%.1f", measurement.value)
+      Text(formattedMeasurement)
       Text(measurement.unit.symbol)
         .font(DesignTokens.Font.body)
     }

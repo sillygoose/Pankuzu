@@ -44,7 +44,7 @@ struct VehicleSettingsView: View {
             editVehicle = Vehicle.Draft(vehicle)
           }
           .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button(role: .destructive) {
+            Button {
               isShowingAlert = vehicle
             } label: {
               HStack {
@@ -61,7 +61,7 @@ struct VehicleSettingsView: View {
       VStack(spacing: 20) {
         Text("Warning!")
           .font(.headline)
-        Text("Deleting a vehicle is permanent and cannot be undone. Press the 'OK' button to permanently delete this vehicle.")
+        Text("Deleting a vehicle is permanent and cannot be undone.\n\nPress the 'OK' button to permanently delete this vehicle or swipe down to cancel.")
           .font(.subheadline)
           .foregroundColor(.secondary)
         Button("OK") {

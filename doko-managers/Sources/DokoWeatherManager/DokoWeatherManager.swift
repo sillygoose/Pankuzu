@@ -12,6 +12,15 @@ public final class DokoWeatherManager: Sendable {
   public static let shared = DokoWeatherManager()
 
   private let weatherService: WeatherService
+  private var _latestWeatherUpdate: DokoCurrentWeather?
+
+  public var latestWeather: DokoCurrentWeather? {
+    guard
+      let latest = _latestWeatherUpdate,
+      Date.now.timeIntervalSince(latest.timestamp) < 660
+    else { return nil }
+    return latest
+  }
 
   private init() {
     self.weatherService = WeatherService()
@@ -29,6 +38,7 @@ public final class DokoWeatherManager: Sendable {
         windCompassDirection: currentWeather.wind.compassDirection.abbreviation,
         conditionSymbol: currentWeather.symbolName
       )
+      _latestWeatherUpdate = dokoCurrentWeather
       return dokoCurrentWeather
     } catch {
       logger.error("\(timestamp()) WM.currentWeather failed: \(error.localizedDescription)")
