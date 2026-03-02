@@ -89,6 +89,9 @@ extension Location {
         .compactMap({ $0 })
         .joined(separator: ", ")
     }
+    if street == nil, city == nil, stateProv == nil {
+      return String(format: "(%.5f, %.5f)", latitude, longitude)
+    }
     return [street, city, stateProv]
       .compactMap({ $0 })
       .joined(separator: ", ")
