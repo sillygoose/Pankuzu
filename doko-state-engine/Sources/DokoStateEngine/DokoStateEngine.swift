@@ -134,8 +134,8 @@ public final class DokoStateEngine {
             let nextState = dokoResponsePacket.nextState ?? .vehicleCapabilities
             $vehicleState.withLock { $0 = nextState }
             
-//          case .testerPresent:
-//            break ###
+          case .testerPresent:
+            break //###
             
           case .idle:
             guard case .idle = vehicleState else {
