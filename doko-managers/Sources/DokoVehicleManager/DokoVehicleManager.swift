@@ -92,7 +92,7 @@ public final class DokoVehicleManager: Sendable {
     if let connectedVehicle = connectedVehicleInterface.vehicle, connectedVehicle.id == vehicleID { return }
     withErrorReporting {
       try database.write { db in
-        try Vehicle.where { $0.id == vehicleID }.delete().execute(db)
+        try Vehicle.where { $0.id.eq(vehicleID) }.delete().execute(db)
       }
     }
   }

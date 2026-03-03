@@ -164,7 +164,7 @@ public final class TripsModel {
       try database.write { db in
         try Trip
           .find(tripID)
-          .update { $0.deleted = now }
+          .update { $0.deleted = #bind(now) }
           .execute(db)
       }
     }

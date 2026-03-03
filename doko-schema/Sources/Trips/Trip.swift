@@ -139,7 +139,7 @@ public struct Trip: Equatable, Identifiable, Hashable, Codable, Sendable {
 extension Trip.Draft: Identifiable, Sendable {}
 
 extension Trip.TableColumns {
-  public var isDeleted: some QueryExpression<Bool> { return deleted != nil }
+  public var isDeleted: some QueryExpression<Bool> { return deleted.isNot(nil) }
   public var deletedOrdering: some QueryExpression { return deleted.desc() }
   public func readyForDeletion(days: Int = 30) -> some QueryExpression<Bool> {
     @Dependency(\.date.now) var now

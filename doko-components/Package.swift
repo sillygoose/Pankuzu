@@ -16,7 +16,7 @@ let package = Package(
     .package(path: "../doko-sharing"),
     .package(path: "../doko-managers"),
     .package(path: "../obdlink-core"),
-    .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.4.3"),
+    .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.6.0"),
     .package(url: "https://github.com/pointfreeco/swift-sharing", from: "2.7.4"),
   ],
   targets: [

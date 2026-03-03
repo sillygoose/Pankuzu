@@ -105,12 +105,12 @@ public final class ChargesModel {
           .where { if let vehicleID = displayVehicleID { $0.vehicleID.eq(vehicleID) } }
           .select {
             ChargeStats.Columns(
-              acCount: $0.count(filter: $0.chargerType == Charge.ChargerType.ac),
-              dcCount: $0.count(filter: $0.chargerType == Charge.ChargerType.dc),
-              acDuration: $0.duration.sum(filter: $0.chargerType == Charge.ChargerType.ac),
-              dcDuration: $0.duration.sum(filter: $0.chargerType == Charge.ChargerType.dc),
-              acEnergy: $0.energy.sum(filter: $0.chargerType == Charge.ChargerType.ac),
-              dcEnergy: $0.energy.sum(filter: $0.chargerType == Charge.ChargerType.dc)
+              acCount: $0.count(filter: $0.chargerType.eq(Charge.ChargerType.ac)),
+              dcCount: $0.count(filter: $0.chargerType.eq(Charge.ChargerType.dc)),
+              acDuration: $0.duration.sum(filter: $0.chargerType.eq(Charge.ChargerType.ac)),
+              dcDuration: $0.duration.sum(filter: $0.chargerType.eq(Charge.ChargerType.dc)),
+              acEnergy: $0.energy.sum(filter: $0.chargerType.eq(Charge.ChargerType.ac)),
+              dcEnergy: $0.energy.sum(filter: $0.chargerType.eq(Charge.ChargerType.dc))
             )
           },
         animation: .default

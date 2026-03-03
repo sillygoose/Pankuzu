@@ -127,10 +127,10 @@ public struct Charge: Equatable, Hashable, Identifiable, Codable, Sendable {
 extension Charge.Draft: Identifiable, Sendable {}
 
 extension Charge.TableColumns {
-  public var isAcCharge: some QueryExpression<Bool> { return chargerType == Charge.ChargerType.ac }
-  public var isDcCharge: some QueryExpression<Bool> { return chargerType == Charge.ChargerType.dc }
-  public var isNoCharge: some QueryExpression<Bool> { return chargerType == Charge.ChargerType.none }
-  public var isDeleted: some QueryExpression<Bool> {  return deleted != nil  }
+  public var isAcCharge: some QueryExpression<Bool> { return chargerType.eq(Charge.ChargerType.ac) }
+  public var isDcCharge: some QueryExpression<Bool> { return chargerType.eq(Charge.ChargerType.dc) }
+  public var isNoCharge: some QueryExpression<Bool> { return chargerType.eq(Charge.ChargerType.none) }
+  public var isDeleted: some QueryExpression<Bool> {  return deleted.isNot(nil)  }
   public var deletedOrdering: some QueryExpression { return deleted.desc()  }
   public func readyForDeletion(days: Int = 30) -> some QueryExpression<Bool> {
     @Dependency(\.date.now) var now

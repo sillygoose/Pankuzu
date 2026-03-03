@@ -120,7 +120,7 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
           try database.write { db in
             try Trip
               .find(trip.id)
-              .update { $0.deleted = nil }
+              .update { $0.deleted = #bind(nil) }
               .execute(db)
           }
         }
@@ -131,7 +131,7 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
           try database.write { db in
             try Charge
               .find(charge.id)
-              .update { $0.deleted = nil }
+              .update { $0.deleted = #bind(nil) }
               .execute(db)
           }
         }

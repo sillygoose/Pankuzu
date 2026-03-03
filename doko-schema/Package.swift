@@ -19,7 +19,7 @@ let package = Package(
   dependencies: [
     .package(path: "../doko-core"),
     .package(path: "../doko-managers"),
-    .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.4.3"),
+    .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.6.0"),
   ],
   targets: [
     .target(

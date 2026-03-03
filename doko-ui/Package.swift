@@ -24,8 +24,8 @@ let package = Package(
     .package(path: "../doko-schema"),
     .package(path: "../doko-state-engine"),
     .package(path: "../doko-managers"),
-    .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.4.3"),
-    .package(url: "https://github.com/pointfreeco/swift-navigation", from: "2.6.0"),
+    .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.6.0"),
+    .package(url: "https://github.com/pointfreeco/swift-navigation", from: "2.7.0"),
     .package(url: "https://github.com/pointfreeco/swift-case-paths", from: "1.7.2"),
   ],
   targets: [

@@ -281,10 +281,10 @@ public func appDatabase() throws -> any DatabaseWriter {
       after: .insert { new in
         Location
           .where { $0.id.eq(new.originID) && $0.deleted.isNot(nil) }
-          .update { $0.deleted = nil }
+          .update { $0.deleted = #bind(nil) }
         Location
           .where { $0.id.eq(new.destinationID) && $0.deleted.isNot(nil) }
-          .update { $0.deleted = nil }
+          .update { $0.deleted = #bind(nil) }
       }
     )
     .execute(db)
@@ -294,7 +294,7 @@ public func appDatabase() throws -> any DatabaseWriter {
       after: .insert { new in
         Location
           .where { $0.id.eq(new.locationID) && $0.deleted.isNot(nil) }
-          .update { $0.deleted = nil }
+          .update { $0.deleted = #bind(nil) }
       }
     )
     .execute(db)
@@ -304,10 +304,10 @@ public func appDatabase() throws -> any DatabaseWriter {
       after: .update(of: \.deleted) { _, new in
         Location
           .where { $0.id.eq(new.originID) && $0.deleted.isNot(nil) }
-          .update { $0.deleted = nil }
+          .update { $0.deleted = #bind(nil) }
         Location
           .where { $0.id.eq(new.destinationID) && $0.deleted.isNot(nil) }
-          .update { $0.deleted = nil }
+          .update { $0.deleted = #bind(nil) }
       } when: { old, new in
         old.deleted.isNot(nil) && new.deleted.is(nil)
       }
@@ -319,7 +319,7 @@ public func appDatabase() throws -> any DatabaseWriter {
       after: .update(of: \.deleted) { _, new in
         Location
           .where { $0.id.eq(new.locationID) && $0.deleted.isNot(nil) }
-          .update { $0.deleted = nil }
+          .update { $0.deleted = #bind(nil) }
       } when: { old, new in
         old.deleted.isNot(nil) && new.deleted.is(nil)
       }

@@ -60,8 +60,8 @@ extension LocationProtocol {
 }
 
 extension Location.TableColumns {
-  public var isDeleted: some QueryExpression<Bool> { deleted != nil }
-  public var isHidden: some QueryExpression<Bool> { hidden == true }
+  public var isDeleted: some QueryExpression<Bool> { deleted.isNot(nil) }
+  public var isHidden: some QueryExpression<Bool> { hidden.eq(true) }
   public var deletedOrdering: some QueryExpression { deleted.desc() }
 }
 
