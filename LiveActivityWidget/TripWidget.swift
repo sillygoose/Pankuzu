@@ -18,14 +18,6 @@ struct TripLiveActivityWidget: Widget {
           Image(systemName: "record.circle")
             .foregroundStyle(DesignTokens.Color.record)
         }
-        DynamicIslandExpandedRegion(.bottom) {
-          TripActiveView(
-            duration: context.state.duration,
-            distance: context.state.distance,
-            rangeConsumed: context.state.rangeConsumed,
-            windSock: context.state.windSock
-          )
-        }
       } compactLeading: {
         Image(systemName: "car")
           .foregroundStyle(DesignTokens.Color.tripping)
