@@ -27,8 +27,8 @@ public actor FordElectrics: ConnectedVehicleInterface {
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
     typealias CommandLookupDictionary = [ObdCommand: String]
     let commandLookupDictionary: CommandLookupDictionary = [
-      .extendedDiagnosticSession:       "1003",
-      .testerPresent:                   "3E80",
+//      .extendedDiagnosticSession:       "1003",
+//      .testerPresent:                   "3E80",
 
       .gearSelected:                    "STPX h:7E2, d:221E12",
 
@@ -67,13 +67,13 @@ public actor FordElectrics: ConnectedVehicleInterface {
     switch packetType {
     case .vehicleCapabilities:
       return ObdCommandPacket(type: .vehicleCapabilities, commands: [
-        .extendedDiagnosticSession,
+//        .extendedDiagnosticSession,
         .odometer
       ])
-    case .testerPresent:
-      return ObdCommandPacket(type: .testerPresent, commands: [
-        .testerPresent
-      ])
+//    case .testerPresent:
+//      return ObdCommandPacket(type: .testerPresent, commands: [
+//        .testerPresent
+//      ])
 
     case .idle:
       return ObdCommandPacket(type: .idle, commands: [

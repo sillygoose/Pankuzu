@@ -13,10 +13,10 @@ extension VwElectrics {
     do {
       var commandResponse: ObdResponse
       switch command {
-      case .extendedDiagnosticSession:
-        commandResponse = .extendedDiagnosticSession
-      case .testerPresent:
-        commandResponse = .testerPresent
+//      case .extendedDiagnosticSession:
+//        commandResponse = .extendedDiagnosticSession
+//      case .testerPresent:
+//        commandResponse = .testerPresent
 
       case .position:
         guard let position = await CoreLocationManager.shared.currentLocation else {
