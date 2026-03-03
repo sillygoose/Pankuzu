@@ -3,7 +3,7 @@ import CoreLocation
 
 import DokoTypes
 
-public enum ObdCommand: Equatable, Sendable {
+public enum ObdCommand: Equatable, Hashable, Sendable {
   case atz
   case ate0
   case ath0
@@ -15,7 +15,8 @@ public enum ObdCommand: Equatable, Sendable {
   
   case extendedDiagnosticSession
   case testerPresent
-  
+  case stpx0, stpx1, stpx2, stpx3, stpx4, stpx5, stpx6, stpx7
+
   case vin
   case odometer, obdOdometer
 
@@ -67,6 +68,24 @@ public enum ObdCommand: Equatable, Sendable {
         return ".extendedDiagnosticSession"
       case .testerPresent:
         return ".testerPresent"
+
+      case .stpx0:
+        return ".stpx0"
+      case .stpx1:
+        return ".stpx1"
+      case .stpx2:
+        return ".stpx2"
+      case .stpx3:
+        return ".stpx3"
+      case .stpx4:
+        return ".stpx4"
+      case .stpx5:
+        return ".stpx5"
+      case .stpx6:
+        return ".stpx6"
+      case .stpx7:
+        return ".stpx7"
+
       case .vin:
         return ".vin"
       case .odometer:
@@ -196,7 +215,8 @@ public enum ObdResponse: Equatable, Sendable {
   
   case extendedDiagnosticSession
   case testerPresent
-  
+  case stpx(String)
+
   case vin(String)
   case odometer(Double)
   case obdOdometer(Double)
@@ -252,6 +272,8 @@ public enum ObdResponse: Equatable, Sendable {
         return ".extendedDiagnosticSession"
       case .testerPresent:
         return ".testerPresent"
+      case let .stpx(response):
+        return ".stpx(\(response)"
 
       case .vin(let vin):
         return ".vin(\(vin))"

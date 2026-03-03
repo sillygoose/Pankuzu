@@ -55,11 +55,6 @@ extension ObdResponsePacket {
     return v
   }
   
-//  public var pluggedIn: Bool? {
-//    guard case let .pluggedIn(v)? = responses[.pluggedIn]?.response else { return nil }
-//    return v
-//  }
-  
   public var obdOdometer: Double? {
     guard case let .obdOdometer(v)? = responses[.obdOdometer]?.response else { return nil }
     return v

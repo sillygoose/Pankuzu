@@ -18,6 +18,23 @@ extension FordElectrics {
 //      case .testerPresent:
 //        commandResponse = .testerPresent
 
+      case .stpx0:
+        commandResponse = .stpx(".stpx0")
+      case .stpx1:
+        commandResponse = .stpx(".stpx1")
+      case .stpx2:
+        commandResponse = .stpx(".stpx2")
+      case .stpx3:
+        commandResponse = .stpx(".stpx3")
+      case .stpx4:
+        commandResponse = .stpx(".stpx4")
+      case .stpx5:
+        commandResponse = .stpx(".stpx5")
+      case .stpx6:
+        commandResponse = .stpx(".stpx6")
+      case .stpx7:
+        commandResponse = .stpx(".stpx7")
+
       case .position:
         guard let position = await CoreLocationManager.shared.currentLocation else {
           throw ParsedResponseError.locationUnavailable
