@@ -13,10 +13,6 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case stcsegr1
   case stprs
   
-  case extendedDiagnosticSession
-  case testerPresent
-  case stpx0, stpx1, stpx2, stpx3, stpx4, stpx5, stpx6, stpx7
-
   case vin
   case odometer, obdOdometer
 
@@ -36,7 +32,7 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case dcChargerStatus
   case dcChargerCouplerTemperature
 
-  // Non-OBDLink macros
+  /* Non-OBDLink macros */
   case position
   case weather
   case meanTemperature
@@ -64,27 +60,6 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".stcsegr1"
       case .stprs:
         return ".stprs"
-      case .extendedDiagnosticSession:
-        return ".extendedDiagnosticSession"
-      case .testerPresent:
-        return ".testerPresent"
-
-      case .stpx0:
-        return ".stpx0"
-      case .stpx1:
-        return ".stpx1"
-      case .stpx2:
-        return ".stpx2"
-      case .stpx3:
-        return ".stpx3"
-      case .stpx4:
-        return ".stpx4"
-      case .stpx5:
-        return ".stpx5"
-      case .stpx6:
-        return ".stpx6"
-      case .stpx7:
-        return ".stpx7"
 
       case .vin:
         return ".vin"
@@ -213,10 +188,6 @@ public enum ObdResponse: Equatable, Sendable {
   case stprs(String)
   case stcsegr1
   
-  case extendedDiagnosticSession
-  case testerPresent
-  case stpx(String)
-
   case vin(String)
   case odometer(Double)
   case obdOdometer(Double)
@@ -268,13 +239,6 @@ public enum ObdResponse: Equatable, Sendable {
       case .stcsegr1:
         return ".stcsegr1"
         
-      case .extendedDiagnosticSession:
-        return ".extendedDiagnosticSession"
-      case .testerPresent:
-        return ".testerPresent"
-      case let .stpx(response):
-        return ".stpx(\(response)"
-
       case .vin(let vin):
         return ".vin(\(vin))"
       case .odometer(let odometer):

@@ -84,7 +84,6 @@ public final class TripDetailElevationModel {
       let binEnd = binStart + binDuration
       let binCenter = binStart + binDuration / 2
 
-      // Find all positions in this bin
       let positionsInBin = data.filter { position in
         let t = position.timestamp.timeIntervalSince1970
         return t >= binStart && t < binEnd
@@ -92,7 +91,6 @@ public final class TripDetailElevationModel {
 
       let meanElevation: Double
       if positionsInBin.isEmpty {
-        // Use previous bin's elevation if no data in this bin
         meanElevation = previousElevation
       } else {
         meanElevation = positionsInBin.map(\.elevation).reduce(0, +) / Double(positionsInBin.count)

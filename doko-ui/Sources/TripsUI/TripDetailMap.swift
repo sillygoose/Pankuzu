@@ -47,7 +47,6 @@ public final class TripDetailMapModel {
       )
     }
 
-    // Build elevation path by finding closest position for each elevation timestamp
     _tripElevations = FetchOne(TripElevation.find(trip.id))
     if let tripElevations, !path.isEmpty {
       self.elevationPath = tripElevations.elevations.compactMap { elevation in
@@ -147,7 +146,6 @@ public struct TripDetailMapView: View {
     try? $0.bootstrapDatabase()
     try? $0.defaultDatabase.seedPreviews()
   }
-  // Load trips via a simple helper to avoid ambiguous property wrapper in previews
   struct PreviewTripsLoader {
     @FetchAll var trips: [Trip]
     init() { _trips = FetchAll() }

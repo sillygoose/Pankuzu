@@ -27,18 +27,6 @@ public actor FordElectrics: ConnectedVehicleInterface {
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
     typealias CommandLookupDictionary = [ObdCommand: String]
     let commandLookupDictionary: CommandLookupDictionary = [
-//      .extendedDiagnosticSession:       "1003",
-//      .testerPresent:                   "3E80",
-
-      .stpx0:                           "STPX h:7E0, d:1001, r:1",
-      .stpx1:                           "STPX h:7E0, d:1003, r:1",
-      .stpx2:                           "STPX h:7E2, d:1001, r:1",
-      .stpx3:                           "STPX h:7E2, d:1003, r:1",
-      .stpx4:                           "STPX h:7E4, d:1001, r:1",
-      .stpx5:                           "STPX h:7E4, d:1003, r:1",
-      .stpx6:                           "STPX h:7E6, d:1001, r:1",
-      .stpx7:                           "STPX h:7E6, d:1003, r:1",
-
       .gearSelected:                    "STPX h:7E2, d:221E12",
 
       .energyToEmpty:                   "STPX h:7E4, d:224848",
@@ -62,13 +50,6 @@ public actor FordElectrics: ConnectedVehicleInterface {
       DokoLogging.shared.postLoggingResponse(.error("FE.vehicleObdCommand(\(command.description)): dictionary empty"))
       return nil
     }
-#if DEBUG
-//    @Shared(.simIdle) var simIdle
-//    if simIdle {
-//      if command == .extendedDiagnosticSession { return "" }
-//      if command == .testerPresent { return "" }
-//    }
-#endif
     return obdLinkCommand
   }
 
@@ -76,14 +57,8 @@ public actor FordElectrics: ConnectedVehicleInterface {
     switch packetType {
     case .vehicleCapabilities:
       return ObdCommandPacket(type: .vehicleCapabilities, commands: [
-//        .extendedDiagnosticSession,
-        .stpx0, .stpx1, .stpx2, .stpx3, .stpx4, .stpx5, .stpx6, .stpx7,
         .odometer
       ])
-//    case .testerPresent:
-//      return ObdCommandPacket(type: .testerPresent, commands: [
-//        .testerPresent
-//      ])
 
     case .idle:
       return ObdCommandPacket(type: .idle, commands: [

@@ -71,7 +71,6 @@ public final class TripDetailWeatherModel {
       result = data
     }
 
-    // Remove second-to-last if too close to last (< 180 seconds)
     if result.count >= 2 {
       let last = result[result.count - 1]
       let secondToLast = result[result.count - 2]

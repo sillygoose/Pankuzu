@@ -101,25 +101,4 @@ extension VwElectrics {
     dokoResponses[.nextState] = DokoCommandResponse(command: .idle, response: .nextState(nextState))
     return DokoResponsePacket(type: .idle, responses: dokoResponses)
   }
-  
-//  func pluggedInResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
-//    var dokoResponses: DokoResponseDictionary = [:]
-//    guard
-//      let pluggedIn = responsePacket.pluggedIn,
-//      let acChargerStatus = responsePacket.acChargerStatus,
-//      let dcChargerStatus = responsePacket.dcChargerStatus
-//    else {
-//      return DokoResponsePacket(type: .pluggedIn, responses: dokoResponses)
-//    }
-//    var nextState: VehicleState {
-//      if !pluggedIn { return .idle }
-//      if acChargerStatus { return .acChargeStarting }
-//      if dcChargerStatus { return .dcChargeStarting }
-//      return .pluggedIn
-//    }
-//    let chargeStatus = acChargerStatus || dcChargerStatus
-//    dokoResponses[.nextState] = DokoCommandResponse(command: .pluggedIn, response: .nextState(nextState))
-//    dokoResponses[.chargerStatus] = DokoCommandResponse(command: .pluggedIn, response: .chargerStatus(chargeStatus))
-//    return DokoResponsePacket(type: .pluggedIn, responses: dokoResponses)
-//  }
 }

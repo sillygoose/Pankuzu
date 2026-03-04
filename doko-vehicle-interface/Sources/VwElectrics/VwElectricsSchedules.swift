@@ -56,10 +56,6 @@ extension VwElectrics {
       schedulerType: .firesThenDelays(2),
       packetType: .idle
     ),
-//    StateEngineDokoCommandPacket(
-//      schedulerType: .firesThenDelays(3),
-//      packetType: .testerPresent
-//    )
   ]
 
   private static let tripStartingDokoCommandSchedule: StateEngineDokoSchedule = [
@@ -67,10 +63,6 @@ extension VwElectrics {
       schedulerType: .oneShotWithDelay(1),
       packetType: .tripStarting
     ),
-//    StateEngineDokoCommandPacket(
-//      schedulerType: .oneShotWithDelay(3),
-//      packetType: .testerPresent
-//    )
   ]
   private static let tripInProgressDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
@@ -93,20 +85,12 @@ extension VwElectrics {
       schedulerType: .delaysThenFires(300),
       packetType: .tripWeather
     ),
-//    StateEngineDokoCommandPacket(
-//      schedulerType: .delaysThenFires(3),
-//      packetType: .testerPresent
-//    )
   ]
   private static let tripEndingDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .oneShotWithDelay(1),
       packetType: .tripEnding
     ),
-//    StateEngineDokoCommandPacket(
-//      schedulerType: .oneShotWithDelay(2),
-//      packetType: .testerPresent
-//    )
   ]
  
   private static let acChargeStartingDokoCommandSchedule: StateEngineDokoSchedule = [
@@ -114,10 +98,6 @@ extension VwElectrics {
       schedulerType: .oneShotWithDelay(2),
       packetType: .acChargeStarting
     ),
-//    StateEngineDokoCommandPacket(
-//      schedulerType: .oneShotWithDelay(2),
-//      packetType: .testerPresent
-//    )
   ]
   private static let acChargeInProgressDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
@@ -136,20 +116,12 @@ extension VwElectrics {
       schedulerType: .delaysThenFires(30),
       packetType: .acChargeHistory
     ),
-//    StateEngineDokoCommandPacket(
-//      schedulerType: .oneShotWithDelay(3),
-//      packetType: .testerPresent
-//    )
   ]
   private static let acChargeEndingDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .oneShot,
       packetType: .acChargeEnding
     ),
-//    StateEngineDokoCommandPacket(
-//      schedulerType: .oneShotWithDelay(2),
-//      packetType: .testerPresent
-//    )
   ]
 
   private static let dcChargeStartingDokoCommandSchedule: StateEngineDokoSchedule = [
@@ -157,10 +129,6 @@ extension VwElectrics {
       schedulerType: .oneShotWithDelay(2),
       packetType: .dcChargeStarting
     ),
-//    StateEngineDokoCommandPacket(
-//      schedulerType: .oneShotWithDelay(2),
-//      packetType: .testerPresent
-//    )
   ]
   private static let dcChargeInProgressDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
@@ -179,19 +147,11 @@ extension VwElectrics {
       schedulerType: .delaysThenFires(5),
       packetType: .dcChargeHistory
     ),
-//    StateEngineDokoCommandPacket(
-//      schedulerType: .oneShotWithDelay(3),
-//      packetType: .testerPresent
-//    )
   ]
   private static let dcChargeEndingDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .oneShot,
       packetType: .dcChargeEnding
     ),
-//    StateEngineDokoCommandPacket(
-//      schedulerType: .oneShotWithDelay(2),
-//      packetType: .testerPresent
-//    )
   ]
 }

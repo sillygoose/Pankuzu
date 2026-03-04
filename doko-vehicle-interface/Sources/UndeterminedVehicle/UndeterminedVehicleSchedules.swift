@@ -31,16 +31,4 @@ extension UndeterminedVehicle {
       packetType: .vin
     )
   ]
-//  public static let detectStp33VehicleDokoCommandSchedule: StateEngineDokoSchedule = [
-//    StateEngineDokoCommandPacket(
-//      schedulerType: .oneShotWithDelay(1),
-//      packetType: .vin(.iso15765_11bit)
-//    )
-//  ]
-//  public static let detectStp34VehicleDokoCommandSchedule: StateEngineDokoSchedule = [
-//    StateEngineDokoCommandPacket(
-//      schedulerType: .oneShotWithDelay(1),
-//      packetType: .vin(.iso15765_29bit)
-//    )
-//  ]
 }

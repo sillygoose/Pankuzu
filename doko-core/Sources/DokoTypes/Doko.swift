@@ -114,7 +114,7 @@ public enum VehicleState: Equatable, Hashable, Sendable {
 public enum DokoPacketType: Equatable, Hashable, Sendable {
   case reset
   case vin
-  case vehicleCapabilities, testerPresent
+  case vehicleCapabilities
   case idle
 
   case tripStarting, tripInProgress, tripEnergy, tripUpdate, tripEnding
@@ -128,15 +128,10 @@ public enum DokoPacketType: Equatable, Hashable, Sendable {
     switch self {
     case .reset:
       ".reset"
-
     case .vehicleCapabilities:
       ".vehicleCapabilities"
-    case .testerPresent:
-      ".testerPresent"
-      
     case .vin:
       ".vin"
-
     case .idle:
       ".idle"
 
@@ -202,10 +197,7 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case vehicleCapabilities
 
   case idle
-//  case pluggedIn, inGear
-//  case inGear
-//  case chargerStatus
-  
+
   case tripStarting, tripInProgress, tripUpdate, tripEnding
   case tripEnergy, tripPosition, tripData, tripWeather
 
@@ -252,12 +244,6 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
 
       case .idle:
         return ".idle"
-//      case .pluggedIn:
-//        return ".pluggedIn"
-//      case .inGear:
-//        return ".inGear"
-//      case .chargerStatus:
-//        return ".chargerStatus"
 
       case .tripStarting:
         return ".tripStarting"
@@ -354,10 +340,6 @@ public enum DokoResponse: Equatable, Sendable {
   case stprs(String)
   case vin(String)
 
-//  case pluggedIn(Bool)
-//  case inGear(Bool)
-//  case chargerStatus(Bool)
-
   case position(DokoPosition)
   case weather(DokoCurrentWeather)
   case meanTemperature(Double)
@@ -389,13 +371,6 @@ public enum DokoResponse: Equatable, Sendable {
         return ".stprs(\(protocolString))"
       case .vin(let vin):
         return ".vin(\(vin))"
-
-//      case .pluggedIn(let state):
-//        return ".pluggedIn(\(state))"
-//      case .inGear(let state):
-//        return ".inGear(\(state))"
-//      case .chargerStatus(let state):
-//        return ".chargerStatus(\(state))"
 
       case let .position(position):
         return String(format: ".position(%.5f, %.5f, %.0f)", position.latitude, position.longitude, position.elevation)

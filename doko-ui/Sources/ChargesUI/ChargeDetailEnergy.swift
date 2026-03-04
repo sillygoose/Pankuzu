@@ -41,7 +41,6 @@ public final class ChargeDetailEnergyModel {
     let rawData = chargeHistory.energyToEmpty
     energyToEmpty = downsample(rawData, maxPoints: 60)
 
-    // Calculate energy line: initialEnergyToEmpty + batteryEnergy (charging adds energy)
     if let initialEnergy = charge.energyToEmptyStart {
       let rawBatteryEnergy = chargeHistory.batteryEnergy
       calculatedEnergy = rawBatteryEnergy.map { point in

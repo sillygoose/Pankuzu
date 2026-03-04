@@ -27,9 +27,6 @@ public actor VwElectrics: ConnectedVehicleInterface {
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
     typealias CommandLookupDictionary = [ObdCommand: String]
     let commandLookupDictionary: CommandLookupDictionary = [
-//      .extendedDiagnosticSession:       "1003",
-//      .testerPresent:                   "3E00",
-
       .gearSelected:                    "STPX h:17FC0076, d:22210E",  //0x17fc0076 03 22 21 0e 55 55 55 55
       .odometer:                        "STPX h:17FC0076, d:22295A",  //0x17fe0076 06 62 29 5a XX YY ZZ aa  (XX*2^16+YY*2^8+ZZ) = km in decimal
 
@@ -48,13 +45,6 @@ public actor VwElectrics: ConnectedVehicleInterface {
       DokoLogging.shared.postLoggingResponse(.error("VWE.vehicleObdCommand(\(command.description)): dictionary empty"))
       return nil
     }
-#if DEBUG
-//    @Shared(.simIdle) var simIdle
-//    if simIdle {
-//      if command == .extendedDiagnosticSession { return "" }
-//      if command == .testerPresent { return "" }
-//    }
-#endif
     return obdLinkCommand
   }
 
@@ -62,15 +52,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
     switch packetType {
     case .vehicleCapabilities:
       return ObdCommandPacket(type: .vehicleCapabilities, commands: [
-        .extendedDiagnosticSession,
         .gearSelected, .odometer,
         .acChargerStatus, .dcChargerStatus,
         .stateOfCharge, .batteryTemperature, .batteryVoltage, .batteryCurrent
       ])
-//    case .testerPresent:
-//      return ObdCommandPacket(type: .testerPresent, commands: [
-//        .testerPresent
-//      ])
 
     case .idle:
       return ObdCommandPacket(type: .idle, commands: [

@@ -35,8 +35,6 @@ public final class DokoVehicleManager: Sendable {
       for await newAccessoryName in $observedAccessoryName.publisher.values {
         if Task.isCancelled { break }
         guard oldAccessoryName != newAccessoryName else { continue }
-//        self.logger.info("\(timestamp()) DVM: Accessory changed to \(newAccessoryName ?? "nil")")
-//        DokoLogging.shared.postLoggingResponse(.info("DVM: Accessory changed from \(oldAccessoryName ?? "nil") to \(newAccessoryName ?? "nil")"))
         if newAccessoryName == nil {
           $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: nil) }
           $connectedVehicleModel.withLock { $0 = nil }

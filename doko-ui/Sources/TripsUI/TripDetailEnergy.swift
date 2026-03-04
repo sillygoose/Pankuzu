@@ -37,7 +37,6 @@ public final class TripDetailEnergyModel {
     let rawData = tripData.energyToEmpty
     energyToEmpty = downsample(rawData, maxPoints: 60)
 
-    // Calculate energy line: initialEnergyToEmpty - batteryEnergy
     if let initialEnergy = trip.energyToEmptyStart {
       let rawBatteryEnergy = tripData.batteryEnergy
       calculatedEnergy = rawBatteryEnergy.map { point in

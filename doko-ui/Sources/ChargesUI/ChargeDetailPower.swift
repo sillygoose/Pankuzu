@@ -55,7 +55,6 @@ public final class ChargeDetailPowerChartModel {
       let binEnd = binStart + binDuration
       let binCenter = binStart + binDuration / 2
 
-      // Find all points in this bin
       let pointsInBin = data.filter { point in
         let t = point.timestamp.timeIntervalSince1970
         return t >= binStart && t < binEnd
@@ -63,7 +62,6 @@ public final class ChargeDetailPowerChartModel {
 
       let meanPower: Double
       if pointsInBin.isEmpty {
-        // Use previous bin's power if no data in this bin
         meanPower = previousPower
       } else {
         meanPower = pointsInBin.map(\.datapoint).reduce(0, +) / Double(pointsInBin.count)

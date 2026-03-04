@@ -8,16 +8,10 @@ import CoreLocationManager
 
 extension VwElectrics {
   public func vehicleObdCommandResponse(_ command: ObdCommand, _ response: String, rawCommand: String) async -> ObdCommandResponse {
-    //self.logger.info("\(timestamp()) VWE.parsedResponse(\(command.description), \(response))")
     let result: ObdResult = .ok
     do {
       var commandResponse: ObdResponse
       switch command {
-//      case .extendedDiagnosticSession:
-//        commandResponse = .extendedDiagnosticSession
-//      case .testerPresent:
-//        commandResponse = .testerPresent
-
       case .position:
         guard let position = await CoreLocationManager.shared.currentLocation else {
           throw ParsedResponseError.locationUnavailable

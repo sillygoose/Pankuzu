@@ -36,15 +36,6 @@ extension ObdResponsePacket {
     return v
   }
 
-//  public var stp33: String? {
-//    guard case .stp33? = responses[.stp33]?.response else { return nil }
-//    return ".stp33"
-//  }
-//  public var stp34: String? {
-//    guard case .stp34? = responses[.stp34]?.response else { return nil }
-//    return ".stp34"
-//  }
-  
   public var vin: String? {
     guard case let .vin(v)? = responses[.vin]?.response else { return nil }
     return v
