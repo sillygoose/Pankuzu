@@ -17,20 +17,20 @@ public actor UndeterminedVehicle: ConnectedVehicleInterface {
   }
 
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
-    typealias CommandLookupDictionary = [ObdCommand: String]
-    let commandLookupDictionary: CommandLookupDictionary = [
-      .atz:                         "ATZ",
-      .ate0:                        "ATE0",
-      .ath0:                        "ATH0",
-      .atcaf1:                      "ATCAF1",
-      .ats0:                        "ATS0",
-      .stcsegr1:                    "STCSEGR1",
-      .atsp0:                       "ATSP0",
-      .stprs:                       "STPRS",
-
-      .vin:                         "0902",
-    ]
-    guard let obdLinkCommand = commandLookupDictionary[command] else {
+    let obdLinkCommand: String?
+    switch command {
+    case .atz:                        obdLinkCommand = "ATZ"
+    case .ate(let enabled):           obdLinkCommand = "ATE\(enabled ? 1 : 0)"
+    case .ath(let enabled):           obdLinkCommand = "ATH\(enabled ? 1 : 0)"
+    case .atcaf(let enabled):         obdLinkCommand = "ATCAF\(enabled ? 1 : 0)"
+    case .ats(let enabled):           obdLinkCommand = "ATS\(enabled ? 1 : 0)"
+    case .stcsegr(let enabled):       obdLinkCommand = "STCSEGR\(enabled ? 1 : 0)"
+    case .atsp(let proto):            obdLinkCommand = "ATSP\(proto)"
+    case .stprs:                      obdLinkCommand = "STPRS"
+    case .vin:                        obdLinkCommand = "0902"
+    default:                          obdLinkCommand = nil
+    }
+    guard let obdLinkCommand else {
       DokoLogging.shared.postLoggingResponse(.error("vehicleObdCommand: \(command.description) not found"))
       return nil
     }
@@ -43,7 +43,7 @@ public actor UndeterminedVehicle: ConnectedVehicleInterface {
       return ObdCommandPacket(
         type: .reset,
         commands: [
-          .atz, .ate0, .ath0, .atcaf1, .ats0, .stcsegr1, .atsp0
+          .atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
         ])
 
     case .vin:

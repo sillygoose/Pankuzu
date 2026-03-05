@@ -12,18 +12,18 @@ extension UndeterminedVehicle {
       switch command {
       case .atz:
         commandResponse = .atz(response)
-      case .ate0:
-        commandResponse = .ate0
-      case .ath0:
-        commandResponse = .ath0
-      case .atcaf1:
-        commandResponse = .atcaf1
-      case .ats0:
-        commandResponse = .ats0
-      case .stcsegr1:
-        commandResponse = .stcsegr1
-      case .atsp0:
-        commandResponse = .atsp0
+      case .ate(let enabled):
+        commandResponse = .ate(enabled)
+      case .ath(let enabled):
+        commandResponse = .ath(enabled)
+      case .atcaf(let enabled):
+        commandResponse = .atcaf(enabled)
+      case .ats(let enabled):
+        commandResponse = .ats(enabled)
+      case .stcsegr(let enabled):
+        commandResponse = .stcsegr(enabled)
+      case .atsp(let proto):
+        commandResponse = .atsp(proto)
       case .stprs:
         commandResponse = .stprs(response)
         

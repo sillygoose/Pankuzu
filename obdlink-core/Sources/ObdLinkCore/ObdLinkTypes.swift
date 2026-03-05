@@ -5,12 +5,13 @@ import DokoTypes
 
 public enum ObdCommand: Equatable, Hashable, Sendable {
   case atz
-  case ate0
-  case ath0
-  case atcaf1
-  case ats0
-  case atsp0
-  case stcsegr1
+  case ate(Bool)
+  case ath(Bool)
+  case atcaf(Bool)
+  case ats(Bool)
+  case atsp(Int)
+  case stp(Int)
+  case stcsegr(Bool)
   case stprs
   
   case vin
@@ -46,18 +47,20 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
       switch self {
       case .atz:
         return ".atz"
-      case .ate0:
-        return ".ate0"
-      case .ath0:
-        return ".ath0"
-      case .atcaf1:
-        return ".atcaf1"
-      case .ats0:
-        return ".ats0"
-      case .atsp0:
-        return ".atsp0"
-      case .stcsegr1:
-        return ".stcsegr1"
+      case .ate(let enabled):
+        return ".ate(\(enabled))"
+      case .ath(let enabled):
+        return ".ath(\(enabled))"
+      case .atcaf(let enabled):
+        return ".atcaf(\(enabled))"
+      case .ats(let enabled):
+        return ".ats(\(enabled))"
+      case .atsp(let proto):
+        return ".atsp(\(proto))"
+      case .stp(let proto):
+        return ".stp(\(proto))"
+      case .stcsegr(let enabled):
+        return ".stcsegr(\(enabled))"
       case .stprs:
         return ".stprs"
 
@@ -180,13 +183,14 @@ public enum ObdResponse: Equatable, Sendable {
   case info(String)
   case error(String)
   case atz(String)
-  case ate0
-  case ath0
-  case atcaf1
-  case ats0
-  case atsp0
+  case ate(Bool)
+  case ath(Bool)
+  case atcaf(Bool)
+  case ats(Bool)
+  case atsp(Int)
+  case stp(Int)
   case stprs(String)
-  case stcsegr1
+  case stcsegr(Bool)
   
   case vin(String)
   case odometer(Double)
@@ -224,20 +228,22 @@ public enum ObdResponse: Equatable, Sendable {
 
       case .atz:
         return ".atz"
-      case .ate0:
-        return ".ate0"
-      case .ath0:
-        return ".ath0"
-      case .atcaf1:
-        return ".atcaf1"
-      case .ats0:
-        return ".ats0"
-      case .atsp0:
-        return ".atsp0"
+      case .ate(let enabled):
+        return ".ate(\(enabled))"
+      case .ath(let enabled):
+        return ".ath(\(enabled))"
+      case .atcaf(let enabled):
+        return ".atcaf(\(enabled))"
+      case .ats(let enabled):
+        return ".ats(\(enabled))"
+      case .atsp(let proto):
+        return ".atsp(\(proto))"
+      case .stp(let proto):
+        return ".stp(\(proto))"
       case .stprs(let pstring):
         return ".stprs(\(pstring))"
-      case .stcsegr1:
-        return ".stcsegr1"
+      case .stcsegr(let enabled):
+        return ".stcsegr(\(enabled))"
         
       case .vin(let vin):
         return ".vin(\(vin))"

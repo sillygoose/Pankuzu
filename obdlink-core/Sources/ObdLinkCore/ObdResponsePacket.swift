@@ -7,29 +7,40 @@ extension ObdResponsePacket {
     guard case let .atz(v)? = responses[.atz]?.response else { return nil }
     return v
   }
-  public var ate0: String? {
-    guard case .ate0? = responses[.ate0]?.response else { return nil }
-    return ".ate0"
+  public var ate: Bool? {
+    guard let entry = responses.first(where: { if case .ate = $0.key { return true }; return false }),
+          case let .ate(v) = entry.value.response else { return nil }
+    return v
   }
-  public var ath0: String? {
-    guard case .ath0? = responses[.ath0]?.response else { return nil }
-    return ".ath0"
+  public var ath: Bool? {
+    guard let entry = responses.first(where: { if case .ath = $0.key { return true }; return false }),
+          case let .ath(v) = entry.value.response else { return nil }
+    return v
   }
-  public var atcaf1: String? {
-    guard case .atcaf1? = responses[.atcaf1]?.response else { return nil }
-    return ".atcaf1"
+  public var atcaf: Bool? {
+    guard let entry = responses.first(where: { if case .atcaf = $0.key { return true }; return false }),
+          case let .atcaf(v) = entry.value.response else { return nil }
+    return v
   }
-  public var ats0: String? {
-    guard case .ats0? = responses[.ats0]?.response else { return nil }
-    return ".ats0"
+  public var ats: Bool? {
+    guard let entry = responses.first(where: { if case .ats = $0.key { return true }; return false }),
+          case let .ats(v) = entry.value.response else { return nil }
+    return v
   }
-  public var stcsegr1: String? {
-    guard case .stcsegr1? = responses[.stcsegr1]?.response else { return nil }
-    return ".stcsegr1"
+  public var stcsegr: Bool? {
+    guard let entry = responses.first(where: { if case .stcsegr = $0.key { return true }; return false }),
+          case let .stcsegr(v) = entry.value.response else { return nil }
+    return v
   }
-  public var atsp0: String? {
-    guard case .atsp0? = responses[.atsp0]?.response else { return nil }
-    return ".stp33"
+  public var atsp: Int? {
+    guard let entry = responses.first(where: { if case .atsp = $0.key { return true }; return false }),
+          case let .atsp(v) = entry.value.response else { return nil }
+    return v
+  }
+  public var stp: Int? {
+    guard let entry = responses.first(where: { if case .stp = $0.key { return true }; return false }),
+          case let .stp(v) = entry.value.response else { return nil }
+    return v
   }
   public var stprs: String? {
     guard case let .stprs(v)? = responses[.stprs]?.response else { return nil }
