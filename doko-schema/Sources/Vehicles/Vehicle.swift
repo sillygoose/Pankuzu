@@ -12,8 +12,13 @@ public struct Vehicle: Identifiable, Hashable, Codable, Sendable {
   public let id: String
   public var vin: String { id }
   public var name: String?
-  
+
   public init(vin: String, name: String? = nil) {
+    self.id = vin
+    self.name = name
+  }
+
+  public init(decoding vin: String, name: String? = nil) {
     self.id = vin
     self.name = name
   }
@@ -43,114 +48,92 @@ public enum WorldManufacturerIdentifier: String, Equatable {
   }
 }
 
-public enum ModelIdentifier: String, Equatable {
-  case miUNKNOWN
-
-  case miTK1R = "TK1R"    // Mustang-Mach-E
-  case miTK1S = "TK1S"
-  case miTK2R = "TK2R"
-  case miTK3R = "TK3R"
-  case miTK3S = "TK3S"
-  case miTK4S = "TK4S"
-
-  case mi6W1E = "6W1E"    // F-150 Lightning
-  case mi6W3L = "6W3L"
-  case mi6W5L = "6W5L"
-  case miVW1E = "VW1E"
-  case miVW1B = "VW1B"
-  case miVW3L = "VW3L"
-  case miVW5L = "VW5L"
-  case miVW7L = "VW7L"
-
-  case mi5MPE = "5MPE"    // VW ID.4
-  case mi5NPE = "5NPE"
-  case miVMPE = "VMPE"
-  case miVNPE = "VNPE"
-  case miDMPE = "DMPE"
-  case miDNPE = "DNPE"
-  case miGMPE = "GMPE"
-  case miGNPE = "GNPE"
-  case miTMPE = "TMPE"
-  case miTNPE = "TNPE"
-  case miCMPE = "CMPE"
-  case miCNPE = "CNPE"
-  case miJSPE = "JSPE"
+public enum VehicleType: CaseIterable, Sendable {
+  case undetermined
+  case fordElectric
+  case vwElectric
 
   public var description: String {
     switch self {
-    case .miTK1R, .miTK1S:
-      return "Mustang Mach-E Select"
-    case .miTK2R:
-      return "Mustang Mach-E Cal RT1"
-    case .miTK3R, .miTK3S:
-      return "Mustang Mach-E Premium"
-    case .miTK4S:
-      return "Mustang Mach-E GT"
-
-    case .miVW1E:
-      return "F-150 Lightning"
-    case .miVW1B:
-      return "F-150 Lightning Pro"
-    case .miVW3L:
-      return "F-150 Lightning XLT"
-    case .mi6W3L:
-      return "F-150 Lightning Flash"
-    case .mi6W1E, .miVW5L, .mi6W5L:
-      return "F-150 Lightning Lariat"
-    case .miVW7L:
-      return "F-150 Lightning Platinum"
-
-    case .mi5MPE, .mi5NPE:
-      return "ID.4 S"
-    case .miVMPE, .miVNPE, .miCMPE, .miCNPE, .miDMPE, .miDNPE:
-      return "ID.4 Pro"
-    case .miGMPE, .miGNPE, .miTMPE, .miTNPE, .miJSPE:
-      return "ID.4 Pro S"
-
-    case .miUNKNOWN:
-      return "Unknown"
+    case .undetermined: return "Undetermined"
+    case .fordElectric: return "Ford Electric"
+    case .vwElectric: return "VW Electric"
     }
   }
 }
 
 extension VehicleProtocol {
-  public var modelIdentifier: ModelIdentifier {
-    let start = vin.index(vin.startIndex, offsetBy: 3)
-    let end = vin.index(vin.startIndex, offsetBy: 7)
-    let modelIdentifierString = String(vin[start..<end])
-    let modelIdentifier = ModelIdentifier(rawValue: modelIdentifierString) ?? .miUNKNOWN
-    return modelIdentifier
-  }
-  
   public var year: String {
-    let start = vin.index(vin.startIndex, offsetBy: 9)
-    let end = vin.index(vin.startIndex, offsetBy: 10)
-    let modelYearString = String(vin[start..<end])
+    guard vin.count == 17 else { return "Unknown" }
+    let modelYearString = String(vin[vin.index(vin.startIndex, offsetBy: 9)])
     let modelYears: [String: Int] = ["M": 2021, "N": 2022, "P": 2023, "R": 2024, "S": 2025, "T": 2026, "U": 2027, "V": 2028, "W": 2029]
     let year = modelYears[modelYearString] ?? -1
     return year.description
   }
-  
+
   public var make: String {
-    let start = vin.index(vin.startIndex, offsetBy: 0)
-    let end = vin.index(vin.startIndex, offsetBy: 3)
-    let wmiString = String(vin[start..<end])
-    let wmi = WorldManufacturerIdentifier(rawValue: wmiString) ?? .unknown
-    return "\(wmi.manufacturer)"
+    let wmi = WorldManufacturerIdentifier(rawValue: String(vin.prefix(3))) ?? .unknown
+    return wmi.manufacturer
   }
-  
+
   public var model: String {
-    return "\(modelIdentifier.description)"
+    guard vin.count == 17 else { return "Unknown" }
+    let wmi = String(vin.prefix(3))
+    let pos5 = vin[vin.index(vin.startIndex, offsetBy: 4)]
+    let pos6 = vin[vin.index(vin.startIndex, offsetBy: 5)]
+    let pos7 = vin[vin.index(vin.startIndex, offsetBy: 6)]
+    switch wmi {
+    case "3FM":
+      let trim: String
+      switch String([pos5, pos6, pos7]) {
+      case "K1R", "K1S": trim = "Select"
+      case "K2R":        trim = "Cal Route 1"
+      case "K3R", "K3S": trim = "Premium"
+      case "K4S":        trim = "GT"
+      default:           trim = ""
+      }
+      return trim.isEmpty ? "Mustang Mach-E" : "Mustang Mach-E \(trim)"
+    case "1FT":
+      switch String([pos5, pos6, pos7]) {
+      case "W1E": return "F-150 Lightning"
+      case "W1L": return "F-150 Lightning Pro"
+      case "W3L": return "F-150 Lightning XLT"
+      case "W5L": return "F-150 Lightning Lariat"
+      case "W7L": return "F-150 Lightning Platinum"
+      default:    return "F-150 Lightning"
+      }
+    case "WVG", "1V2":
+      return "ID.4"
+    default:
+      return "Unknown"
+    }
   }
-  public var makeModel: String { self.make + " " + self.model }
-  public var yearModel: String { self.year + " " + self.model }
-  public var yearMakeModel: String { self.year + " " + self.make + " " + self.model }
-  
+
+  public var makeModel: String { make + " " + model }
+  public var yearModel: String { year + " " + model }
+  public var yearMakeModel: String { year + " " + make + " " + model }
+
   public var truck: Bool {
-    let start = vin.index(vin.startIndex, offsetBy: 0)
-    let end = vin.index(vin.startIndex, offsetBy: 3)
-    let wmiString = String(vin[start..<end])
-    let wmi = WorldManufacturerIdentifier(rawValue: wmiString) ?? .unknown
+    let wmi = WorldManufacturerIdentifier(rawValue: String(vin.prefix(3))) ?? .unknown
     return wmi == .FordTruckUsa
+  }
+
+  public var vehicleType: VehicleType {
+    guard vin.count == 17 else { return .undetermined }
+    let wmi = String(vin.prefix(3))
+    let pos4 = vin[vin.index(vin.startIndex, offsetBy: 3)]
+    let pos8 = vin[vin.index(vin.startIndex, offsetBy: 7)]
+    switch wmi {
+    case "3FM":
+      return "M7SUXE".contains(pos8) ? .fordElectric : .undetermined
+    case "1FT":
+      let validGVWR = pos4 == "V" || pos4 == "6"
+      let validEngine = "SK7MLV".contains(pos8)
+      return validGVWR && validEngine ? .fordElectric : .undetermined
+    case "WVG", "1V2":
+      return .vwElectric
+    default:
+      return .undetermined
+    }
   }
 }
