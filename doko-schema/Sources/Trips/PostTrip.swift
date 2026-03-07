@@ -22,9 +22,11 @@ extension Trip {
     }
 
     guard let originID = DokoLocationManager.shared.addLocation(
-      latitude: position.latitude, longitude: position.longitude, elevation: position.elevation
+      latitude: position.latitude, longitude: position.longitude, elevation: position.elevation, sharedLocation: true
     ) else { throw TripError.tripLocationError }
-    let destinationID = DokoLocationManager.shared.placeholderLocation
+    guard let destinationID = DokoLocationManager.shared.addLocation(
+      latitude: position.latitude, longitude: position.longitude, elevation: position.elevation, sharedLocation: false
+    ) else { throw TripError.tripLocationError }
 
     var trip = Trip(
       id: UUID(),
@@ -90,12 +92,16 @@ extension Trip {
     }
     var tripDraft = tripDraft
 
-    guard let destinationID = DokoLocationManager.shared.addLocation(
-      latitude: position.latitude, longitude: position.longitude, elevation: position.elevation
-    ) else {
-      throw TripError.tripLocationError
-    }
-    tripDraft.destinationID = destinationID
+    //###
+    let destinationID = DokoLocationManager.shared.updateLocation(
+      id: tripDraft.destinationID,
+      latitude: position.latitude, longitude: position.longitude, elevation: position.elevation,
+      sharedLocation: true
+    )
+//    else {
+//      throw TripError.tripLocationError
+//    }
+//    tripDraft.destinationID = destinationID
     tripDraft.latitudeEnd = position.latitude
     tripDraft.longitudeEnd = position.longitude
     tripDraft.elevationEnd = position.elevation

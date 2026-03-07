@@ -32,13 +32,26 @@ public final class DokoLocationManager: Sendable {
     return location
   }
 
-  public func addLocation(latitude: Double, longitude: Double, elevation: Double) -> Location.ID? {
+  public func updateLocation(id: Location.ID, latitude: Double, longitude: Double, elevation: Double, sharedLocation: Bool = true) -> Location.ID {
     @FetchAll var locations: [Location]
     @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
-    if let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold) {
+    if sharedLocation, let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold) {
+      DokoLogging.shared.postLoggingResponse(.location(String(format: "Location exists at (%.5f, %.5f)", latitude, longitude)))
+      //### remove location
+      return locationID
+    }
+
+    return id
+  }
+
+  public func addLocation(latitude: Double, longitude: Double, elevation: Double, sharedLocation: Bool = true) -> Location.ID? {
+    @FetchAll var locations: [Location]
+    @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
+    if sharedLocation, let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold) {
       DokoLogging.shared.postLoggingResponse(.location(String(format: "Location exists at (%.5f, %.5f)", latitude, longitude)))
       return locationID
     }
+
     @Dependency(\.defaultDatabase) var database
     var locationID: Location.ID? = nil
     let draftLocation = Location.Draft(latitude: latitude, longitude: longitude, elevation: elevation)
@@ -48,6 +61,7 @@ public final class DokoLocationManager: Sendable {
         locationID = id
       }
     }
+    
     Task { [location = draftLocation, id = locationID] in
       guard let id else {
         DokoLogging.shared.postLoggingResponse(.error("Expected honest locationID"))
