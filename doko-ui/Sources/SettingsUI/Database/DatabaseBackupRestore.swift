@@ -102,6 +102,7 @@ func restoreDatabase(from databaseBackup: DatabaseBackup) throws {
     }
 
     for location in databaseBackup.locations {
+      if location.id == UUID(0) { continue }
       if let _ = locations.first(where: { $0.id == location.id }) { continue }
       try Location
         .insert { location }
