@@ -17,8 +17,6 @@ public func appDatabase() throws -> any DatabaseWriter {
   var configuration = Configuration()
   configuration.foreignKeysEnabled = true
   configuration.prepareDatabase { db in
-    db.add(function: $handleDeletedLocations)
-
 #if DEBUG
     db.trace(options: .profile) {
       if context == .preview {
@@ -59,7 +57,6 @@ public func appDatabase() throws -> any DatabaseWriter {
       CREATE TABLE "location" (
        "id" TEXT PRIMARY KEY NOT NULL ON CONFLICT REPLACE DEFAULT (uuid()),
        "deleted" TEXT,
-       "hidden" INTEGER,
        "latitude" REAL NOT NULL,
        "longitude" REAL NOT NULL,
        "elevation" REAL NOT NULL,
@@ -215,19 +212,7 @@ public func appDatabase() throws -> any DatabaseWriter {
   }
   try migrator.migrate(database)
   
-  // Default location placefolder
   try database.write { db in
-    try Location.upsert { Location.defaultLocation }.execute(db)
-  }
-
-  try database.write { db in
-    try Location.createTemporaryTrigger(
-      after: .delete { old in
-        #sql("SELECT \($handleDeletedLocations())")
-      }
-    )
-    .execute(db)
-
     try Trip.createTemporaryTrigger(
       "soft_delete_origin_location_after_trip_soft_delete",
       after: .update(of: \.deleted) { old, new in
@@ -375,21 +360,6 @@ public func appDatabase() throws -> any DatabaseWriter {
   }
 
   return database
-}
-
-@DatabaseFunction
-private func handleDeletedLocations() {
-  Task {
-    @Dependency(\.defaultDatabase) var database
-    try await database.write { db in
-      let isLocationsEmpty = try Location.count().fetchOne(db) == 0
-      if isLocationsEmpty {
-        try Location
-          .upsert { Location.defaultLocation }
-          .execute(db)
-      }
-    }
-  }
 }
 
 extension DependencyValues {

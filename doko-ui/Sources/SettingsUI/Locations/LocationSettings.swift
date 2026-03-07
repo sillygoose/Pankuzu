@@ -9,7 +9,7 @@ import CommonUI
 final class LocationSettingsModel {
   @ObservationIgnored @FetchAll(
     Location
-      .where { $0.isDeleted.eq(false) }  //      .where { $0.isHidden.eq(false) }
+      .where { $0.isDeleted.eq(false) }
   ) var locations
 }
 
