@@ -19,7 +19,7 @@ func parseVin(_ input: String) throws -> String {
 #if DEBUG
   @Shared(.simIdle) var simIdle
 //    if simIdle { return "1FTVW3L76RWG00000" } //### debugging control?
-  if simIdle { return "1V2DNPE81PC030349" }
+  if simIdle { return "1V2DNPE81PC030000" }
 #endif
   var input = input[...].utf8
   return try vinParser().parse(&input)

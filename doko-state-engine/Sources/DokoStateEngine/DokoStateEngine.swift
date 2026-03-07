@@ -190,12 +190,10 @@ public final class DokoStateEngine {
             do {
               let tripDraft = try Trip.postTripUpdateRecord(tripDraft: tripDraft, tripUpdateResponse: dokoResponsePacket)
               self.tripInProgress = tripDraft
-              let position = await CoreLocationManager.shared.currentLocation
-              let weather = dokoResponsePacket.weather
               @Shared(.metric) var metric
-              let windSock: WindSock? = if let position, let weather {
+              let windSock: WindSock? = if let course = dokoResponsePacket.position?.course, let weather = dokoResponsePacket.weather {
                 WindSock(
-                  course: .init(value: position.course, unit: .degrees),
+                  course: .init(value: course, unit: .degrees),
                   temperature: .init(value: weather.temperature, unit: .celsius).converted(to: metric ? .celsius : .fahrenheit),
                   conditions: weather.conditionSymbol,
                   windSpeed: .init(value: weather.windSpeed, unit: .metersPerSecond).converted(to: metric ? .metersPerSecond : .milesPerHour),

@@ -92,16 +92,12 @@ extension Trip {
     }
     var tripDraft = tripDraft
 
-    //###
-    let destinationID = DokoLocationManager.shared.updateLocation(
+    tripDraft.destinationID = DokoLocationManager.shared.updateLocation(
       id: tripDraft.destinationID,
       latitude: position.latitude, longitude: position.longitude, elevation: position.elevation,
       sharedLocation: true
     )
-//    else {
-//      throw TripError.tripLocationError
-//    }
-//    tripDraft.destinationID = destinationID
+
     tripDraft.latitudeEnd = position.latitude
     tripDraft.longitudeEnd = position.longitude
     tripDraft.elevationEnd = position.elevation
@@ -153,6 +149,12 @@ extension Trip {
       throw TripError.tripUpdateError
     }
     var tripDraft = tripDraft
+
+    tripDraft.destinationID = DokoLocationManager.shared.updateLocation(
+      id: tripDraft.destinationID,
+      latitude: position.latitude, longitude: position.longitude, elevation: position.elevation,
+      sharedLocation: false
+    )
 
     tripDraft.latitudeEnd = position.latitude
     tripDraft.longitudeEnd = position.longitude

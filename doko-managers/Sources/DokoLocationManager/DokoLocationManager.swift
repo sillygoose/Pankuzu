@@ -18,16 +18,12 @@ public final class DokoLocationManager: Sendable {
 
   private init() {}
 
-  public var placeholderLocation: Location.ID {
-    return Location.defaultLocation.id
-  }
-
-  public func lookup(id: Location.ID) -> Location {
+ public func lookup(id: Location.ID) -> Location {
     @FetchAll var locations: [Location]
     guard
       let location = locations.first(where: { $0.id == id })
     else {
-      return Location(id: placeholderLocation, latitude: 0, longitude: 0, elevation: 0, name: "<unknown>")
+      return Location(id: UUID(0), latitude: -1, longitude: -1, elevation: -1, name: "<Location Error>")
     }
     return location
   }
@@ -37,10 +33,15 @@ public final class DokoLocationManager: Sendable {
     @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
     if sharedLocation, let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold) {
       DokoLogging.shared.postLoggingResponse(.location(String(format: "Location exists at (%.5f, %.5f)", latitude, longitude)))
-      //### remove location
+      @Dependency(\.defaultDatabase) var database
+      withErrorReporting {
+        try database.write { db in
+          try Location.where { $0.id.eq(id) }.delete().execute(db)
+        }
+      }
       return locationID
     }
-
+    reverseGeocode(id: id, draft: Location.Draft(latitude: latitude, longitude: longitude, elevation: elevation), localSearch: false)
     return id
   }
 
@@ -61,12 +62,16 @@ public final class DokoLocationManager: Sendable {
         locationID = id
       }
     }
-    
-    Task { [location = draftLocation, id = locationID] in
-      guard let id else {
-        DokoLogging.shared.postLoggingResponse(.error("Expected honest locationID"))
-        return
-      }
+
+    if let locationID {
+      reverseGeocode(id: locationID, draft: draftLocation)
+    }
+    return locationID
+  }
+
+  private func reverseGeocode(id: Location.ID, draft: Location.Draft, localSearch: Bool = true) {
+    @Dependency(\.defaultDatabase) var database
+    Task { [location = draft] in
       guard let request = MKReverseGeocodingRequest(location: CLLocation(latitude: location.latitude, longitude: location.longitude)) else {
         DokoLogging.shared.postLoggingResponse(.error("Expected honest MKReverseGeocodingRequest()"))
         return
@@ -75,6 +80,7 @@ public final class DokoLocationManager: Sendable {
         DokoLogging.shared.postLoggingResponse(.error("Expected honest mapItems in MKReverseGeocodingRequest()"))
         return
       }
+
       if let mapItem = mapItems.first {
         @Shared(.poiThreshold) var poiThreshold
         var updatedLocation = Location(id: id, latitude: location.latitude, longitude: location.longitude, elevation: location.elevation)
@@ -92,16 +98,20 @@ public final class DokoLocationManager: Sendable {
               updatedLocation.street = trimmedStreet
             }
           }
+          DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(updatedLocation.placeName))"))
         }
-        let localSearch = MKLocalSearch(
-          request: MKLocalPointsOfInterestRequest(
-            center: CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude),
-            radius: poiThreshold
+        if localSearch {
+          let poiSearch = MKLocalSearch(
+            request: MKLocalPointsOfInterestRequest(
+              center: CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude),
+              radius: poiThreshold
+            )
           )
-        )
-        let response = try? await localSearch.start()
-        if let response, let mapItem = response.mapItems.first {
-          updatedLocation.name = mapItem.name
+          let response = try? await poiSearch.start()
+          if let response, let mapItem = response.mapItems.first {
+            updatedLocation.name = mapItem.name
+            DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(updatedLocation.placeName))"))
+          }
         }
         withErrorReporting {
           try database.write { db in
@@ -110,7 +120,6 @@ public final class DokoLocationManager: Sendable {
         }
       }
     }
-    return locationID
   }
 }
 

@@ -13,7 +13,7 @@ import DokoSharing
 
   @ObservationIgnored @FetchOne(
     Location
-      .where { $0.isDeleted.eq(false) }  //      .where { $0.isHidden.eq(false) }
+      .where { $0.isDeleted.eq(false) }
       .select { Stats.Columns(count: $0.count()) }
   ) var locationStats = Stats()
 
