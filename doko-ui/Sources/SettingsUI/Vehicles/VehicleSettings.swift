@@ -1,8 +1,6 @@
 import Foundation
 import SwiftUI
 
-import Sharing
-
 import DokoSchema
 import VehiclesUI
 import CommonUI
@@ -10,11 +8,9 @@ import CommonUI
 @MainActor
 @Observable
 class VehicleSettingsModel {
-  @ObservationIgnored
-  @FetchAll var vehicles: [Vehicle]
+  @ObservationIgnored @FetchAll var vehicles: [Vehicle]
 
-  @ObservationIgnored
-  @Dependency(\.defaultDatabase) var database
+  @ObservationIgnored @Dependency(\.defaultDatabase) var database
 
   func deleteVehicle(_ vehicle: Vehicle) {
     withErrorReporting {

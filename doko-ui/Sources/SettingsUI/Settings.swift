@@ -11,8 +11,11 @@ import DokoSharing
   @ObservationIgnored @FetchOne(Vehicle.select { Stats.Columns(count: $0.count()) })
   var vehicleStats = Stats()
 
-  @ObservationIgnored @FetchOne(Location.where { !$0.isDeleted && !$0.isHidden }.select { Stats.Columns(count: $0.count()) })
-  var locationStats = Stats()
+  @ObservationIgnored @FetchOne(
+    Location
+      .where { $0.isDeleted.eq(false) }  //      .where { $0.isHidden.eq(false) }
+      .select { Stats.Columns(count: $0.count()) }
+  ) var locationStats = Stats()
 
   @ObservationIgnored @Shared(.connectedAccessoryName) var connectedAccessoryName
   @ObservationIgnored @Shared(.connectedVehicleModel) var connectedVehicleModel
