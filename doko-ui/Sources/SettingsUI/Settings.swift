@@ -1,7 +1,6 @@
 import Foundation
 import SwiftUI
-
-import Sharing
+import TipKit
 
 import CommonUI
 import DokoSchema
@@ -38,6 +37,7 @@ public struct SettingsView: View {
 
   public var body: some View {
     NavigationStack(path: $path) {
+      TipView(SettingsTip())
       List {
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
           GridRow {
