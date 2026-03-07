@@ -26,7 +26,7 @@ public final class DokoVehicleManager: Sendable {
   public static let shared = DokoVehicleManager()
 
   private func startAccessoryNameObservation() {
-    @Shared(.connectedAccessory) var observedAccessoryName
+    @Shared(.connectedAccessoryName) var observedAccessoryName
     @Shared(.connectedVehicleInterface) var connectedVehicleInterface
     @Shared(.connectedVehicleModel) var connectedVehicleModel
     Task { [weak self] in

@@ -24,7 +24,7 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
 class DebuggingModel {
   private let logger = Logger(subsystem: "com.unchan.pankuzu", category: "Settings-Debugging")
   
-  @ObservationIgnored @Shared(.connectedAccessory) var accessoryName
+  @ObservationIgnored @Shared(.connectedAccessoryName) var accessoryName
   @ObservationIgnored @Shared(.vehicleState) var vehicleState
   @ObservationIgnored @Shared(.activeSession) var activeSession
   

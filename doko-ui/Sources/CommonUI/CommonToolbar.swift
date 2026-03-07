@@ -3,12 +3,12 @@ import SwiftUI
 import DokoSharing
 
 public struct SessionToolbar: ViewModifier {
-  let connectedAccessory: String?
+  let connectedAccessoryName: String?
   let connectedVehicleModel: String?
   let activeSession: ActiveSession?
 
-  public init(connectedAccessory: String? = nil, connectedVehicleModel: String? = nil, activeSession: ActiveSession? = nil) {
-    self.connectedAccessory = connectedAccessory
+  public init(connectedAccessoryName: String? = nil, connectedVehicleModel: String? = nil, activeSession: ActiveSession? = nil) {
+    self.connectedAccessoryName = connectedAccessoryName
     self.connectedVehicleModel = connectedVehicleModel
     self.activeSession = activeSession
   }
@@ -21,7 +21,7 @@ public struct SessionToolbar: ViewModifier {
             Image(systemName: activeSession.symbol)
               .foregroundStyle(.red)
               .symbolEffect(.pulse, options: .repeating)
-          } else if connectedAccessory != nil {
+          } else if connectedAccessoryName != nil {
             Image(systemName: "antenna.radiowaves.left.and.right")
               .foregroundStyle(.blue)
           }
@@ -32,12 +32,12 @@ public struct SessionToolbar: ViewModifier {
 
 extension View {
   public func sessionToolbar(
-    connectedAccessory: String?,
+    connectedAccessoryName: String?,
     connectedVehicleModel: String?,
     activeSession: ActiveSession?
   ) -> some View {
     modifier(SessionToolbar(
-      connectedAccessory: connectedAccessory,
+      connectedAccessoryName: connectedAccessoryName,
       connectedVehicleModel: connectedVehicleModel,
       activeSession: activeSession
     ))

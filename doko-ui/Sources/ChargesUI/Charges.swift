@@ -54,7 +54,7 @@ public final class ChargesModel {
 
   @ObservationIgnored @Shared(.displayVehicleID) var displayVehicleID
 
-  @ObservationIgnored @Shared(.connectedAccessory) var connectedAccessory
+  @ObservationIgnored @Shared(.connectedAccessoryName) var connectedAccessoryName
   @ObservationIgnored @Shared(.connectedVehicleModel) var connectedVehicleModel
   @ObservationIgnored @Shared(.activeSession) var activeSession
 
@@ -369,7 +369,7 @@ public struct ChargesView: View {
         .listStyle(.plain)
       }
       .sessionToolbar(
-        connectedAccessory: model.connectedAccessory,
+        connectedAccessoryName: model.connectedAccessoryName,
         connectedVehicleModel: model.connectedVehicleModel,
         activeSession: model.activeSession
       )

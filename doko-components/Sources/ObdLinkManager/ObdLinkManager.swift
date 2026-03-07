@@ -15,6 +15,7 @@ enum ObdLinkError: Error, LocalizedError {
   case inputStreamNotAvailable
   case outputStreamNotAvailable
   case missingDisconnectUserInfo
+  case accessorySerialNumberMismatch(String, String)
 
   var errorDescription: String {
     switch self {
@@ -28,6 +29,8 @@ enum ObdLinkError: Error, LocalizedError {
       "Failed to create session output stream"
     case .missingDisconnectUserInfo:
       "Missing disconnect UserInfo"
+    case .accessorySerialNumberMismatch(let expected, let found):
+      "Serial number mismatch: expected '\(expected)', found '\(found)'"
     }
   }
 }
@@ -48,8 +51,11 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
   private var accessory: EAAccessory?
   private var session: EASession?
 
-  @Shared(.connectedAccessory) var connectedAccessory
+  @Shared(.connectedAccessoryName) var connectedAccessoryName
+  @Shared(.connectedAccessorySerialNumber) var connectedAccessorySerialNumber
   @Shared(.connectedVehicleInterface) var connectedVehicleInterface
+  @Shared(.backgroundMode) var backgroundMode
+  @Shared(.accessorySerialNumber) var accessorySerialNumber
   
   private override init() {
     super.init()
@@ -67,14 +73,37 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
       name: .EAAccessoryDidDisconnect,
       object: nil
     )
+    startBackgroundModeObservation()
+  }
+
+  private func startBackgroundModeObservation() {
+    @Shared(.backgroundMode) var observedBackgroundMode
+    Task { [weak self] in
+      guard let self else { return }
+      var old: Bool = observedBackgroundMode
+      for await newMode in $observedBackgroundMode.publisher.values {
+        guard old != newMode else { continue }
+        old = newMode
+        if newMode {
+          self.connect()
+        } else {
+          self.disconnect()
+        }
+      }
+    }
   }
 
   public func connect() {
-    $connectedAccessory.withLock { $0 = nil }
+    $connectedAccessoryName.withLock { $0 = nil }
+    $connectedAccessorySerialNumber.withLock { $0 = nil }
+    guard backgroundMode else { return }
     let accessories = EAAccessoryManager.shared().connectedAccessories
     do {
       guard let newAccessory = accessories.first(where: { $0.protocolStrings.contains(protocolString) }) else {
         throw ObdLinkError.accessoryNotFound(self.protocolString)
+      }
+      if let requiredSerialNumber = accessorySerialNumber, newAccessory.serialNumber != requiredSerialNumber {
+        throw ObdLinkError.accessorySerialNumberMismatch(requiredSerialNumber, newAccessory.serialNumber)
       }
       guard let newSession = EASession(accessory: newAccessory, forProtocol: protocolString) else {
         throw ObdLinkError.sessionFailed
@@ -105,7 +134,8 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
       self.obdResponseStreamContinuation = obdResponseContinuation
 
       self.commandProcessingTaskHandle = commandProcessingTask()
-      $connectedAccessory.withLock { $0 = newAccessory.name }
+      $connectedAccessoryName.withLock { $0 = newAccessory.name }
+      $connectedAccessorySerialNumber.withLock { $0 = newAccessory.serialNumber }
       DokoLogging.shared.postLoggingResponse(.connect("\(newAccessory.name)"))
     } catch let error as ObdLinkError {
       self.logger.error("\(timestamp()) ObdLinkManager.connect: \(error.errorDescription)")
@@ -133,7 +163,8 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
     session.outputStream?.remove(from: .main, forMode: .default)
     self.session = nil
     self.accessory = nil
-    $connectedAccessory.withLock { $0 = nil }
+    $connectedAccessoryName.withLock { $0 = nil }
+    $connectedAccessorySerialNumber.withLock { $0 = nil }
     DokoLogging.shared.postLoggingResponse(.disconnect("\(accessoryName)"))
   }
 
@@ -248,6 +279,7 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
       self.logger.error("\(timestamp()) ObdLinkManager.\(streamType)(\(aStream.streamError?.localizedDescription ?? "Unknown error")")
       DokoLogging.shared.postLoggingResponse(.error("ObdLinkManager.\(streamType)(\(aStream.streamError?.localizedDescription ?? "Unknown error")"))
       disconnect()
+      guard backgroundMode else { break }
       Task {
         try? await Task.sleep(for: .seconds(1))
         let accessories = EAAccessoryManager.shared().connectedAccessories
@@ -262,6 +294,7 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
       self.logger.error("\(timestamp()) ObdLinkManager.\(streamType)(.endEncountered)")
       DokoLogging.shared.postLoggingResponse(.error("ObdLinkManager.\(streamType)(.endEncountered)"))
       disconnect()
+      guard backgroundMode else { break }
       Task {
         try? await Task.sleep(for: .seconds(1))
         let accessories = EAAccessoryManager.shared().connectedAccessories
@@ -299,7 +332,12 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
     }
   }
 
+  public func setBackgroundMode(_ enabled: Bool) {
+    $backgroundMode.withLock { $0 = enabled }
+  }
+
   @objc func connectAccessory(connectingAccessory: NotificationCenter.Publisher.Output) {
+    guard backgroundMode else { return }
     if session == nil {
       connect()
     } else {

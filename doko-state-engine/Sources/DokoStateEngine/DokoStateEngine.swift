@@ -431,7 +431,7 @@ public final class DokoStateEngine {
 
 extension DokoStateEngine {
   public func accessoryNameObservation() {
-    @Shared(.connectedAccessory) var observedAccessoryName
+    @Shared(.connectedAccessoryName) var observedAccessoryName
     @Shared(.activeSession) var activeSession
     DokoLogging.shared.postLoggingResponse(.info("SE.accessoryNameObservation"))
     Task { [weak self] in
@@ -499,7 +499,7 @@ extension DokoStateEngine {
       return
     }
     @Shared(.vehicleState) var vehicleState
-    @Shared(.connectedAccessory) var accessoryName
+    @Shared(.connectedAccessoryName) var accessoryName
     @Shared(.connectedVehicleInterface) var connectedVehicleInterface
     DokoLogging.shared.postLoggingResponse(.info("SE.vehicleStateObservation"))
     vehicleStateObservationTask = Task { [weak self] in
