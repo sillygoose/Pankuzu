@@ -94,67 +94,72 @@ func restoreDatabase(from databaseBackup: DatabaseBackup) throws {
   @FetchAll var chargeHistories: [ChargeHistory]
 
   try database.write { db in
-    for vehicle in databaseBackup.vehicles {
-      if let _ = vehicles.first(where: { $0.id == vehicle.id }) { continue }
-      try Vehicle
-        .insert { vehicle }
-        .execute(db)
-    }
-
-    for location in databaseBackup.locations {
-      if location.id == UUID(0) { continue }
-      if let _ = locations.first(where: { $0.id == location.id }) { continue }
-      try Location
-        .insert { location }
-        .execute(db)
-    }
-
     for trip in databaseBackup.trips {
-      if let _ = trips.first(where: { $0.id == trip.id }) { continue }
+      if trips.contains(where: { $0.id == trip.id }) { continue }
       try Trip
         .insert { trip }
         .execute(db)
     }
 
     for tripPosition in databaseBackup.tripPositions {
-      if let _ = tripPositions.first(where: { $0.id == tripPosition.id }) { continue }
+      if tripPositions.contains(where: { $0.id == tripPosition.id }) { continue }
       try TripPosition
         .insert { tripPosition }
         .execute(db)
     }
 
     for tripElevation in databaseBackup.tripElevations {
-      if let _ = tripElevations.first(where: { $0.id == tripElevation.id }) { continue }
+      if tripElevations.contains(where: { $0.id == tripElevation.id }) { continue }
       try TripElevation
         .insert { tripElevation }
         .execute(db)
     }
 
     for tripDatum in databaseBackup.tripData {
-      if let _ = tripData.first(where: { $0.id == tripDatum.id }) { continue }
+      if tripData.contains(where: { $0.id == tripDatum.id }) { continue }
       try TripData
         .insert { tripDatum }
         .execute(db)
     }
 
     for tripWeather in databaseBackup.tripWeatherData {
-      if let _ = tripWeatherData.first(where: { $0.id == tripWeather.id }) { continue }
+      if tripWeatherData.contains(where: { $0.id == tripWeather.id }) { continue }
       try TripWeather
         .insert { tripWeather }
         .execute(db)
     }
 
     for charge in databaseBackup.charges {
-      if let _ = charges.first(where: { $0.id == charge.id }) { continue }
+      if charges.contains(where: { $0.id == charge.id }) { continue }
       try Charge
         .insert { charge }
         .execute(db)
     }
 
     for chargeHistory in databaseBackup.chargeHistories {
-      if let _ = chargeHistories.first(where: { $0.id == chargeHistory.id }) { continue }
+      if chargeHistories.contains(where: { $0.id == chargeHistory.id }) { continue }
       try ChargeHistory
         .insert { chargeHistory }
+        .execute(db)
+    }
+
+    let referencedVehicleIDs = Set(databaseBackup.trips.map(\.vehicleID) + databaseBackup.charges.map(\.vehicleID))
+    for vehicle in databaseBackup.vehicles where referencedVehicleIDs.contains(vehicle.id) {
+      if vehicles.contains(where: { $0.id == vehicle.id }) { continue }
+      try Vehicle
+        .insert { vehicle }
+        .execute(db)
+    }
+
+    let referencedLocationIDs = Set(
+      databaseBackup.trips.flatMap { [$0.originID, $0.destinationID] } +
+      databaseBackup.charges.map(\.locationID)
+    )
+    for location in databaseBackup.locations where referencedLocationIDs.contains(location.id) {
+      if location.id == UUID(0) { continue }
+      if locations.contains(where: { $0.id == location.id }) { continue }
+      try Location
+        .insert { location }
         .execute(db)
     }
   }
