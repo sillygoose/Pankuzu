@@ -12,9 +12,7 @@ import VehiclesUI
 import LocationsUI
 import CommonUI
 
-@MainActor
-@Observable
-public final class ChargeDetailModel {
+@MainActor @Observable public final class ChargeDetailModel {
   public enum Destination: Identifiable {
     case editLocationForm(Location)
     case editVehicleForm(Vehicle)
@@ -43,19 +41,12 @@ public final class ChargeDetailModel {
 
   var destination: Destination?
 
-  @ObservationIgnored
-  @FetchOne(Charge.none) var charge
+  @ObservationIgnored @FetchOne(Charge.none) var charge
+  @ObservationIgnored @FetchOne(ChargeHistory.none) var chargeHistory
+  @ObservationIgnored @FetchAll var locations: [Location]
+  @ObservationIgnored @Shared(.metric) var metric
 
-  @ObservationIgnored
-  @FetchOne(ChargeHistory.none) var chargeHistory
-
-  @ObservationIgnored
-  @FetchAll var locations: [Location]
-
-  @ObservationIgnored
-  @Shared(.metric) var metric
-
-  var chargeLocation: Location?
+  var chargeLocation: Location = .unexpectedLocation
   var vehicle: Vehicle?
   var maximumPower: Double?
 
@@ -119,20 +110,14 @@ public struct ChargeDetailView: View {
         Section {
           Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
             GridRow {
-              let (placeName, cityState) = {
-                guard let chargeLocation = model.chargeLocation else { return ("In Progress", "") }
-                return (chargeLocation.placeName, chargeLocation.cityState)
-              }()
               DokoGridLocation(
                 color: charge.chargerType == .ac ? .purple : .green,
-                placeName: placeName,
-                cityState: cityState,
+                placeName: model.chargeLocation.placeName,
+                cityState: model.chargeLocation.cityState,
                 label: charge.chargerType == .ac ? "AC" : "DCFC",
                 iconName: charge.chargerType == .ac ? "powerplug" : "ev.charger"
               ) {
-                if let chargeLocation = model.chargeLocation {
-                  model.destination = .editLocationForm(chargeLocation)
-                }
+                model.destination = .editLocationForm(model.chargeLocation)
               }
             }
           }

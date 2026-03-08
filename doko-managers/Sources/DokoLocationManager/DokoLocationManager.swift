@@ -6,7 +6,7 @@ import SQLiteData
 
 import DokoLogging
 import DokoSharing
-import Locations
+import Locations //###
 
 public final class DokoLocationManager: Sendable {
   let logger = Logger(
@@ -23,7 +23,7 @@ public final class DokoLocationManager: Sendable {
     guard
       let location = locations.first(where: { $0.id == id })
     else {
-      return Location(id: UUID(0), latitude: -1, longitude: -1, elevation: -1, name: "<Location Error>")
+      return .unexpectedLocation
     }
     return location
   }

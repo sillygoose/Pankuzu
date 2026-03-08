@@ -66,8 +66,8 @@ public struct DokoGridLocation: View {
         GridRow {
           DokoGridLocation(
             color: .blue,
-            placeName: "In Progress",
-            cityState: "",
+            placeName: "Kwik-Fill",
+            cityState: "7Skaneatekes, NY",
             label: "To",
             iconName: "mappin.and.ellipse.circle.fill"
           ) {

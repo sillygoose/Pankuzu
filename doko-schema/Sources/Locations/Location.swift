@@ -59,6 +59,10 @@ extension Location.TableColumns {
 }
 
 extension Location {
+  public static var unexpectedLocation: Location {
+    Location(id: UUID(0), latitude: -1, longitude: -1, elevation: -1, name: "<Location Error>")
+  }
+
   public var placeName: String {
     if let name { return name }
     if let street { return street }
