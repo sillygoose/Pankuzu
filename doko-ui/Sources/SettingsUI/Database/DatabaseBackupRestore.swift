@@ -94,6 +94,13 @@ func restoreDatabase(from databaseBackup: DatabaseBackup) throws {
   @FetchAll var chargeHistories: [ChargeHistory]
 
   try database.write { db in
+    for vehicle in databaseBackup.vehicles  {
+      if vehicles.contains(where: { $0.id == vehicle.id }) { continue }
+      try Vehicle
+        .insert { vehicle }
+        .execute(db)
+    }
+
     for trip in databaseBackup.trips {
       if trips.contains(where: { $0.id == trip.id }) { continue }
       try Trip
@@ -140,14 +147,6 @@ func restoreDatabase(from databaseBackup: DatabaseBackup) throws {
       if chargeHistories.contains(where: { $0.id == chargeHistory.id }) { continue }
       try ChargeHistory
         .insert { chargeHistory }
-        .execute(db)
-    }
-
-    let referencedVehicleIDs = Set(databaseBackup.trips.map(\.vehicleID) + databaseBackup.charges.map(\.vehicleID))
-    for vehicle in databaseBackup.vehicles where referencedVehicleIDs.contains(vehicle.id) {
-      if vehicles.contains(where: { $0.id == vehicle.id }) { continue }
-      try Vehicle
-        .insert { vehicle }
         .execute(db)
     }
 
