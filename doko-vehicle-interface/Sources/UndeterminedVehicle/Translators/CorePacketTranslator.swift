@@ -41,7 +41,7 @@ extension UndeterminedVehicle {
     else {
       return DokoResponsePacket(type: .vin, responses: dokoResponses)
     }
-    dokoResponses[.nextState] = DokoCommandResponse(command: .vin, response: .nextState(.vehicleCapabilities))
+    dokoResponses[.nextState] = DokoCommandResponse(command: .vin, response: .nextState(.vehicleCustomization))
     dokoResponses[.vin] = DokoCommandResponse(command: .vin, response: .vin(vin))
     dokoResponses[.stprs] = DokoCommandResponse(command: .stprs, response: .stprs(protocolString))
     return DokoResponsePacket(type: .vin, responses: dokoResponses)

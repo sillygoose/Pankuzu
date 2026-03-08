@@ -3,7 +3,7 @@ import OSLog
 import DokoTypes
 import ObdLinkCore
 
-extension FordElectrics {
+extension FordMachE {
   public func vehicleDokoResponsePacket(_ responsePacket: ObdResponsePacket) async -> DokoResponsePacket {
     switch responsePacket.type {
     case .vehicleCustomization:

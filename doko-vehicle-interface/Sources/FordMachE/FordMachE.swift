@@ -6,11 +6,11 @@ import VehicleInterface
 import ObdLinkCore
 import Vehicles
 
-public actor FordElectrics: ConnectedVehicleInterface {
-  let logger = Logger(subsystem: "com.unchan.doko", category: "FordElectrics")
+public actor FordMachE: ConnectedVehicleInterface {
+  let logger = Logger(subsystem: "com.unchan.doko", category: "FordMachE")
 
   nonisolated public let vehicle: Vehicle?
-  nonisolated public let name: String = "FordElectrics"
+  nonisolated public let name: String = "FordMachE"
 
   public var batteryPower: Double = 0.0
   public var batteryEnergy: Double = 0.0
@@ -27,6 +27,10 @@ public actor FordElectrics: ConnectedVehicleInterface {
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
     let obdLinkCommand: String?
     switch command {
+    case .stpo:                         obdLinkCommand = "STPO"
+    case .stp(let canProtocol):         obdLinkCommand = "STP\(canProtocol)"
+    case .stpbr(let baudrate):          obdLinkCommand = "STPBR\(baudrate)"
+      
     case .gearSelected:                 obdLinkCommand = "STPX h:7E2, d:221E12"
     case .acChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224888"
     case .dcChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224897"
@@ -50,16 +54,17 @@ public actor FordElectrics: ConnectedVehicleInterface {
     default:                            obdLinkCommand = nil
     }
     guard let obdLinkCommand else {
-      DokoLogging.shared.postLoggingResponse(.error("FE.vehicleObdCommand: \(command.description) not found"))
+      DokoLogging.shared.postLoggingResponse(.error("FME.vehicleObdCommand: \(command.description) not found"))
       return nil
     }
     return obdLinkCommand
   }
-  
+ 
   public func translateDokoCommandPacket(using packetType: DokoPacketType) async -> ObdCommandPacket? {
     switch packetType {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
+        .stp(33), .stpbr(500000), .stpo,
         .odometer
       ])
 
@@ -171,7 +176,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
       ])
 
     default:
-      DokoLogging.shared.postLoggingResponse(.error("FE.translateDokoCommandPacket: no packet translation for '\(packetType.description)'"))
+      DokoLogging.shared.postLoggingResponse(.error("FME.translateDokoCommandPacket: no packet translation for '\(packetType.description)'"))
       return nil
     }
   }

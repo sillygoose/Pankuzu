@@ -4,46 +4,46 @@ import DokoTypes
 import DokoLogging
 import ObdLinkCore
 
-extension FordElectrics {
+extension FordMachE {
   public func createStateScheduler(for state: VehicleState) async -> StateEngineDokoSchedule? {
-    self.logger.info("\(timestamp()) FE.createStateScheduler(\(state.description))")
+    self.logger.info("\(timestamp()) FME.createStateScheduler(\(state.description))")
     switch state {
     case .vehicleCustomization:
-      return FordElectrics.vehicleCustomizationDokoCommandSchedule
+      return FordMachE.vehicleCustomizationDokoCommandSchedule
 
     case .idle:
-      return FordElectrics.idleDokoCommandSchedule
+      return FordMachE.idleDokoCommandSchedule
 
     case .tripStarting:
-      return FordElectrics.tripStartingDokoCommandSchedule
+      return FordMachE.tripStartingDokoCommandSchedule
     case .tripInProgress:
-      return FordElectrics.tripInProgressDokoCommandSchedule
+      return FordMachE.tripInProgressDokoCommandSchedule
     case .tripEnding:
-      return FordElectrics.tripEndingDokoCommandSchedule
+      return FordMachE.tripEndingDokoCommandSchedule
 
     case .acChargeStarting:
-      return FordElectrics.acChargeStartingDokoCommandSchedule
+      return FordMachE.acChargeStartingDokoCommandSchedule
     case .acChargeInProgress:
-      return FordElectrics.acChargeInProgressDokoCommandSchedule
+      return FordMachE.acChargeInProgressDokoCommandSchedule
     case .acChargeEnding:
-      return FordElectrics.acChargeEndingDokoCommandSchedule
+      return FordMachE.acChargeEndingDokoCommandSchedule
 
     case .dcChargeStarting:
-      return FordElectrics.dcChargeStartingDokoCommandSchedule
+      return FordMachE.dcChargeStartingDokoCommandSchedule
     case .dcChargeInProgress:
-      return FordElectrics.dcChargeInProgressDokoCommandSchedule
+      return FordMachE.dcChargeInProgressDokoCommandSchedule
     case .dcChargeEnding:
-      return FordElectrics.dcChargeEndingDokoCommandSchedule
+      return FordMachE.dcChargeEndingDokoCommandSchedule
 
     default:
-      self.logger.error("\(timestamp()) FE.createStateScheduler: No scheduler for state '\(state.description)'")
-      DokoLogging.shared.postLoggingResponse(.error("FE.createStateScheduler: No scheduler for state '\(state.description)'"))
+      self.logger.error("\(timestamp()) FME.createStateScheduler: No scheduler for state '\(state.description)'")
+      DokoLogging.shared.postLoggingResponse(.error("FME.createStateScheduler: No scheduler for state '\(state.description)'"))
       return nil
     }
   }
 }
 
-extension FordElectrics {
+extension FordMachE {
   private static let vehicleCustomizationDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .oneShotWithDelay(1),

@@ -50,8 +50,8 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
   public func translateDokoCommandPacket(using packetType: DokoPacketType) async -> ObdCommandPacket? {
     switch packetType {
-    case .vehicleCapabilities:
-      return ObdCommandPacket(type: .vehicleCapabilities, commands: [
+    case .vehicleCustomization:
+      return ObdCommandPacket(type: .vehicleCustomization, commands: [
         .gearSelected, .odometer,
         .acChargerStatus, .dcChargerStatus,
         .stateOfCharge, .batteryTemperature, .batteryVoltage, .batteryCurrent

@@ -51,12 +51,14 @@ public enum WorldManufacturerIdentifier: String, Equatable {
 public enum VehicleType: CaseIterable, Sendable {
   case undetermined
   case fordElectric
+  case fordMachE
   case vwElectric
 
   public var description: String {
     switch self {
     case .undetermined: return "Undetermined"
     case .fordElectric: return "Ford Electric"
+    case .fordMachE: return "Ford Mustang Mach-E"
     case .vwElectric: return "VW Electric"
     }
   }
@@ -125,7 +127,11 @@ extension VehicleProtocol {
     let pos8 = vin[vin.index(vin.startIndex, offsetBy: 7)]
     switch wmi {
     case "3FM":
-      return "M7SUXE".contains(pos8) ? .fordElectric : .undetermined
+      guard "M7SUXE".contains(pos8) else { return .undetermined }
+      let modelYearChar = String(vin[vin.index(vin.startIndex, offsetBy: 9)])
+      let modelYears: [String: Int] = ["M": 2021, "N": 2022, "P": 2023, "R": 2024, "S": 2025, "T": 2026, "U": 2027, "V": 2028, "W": 2029]
+      let modelYear = modelYears[modelYearChar] ?? 0
+      return modelYear >= 2025 ? .fordMachE : .fordElectric
     case "1FT":
       let validGVWR = pos4 == "V" || pos4 == "6"
       let validEngine = "SK7MLV".contains(pos8)

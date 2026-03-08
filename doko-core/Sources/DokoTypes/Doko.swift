@@ -86,7 +86,7 @@ public enum CanbusProtocol: Equatable, Hashable, Sendable {
 
 public enum VehicleState: Equatable, Hashable, Sendable {
   case reset
-  case vin, vehicleCapabilities
+  case vin, vehicleCustomization
   case idle,
        tripStarting, tripInProgress, tripEnding,
        acChargeStarting, acChargeInProgress, acChargeEnding,
@@ -96,7 +96,7 @@ public enum VehicleState: Equatable, Hashable, Sendable {
     switch self {
     case .reset: return ".reset"
     case .vin: return ".vin"
-    case .vehicleCapabilities: return ".vehicleCapabilities"
+    case .vehicleCustomization: return ".vehicleCustomization"
     case .idle: return ".idle"
     case .tripStarting: return ".tripStarting"
     case .tripInProgress: return ".tripInProgress"
@@ -114,7 +114,7 @@ public enum VehicleState: Equatable, Hashable, Sendable {
 public enum DokoPacketType: Equatable, Hashable, Sendable {
   case reset
   case vin
-  case vehicleCapabilities
+  case vehicleCustomization
   case idle
 
   case tripStarting, tripInProgress, tripEnergy, tripUpdate, tripEnding
@@ -128,8 +128,8 @@ public enum DokoPacketType: Equatable, Hashable, Sendable {
     switch self {
     case .reset:
       ".reset"
-    case .vehicleCapabilities:
-      ".vehicleCapabilities"
+    case .vehicleCustomization:
+      ".vehicleCustomization"
     case .vin:
       ".vin"
     case .idle:
@@ -194,7 +194,7 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case reset
   case stprs
   case vin
-  case vehicleCapabilities
+  case vehicleCustomization
 
   case idle
 
@@ -239,8 +239,8 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".stprs"
       case .vin:
         return ".vin"
-      case .vehicleCapabilities:
-        return ".vehicleCapabilities"
+      case .vehicleCustomization:
+        return ".vehicleCustomization"
 
       case .idle:
         return ".idle"

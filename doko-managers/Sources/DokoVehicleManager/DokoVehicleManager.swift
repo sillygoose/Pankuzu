@@ -12,6 +12,7 @@ import Vehicles
 import VehicleInterface
 import UndeterminedVehicle
 import FordElectrics
+import FordMachE
 import VwElectrics
 
 extension SharedKey where Self == InMemoryKey<ConnectedVehicleInterface>.Default {
@@ -115,6 +116,8 @@ extension DokoVehicleManager {
         return UndeterminedVehicle()
       case .fordElectric:
         return FordElectrics(vehicle: vehicle)
+      case .fordMachE:
+        return FordMachE(vehicle: vehicle)
       case .vwElectric:
         return VwElectrics(vehicle: vehicle)
       }

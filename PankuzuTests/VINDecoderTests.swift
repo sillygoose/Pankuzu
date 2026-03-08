@@ -36,7 +36,7 @@ struct VINDecoderTests {
   }
 
   @Test func machEPremiumAWD() {
-    let v = Vehicle(decoding: "3FMTK3SMXSMA00001")  // K3S, year S=2025
+    let v = Vehicle(decoding: "3FMTK3SMXRMA00001")  // K3S, year R=2024
     #expect(v.vehicleType == .fordElectric)
     #expect(v.model == "Mustang Mach-E Premium")
   }
@@ -64,6 +64,71 @@ struct VINDecoderTests {
   @Test func machENonElectricEngineCode() {
     let v = Vehicle(decoding: "3FMTK1RAXMMA00001")  // engine A - not electric
     #expect(v.vehicleType == .undetermined)
+  }
+
+  // MARK: - Mustang Mach-E 2025+ (year S=2025 or newer → .fordMachE)
+
+  @Test func machE2025SelectRWD() {
+    let v = Vehicle(decoding: "3FMTK1RMXSMA00001")  // K1R, year S=2025
+    #expect(v.vehicleType == .fordMachE)
+    #expect(v.model == "Mustang Mach-E Select")
+    #expect(v.year == "2025")
+  }
+
+  @Test func machE2025SelectAWD() {
+    let v = Vehicle(decoding: "3FMTK1SMXSMA00001")  // K1S, year S=2025
+    #expect(v.vehicleType == .fordMachE)
+    #expect(v.model == "Mustang Mach-E Select")
+    #expect(v.year == "2025")
+  }
+
+  @Test func machE2025CalRoute1() {
+    let v = Vehicle(decoding: "3FMTK2RMXSMA00001")  // K2R, year S=2025
+    #expect(v.vehicleType == .fordMachE)
+    #expect(v.model == "Mustang Mach-E Cal Route 1")
+    #expect(v.year == "2025")
+  }
+
+  @Test func machE2025PremiumRWD() {
+    let v = Vehicle(decoding: "3FMTK3RMXSMA00001")  // K3R, year S=2025
+    #expect(v.vehicleType == .fordMachE)
+    #expect(v.model == "Mustang Mach-E Premium")
+    #expect(v.year == "2025")
+  }
+
+  @Test func machE2025PremiumAWD() {
+    let v = Vehicle(decoding: "3FMTK3SMXSMA00001")  // K3S, year S=2025
+    #expect(v.vehicleType == .fordMachE)
+    #expect(v.model == "Mustang Mach-E Premium")
+    #expect(v.year == "2025")
+  }
+
+  @Test func machE2025GT() {
+    let v = Vehicle(decoding: "3FMTK4SMXSMA00001")  // K4S, year S=2025
+    #expect(v.vehicleType == .fordMachE)
+    #expect(v.model == "Mustang Mach-E GT")
+    #expect(v.year == "2025")
+  }
+
+  @Test func machE2026() {
+    let v = Vehicle(decoding: "3FMTK1RMXTMA00001")  // K1R, year T=2026
+    #expect(v.vehicleType == .fordMachE)
+    #expect(v.year == "2026")
+  }
+
+  @Test func machE2025AllEngineCodes() {
+    for engine in ["M", "7", "S", "U", "X", "E"] {
+      let v = Vehicle(decoding: "3FMTK1R\(engine)XSMA00001")
+      #expect(v.vehicleType == .fordMachE, "engine code \(engine) should be fordMachE for 2025")
+    }
+  }
+
+  @Test func machEYearBoundary() {
+    // 2024 (R) → fordElectric, 2025 (S) → fordMachE
+    let v2024 = Vehicle(decoding: "3FMTK1RMXRMA00001")  // year R=2024
+    #expect(v2024.vehicleType == .fordElectric)
+    let v2025 = Vehicle(decoding: "3FMTK1RMXSMA00001")  // year S=2025
+    #expect(v2025.vehicleType == .fordMachE)
   }
 
   // MARK: - F-150 Lightning 2023 (WMI: 1FT, pos5-7: W1E, engine: L or V)

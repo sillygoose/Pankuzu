@@ -127,11 +127,11 @@ public final class DokoStateEngine {
             }
             $vehicleState.withLock { $0 = nextState }
 
-          case .vehicleCapabilities:
-            guard case .vehicleCapabilities = vehicleState else {
+          case .vehicleCustomization:
+            guard case .vehicleCustomization = vehicleState else {
               throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
             }
-            let nextState = dokoResponsePacket.nextState ?? .vehicleCapabilities
+            let nextState = dokoResponsePacket.nextState ?? .vehicleCustomization
             $vehicleState.withLock { $0 = nextState }
             
           case .idle:
