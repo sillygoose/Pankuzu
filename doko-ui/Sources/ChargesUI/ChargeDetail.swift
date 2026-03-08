@@ -20,6 +20,7 @@ import CommonUI
     case powerChart
     case energyUsedChart
     case batteryChart
+    case stateOfHealthChart
 
     public var id: String {
       switch self {
@@ -35,6 +36,8 @@ import CommonUI
         return "energyUsedChart"
       case .batteryChart:
         return "batteryChart"
+      case .stateOfHealthChart:
+        return "stateOfHealthChart"
       }
     }
   }
@@ -227,13 +230,15 @@ public struct ChargeDetailView: View {
           GridRow {
             let batteryStateOfHealthColor =
             batteryStateOfHealth < 80 ? Color.red : batteryStateOfHealth < 90 ? .yellow : .green
-            DokoGridCount(
+            DokoGridValueButton(
               color: batteryStateOfHealthColor,
               value: String(format: "%.1f", batteryStateOfHealth),
               units: "%",
               iconName: "minus.plus.batteryblock.stack",
               title: "State of Health"
-            )
+            ) {
+              model.destination = .stateOfHealthChart
+            }
             
             DokoGridValueButton(
               color: .orange,
@@ -304,6 +309,16 @@ public struct ChargeDetailView: View {
           ChargeDetailBatteryView(
             model: ChargeDetailBatteryModel(
               charge: charge
+            )
+          )
+          .presentationDetents([.medium])
+        }
+      case .stateOfHealthChart:
+        NavigationStack {
+          SoHHistoryView(
+            model: SoHHistoryModel(
+              vehicleID: charge.vehicleID,
+              currentID: charge.id
             )
           )
           .presentationDetents([.medium])

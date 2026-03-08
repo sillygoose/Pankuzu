@@ -23,7 +23,8 @@ public final class TripDetailModel {
     case weatherChart
     case energyUsedChart
     case batteryChart
-    
+    case stateOfHealthChart
+
     public var id: String {
       switch self {
       case .editLocationForm(let location):
@@ -40,6 +41,8 @@ public final class TripDetailModel {
         return "energyUsedChart"
       case .batteryChart:
         return "batteryChart"
+      case .stateOfHealthChart:
+        return "stateOfHealthChart"
       }
     }
   }
@@ -268,13 +271,15 @@ public struct TripDetailView: View {
             return Color.green
           }()
           GridRow {
-            DokoGridCount(
+            DokoGridValueButton(
               color: batteryStateOfHealthColor,
               value: String(format: "%.1f", batteryStateOfHealth),
               units: "%",
               iconName: "minus.plus.batteryblock.stack",
               title: "State of Health"
-            )
+            ) {
+              model.destination = .stateOfHealthChart
+            }
             
             DokoGridValueButton(
               color: .orange,
@@ -357,7 +362,18 @@ public struct TripDetailView: View {
             )
           )
           .presentationDetents([.medium])
-        }      }
+        }
+      case .stateOfHealthChart:
+        NavigationStack {
+          SoHHistoryView(
+            model: SoHHistoryModel(
+              vehicleID: trip.vehicleID,
+              currentID: trip.id
+            )
+          )
+          .presentationDetents([.medium])
+        }
+      }
     }
   }
 }

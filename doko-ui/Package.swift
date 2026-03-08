@@ -97,6 +97,7 @@ let package = Package(
       name: "CommonUI",
       dependencies: [
         .product(name: "DokoSharing", package: "doko-sharing"),
+        .product(name: "DokoSchema", package: "doko-schema"),
       ]
     ),
   ],
