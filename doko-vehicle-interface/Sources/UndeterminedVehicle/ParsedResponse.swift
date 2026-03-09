@@ -22,8 +22,8 @@ extension UndeterminedVehicle {
         commandResponse = .ats(enabled)
       case .stcsegr(let enabled):
         commandResponse = .stcsegr(enabled)
-      case .atsp(let proto):
-        commandResponse = .atsp(proto)
+      case .atsp(let busProtocol):
+        commandResponse = .atsp(busProtocol)
       case .stprs:
         commandResponse = .stprs(response)
         

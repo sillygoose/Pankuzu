@@ -12,6 +12,13 @@ extension FordMachE {
     do {
       var commandResponse: ObdResponse
       switch command {
+      case .stp(let canProtocol):
+        commandResponse = .stp(canProtocol)
+      case .stpbr(let baudRate):
+        commandResponse = .stpbr(baudRate)
+      case .stpo:
+        commandResponse = .stpo(response)
+
       case .position:
         guard let position = await CoreLocationManager.shared.currentLocation else {
           throw ParsedResponseError.locationUnavailable

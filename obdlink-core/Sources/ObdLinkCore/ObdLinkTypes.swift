@@ -57,12 +57,12 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".atcaf(\(enabled))"
       case .ats(let enabled):
         return ".ats(\(enabled))"
-      case .atsp(let proto):
-        return ".atsp(\(proto))"
-      case .stp(let proto):
-        return ".stp(\(proto))"
-      case .stpbr(let rate):
-        return ".stpbr(\(rate))"
+      case .atsp(let canProtocol):
+        return ".atsp(\(canProtocol))"
+      case .stp(let canProtocol):
+        return ".stp(\(canProtocol))"
+      case .stpbr(let baudRate):
+        return ".stpbr(\(baudRate))"
       case .stpo:
         return ".stpo"
       case .stcsegr(let enabled):
@@ -244,16 +244,16 @@ public enum ObdResponse: Equatable, Sendable {
         return ".atcaf(\(enabled))"
       case .ats(let enabled):
         return ".ats(\(enabled))"
-      case .atsp(let proto):
-        return ".atsp(\(proto))"
-      case .stp(let proto):
-        return ".stp(\(proto))"
-      case .stpbr(let baudrate):
-        return ".stpbr(\(baudrate))"
+      case .atsp(let canProtocol):
+        return ".atsp(\(canProtocol))"
+      case .stp(let canProtocol):
+        return ".stp(\(canProtocol))"
+      case .stpbr(let baudRate):
+        return ".stpbr(\(baudRate))"
       case .stpo:
         return ".stpo"
-      case .stprs(let pstring):
-        return ".stprs(\(pstring))"
+      case .stprs(let canProtocol):
+        return ".stprs(\(canProtocol))"
       case .stcsegr(let enabled):
         return ".stcsegr(\(enabled))"
         

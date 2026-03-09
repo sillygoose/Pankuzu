@@ -29,8 +29,8 @@ public actor FordMachE: ConnectedVehicleInterface {
     switch command {
     case .stpo:                         obdLinkCommand = "STPO"
     case .stp(let canProtocol):         obdLinkCommand = "STP\(canProtocol)"
-    case .stpbr(let baudrate):          obdLinkCommand = "STPBR\(baudrate)"
-      
+    case .stpbr(let baudRate):          obdLinkCommand = "STPBR\(baudRate)"
+
     case .gearSelected:                 obdLinkCommand = "STPX h:7E2, d:221E12"
     case .acChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224888"
     case .dcChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224897"
@@ -64,7 +64,7 @@ public actor FordMachE: ConnectedVehicleInterface {
     switch packetType {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
-        .stp(33), .stpbr(500000), .stpo
+        .stp(53), .stpbr(500000), .stpo
       ])
 
     case .idle:
