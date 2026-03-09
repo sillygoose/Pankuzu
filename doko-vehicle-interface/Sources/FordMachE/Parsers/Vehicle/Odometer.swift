@@ -3,8 +3,8 @@ import DokoDebug
 
 private struct odometerParser: Parser {
   var body: some Parser<Substring.UTF8View, Double> {
-    "41A6".utf8
-    UInt32ToDouble()
+    "62404C".utf8
+    HexTripleToDouble()
   }
 }
 
