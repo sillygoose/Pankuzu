@@ -69,7 +69,9 @@ extension VehicleProtocol {
     guard vin.count == 17 else { return "Unknown" }
     let modelYearString = String(vin[vin.index(vin.startIndex, offsetBy: 9)])
     let modelYears: [String: Int] = ["M": 2021, "N": 2022, "P": 2023, "R": 2024, "S": 2025, "T": 2026, "U": 2027, "V": 2028, "W": 2029]
-    let year = modelYears[modelYearString] ?? -1
+    guard let year = modelYears[modelYearString] else {
+      return "Unknown"
+    }
     return year.description
   }
 
