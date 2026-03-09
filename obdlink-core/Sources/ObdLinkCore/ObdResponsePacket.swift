@@ -42,6 +42,15 @@ extension ObdResponsePacket {
           case let .stp(v) = entry.value.response else { return nil }
     return v
   }
+  public var stpbr: Int? {
+    guard let entry = responses.first(where: { if case .stpbr = $0.key { return true }; return false }),
+          case let .stpbr(v) = entry.value.response else { return nil }
+    return v
+  }
+  public var stpo: String? {
+    guard case let .stpo(v)? = responses[.stpo]?.response else { return nil }
+    return v
+  }
   public var stprs: String? {
     guard case let .stprs(v)? = responses[.stprs]?.response else { return nil }
     return v

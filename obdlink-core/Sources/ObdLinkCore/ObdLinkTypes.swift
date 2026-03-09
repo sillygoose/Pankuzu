@@ -11,8 +11,8 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case ats(Bool)
   case atsp(Int)
   case stp(Int)
-  case stpo
   case stpbr(Int)
+  case stpo
   case stcsegr(Bool)
   case stprs
   
@@ -61,10 +61,10 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".atsp(\(proto))"
       case .stp(let proto):
         return ".stp(\(proto))"
-      case .stpo:
-        return ".stpo"
       case .stpbr(let rate):
         return ".stpbr(\(rate))"
+      case .stpo:
+        return ".stpo"
       case .stcsegr(let enabled):
         return ".stcsegr(\(enabled))"
       case .stprs:
@@ -195,8 +195,8 @@ public enum ObdResponse: Equatable, Sendable {
   case ats(Bool)
   case atsp(Int)
   case stp(Int)
-  case stpo
   case stpbr(Int)
+  case stpo(String)
   case stprs(String)
   case stcsegr(Bool)
   
@@ -248,10 +248,10 @@ public enum ObdResponse: Equatable, Sendable {
         return ".atsp(\(proto))"
       case .stp(let proto):
         return ".stp(\(proto))"
+      case .stpbr(let baudrate):
+        return ".stpbr(\(baudrate))"
       case .stpo:
         return ".stpo"
-      case .stpbr(let rate):
-        return ".stpbr(\(rate))"
       case .stprs(let pstring):
         return ".stprs(\(pstring))"
       case .stcsegr(let enabled):

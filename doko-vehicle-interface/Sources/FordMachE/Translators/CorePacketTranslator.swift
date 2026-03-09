@@ -59,11 +59,14 @@ extension FordMachE {
 
   private func vehicleCustomizationResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
-    guard let odometer = responsePacket.odometer else {
+    guard
+      let _ = responsePacket.stp,
+      let _ = responsePacket.stpbr,
+      let _ = responsePacket.stpo
+    else {
       return DokoResponsePacket(type: .vehicleCustomization, responses: dokoResponses)
     }
     dokoResponses[.nextState] = DokoCommandResponse(command: .vehicleCustomization, response: .nextState(.idle))
-    dokoResponses[.odometer] = DokoCommandResponse(command: .vehicleCustomization, response: .odometer(odometer))
     return DokoResponsePacket(type: .vehicleCustomization, responses: dokoResponses)
   }
 
