@@ -185,21 +185,14 @@ public struct AddChargeFormView: View {
 
         ForEach(searchResults, id: \.self) { item in
           Button {
-            if let coordinate = item.placemark.location?.coordinate {
-              cameraPosition = .region(MKCoordinateRegion(
-                center: coordinate,
-                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-              ))
-            }
+            cameraPosition = .region(MKCoordinateRegion(
+              center: item.location.coordinate,
+              span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            ))
             searchText = item.name ?? ""
             searchResults = []
           } label: {
-            VStack(alignment: .leading) {
-              Text(item.name ?? "").foregroundStyle(.primary)
-              if let subtitle = item.placemark.title {
-                Text(subtitle).font(.caption).foregroundStyle(.secondary)
-              }
-            }
+            SearchResultRow(item: item)
           }
           .buttonStyle(.plain)
         }
@@ -318,6 +311,18 @@ public struct AddChargeFormView: View {
     request.naturalLanguageQuery = searchText
     let response = try? await MKLocalSearch(request: request).start()
     searchResults = response?.mapItems ?? []
+  }
+}
+
+private struct SearchResultRow: View {
+  let item: MKMapItem
+  var body: some View {
+    VStack(alignment: .leading) {
+      Text(item.name ?? "").foregroundStyle(.primary)
+      if let subtitle = item.address?.shortAddress {
+        Text(subtitle).font(.caption).foregroundStyle(.secondary)
+      }
+    }
   }
 }
 
