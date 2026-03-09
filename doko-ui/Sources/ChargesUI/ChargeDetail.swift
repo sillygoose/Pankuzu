@@ -14,6 +14,7 @@ import CommonUI
 
 @MainActor @Observable public final class ChargeDetailModel {
   public enum Destination: Identifiable {
+    case editChargeForm(Charge)
     case editLocationForm(Location)
     case editVehicleForm(Vehicle)
     case chargeLocationMap
@@ -24,6 +25,8 @@ import CommonUI
 
     public var id: String {
       switch self {
+      case .editChargeForm(let charge):
+        return "editChargeForm-\(charge.id)"
       case .editLocationForm(let location):
         return "editLocationForm-\(location.id)"
       case .editVehicleForm(let vehicle):
@@ -257,8 +260,26 @@ public struct ChargeDetailView: View {
       "\(charge.timeStart.formatted(date: .numeric, time: .shortened))"
     )
     .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItem(placement: .primaryAction) {
+        Button("Edit") {
+          model.destination = .editChargeForm(charge)
+        }
+      }
+    }
     .sheet(item: $model.destination) { destination in
       switch destination {
+      case .editChargeForm(let charge):
+        NavigationStack {
+          ChargeFormView(
+            model: ChargeFormModel(
+              charge: Charge.Draft(charge)
+            )
+          )
+          .navigationTitle("Edit Charge")
+          .navigationBarTitleDisplayMode(.inline)
+          .presentationDetents([.medium])
+        }
       case .editLocationForm(let location):
         NavigationStack {
           LocationFormView(
