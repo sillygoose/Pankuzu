@@ -33,56 +33,59 @@ struct BluetoothSettingsView: View {
   @Shared(.connectionExpanded) var connectionExpanded
 
   var body: some View {
-    List {
-      DisclosureGroup(
-        isExpanded: Binding(
-          get: { connectionExpanded },
-          set: { newValue in $connectionExpanded.withLock { $0 = newValue } }
-        )
-      ) {
-        Section {
-          Toggle(
-            "Background Operation",
-            isOn: Binding(
-              get: { model.backgroundMode },
-              set: { isOn, _ in model.setBackgroundMode(isOn) }
-            )
+    VStack(spacing: 0) {
+      List {
+        DisclosureGroup(
+          isExpanded: Binding(
+            get: { connectionExpanded },
+            set: { newValue in $connectionExpanded.withLock { $0 = newValue } }
           )
-        } header: {
-          Text("OBDLink Adapter")
-        } footer: {
-          Text("Enable to allow the OBDLink adapter to connect and operate in the background recording trips and charges.")
-            .font(.caption)
-        }
+        ) {
+          Section {
+            HStack {
+              Text(model.accessorySerialNumber ?? "Any")
+                .foregroundStyle(model.accessorySerialNumber == nil ? .secondary : .primary)
+              Spacer()
+              Button("Clear") {
+                model.clearAccessorySerialNumber()
+              }
+              .buttonStyle(.borderless)
+              .disabled(model.accessorySerialNumber == nil)
 
-        Section {
-          HStack {
-            Text(model.accessorySerialNumber ?? "Any")
-              .foregroundStyle(model.accessorySerialNumber == nil ? .secondary : .primary)
-            Spacer()
-            Button("Clear") {
-              model.clearAccessorySerialNumber()
+              Button("Set") {
+                model.setAccessorySerialNumberFromConnected()
+              }
+              .buttonStyle(.borderless)
+              .disabled(model.connectedAccessorySerialNumber == nil)
             }
-            .buttonStyle(.borderless)
-            .disabled(model.accessorySerialNumber == nil)
-            
-            Button("Set") {
-              model.setAccessorySerialNumberFromConnected()
-            }
-            .buttonStyle(.borderless)
-            .disabled(model.connectedAccessorySerialNumber == nil)
+          } header: {
+            Text("Accessory Serial Number")
+          } footer: {
+            Text("Only connect to the OBDLink adapter with this serial number.")
+              .font(.caption)
           }
-        } header: {
-          Text("Accessory Serial Number")
-        } footer: {
-          Text("Only connect to the OBDLink adapter with this serial number.")
-            .font(.caption)
+        } label: {
+          Text("Connection")
         }
-      } label: {
-        Text("Connection")
       }
+      .listStyle(.plain)
+
+      Divider()
+
+      Button {
+        model.setBackgroundMode(!model.backgroundMode)
+      } label: {
+        Label(
+          model.backgroundMode ? "Background Mode On" : "Background Mode Off",
+          systemImage: model.backgroundMode ? "dot.radiowaves.left.and.right" : "dot.radiowaves.left.and.right.slash"
+        )
+        .frame(maxWidth: .infinity)
+        .padding()
+      }
+      .buttonStyle(.borderedProminent)
+      .tint(model.backgroundMode ? .green : .secondary)
+      .padding()
     }
-    .listStyle(.plain)
     .navigationTitle("Bluetooth")
   }
 }
