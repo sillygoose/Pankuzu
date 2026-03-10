@@ -32,6 +32,22 @@ public struct TripDetailsTip: Tip {
   }
 }
 
+public struct AddChargeTip: Tip {
+  public init() {}
+
+  public var title: Text {
+    Text("Add a Charge")
+  }
+
+  public var message: Text? {
+    Text("You can manually add a missed charge using a plus sign gesture, try it out.")
+  }
+
+  public var image: Image? {
+    Image(systemName: "plus.circle")
+  }
+}
+
 public struct ChargeDetailsTip: Tip {
   public init() {}
 
