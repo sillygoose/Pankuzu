@@ -140,9 +140,4 @@ extension ObdResponsePacket {
     guard case let .weather(v)? = responses[.weather]?.response else { return nil }
     return v
   }
-  
-  public var meanTemperature: Double? {
-    guard case let .meanTemperature(v)? = responses[.meanTemperature]?.response else { return nil }
-    return v
-  }
 }

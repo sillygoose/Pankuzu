@@ -38,7 +38,6 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   /* Non-OBDLink macros */
   case position
   case weather
-  case meanTemperature
 
   public var description: String {
     return self.key
@@ -104,8 +103,6 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".position"
       case .weather:
         return ".weather"
-      case .meanTemperature:
-        return ".meanTemperature"
       }
     }
   }
@@ -222,7 +219,6 @@ public enum ObdResponse: Equatable, Sendable {
 
   case position(DokoPosition)
   case weather(DokoCurrentWeather)
-  case meanTemperature(Double)
 
   public var description: String {
     get {
@@ -296,8 +292,6 @@ public enum ObdResponse: Equatable, Sendable {
         return String(format: ".position(%.5f, %.5f, %.0f)", position.latitude, position.longitude, position.elevation)
       case let .weather(weather):
         return ".weather(\(String(format: "%.0f℃", weather.temperature)), \(weather.conditionSymbol))"
-      case let .meanTemperature(temp):
-        return ".meanTemperature(\(String(format: "%.0f℃", temp)))"
       }
     }
   }
