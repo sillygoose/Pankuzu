@@ -80,8 +80,11 @@ public final class DokoLocationManager: Sendable {
         DokoLogging.shared.postLoggingResponse(.error("Expected honest MKReverseGeocodingRequest()"))
         return
       }
-      guard let mapItems = try? await request.mapItems else {
-        DokoLogging.shared.postLoggingResponse(.error("Expected honest mapItems in MKReverseGeocodingRequest()"))
+      let mapItems: [MKMapItem]
+      do {
+        mapItems = try await request.mapItems
+      } catch {
+        DokoLogging.shared.postLoggingResponse(.error("MKReverseGeocodingRequest failed: \(error.localizedDescription)"))
         return
       }
 
