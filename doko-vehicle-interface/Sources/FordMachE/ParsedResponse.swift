@@ -12,6 +12,10 @@ extension FordMachE {
     do {
       var commandResponse: ObdResponse
       switch command {
+      case .ath(let enabled):
+        commandResponse = .ath(enabled)
+      case .stpx(_, _):
+        commandResponse = .stpx(response)
       case .stp(let canProtocol):
         commandResponse = .stp(canProtocol)
       case .stpbr(let baudRate):

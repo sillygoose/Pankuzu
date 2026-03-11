@@ -27,6 +27,9 @@ public actor FordMachE: ConnectedVehicleInterface {
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
     let obdLinkCommand: String?
     switch command {
+    case .stpx(let header, let did):    obdLinkCommand = String(format: "STPX h:%X, d:22%0X", header, did)
+    case .ath(let enabled):             obdLinkCommand = "ATH\(enabled ? 1 : 0)"
+
     case .stpo:                         obdLinkCommand = "STPO"
     case .stp(let canProtocol):         obdLinkCommand = "STP\(canProtocol)"
     case .stpbr(let baudRate):          obdLinkCommand = "STPBR\(baudRate)"
@@ -64,6 +67,13 @@ public actor FordMachE: ConnectedVehicleInterface {
     switch packetType {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
+        //### removed after 2025 mach-e test
+        .ath(true),
+        .stpx(0x7DF, 0x4888),
+        .stpx(0x7DF, 0x4897),
+        .stpx(0x7DF, 0x48A4),
+        .ath(false),
+        //### removed after 2025 mach-e test
         .stp(53), .stpbr(500000), .stpo
       ])
 

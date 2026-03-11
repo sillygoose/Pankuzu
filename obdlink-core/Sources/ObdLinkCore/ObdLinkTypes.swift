@@ -15,7 +15,8 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case stpo
   case stcsegr(Bool)
   case stprs
-  
+  case stpx(Int, Int)
+
   case vin
   case odometer, obdOdometer
 
@@ -68,6 +69,8 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".stcsegr(\(enabled))"
       case .stprs:
         return ".stprs"
+      case .stpx(let header, let did):
+        return String(format: ".stpx(h:%X, d:22%X)", header, did)
 
       case .vin:
         return ".vin"
@@ -194,9 +197,10 @@ public enum ObdResponse: Equatable, Sendable {
   case stp(Int)
   case stpbr(Int)
   case stpo(String)
-  case stprs(String)
   case stcsegr(Bool)
-  
+  case stprs(String)
+  case stpx(String)
+
   case vin(String)
   case odometer(Double)
   case obdOdometer(Double)
@@ -248,11 +252,13 @@ public enum ObdResponse: Equatable, Sendable {
         return ".stpbr(\(baudRate))"
       case .stpo:
         return ".stpo"
-      case .stprs(let canProtocol):
-        return ".stprs(\(canProtocol))"
       case .stcsegr(let enabled):
         return ".stcsegr(\(enabled))"
-        
+      case .stprs(let canProtocol):
+        return ".stprs(\(canProtocol))"
+      case .stpx:
+        return ".stpx"
+
       case .vin(let vin):
         return ".vin(\(vin))"
       case .odometer(let odometer):
