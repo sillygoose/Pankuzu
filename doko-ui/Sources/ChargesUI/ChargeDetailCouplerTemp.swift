@@ -23,6 +23,7 @@ final class ChargeDetailCouplerTempChartModel {
 
   var tempBins: [CouplerTempBin] = []
   var selectedBin: CouplerTempBin?
+  var minTemp: Double = 0
   var maxTemp: Double = 0
 
   init(charge: Charge) {
@@ -32,6 +33,7 @@ final class ChargeDetailCouplerTempChartModel {
     guard let chargeHistory else { return }
 
     tempBins = createTempBins(from: chargeHistory.couplerTemp, numberOfBins: 80)
+    minTemp = floor(tempBins.map(\.temp_C).min() ?? 0)
     maxTemp = ceil(tempBins.map(\.temp_C).max() ?? 0)
   }
 
@@ -128,6 +130,7 @@ struct ChargeDetailCouplerTempChartView: View {
           }
         }
       }
+      .chartYScale(domain: (model.displayTemp(model.minTemp) - 25)...(model.displayTemp(model.maxTemp) + 25))
       .chartXAxis(.automatic)
       .chartYAxis {
         AxisMarks(position: .trailing) { value in
