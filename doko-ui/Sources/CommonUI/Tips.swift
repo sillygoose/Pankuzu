@@ -64,6 +64,22 @@ public struct ChargeDetailsTip: Tip {
   }
 }
 
+public struct EditChargeDetailTip: Tip {
+  public init() {}
+
+  public var title: Text {
+    Text("Edit Charge Details")
+  }
+
+  public var message: Text? {
+    Text("You can edit an incomplete charge by drawing a circle gesture on the detailed charge.")
+  }
+
+  public var image: Image? {
+    Image(systemName: "pencil.circle")
+  }
+}
+
 public struct SettingsTip: Tip {
   public init() {}
   

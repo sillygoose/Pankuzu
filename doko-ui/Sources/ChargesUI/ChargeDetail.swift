@@ -10,6 +10,7 @@ import DokoTypes
 import VehiclesUI
 import LocationsUI
 import CommonUI
+import TipKit
 
 @MainActor @Observable public final class ChargeDetailModel {
   public enum Destination: Identifiable {
@@ -87,6 +88,7 @@ public struct ChargeDetailView: View {
     let peakPower = Measurement(value: model.maximumPower ?? 0.0, unit: UnitPower.kilowatts)
 
     ScrollView {
+      TipView(EditChargeDetailTip())
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
           DokoGridButton(color: .blue, iconName: "map.fill", title: "Map") {
