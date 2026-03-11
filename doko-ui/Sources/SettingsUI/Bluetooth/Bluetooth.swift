@@ -5,8 +5,8 @@ import Sharing
 import DokoSharing
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
-  static var connectionExpanded: Self {
-    Self[.appStorage("BluetoothSettings-connectionExpanded"), default: false]
+  static var adaptorExpanded: Self {
+    Self[.appStorage("BluetoothSettings-adaptorExpanded"), default: false]
   }
 }
 
@@ -30,7 +30,7 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
 
 struct BluetoothSettingsView: View {
   @Bindable var model: BluetoothSettingsModel
-  @Shared(.connectionExpanded) var connectionExpanded
+  @Shared(.adaptorExpanded) var connectionExpanded
 
   var body: some View {
     VStack(spacing: 0) {
@@ -59,13 +59,13 @@ struct BluetoothSettingsView: View {
               .disabled(model.connectedAccessorySerialNumber == nil)
             }
           } header: {
-            Text("Accessory Serial Number")
+            Text("Adapter Serial Number")
           } footer: {
             Text("Only connect to the OBDLink adapter with this serial number.")
               .font(.caption)
           }
         } label: {
-          Text("Connection")
+          Text("Adapter")
         }
       }
       .listStyle(.plain)
@@ -76,14 +76,14 @@ struct BluetoothSettingsView: View {
         model.setBackgroundMode(!model.backgroundMode)
       } label: {
         Label(
-          model.backgroundMode ? "Background Mode On" : "Background Mode Off",
-          systemImage: model.backgroundMode ? "dot.radiowaves.left.and.right" : "dot.radiowaves.left.and.right.slash"
+          model.backgroundMode ? "Disable Background Mode" : "Enable Background Mode",
+          systemImage: model.backgroundMode ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash"
         )
         .frame(maxWidth: .infinity)
         .padding()
       }
       .buttonStyle(.borderedProminent)
-      .tint(model.backgroundMode ? .green : .secondary)
+      .tint(model.backgroundMode ? .red : .blue)
       .padding()
     }
     .navigationTitle("Bluetooth")

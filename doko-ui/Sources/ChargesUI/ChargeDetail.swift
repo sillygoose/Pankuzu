@@ -2,8 +2,7 @@ import Foundation
 import MapKit
 import SwiftUI
 
-import Sharing
-
+import DokoSharing
 import DokoLocationManager
 import DokoVehicleManager
 import DokoSchema
