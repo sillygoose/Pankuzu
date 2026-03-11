@@ -37,6 +37,7 @@ class DebuggingModel {
   @ObservationIgnored @Shared(.logInfoPackets) var logInfoPackets
   @ObservationIgnored @Shared(.logStatePackets) var logStatePackets
   @ObservationIgnored @Shared(.logCoreLocationPackets) var logCoreLocationPackets
+  @ObservationIgnored @Shared(.logLocationPackets) var logLocationPackets
   @ObservationIgnored @Shared(.logLiveActivityPackets) var logLiveActivityPackets
   @ObservationIgnored @Shared(.logPacketManagerPackets) var logPacketManagerPackets
   
@@ -167,6 +168,13 @@ struct DebuggingView: View {
             isOn: Binding(
               get: { model.logCoreLocationPackets },
               set: { isOn, _ in model.$logCoreLocationPackets.withLock { $0 = isOn } }
+            )
+          )
+          Toggle(
+            "Location",
+            isOn: Binding(
+              get: { model.logLocationPackets },
+              set: { isOn, _ in model.$logLocationPackets.withLock { $0 = isOn } }
             )
           )
           Toggle(

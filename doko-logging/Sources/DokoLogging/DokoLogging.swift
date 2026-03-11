@@ -17,6 +17,7 @@ public enum LoggingPacketType: Sendable {
   case connect(String)
   case disconnect(String)
   case coreLocation(String)
+  case location(String)
   case liveActivity(String)
   case packetManager(String)
 
@@ -29,6 +30,7 @@ public enum LoggingPacketType: Sendable {
     case .connect(let connect): return ".connect(\(connect))"
     case .disconnect(let disconnect): return ".disconnect(\(disconnect))"
     case .coreLocation(let location): return ".coreLocation(\(location))"
+    case .location(let location): return ".location(\(location))"
     case .liveActivity(let liveActivity): return ".liveActivity(\(liveActivity))"
     case .packetManager(let packetManager): return ".packetManager(\(packetManager))"
     }
@@ -57,6 +59,7 @@ public final class DokoLogging: Sendable {
     @Shared(.logInfoPackets) var logInfoPackets
     @Shared(.logStatePackets) var logStatePackets
     @Shared(.logCoreLocationPackets) var logCoreLocationPackets
+    @Shared(.logLocationPackets) var logLocationPackets
     @Shared(.logLiveActivityPackets) var logLiveActivityPackets
     @Shared(.logPacketManagerPackets) var logPacketManagerPackets
 
@@ -67,6 +70,7 @@ public final class DokoLogging: Sendable {
       case .error, .connect, .disconnect: shouldLog = true
       case .info: shouldLog = logInfoPackets
       case .coreLocation: shouldLog = logCoreLocationPackets
+      case .location: shouldLog = logLocationPackets
       case .liveActivity: shouldLog = logLiveActivityPackets
       case .state, .schedulers: shouldLog = logStatePackets
       case .packetManager: shouldLog = logPacketManagerPackets
