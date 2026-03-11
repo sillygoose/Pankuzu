@@ -17,13 +17,13 @@ actor TripPositionDuplicateFilter: LocationFilter {
       return true
     }
     if location.timestamp == last.timestamp {
-      DokoLogging.shared.postLoggingResponse(.location("TripPositionDuplicateFilter.timestamp"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation("TripPositionDuplicateFilter.timestamp"))
       return false
     }
 
     let distance = location.distance(from: last)
     if distance < identicalTripPositionDistance {
-      DokoLogging.shared.postLoggingResponse(.location("TripPositionDuplicateFilter.distance"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation("TripPositionDuplicateFilter.distance"))
       return false
     }
     lastLocation = location
@@ -58,7 +58,7 @@ actor TripPositionCourseChangeFilter: LocationFilter {
         lastAcceptedLocation = location
         return true
       }
-      DokoLogging.shared.postLoggingResponse(.location("TripPositionCourseChangeFilter.course"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation("TripPositionCourseChangeFilter.course"))
       return false
     }
     lastAcceptedLocation = location

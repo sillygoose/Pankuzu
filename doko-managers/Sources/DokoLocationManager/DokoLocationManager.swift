@@ -32,7 +32,7 @@ public final class DokoLocationManager: Sendable {
     @FetchAll var locations: [Location]
     @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
     if sharedLocation, let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold) {
-      DokoLogging.shared.postLoggingResponse(.location(String(format: "Location exists at (%.5f, %.5f)", latitude, longitude)))
+      DokoLogging.shared.postLoggingResponse(.coreLocation(String(format: "Location exists at (%.5f, %.5f)", latitude, longitude)))
       @Dependency(\.defaultDatabase) var database
       withErrorReporting {
         try database.write { db in
@@ -49,7 +49,7 @@ public final class DokoLocationManager: Sendable {
     @FetchAll var locations: [Location]
     @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
     if sharedLocation, let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold) {
-      DokoLogging.shared.postLoggingResponse(.location(String(format: "Location exists at (%.5f, %.5f)", latitude, longitude)))
+      DokoLogging.shared.postLoggingResponse(.coreLocation(String(format: "Location exists at (%.5f, %.5f)", latitude, longitude)))
       return locationID
     }
 
@@ -98,7 +98,7 @@ public final class DokoLocationManager: Sendable {
               updatedLocation.street = trimmedStreet
             }
           }
-          DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(updatedLocation.placeName))"))
+          DokoLogging.shared.postLoggingResponse(.coreLocation("reverseGeo(\(updatedLocation.placeName))"))
         }
         if localSearch {
           let poiSearch = MKLocalSearch(
@@ -110,7 +110,7 @@ public final class DokoLocationManager: Sendable {
           let response = try? await poiSearch.start()
           if let response, let mapItem = response.mapItems.first {
             updatedLocation.name = mapItem.name
-            DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(updatedLocation.placeName))"))
+            DokoLogging.shared.postLoggingResponse(.coreLocation("reverseGeo(\(updatedLocation.placeName))"))
           }
         }
         withErrorReporting {

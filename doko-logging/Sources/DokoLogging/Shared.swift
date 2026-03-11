@@ -37,8 +37,8 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
 }
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
-  public static var logLocationPackets: Self {
-    Self[.appStorage("ApplicationSettings-logLocationPackets"), default: false]
+  public static var logCoreLocationPackets: Self {
+    Self[.appStorage("ApplicationSettings-logCoreLocationPackets"), default: false]
   }
 }
 
