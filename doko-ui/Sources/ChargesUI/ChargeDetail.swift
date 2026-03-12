@@ -1,5 +1,4 @@
 import Foundation
-import MapKit
 import SwiftUI
 
 import DokoSharing
@@ -10,7 +9,6 @@ import DokoTypes
 import VehiclesUI
 import LocationsUI
 import CommonUI
-import TipKit
 
 @MainActor @Observable public final class ChargeDetailModel {
   public enum Destination: Identifiable {
@@ -73,8 +71,6 @@ import TipKit
 
 public struct ChargeDetailView: View {
   @Bindable var model: ChargeDetailModel
-  @State private var gesturePoints: [CGPoint] = []
-  @State private var gestureRecognized = false
 
   public init(model: ChargeDetailModel) {
     self.model = model
@@ -88,7 +84,6 @@ public struct ChargeDetailView: View {
     let peakPower = Measurement(value: model.maximumPower ?? 0.0, unit: UnitPower.kilowatts)
 
     ScrollView {
-      TipView(EditChargeDetailTip())
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
           DokoGridButton(color: .blue, iconName: "map.fill", title: "Map") {
@@ -259,42 +254,13 @@ public struct ChargeDetailView: View {
         }
       }
     }
-    .contentShape(Rectangle())
-    .overlay {
-      Canvas { context, _ in
-        guard gesturePoints.count > 1 else { return }
-        var path = Path()
-        path.move(to: gesturePoints[0])
-        for point in gesturePoints.dropFirst() {
-          path.addLine(to: point)
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Button("Edit") {
+          model.destination = .editChargeForm(charge)
         }
-        context.stroke(
-          path,
-          with: .color(gestureRecognized ? .green.opacity(0.9) : .mint.opacity(0.5)),
-          style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
-        )
       }
-      .allowsHitTesting(false)
     }
-    .sensoryFeedback(.impact(flexibility: .rigid), trigger: gestureRecognized) { _, new in new }
-    .simultaneousGesture(
-      DragGesture(minimumDistance: 5, coordinateSpace: .local)
-        .onChanged { value in
-          gesturePoints.append(value.location)
-          if !gestureRecognized && isCircleGesture(gesturePoints) {
-            gestureRecognized = true
-          }
-        }
-        .onEnded { _ in
-          if gestureRecognized {
-            model.destination = .editChargeForm(charge)
-          }
-          withAnimation(.easeOut(duration: 0.3)) {
-            gesturePoints = []
-          }
-          gestureRecognized = false
-        }
-    )
     .navigationTitle(
       "\(charge.timeStart.formatted(date: .numeric, time: .shortened))"
     )
@@ -380,18 +346,6 @@ public struct ChargeDetailView: View {
     }
   }
 
-  private func isCircleGesture(_ points: [CGPoint]) -> Bool {
-    guard points.count > 20 else { return false }
-    let start = points.first!
-    let end = points.last!
-    let closureDistance = hypot(end.x - start.x, end.y - start.y)
-    let xs = points.map(\.x)
-    let ys = points.map(\.y)
-    let width = (xs.max()! - xs.min()!)
-    let height = (ys.max()! - ys.min()!)
-    let minSpan = min(width, height)
-    return closureDistance < minSpan * 0.5 && minSpan > 40
-  }
 }
 
 #Preview {
