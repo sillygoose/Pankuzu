@@ -6,8 +6,8 @@ import ObdLinkCore
 extension FordElectrics {
   public func vehicleDokoResponsePacket(_ responsePacket: ObdResponsePacket) async -> DokoResponsePacket {
     switch responsePacket.type {
-    case .vehicleCapabilities:
-      return vehicleCapabilitiesResponsePacket(responsePacket)
+    case .vehicleCustomization:
+      return vehicleCustomizationResponsePacket(responsePacket)
     case .idle:
       return idleResponsePacket(responsePacket)
       
@@ -57,14 +57,14 @@ extension FordElectrics {
     }
   }
 
-  private func vehicleCapabilitiesResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+  private func vehicleCustomizationResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
     guard let odometer = responsePacket.odometer else {
-      return DokoResponsePacket(type: .vehicleCapabilities, responses: dokoResponses)
+      return DokoResponsePacket(type: .vehicleCustomization, responses: dokoResponses)
     }
-    dokoResponses[.nextState] = DokoCommandResponse(command: .vehicleCapabilities, response: .nextState(.idle))
-    dokoResponses[.odometer] = DokoCommandResponse(command: .vehicleCapabilities, response: .odometer(odometer))
-    return DokoResponsePacket(type: .vehicleCapabilities, responses: dokoResponses)
+    dokoResponses[.nextState] = DokoCommandResponse(command: .vehicleCustomization, response: .nextState(.idle))
+    dokoResponses[.odometer] = DokoCommandResponse(command: .vehicleCustomization, response: .odometer(odometer))
+    return DokoResponsePacket(type: .vehicleCustomization, responses: dokoResponses)
   }
 
   func idleResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {

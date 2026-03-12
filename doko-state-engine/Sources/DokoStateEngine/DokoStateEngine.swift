@@ -127,11 +127,11 @@ public final class DokoStateEngine {
             }
             $vehicleState.withLock { $0 = nextState }
 
-          case .vehicleCapabilities:
-            guard case .vehicleCapabilities = vehicleState else {
+          case .vehicleCustomization:
+            guard case .vehicleCustomization = vehicleState else {
               throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
             }
-            let nextState = dokoResponsePacket.nextState ?? .vehicleCapabilities
+            let nextState = dokoResponsePacket.nextState ?? .vehicleCustomization
             $vehicleState.withLock { $0 = nextState }
             
           case .idle:
@@ -190,12 +190,10 @@ public final class DokoStateEngine {
             do {
               let tripDraft = try Trip.postTripUpdateRecord(tripDraft: tripDraft, tripUpdateResponse: dokoResponsePacket)
               self.tripInProgress = tripDraft
-              let position = await CoreLocationManager.shared.currentLocation
-              let weather = dokoResponsePacket.weather
               @Shared(.metric) var metric
-              let windSock: WindSock? = if let position, let weather {
+              let windSock: WindSock? = if let course = dokoResponsePacket.position?.course, let weather = dokoResponsePacket.weather {
                 WindSock(
-                  course: .init(value: position.course, unit: .degrees),
+                  course: .init(value: course, unit: .degrees),
                   temperature: .init(value: weather.temperature, unit: .celsius).converted(to: metric ? .celsius : .fahrenheit),
                   conditions: weather.conditionSymbol,
                   windSpeed: .init(value: weather.windSpeed, unit: .metersPerSecond).converted(to: metric ? .metersPerSecond : .milesPerHour),
@@ -431,7 +429,7 @@ public final class DokoStateEngine {
 
 extension DokoStateEngine {
   public func accessoryNameObservation() {
-    @Shared(.connectedAccessory) var observedAccessoryName
+    @Shared(.connectedAccessoryName) var observedAccessoryName
     @Shared(.activeSession) var activeSession
     DokoLogging.shared.postLoggingResponse(.info("SE.accessoryNameObservation"))
     Task { [weak self] in
@@ -499,7 +497,7 @@ extension DokoStateEngine {
       return
     }
     @Shared(.vehicleState) var vehicleState
-    @Shared(.connectedAccessory) var accessoryName
+    @Shared(.connectedAccessoryName) var accessoryName
     @Shared(.connectedVehicleInterface) var connectedVehicleInterface
     DokoLogging.shared.postLoggingResponse(.info("SE.vehicleStateObservation"))
     vehicleStateObservationTask = Task { [weak self] in

@@ -9,6 +9,12 @@ struct PowerBin: Identifiable {
   let power_kW: Double
 }
 
+struct SoCBin: Identifiable {
+  let id: Int
+  let timestamp: Date
+  let soc: Double
+}
+
 @MainActor
 @Observable
 public final class ChargeDetailPowerChartModel {
@@ -18,7 +24,9 @@ public final class ChargeDetailPowerChartModel {
   @FetchOne(ChargeHistory.none) var chargeHistory
 
   var powerBins: [PowerBin] = []
+  var socBins: [SoCBin] = []
   var selectedBin: PowerBin?
+  var selectedSoCBin: SoCBin?
   var maxPower: Double = 0
 
   public init(
@@ -30,12 +38,53 @@ public final class ChargeDetailPowerChartModel {
     guard let chargeHistory else { return }
 
     powerBins = createPowerBins(from: chargeHistory.batteryPower, numberOfBins: 80)
+    socBins = createSoCBins(from: chargeHistory.stateOfCharge, numberOfBins: 80)
 
     var maxValue: Double = 0
     for bin in powerBins {
       maxValue = max(maxValue, bin.power_kW)
     }
     maxPower = ceil(maxValue)
+  }
+
+  private func createSoCBins(from data: [DokoDataPoint], numberOfBins: Int) -> [SoCBin] {
+    guard !data.isEmpty,
+          let first = data.first,
+          let last = data.last else { return [] }
+
+    let startTime = first.timestamp.timeIntervalSince1970
+    let endTime = last.timestamp.timeIntervalSince1970
+    let binDuration = (endTime - startTime) / Double(numberOfBins)
+
+    var bins: [SoCBin] = []
+    var previousSoC: Double = first.datapoint
+
+    for i in 0..<numberOfBins {
+      let binStart = startTime + Double(i) * binDuration
+      let binEnd = binStart + binDuration
+      let binCenter = binStart + binDuration / 2
+
+      let pointsInBin = data.filter { point in
+        let t = point.timestamp.timeIntervalSince1970
+        return t >= binStart && t < binEnd
+      }
+
+      let meanSoC: Double
+      if pointsInBin.isEmpty {
+        meanSoC = previousSoC
+      } else {
+        meanSoC = pointsInBin.map(\.datapoint).reduce(0, +) / Double(pointsInBin.count)
+        previousSoC = meanSoC
+      }
+
+      bins.append(SoCBin(
+        id: i,
+        timestamp: Date(timeIntervalSince1970: binCenter),
+        soc: meanSoC
+      ))
+    }
+
+    return bins
   }
 
   private func createPowerBins(from data: [DokoDataPoint], numberOfBins: Int) -> [PowerBin] {
@@ -93,7 +142,17 @@ public struct ChargeDetailPowerChartView: View {
             y: .value("Power", bin.power_kW),
             width: .fixed(3)
           )
-          .foregroundStyle(.green)
+          .foregroundStyle(by: .value("Series", "Power"))
+        }
+
+        ForEach(model.socBins) { bin in
+          LineMark(
+            x: .value("Time", bin.timestamp),
+            y: .value("SoC", (bin.soc / 100.0) * model.maxPower)
+          )
+          .foregroundStyle(by: .value("Series", "State of Charge"))
+          .interpolationMethod(.catmullRom)
+          .lineStyle(StrokeStyle(lineWidth: 3))
         }
 
         if let selected = model.selectedBin {
@@ -114,6 +173,13 @@ public struct ChargeDetailPowerChartView: View {
               Text(String(format: "%.1f kW", selected.power_kW))
                 .font(.caption)
                 .fontWeight(.semibold)
+                .foregroundStyle(.green)
+              if let soc = model.selectedSoCBin?.soc {
+                Text(String(format: "%.1f%%", soc))
+                  .font(.caption)
+                  .fontWeight(.semibold)
+                  .foregroundStyle(.red)
+              }
             }
             .padding(6)
             .background(Color(.systemBackground).opacity(0.9))
@@ -121,6 +187,8 @@ public struct ChargeDetailPowerChartView: View {
           }
         }
       }
+      .chartForegroundStyleScale(["Power": Color.green, "State of Charge": Color.red])
+      .chartLegend(position: .bottom, alignment: .center)
       .chartYScale(domain: 0...model.maxPower)
       .chartYAxis {
         AxisMarks(position: .trailing) { value in
@@ -128,6 +196,12 @@ public struct ChargeDetailPowerChartView: View {
             AxisGridLine()
             AxisTick()
             AxisValueLabel(String(format: "%.0f kW", kw))
+          }
+        }
+        AxisMarks(position: .leading, values: .stride(by: model.maxPower / 4)) { value in
+          if let kw = value.as(Double.self), model.maxPower > 0 {
+            AxisTick()
+            AxisValueLabel(String(format: "%.0f%%", (kw / model.maxPower) * 100))
           }
         }
       }
@@ -143,13 +217,16 @@ public struct ChargeDetailPowerChartView: View {
                   let x = value.location.x - geometry[proxy.plotFrame!].origin.x
                   guard let timestamp: Date = proxy.value(atX: x) else { return }
 
-                  let closest = model.powerBins.min { a, b in
+                  model.selectedBin = model.powerBins.min { a, b in
                     abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
                   }
-                  model.selectedBin = closest
+                  model.selectedSoCBin = model.socBins.min { a, b in
+                    abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
+                  }
                 }
                 .onEnded { _ in
                   model.selectedBin = nil
+                  model.selectedSoCBin = nil
                 }
             )
         }

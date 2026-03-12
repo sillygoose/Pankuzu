@@ -13,7 +13,6 @@ public protocol LocationProtocol: Sendable {
 public struct Location: Identifiable, Hashable, Codable, Sendable {
   public let id: UUID
   public var deleted: Date?
-  public var hidden: Bool?
   public var latitude: Double
   public var longitude: Double
   public var elevation: Double
@@ -36,7 +35,6 @@ public struct Location: Identifiable, Hashable, Codable, Sendable {
     region: String? = nil,
   ) {
     self.id = id
-    self.hidden = hidden
     self.latitude = latitude
     self.longitude = longitude
     self.elevation = elevation
@@ -46,10 +44,6 @@ public struct Location: Identifiable, Hashable, Codable, Sendable {
     self.stateProv = stateProv
     self.region = region
   }
-
-  public static let defaultLocation: Location = .init(
-    id: UUID(0), hidden: true, latitude: 0, longitude: 0, elevation: 0, name: "In Progress"
-  )
 }
 extension Location.Draft: Identifiable, Equatable {}
 extension Location: LocationProtocol {}
@@ -61,11 +55,14 @@ extension LocationProtocol {
 
 extension Location.TableColumns {
   public var isDeleted: some QueryExpression<Bool> { deleted.isNot(nil) }
-  public var isHidden: some QueryExpression<Bool> { hidden.eq(true) }
   public var deletedOrdering: some QueryExpression { deleted.desc() }
 }
 
 extension Location {
+  public static var unexpectedLocation: Location {
+    Location(id: UUID(0), latitude: -1, longitude: -1, elevation: -1, name: "<Location Error>")
+  }
+
   public var placeName: String {
     if let name { return name }
     if let street { return street }

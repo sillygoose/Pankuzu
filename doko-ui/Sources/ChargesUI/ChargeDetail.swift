@@ -2,8 +2,7 @@ import Foundation
 import MapKit
 import SwiftUI
 
-import Sharing
-
+import DokoSharing
 import DokoLocationManager
 import DokoVehicleManager
 import DokoSchema
@@ -11,20 +10,23 @@ import DokoTypes
 import VehiclesUI
 import LocationsUI
 import CommonUI
+import TipKit
 
-@MainActor
-@Observable
-public final class ChargeDetailModel {
+@MainActor @Observable public final class ChargeDetailModel {
   public enum Destination: Identifiable {
+    case editChargeForm(Charge)
     case editLocationForm(Location)
     case editVehicleForm(Vehicle)
     case chargeLocationMap
     case powerChart
     case energyUsedChart
     case batteryChart
+    case stateOfHealthChart
 
     public var id: String {
       switch self {
+      case .editChargeForm(let charge):
+        return "editChargeForm-\(charge.id)"
       case .editLocationForm(let location):
         return "editLocationForm-\(location.id)"
       case .editVehicleForm(let vehicle):
@@ -37,25 +39,20 @@ public final class ChargeDetailModel {
         return "energyUsedChart"
       case .batteryChart:
         return "batteryChart"
+      case .stateOfHealthChart:
+        return "stateOfHealthChart"
       }
     }
   }
 
   var destination: Destination?
 
-  @ObservationIgnored
-  @FetchOne(Charge.none) var charge
+  @ObservationIgnored @FetchOne(Charge.none) var charge
+  @ObservationIgnored @FetchOne(ChargeHistory.none) var chargeHistory
+  @ObservationIgnored @FetchAll var locations: [Location]
+  @ObservationIgnored @Shared(.metric) var metric
 
-  @ObservationIgnored
-  @FetchOne(ChargeHistory.none) var chargeHistory
-
-  @ObservationIgnored
-  @FetchAll var locations: [Location]
-
-  @ObservationIgnored
-  @Shared(.metric) var metric
-
-  var chargeLocation: Location?
+  var chargeLocation: Location = .unexpectedLocation
   var vehicle: Vehicle?
   var maximumPower: Double?
 
@@ -76,11 +73,13 @@ public final class ChargeDetailModel {
 
 public struct ChargeDetailView: View {
   @Bindable var model: ChargeDetailModel
+  @State private var gesturePoints: [CGPoint] = []
+  @State private var gestureRecognized = false
 
   public init(model: ChargeDetailModel) {
     self.model = model
   }
-  
+
   public var body: some View {
     let charge = model.charge ?? Charge.honestEmptyCharge
     let duration: Duration = .seconds(charge.duration)
@@ -89,6 +88,7 @@ public struct ChargeDetailView: View {
     let peakPower = Measurement(value: model.maximumPower ?? 0.0, unit: UnitPower.kilowatts)
 
     ScrollView {
+      TipView(EditChargeDetailTip())
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
           DokoGridButton(color: .blue, iconName: "map.fill", title: "Map") {
@@ -119,20 +119,14 @@ public struct ChargeDetailView: View {
         Section {
           Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
             GridRow {
-              let (placeName, cityState) = {
-                guard let chargeLocation = model.chargeLocation else { return ("In Progress", "") }
-                return (chargeLocation.placeName, chargeLocation.cityState)
-              }()
               DokoGridLocation(
                 color: charge.chargerType == .ac ? .purple : .green,
-                placeName: placeName,
-                cityState: cityState,
+                placeName: model.chargeLocation.placeName,
+                cityState: model.chargeLocation.cityState,
                 label: charge.chargerType == .ac ? "AC" : "DCFC",
                 iconName: charge.chargerType == .ac ? "powerplug" : "ev.charger"
               ) {
-                if let chargeLocation = model.chargeLocation {
-                  model.destination = .editLocationForm(chargeLocation)
-                }
+                model.destination = .editLocationForm(model.chargeLocation)
               }
             }
           }
@@ -242,13 +236,15 @@ public struct ChargeDetailView: View {
           GridRow {
             let batteryStateOfHealthColor =
             batteryStateOfHealth < 80 ? Color.red : batteryStateOfHealth < 90 ? .yellow : .green
-            DokoGridCount(
+            DokoGridValueButton(
               color: batteryStateOfHealthColor,
               value: String(format: "%.1f", batteryStateOfHealth),
               units: "%",
               iconName: "minus.plus.batteryblock.stack",
               title: "State of Health"
-            )
+            ) {
+              model.destination = .stateOfHealthChart
+            }
             
             DokoGridValueButton(
               color: .orange,
@@ -263,12 +259,59 @@ public struct ChargeDetailView: View {
         }
       }
     }
+    .contentShape(Rectangle())
+    .overlay {
+      Canvas { context, _ in
+        guard gesturePoints.count > 1 else { return }
+        var path = Path()
+        path.move(to: gesturePoints[0])
+        for point in gesturePoints.dropFirst() {
+          path.addLine(to: point)
+        }
+        context.stroke(
+          path,
+          with: .color(gestureRecognized ? .green.opacity(0.9) : .mint.opacity(0.5)),
+          style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
+        )
+      }
+      .allowsHitTesting(false)
+    }
+    .sensoryFeedback(.impact(flexibility: .rigid), trigger: gestureRecognized) { _, new in new }
+    .simultaneousGesture(
+      DragGesture(minimumDistance: 5, coordinateSpace: .local)
+        .onChanged { value in
+          gesturePoints.append(value.location)
+          if !gestureRecognized && isCircleGesture(gesturePoints) {
+            gestureRecognized = true
+          }
+        }
+        .onEnded { _ in
+          if gestureRecognized {
+            model.destination = .editChargeForm(charge)
+          }
+          withAnimation(.easeOut(duration: 0.3)) {
+            gesturePoints = []
+          }
+          gestureRecognized = false
+        }
+    )
     .navigationTitle(
       "\(charge.timeStart.formatted(date: .numeric, time: .shortened))"
     )
     .navigationBarTitleDisplayMode(.inline)
     .sheet(item: $model.destination) { destination in
       switch destination {
+      case .editChargeForm(let charge):
+        NavigationStack {
+          ChargeFormView(
+            model: ChargeFormModel(
+              charge: Charge.Draft(charge)
+            )
+          )
+          .navigationTitle("Edit Charge")
+          .navigationBarTitleDisplayMode(.inline)
+          .presentationDetents([.medium])
+        }
       case .editLocationForm(let location):
         NavigationStack {
           LocationFormView(
@@ -323,8 +366,31 @@ public struct ChargeDetailView: View {
           )
           .presentationDetents([.medium])
         }
+      case .stateOfHealthChart:
+        NavigationStack {
+          SoHHistoryView(
+            model: SoHHistoryModel(
+              vehicleID: charge.vehicleID,
+              currentID: charge.id
+            )
+          )
+          .presentationDetents([.medium])
+        }
       }
     }
+  }
+
+  private func isCircleGesture(_ points: [CGPoint]) -> Bool {
+    guard points.count > 20 else { return false }
+    let start = points.first!
+    let end = points.last!
+    let closureDistance = hypot(end.x - start.x, end.y - start.y)
+    let xs = points.map(\.x)
+    let ys = points.map(\.y)
+    let width = (xs.max()! - xs.min()!)
+    let height = (ys.max()! - ys.min()!)
+    let minSpan = min(width, height)
+    return closureDistance < minSpan * 0.5 && minSpan > 40
   }
 }
 

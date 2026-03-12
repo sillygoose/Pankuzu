@@ -62,7 +62,7 @@ public final class LiveActivityManager {
   }
   
   private func startAccessoryNameObservation() {
-    @Shared(.connectedAccessory) var observedAccessoryName
+    @Shared(.connectedAccessoryName) var observedAccessoryName
     Task { [weak self] in
       guard let self else { return }
       var oldAccessoryName: String? = nil

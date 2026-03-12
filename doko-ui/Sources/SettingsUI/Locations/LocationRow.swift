@@ -8,6 +8,7 @@ struct LocationRow: View {
   var body: some View {
     HStack {
       VStack(alignment: .leading) {
+        Text(String(format: "%.5f, %.5f", location.latitude, location.longitude))
         if let name = location.name {
           Text("\(name)")
         }

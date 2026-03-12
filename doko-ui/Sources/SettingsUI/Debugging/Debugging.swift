@@ -24,7 +24,7 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
 class DebuggingModel {
   private let logger = Logger(subsystem: "com.unchan.pankuzu", category: "Settings-Debugging")
   
-  @ObservationIgnored @Shared(.connectedAccessory) var accessoryName
+  @ObservationIgnored @Shared(.connectedAccessoryName) var accessoryName
   @ObservationIgnored @Shared(.vehicleState) var vehicleState
   @ObservationIgnored @Shared(.activeSession) var activeSession
   
@@ -36,6 +36,7 @@ class DebuggingModel {
   
   @ObservationIgnored @Shared(.logInfoPackets) var logInfoPackets
   @ObservationIgnored @Shared(.logStatePackets) var logStatePackets
+  @ObservationIgnored @Shared(.logCoreLocationPackets) var logCoreLocationPackets
   @ObservationIgnored @Shared(.logLocationPackets) var logLocationPackets
   @ObservationIgnored @Shared(.logLiveActivityPackets) var logLiveActivityPackets
   @ObservationIgnored @Shared(.logPacketManagerPackets) var logPacketManagerPackets
@@ -160,6 +161,13 @@ struct DebuggingView: View {
             isOn: Binding(
               get: { model.logStatePackets },
               set: { isOn, _ in model.$logStatePackets.withLock { $0 = isOn } }
+            )
+          )
+          Toggle(
+            "CoreLocation",
+            isOn: Binding(
+              get: { model.logCoreLocationPackets },
+              set: { isOn, _ in model.$logCoreLocationPackets.withLock { $0 = isOn } }
             )
           )
           Toggle(

@@ -31,10 +31,10 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
 
   public var currentLocation: CLLocation? {
     if !locationUpdatesEnabled {
-      DokoLogging.shared.postLoggingResponse(.location("'currentLocation' requested when disabled"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation("'currentLocation' requested when disabled"))
     }
     if _currentLocation == nil {
-      DokoLogging.shared.postLoggingResponse(.location("'currentLocation' is nil"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation("'currentLocation' is nil"))
     }
     return _currentLocation
   }
@@ -64,13 +64,13 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
 
   public func startPacketUpdates() {
     logger.debug("\(timestamp()) CLM.startPacketUpdates")
-    DokoLogging.shared.postLoggingResponse(.location(".startPacketUpdates"))
+    DokoLogging.shared.postLoggingResponse(.coreLocation(".startPacketUpdates"))
     packetUpdatesEnabled = true
   }
 
   public func stopPacketUpdates() {
     logger.debug("\(timestamp()) CLM.stopPacketUpdates")
-    DokoLogging.shared.postLoggingResponse(.location(".stopPacketUpdates"))
+    DokoLogging.shared.postLoggingResponse(.coreLocation(".stopPacketUpdates"))
     packetUpdatesEnabled = false
   }
 
@@ -94,12 +94,12 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
     liveUpdatesTask = Task { [weak self] in
       guard let self else { return }
       await resetLocationFilters()
-      DokoLogging.shared.postLoggingResponse(.location(".liveUpdatesTask started"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation(".liveUpdatesTask started"))
       do {
         for try await update in CLLocationUpdate.liveUpdates(.automotiveNavigation) {
           if Task.isCancelled || !self.locationUpdatesEnabled { break }
           if let location = update.location {
-            DokoLogging.shared.postLoggingResponse(.location("liveUpdate(\(String(format: "%.1f, %.1f", location.horizontalAccuracy, location.verticalAccuracy)))"))
+            DokoLogging.shared.postLoggingResponse(.coreLocation("liveUpdate(\(String(format: "%.1f, %.1f", location.horizontalAccuracy, location.verticalAccuracy)))"))
             if let accurateLocation = await filterAccuracy(location) {
               await MainActor.run {
                 self._currentLocation = accurateLocation
@@ -110,10 +110,10 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
             }
           }
         }
-        DokoLogging.shared.postLoggingResponse(.location(".liveUpdatesTask ended"))
+        DokoLogging.shared.postLoggingResponse(.coreLocation(".liveUpdatesTask ended"))
       } catch {
         self.logger.error("\(timestamp()) liveUpdates stream error: \(String(describing: error))")
-        DokoLogging.shared.postLoggingResponse(.location("liveUpdates stream error: \(String(describing: error))"))
+        DokoLogging.shared.postLoggingResponse(.coreLocation("liveUpdates stream error: \(String(describing: error))"))
       }
     }
   }
@@ -128,12 +128,12 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
     background?.invalidate()
     background = nil
     logger.debug("\(timestamp()) CLM.stopLocationUpdates completed")
-    DokoLogging.shared.postLoggingResponse(.location(".stopLocationUpdates"))
+    DokoLogging.shared.postLoggingResponse(.coreLocation(".stopLocationUpdates"))
   }
 
   public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
     guard locationUpdatesEnabled, let location = locations.last else { return }
-    DokoLogging.shared.postLoggingResponse(.location("didUpdateLocations(\(String(format: "%.1f, %.1f", location.horizontalAccuracy, location.verticalAccuracy)))"))
+    DokoLogging.shared.postLoggingResponse(.coreLocation("didUpdateLocations(\(String(format: "%.1f, %.1f", location.horizontalAccuracy, location.verticalAccuracy)))"))
     Task {
       if let accurateLocation = await filterAccuracy(location) {
         await MainActor.run {
@@ -148,7 +148,7 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
 
   public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
     logger.error("\(timestamp()) CLM.locationManager( error:\(String(describing: error)))")
-    DokoLogging.shared.postLoggingResponse(.location(".locationManager(\(String(describing: error)))"))
+    DokoLogging.shared.postLoggingResponse(.coreLocation(".locationManager(\(String(describing: error)))"))
   }
 
   public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {

@@ -8,8 +8,8 @@ extension FordElectrics {
   public func createStateScheduler(for state: VehicleState) async -> StateEngineDokoSchedule? {
     self.logger.info("\(timestamp()) FE.createStateScheduler(\(state.description))")
     switch state {
-    case .vehicleCapabilities:
-      return FordElectrics.vehicleCapabilitiesDokoCommandSchedule
+    case .vehicleCustomization:
+      return FordElectrics.vehicleCustomizationDokoCommandSchedule
 
     case .idle:
       return FordElectrics.idleDokoCommandSchedule
@@ -44,10 +44,10 @@ extension FordElectrics {
 }
 
 extension FordElectrics {
-  private static let vehicleCapabilitiesDokoCommandSchedule: StateEngineDokoSchedule = [
+  private static let vehicleCustomizationDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(
       schedulerType: .oneShotWithDelay(1),
-      packetType: .vehicleCapabilities
+      packetType: .vehicleCustomization
     )
   ]
 

@@ -54,7 +54,7 @@ public final class ChargesModel {
 
   @ObservationIgnored @Shared(.displayVehicleID) var displayVehicleID
 
-  @ObservationIgnored @Shared(.connectedAccessory) var connectedAccessory
+  @ObservationIgnored @Shared(.connectedAccessoryName) var connectedAccessoryName
   @ObservationIgnored @Shared(.connectedVehicleModel) var connectedVehicleModel
   @ObservationIgnored @Shared(.activeSession) var activeSession
 
@@ -193,6 +193,9 @@ public final class ChargesModel {
 public struct ChargesView: View {
   @Bindable var model: ChargesModel
   @State private var path = NavigationPath()
+  @State private var isAddingCharge = false
+  @State private var gesturePoints: [CGPoint] = []
+  @State private var gestureRecognized = false
 
   public init(model: ChargesModel) {
     self.model = model
@@ -202,6 +205,7 @@ public struct ChargesView: View {
     NavigationStack(path: $path) {
       VStack(spacing: 0) {
         VStack(spacing: 8) {
+          TipView(AddChargeTip())
           DisplayPeriodPicker(
             datePicker: Binding(
               get: { model.displayPeriod },
@@ -341,6 +345,42 @@ public struct ChargesView: View {
             }
           }
         }
+        .contentShape(Rectangle())
+        .overlay {
+          Canvas { context, _ in
+            guard gesturePoints.count > 1 else { return }
+            var path = Path()
+            path.move(to: gesturePoints[0])
+            for point in gesturePoints.dropFirst() {
+              path.addLine(to: point)
+            }
+            context.stroke(
+              path,
+              with: .color(gestureRecognized ? .green.opacity(0.9) : .mint.opacity(0.5)),
+              style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
+            )
+          }
+          .allowsHitTesting(false)
+        }
+        .sensoryFeedback(.impact(flexibility: .rigid), trigger: gestureRecognized) { _, new in new }
+        .simultaneousGesture(
+          DragGesture(minimumDistance: 5, coordinateSpace: .local)
+            .onChanged { value in
+              gesturePoints.append(value.location)
+              if !gestureRecognized && isPlusGesture(gesturePoints) {
+                gestureRecognized = true
+              }
+            }
+            .onEnded { _ in
+              if gestureRecognized {
+                isAddingCharge = true
+              }
+              withAnimation(.easeOut(duration: 0.3)) {
+                gesturePoints = []
+              }
+              gestureRecognized = false
+            }
+        )
         .padding(.horizontal)
 
         List {
@@ -368,8 +408,18 @@ public struct ChargesView: View {
         }
         .listStyle(.plain)
       }
+      .sheet(isPresented: $isAddingCharge) {
+        NavigationStack {
+          AddChargeFormView(
+            model: AddChargeFormModel(vehicleID: model.displayVehicleID)
+          )
+          .navigationTitle("Add Charge")
+          .navigationBarTitleDisplayMode(.inline)
+          .presentationDetents([.large])
+        }
+      }
       .sessionToolbar(
-        connectedAccessory: model.connectedAccessory,
+        connectedAccessoryName: model.connectedAccessoryName,
         connectedVehicleModel: model.connectedVehicleModel,
         activeSession: model.activeSession
       )
@@ -387,6 +437,27 @@ public struct ChargesView: View {
         }
       }
     }
+  }
+
+  private func isPlusGesture(_ points: [CGPoint]) -> Bool {
+    guard points.count > 15 else { return false }
+    let step = max(1, points.count / 15)
+    var hDist: CGFloat = 0
+    var vDist: CGFloat = 0
+    var prevHorizontal: Bool? = nil
+    var dirChanges = 0
+    var i = step
+    while i < points.count {
+      let dx = abs(points[i].x - points[i - step].x)
+      let dy = abs(points[i].y - points[i - step].y)
+      let isHorizontal = dx > dy
+      if let prev = prevHorizontal, prev != isHorizontal { dirChanges += 1 }
+      prevHorizontal = isHorizontal
+      hDist += dx
+      vDist += dy
+      i += step
+    }
+    return hDist > 40 && vDist > 40 && dirChanges >= 1 && dirChanges <= 3
   }
 
   enum Destination: Hashable {

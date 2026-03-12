@@ -6,8 +6,8 @@ import ObdLinkCore
 extension VwElectrics {
   public func vehicleDokoResponsePacket(_ responsePacket: ObdResponsePacket) async -> DokoResponsePacket {
     switch responsePacket.type {
-    case .vehicleCapabilities:
-      return vehicleCapabilitiesResponsePacket(responsePacket)
+    case .vehicleCustomization:
+      return vehicleCustomizationResponsePacket(responsePacket)
 
     case .idle:
       return idleResponsePacket(responsePacket)
@@ -58,29 +58,29 @@ extension VwElectrics {
     }
   }
 
-  private func vehicleCapabilitiesResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+  private func vehicleCustomizationResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
 //    guard let odometer = responsePacket.odometer else {
-//      return DokoResponsePacket(type: .vehicleCapabilities, responses: dokoResponses)
+//      return DokoResponsePacket(type: .vehicleCustomization, responses: dokoResponses)
 //    }
-    dokoResponses[.nextState] = DokoCommandResponse(command: .vehicleCapabilities, response: .nextState(.idle))
+    dokoResponses[.nextState] = DokoCommandResponse(command: .vehicleCustomization, response: .nextState(.idle))
     if let odometer = responsePacket.odometer {
-      dokoResponses[.odometer] = DokoCommandResponse(command: .vehicleCapabilities, response: .odometer(odometer))
+      dokoResponses[.odometer] = DokoCommandResponse(command: .vehicleCustomization, response: .odometer(odometer))
     }
     if let obdOdometer = responsePacket.obdOdometer {
-      dokoResponses[.obdOdometer] = DokoCommandResponse(command: .vehicleCapabilities, response: .obdOdometer(obdOdometer))
+      dokoResponses[.obdOdometer] = DokoCommandResponse(command: .vehicleCustomization, response: .obdOdometer(obdOdometer))
     }
     if let batteryVoltage = responsePacket.batteryVoltage, let batteryCurrent = responsePacket.batteryCurrent  {
       let batteryPower = batteryVoltage * batteryCurrent
-      dokoResponses[.batteryPower] = DokoCommandResponse(command: .vehicleCapabilities, response: .batteryPower(batteryPower))
+      dokoResponses[.batteryPower] = DokoCommandResponse(command: .vehicleCustomization, response: .batteryPower(batteryPower))
     }
     if let batteryTemperature = responsePacket.batteryTemperature {
-      dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .vehicleCapabilities, response: .batteryTemperature(batteryTemperature))
+      dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .vehicleCustomization, response: .batteryTemperature(batteryTemperature))
     }
     if let stateOfCharge = responsePacket.stateOfCharge {
-      dokoResponses[.stateOfCharge] = DokoCommandResponse(command: .vehicleCapabilities, response: .stateOfCharge(stateOfCharge))
+      dokoResponses[.stateOfCharge] = DokoCommandResponse(command: .vehicleCustomization, response: .stateOfCharge(stateOfCharge))
     }
-    return DokoResponsePacket(type: .vehicleCapabilities, responses: dokoResponses)
+    return DokoResponsePacket(type: .vehicleCustomization, responses: dokoResponses)
   }
 
   func idleResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {

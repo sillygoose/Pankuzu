@@ -23,6 +23,7 @@ public final class ChargeDetailBatteryModel {
 
 public struct ChargeDetailBatteryView: View {
   @Bindable var model: ChargeDetailBatteryModel
+  @State private var showCouplerTempChart = false
 
   @Environment(\.dismiss) var dismiss
 
@@ -161,27 +162,31 @@ public struct ChargeDetailBatteryView: View {
               }()
               let couplerTempStart = Measurement(value: couplerTempStartMetric, unit: UnitTemperature.celsius)
                 .converted(to: model.metric ? .celsius : .fahrenheit)
-              DokoGridCount(
+              DokoGridValueButton(
                 color: couplerTempStartColor,
                 value: String(format: "%.0f", couplerTempStart.value as CVarArg),
                 units: couplerTempStart.unit.symbol,
                 iconName: couplerTempStartIcon,
                 title: "Coupler Start"
-              )
-              
+              ) {
+                showCouplerTempChart = true
+              }
+
               let (couplerTempEndColor, couplerTempEndIcon) = {
                 if couplerTempEndMetric < 50 { return (Color.green, "ev.plug.dc.nacs") }
                 return (Color.red, "ev.plug.dc.nacs")
               }()
               let couplerTempEnd = Measurement(value: couplerTempEndMetric, unit: UnitTemperature.celsius)
                 .converted(to: model.metric ? .celsius : .fahrenheit)
-              DokoGridCount(
+              DokoGridValueButton(
                 color: couplerTempEndColor,
                 value: String(format: "%.0f", couplerTempEnd.value as CVarArg),
                 units: couplerTempEnd.unit.symbol,
                 iconName: couplerTempEndIcon,
                 title: "Coupler End"
-              )
+              ) {
+                showCouplerTempChart = true
+              }
             }
           }
         }
@@ -193,6 +198,16 @@ public struct ChargeDetailBatteryView: View {
     .toolbar {
       ToolbarItem {
         Button("Done") { dismiss() }
+      }
+    }
+    .sheet(isPresented: $showCouplerTempChart) {
+      NavigationStack {
+        ChargeDetailCouplerTempChartView(
+          model: ChargeDetailCouplerTempChartModel(
+            charge: model.charge
+          )
+        )
+        .presentationDetents([.medium])
       }
     }
   }

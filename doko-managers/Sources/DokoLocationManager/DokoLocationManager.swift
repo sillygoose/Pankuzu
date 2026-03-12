@@ -18,27 +18,42 @@ public final class DokoLocationManager: Sendable {
 
   private init() {}
 
-  public var placeholderLocation: Location.ID {
-    return Location.defaultLocation.id
-  }
-
-  public func lookup(id: Location.ID) -> Location {
+ public func lookup(id: Location.ID) -> Location {
     @FetchAll var locations: [Location]
     guard
       let location = locations.first(where: { $0.id == id })
     else {
-      return Location(id: placeholderLocation, latitude: 0, longitude: 0, elevation: 0, name: "<unknown>")
+      return .unexpectedLocation
     }
     return location
   }
 
-  public func addLocation(latitude: Double, longitude: Double, elevation: Double) -> Location.ID? {
+  public func updateLocation(id: Location.ID, latitude: Double, longitude: Double, elevation: Double, sharedLocation: Bool = true) -> Location.ID {
     @FetchAll var locations: [Location]
     @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
-    if let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold) {
-      DokoLogging.shared.postLoggingResponse(.location(String(format: "Location exists at (%.5f, %.5f)", latitude, longitude)))
+    if sharedLocation, let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold) {
+      DokoLogging.shared.postLoggingResponse(.location("reused location: \(locationID)"))
+      @Dependency(\.defaultDatabase) var database
+      withErrorReporting {
+        try database.write { db in
+          try Location.where { $0.id.eq(id) }.delete().execute(db)
+        }
+      }
+      DokoLogging.shared.postLoggingResponse(.location("deleted location: \(id)"))
       return locationID
     }
+    reverseGeocode(id: id, draft: Location.Draft(latitude: latitude, longitude: longitude, elevation: elevation), localSearch: false)
+    return id
+  }
+
+  public func addLocation(latitude: Double, longitude: Double, elevation: Double, sharedLocation: Bool = true) -> Location.ID? {
+    @FetchAll var locations: [Location]
+    @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
+    if sharedLocation, let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold) {
+      DokoLogging.shared.postLoggingResponse(.location("reused location: \(locationID)"))
+      return locationID
+    }
+
     @Dependency(\.defaultDatabase) var database
     var locationID: Location.ID? = nil
     let draftLocation = Location.Draft(latitude: latitude, longitude: longitude, elevation: elevation)
@@ -48,19 +63,31 @@ public final class DokoLocationManager: Sendable {
         locationID = id
       }
     }
-    Task { [location = draftLocation, id = locationID] in
-      guard let id else {
-        DokoLogging.shared.postLoggingResponse(.error("Expected honest locationID"))
-        return
-      }
+
+    if let locationID {
+      DokoLogging.shared.postLoggingResponse(.location("added location: \(locationID)"))
+      reverseGeocode(id: locationID, draft: draftLocation)
+    } else {
+      DokoLogging.shared.postLoggingResponse(.error("Failed to add location"))
+    }
+    return locationID
+  }
+
+  private func reverseGeocode(id: Location.ID, draft: Location.Draft, localSearch: Bool = true) {
+    @Dependency(\.defaultDatabase) var database
+    Task { [location = draft] in
       guard let request = MKReverseGeocodingRequest(location: CLLocation(latitude: location.latitude, longitude: location.longitude)) else {
         DokoLogging.shared.postLoggingResponse(.error("Expected honest MKReverseGeocodingRequest()"))
         return
       }
-      guard let mapItems = try? await request.mapItems else {
-        DokoLogging.shared.postLoggingResponse(.error("Expected honest mapItems in MKReverseGeocodingRequest()"))
+      let mapItems: [MKMapItem]
+      do {
+        mapItems = try await request.mapItems
+      } catch {
+        DokoLogging.shared.postLoggingResponse(.error("MKReverseGeocodingRequest failed: \(error.localizedDescription)"))
         return
       }
+
       if let mapItem = mapItems.first {
         @Shared(.poiThreshold) var poiThreshold
         var updatedLocation = Location(id: id, latitude: location.latitude, longitude: location.longitude, elevation: location.elevation)
@@ -78,16 +105,20 @@ public final class DokoLocationManager: Sendable {
               updatedLocation.street = trimmedStreet
             }
           }
+          DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(updatedLocation.placeName))"))
         }
-        let localSearch = MKLocalSearch(
-          request: MKLocalPointsOfInterestRequest(
-            center: CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude),
-            radius: poiThreshold
+        if localSearch {
+          let poiSearch = MKLocalSearch(
+            request: MKLocalPointsOfInterestRequest(
+              center: CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude),
+              radius: poiThreshold
+            )
           )
-        )
-        let response = try? await localSearch.start()
-        if let response, let mapItem = response.mapItems.first {
-          updatedLocation.name = mapItem.name
+          let response = try? await poiSearch.start()
+          if let response, let mapItem = response.mapItems.first {
+            updatedLocation.name = mapItem.name
+            DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(updatedLocation.placeName))"))
+          }
         }
         withErrorReporting {
           try database.write { db in
@@ -96,7 +127,6 @@ public final class DokoLocationManager: Sendable {
         }
       }
     }
-    return locationID
   }
 }
 

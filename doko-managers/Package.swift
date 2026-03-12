@@ -77,6 +77,7 @@ let package = Package(
         .product(name: "VehicleInterface", package: "doko-vehicle-interface"),
         .product(name: "UndeterminedVehicle", package: "doko-vehicle-interface"),
         .product(name: "FordElectrics", package: "doko-vehicle-interface"),
+        .product(name: "FordMachE", package: "doko-vehicle-interface"),
         .product(name: "VwElectrics", package: "doko-vehicle-interface"),
         .product(name: "SQLiteData", package: "sqlite-data"),
       ]

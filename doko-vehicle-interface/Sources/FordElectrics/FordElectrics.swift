@@ -25,38 +25,49 @@ public actor FordElectrics: ConnectedVehicleInterface {
   }
 
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
-    typealias CommandLookupDictionary = [ObdCommand: String]
-    let commandLookupDictionary: CommandLookupDictionary = [
-      .gearSelected:                    "STPX h:7E2, d:221E12",
+    let obdLinkCommand: String?
+    switch command {
+    case .stpx(let header, let did):    obdLinkCommand = String(format: "STPX h:%X, d:22%0X", header, did)
+    case .ath(let enabled):             obdLinkCommand = "ATH\(enabled ? 1 : 0)"
 
-      .energyToEmpty:                   "STPX h:7E4, d:224848",
-      .stateOfCharge:                   "STPX h:7E4, d:224845",
-      .stateOfHealth:                   "STPX h:7E4, d:22490C",
-      .batteryTemperature:              "STPX h:7E4, d:224800",
-      .batteryVoltage:                  "STPX h:7E4, d:22480D",
-      .batteryCurrent:                  "STPX h:7E4, d:2248F9",
+    case .gearSelected:                 obdLinkCommand = "STPX h:7E2, d:221E12"
+    case .acChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224888"
+    case .dcChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224897"
 
-      .acChargerStatus:                 "STPX h:7E4, d:22484F",
-      .acChargerCouplerTemperature:     "STPX h:7E2, d:224888",
-      .dcChargerStatus:                 "STPX h:7E4, d:22489E",
-      .dcChargerCouplerTemperature:     "STPX h:7E2, d:224897",
+    case .energyToEmpty:                obdLinkCommand = "STPX h:7E4, d:224848"
+    case .stateOfCharge:                obdLinkCommand = "STPX h:7E4, d:224845"
+    case .stateOfHealth:                obdLinkCommand = "STPX h:7E4, d:22490C"
+    case .batteryTemperature:           obdLinkCommand = "STPX h:7E4, d:224800"
+      
+    case .batteryVoltage:               obdLinkCommand = "STPX h:7E4, d:22480D"
+    case .batteryCurrent:               obdLinkCommand = "STPX h:7E4, d:2248F9"
 
-      .odometer:                        "01A6",
+    case .acChargerStatus:              obdLinkCommand = "STPX h:7E4, d:22484F"
+    case .dcChargerStatus:              obdLinkCommand = "STPX h:7E4, d:22489E"
 
-      .position:                        "",
-      .weather:                         "",
-    ]
-    guard let obdLinkCommand = commandLookupDictionary[command] else {
-      DokoLogging.shared.postLoggingResponse(.error("FE.vehicleObdCommand(\(command.description)): dictionary empty"))
+    case .odometer:                     obdLinkCommand = "01A6"
+
+    case .position:                     obdLinkCommand = ""
+    case .weather:                      obdLinkCommand = ""
+      
+    default:                            obdLinkCommand = nil
+    }
+    guard let obdLinkCommand else {
+      DokoLogging.shared.postLoggingResponse(.error("FE.vehicleObdCommand: \(command.description) not found"))
       return nil
     }
     return obdLinkCommand
   }
-
+  
   public func translateDokoCommandPacket(using packetType: DokoPacketType) async -> ObdCommandPacket? {
     switch packetType {
-    case .vehicleCapabilities:
-      return ObdCommandPacket(type: .vehicleCapabilities, commands: [
+    case .vehicleCustomization:
+      return ObdCommandPacket(type: .vehicleCustomization, commands: [
+        .ath(true),
+        .stpx(0x7DF, 0x4888),
+        .stpx(0x7DF, 0x4897),
+        .stpx(0x7DF, 0x48A4),
+        .ath(false),
         .odometer
       ])
 

@@ -18,7 +18,7 @@ actor TripElevationFilter: LocationFilter {
       return true
     }
     if location.timestamp == last.timestamp {
-      DokoLogging.shared.postLoggingResponse(.location("TripElevationFilter.timestamp"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation("TripElevationFilter.timestamp"))
       return false
     }
 
@@ -29,7 +29,7 @@ actor TripElevationFilter: LocationFilter {
     }
 
     if abs(last.altitude - location.altitude) < minimumTripElevationChange {
-      DokoLogging.shared.postLoggingResponse(.location("TripElevationFilter.change"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation("TripElevationFilter.change"))
       return false
     }
 

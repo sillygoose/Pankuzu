@@ -23,7 +23,8 @@ public final class TripDetailModel {
     case weatherChart
     case energyUsedChart
     case batteryChart
-    
+    case stateOfHealthChart
+
     public var id: String {
       switch self {
       case .editLocationForm(let location):
@@ -40,27 +41,23 @@ public final class TripDetailModel {
         return "energyUsedChart"
       case .batteryChart:
         return "batteryChart"
+      case .stateOfHealthChart:
+        return "stateOfHealthChart"
       }
     }
   }
   
   var destination: Destination?
   
-  @ObservationIgnored
-  @FetchAll var locations: [Location]
-  
-  @ObservationIgnored
-  @FetchOne(Trip.none) var trip
-  
-  @ObservationIgnored
-  @Shared(.metric) var metric
-  @ObservationIgnored
-  @Shared(.kWhPer100km) var kWhPer100km
+  @ObservationIgnored @FetchAll var locations: [Location]
+  @ObservationIgnored @FetchOne(Trip.none) var trip
+  @ObservationIgnored @Shared(.metric) var metric
+  @ObservationIgnored @Shared(.kWhPer100km) var kWhPer100km
   
   var vehicle: Vehicle?
-  var fromLocation: Location?
-  var toLocation: Location?
-  
+  var fromLocation: Location = .unexpectedLocation
+  var toLocation: Location = .unexpectedLocation
+
   public init(
     destination: Destination? = nil,
     tripID: Trip.ID
@@ -120,40 +117,28 @@ public struct TripDetailView: View {
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         Section {
           GridRow {
-            let (placeName, cityState) = {
-              guard let fromLocation = model.fromLocation else { return ("In Progress", "") }
-              return (fromLocation.placeName, fromLocation.cityState)
-            }()
             DokoGridLocation(
               color: .purple,
-              placeName: placeName,
-              cityState: cityState,
+              placeName: model.fromLocation.placeName,
+              cityState: model.fromLocation.cityState,
               label: "From",
               iconName: "mappin.and.ellipse.circle.fill"
             ) {
-              if let fromLocation = model.fromLocation {
-                model.destination = .editLocationForm(fromLocation)
-              }
+              model.destination = .editLocationForm(model.fromLocation)
             }
           }
         }
         
         Section {
           GridRow {
-            let (placeName, cityState) = {
-              guard let toLocation = model.toLocation else { return ("In Progress", "") }
-              return (toLocation.placeName, toLocation.cityState)
-            }()
             DokoGridLocation(
               color: .cyan,
-              placeName: placeName,
-              cityState: cityState,
+              placeName: model.toLocation.placeName,
+              cityState: model.toLocation.cityState,
               label: "To",
               iconName: "mappin.and.ellipse.circle.fill"
             ) {
-              if let toLocation = model.toLocation {
-                model.destination = .editLocationForm(toLocation)
-              }
+              model.destination = .editLocationForm(model.toLocation)
             }
           }
         }
@@ -286,13 +271,15 @@ public struct TripDetailView: View {
             return Color.green
           }()
           GridRow {
-            DokoGridCount(
+            DokoGridValueButton(
               color: batteryStateOfHealthColor,
               value: String(format: "%.1f", batteryStateOfHealth),
               units: "%",
               iconName: "minus.plus.batteryblock.stack",
               title: "State of Health"
-            )
+            ) {
+              model.destination = .stateOfHealthChart
+            }
             
             DokoGridValueButton(
               color: .orange,
@@ -375,7 +362,18 @@ public struct TripDetailView: View {
             )
           )
           .presentationDetents([.medium])
-        }      }
+        }
+      case .stateOfHealthChart:
+        NavigationStack {
+          SoHHistoryView(
+            model: SoHHistoryModel(
+              vehicleID: trip.vehicleID,
+              currentID: trip.id
+            )
+          )
+          .presentationDetents([.medium])
+        }
+      }
     }
   }
 }

@@ -7,8 +7,10 @@ import CommonUI
 @MainActor
 @Observable
 final class LocationSettingsModel {
-  @ObservationIgnored
-  @FetchAll(Location.where { !$0.isDeleted && !$0.isHidden }) var locations
+  @ObservationIgnored @FetchAll(
+    Location
+      .where { $0.isDeleted.eq(false) }
+  ) var locations
 }
 
 struct LocationSettingsView: View {

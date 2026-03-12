@@ -19,12 +19,12 @@ extension UndeterminedVehicle {
     var dokoResponses: DokoResponseDictionary = [:]
     guard
       let version = responsePacket.atz,
-      let _ = responsePacket.ate0,
-      let _ = responsePacket.ath0,
-      let _ = responsePacket.atcaf1,
-      let _ = responsePacket.ats0,
-      let _ = responsePacket.stcsegr1,
-      let _ = responsePacket.atsp0
+      let _ = responsePacket.ate,
+      let _ = responsePacket.ath,
+      let _ = responsePacket.ats,
+      let _ = responsePacket.atcaf,
+      let _ = responsePacket.stcsegr,
+      let _ = responsePacket.atsp
     else {
       return DokoResponsePacket(type: .reset, responses: dokoResponses)
     }
@@ -41,7 +41,7 @@ extension UndeterminedVehicle {
     else {
       return DokoResponsePacket(type: .vin, responses: dokoResponses)
     }
-    dokoResponses[.nextState] = DokoCommandResponse(command: .vin, response: .nextState(.vehicleCapabilities))
+    dokoResponses[.nextState] = DokoCommandResponse(command: .vin, response: .nextState(.vehicleCustomization))
     dokoResponses[.vin] = DokoCommandResponse(command: .vin, response: .vin(vin))
     dokoResponses[.stprs] = DokoCommandResponse(command: .stprs, response: .stprs(protocolString))
     return DokoResponsePacket(type: .vin, responses: dokoResponses)

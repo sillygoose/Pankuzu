@@ -5,14 +5,18 @@ import DokoTypes
 
 public enum ObdCommand: Equatable, Hashable, Sendable {
   case atz
-  case ate0
-  case ath0
-  case atcaf1
-  case ats0
-  case atsp0
-  case stcsegr1
+  case ate(Bool)
+  case ath(Bool)
+  case atcaf(Bool)
+  case ats(Bool)
+  case atsp(Int)
+  case stp(Int)
+  case stpbr(Int)
+  case stpo
+  case stcsegr(Bool)
   case stprs
-  
+  case stpx(Int, Int)
+
   case vin
   case odometer, obdOdometer
 
@@ -35,7 +39,6 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   /* Non-OBDLink macros */
   case position
   case weather
-  case meanTemperature
 
   public var description: String {
     return self.key
@@ -46,20 +49,28 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
       switch self {
       case .atz:
         return ".atz"
-      case .ate0:
-        return ".ate0"
-      case .ath0:
-        return ".ath0"
-      case .atcaf1:
-        return ".atcaf1"
-      case .ats0:
-        return ".ats0"
-      case .atsp0:
-        return ".atsp0"
-      case .stcsegr1:
-        return ".stcsegr1"
+      case .ate(let enabled):
+        return ".ate(\(enabled))"
+      case .ath(let enabled):
+        return ".ath(\(enabled))"
+      case .atcaf(let enabled):
+        return ".atcaf(\(enabled))"
+      case .ats(let enabled):
+        return ".ats(\(enabled))"
+      case .atsp(let canProtocol):
+        return ".atsp(\(canProtocol))"
+      case .stp(let canProtocol):
+        return ".stp(\(canProtocol))"
+      case .stpbr(let baudRate):
+        return ".stpbr(\(baudRate))"
+      case .stpo:
+        return ".stpo"
+      case .stcsegr(let enabled):
+        return ".stcsegr(\(enabled))"
       case .stprs:
         return ".stprs"
+      case .stpx(let header, let did):
+        return String(format: ".stpx(h:%X, d:22%X)", header, did)
 
       case .vin:
         return ".vin"
@@ -95,8 +106,6 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".position"
       case .weather:
         return ".weather"
-      case .meanTemperature:
-        return ".meanTemperature"
       }
     }
   }
@@ -180,14 +189,18 @@ public enum ObdResponse: Equatable, Sendable {
   case info(String)
   case error(String)
   case atz(String)
-  case ate0
-  case ath0
-  case atcaf1
-  case ats0
-  case atsp0
+  case ate(Bool)
+  case ath(Bool)
+  case atcaf(Bool)
+  case ats(Bool)
+  case atsp(Int)
+  case stp(Int)
+  case stpbr(Int)
+  case stpo(String)
+  case stcsegr(Bool)
   case stprs(String)
-  case stcsegr1
-  
+  case stpx(String)
+
   case vin(String)
   case odometer(Double)
   case obdOdometer(Double)
@@ -210,7 +223,6 @@ public enum ObdResponse: Equatable, Sendable {
 
   case position(DokoPosition)
   case weather(DokoCurrentWeather)
-  case meanTemperature(Double)
 
   public var description: String {
     get {
@@ -224,21 +236,29 @@ public enum ObdResponse: Equatable, Sendable {
 
       case .atz:
         return ".atz"
-      case .ate0:
-        return ".ate0"
-      case .ath0:
-        return ".ath0"
-      case .atcaf1:
-        return ".atcaf1"
-      case .ats0:
-        return ".ats0"
-      case .atsp0:
-        return ".atsp0"
-      case .stprs(let pstring):
-        return ".stprs(\(pstring))"
-      case .stcsegr1:
-        return ".stcsegr1"
-        
+      case .ate(let enabled):
+        return ".ate(\(enabled))"
+      case .ath(let enabled):
+        return ".ath(\(enabled))"
+      case .atcaf(let enabled):
+        return ".atcaf(\(enabled))"
+      case .ats(let enabled):
+        return ".ats(\(enabled))"
+      case .atsp(let canProtocol):
+        return ".atsp(\(canProtocol))"
+      case .stp(let canProtocol):
+        return ".stp(\(canProtocol))"
+      case .stpbr(let baudRate):
+        return ".stpbr(\(baudRate))"
+      case .stpo:
+        return ".stpo"
+      case .stcsegr(let enabled):
+        return ".stcsegr(\(enabled))"
+      case .stprs(let canProtocol):
+        return ".stprs(\(canProtocol))"
+      case .stpx:
+        return ".stpx"
+
       case .vin(let vin):
         return ".vin(\(vin))"
       case .odometer(let odometer):
@@ -278,8 +298,6 @@ public enum ObdResponse: Equatable, Sendable {
         return String(format: ".position(%.5f, %.5f, %.0f)", position.latitude, position.longitude, position.elevation)
       case let .weather(weather):
         return ".weather(\(String(format: "%.0f℃", weather.temperature)), \(weather.conditionSymbol))"
-      case let .meanTemperature(temp):
-        return ".meanTemperature(\(String(format: "%.0f℃", temp)))"
       }
     }
   }

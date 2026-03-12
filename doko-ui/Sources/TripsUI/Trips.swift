@@ -44,7 +44,7 @@ public final class TripsModel {
 
   @ObservationIgnored @Shared(.displayVehicleID) var displayVehicleID
 
-  @ObservationIgnored @Shared(.connectedAccessory) var connectedAccessory
+  @ObservationIgnored @Shared(.connectedAccessoryName) var connectedAccessoryName
   @ObservationIgnored @Shared(.connectedVehicleModel) var connectedVehicleModel
   @ObservationIgnored @Shared(.activeSession) var activeSession
 
@@ -230,17 +230,7 @@ public struct TripsView: View {
               value: model.tripStats.distance ?? 0.0,
               unit: UnitLength.kilometers
             )
-            let energyKWh = Measurement(value: (model.tripStats.energy ?? 0.0), unit: UnitEnergy.kilowattHours)
-            let metricEfficiency = Measurement(
-              value: energyKWh.value == 0.0 ? 0.0 : metricDistance.value / energyKWh.value,
-              unit: UnitEnergyEfficiency.kilometersPerKilowattHour
-            )
-
             let distance = metricDistance.converted(to: model.metric ? .kilometers : .miles)
-            let energyEfficiency = metricEfficiency
-              .converted(
-                to:model.metric ? model.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
-              )
 
             GridRow {
               DokoGridCount(
@@ -299,22 +289,33 @@ public struct TripsView: View {
               }
             }
 
-            GridRow {
-              DokoGridCount(
-                color: .red,
-                value: String(format: "%.1f", energyKWh.value as CVarArg),
-                units: energyKWh.unit.symbol,
-                iconName: "bolt.circle.fill",
-                title: "Energy Used"
+            if let energy = model.tripStats.energy {
+              let energyKWh = Measurement(value: energy, unit: UnitEnergy.kilowattHours)
+              let metricEfficiency = Measurement(
+                value: energyKWh.value == 0.0 ? 0.0 : metricDistance.value / energyKWh.value,
+                unit: UnitEnergyEfficiency.kilometersPerKilowattHour
               )
+              let energyEfficiency = metricEfficiency
+                .converted(
+                  to: model.metric ? model.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
+                )
+              GridRow {
+                DokoGridCount(
+                  color: .red,
+                  value: String(format: "%.1f", energyKWh.value as CVarArg),
+                  units: energyKWh.unit.symbol,
+                  iconName: "bolt.circle.fill",
+                  title: "Energy Used"
+                )
 
-              DokoGridCount(
-                color: .green,
-                value: String(format: "%.1f", energyEfficiency.value as CVarArg),
-                units: energyEfficiency.unit.symbol,
-                iconName: "powermeter",
-                title: "Efficiency"
-              )
+                DokoGridCount(
+                  color: .green,
+                  value: String(format: "%.1f", energyEfficiency.value as CVarArg),
+                  units: energyEfficiency.unit.symbol,
+                  iconName: "powermeter",
+                  title: "Efficiency"
+                )
+              }
             }
           }
         }
@@ -346,7 +347,7 @@ public struct TripsView: View {
         .listStyle(.plain)
       }
       .sessionToolbar(
-        connectedAccessory: model.connectedAccessory,
+        connectedAccessoryName: model.connectedAccessoryName,
         connectedVehicleModel: model.connectedVehicleModel,
         activeSession: model.activeSession
       )
@@ -375,10 +376,10 @@ public struct TripsView: View {
   let _ = prepareDependencies {
     try? $0.bootstrapDatabase()
     try? $0.defaultDatabase.seedPreviews()
-    @Shared(.connectedAccessory) var connectedAccessory
+    @Shared(.connectedAccessoryName) var connectedAccessoryName
     @Shared(.connectedVehicleModel) var connectedVehicleModel
     @Shared(.activeSession) var activeSession
-    $connectedAccessory.withLock { $0 = nil }
+    $connectedAccessoryName.withLock { $0 = nil }
     $connectedVehicleModel.withLock { $0 = nil }
     $activeSession.withLock { $0 =  nil }
   }
@@ -395,10 +396,10 @@ public struct TripsView: View {
     try? $0.bootstrapDatabase()
     try? $0.defaultDatabase.seedPreviews()
 
-    @Shared(.connectedAccessory) var connectedAccessory
+    @Shared(.connectedAccessoryName) var connectedAccessoryName
     @Shared(.connectedVehicleModel) var connectedVehicleModel
     @Shared(.activeSession) var activeSession
-    $connectedAccessory.withLock { $0 = "OBDLink MX+" }
+    $connectedAccessoryName.withLock { $0 = "OBDLink MX+" }
     $connectedVehicleModel.withLock { $0 = "2024 Ford Mach-E GT" }
     $activeSession.withLock { $0 =  .trip }
   }

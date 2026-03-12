@@ -32,6 +32,22 @@ public struct TripDetailsTip: Tip {
   }
 }
 
+public struct AddChargeTip: Tip {
+  public init() {}
+
+  public var title: Text {
+    Text("Add a Charge")
+  }
+
+  public var message: Text? {
+    Text("You can manually add a missed charge using a plus sign gesture, try it out.")
+  }
+
+  public var image: Image? {
+    Image(systemName: "plus.circle")
+  }
+}
+
 public struct ChargeDetailsTip: Tip {
   public init() {}
 
@@ -45,5 +61,44 @@ public struct ChargeDetailsTip: Tip {
 
   public var image: Image? {
     Image(systemName: "ev.charger")
+  }
+}
+
+public struct EditChargeDetailTip: Tip {
+  public init() {}
+
+  public var title: Text {
+    Text("Edit Charge Details")
+  }
+
+  public var message: Text? {
+    Text("You can edit an incomplete charge by drawing a circle gesture on the detailed charge.")
+  }
+
+  public var image: Image? {
+    Image(systemName: "pencil.circle")
+  }
+}
+
+public struct SettingsTip: Tip {
+  public init() {}
+  
+  private var displayName: String {
+    guard
+      let displayName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String
+    else { return "Pankuzu" }
+    return "\(displayName)"
+  }
+
+  public var title: Text {
+    Text("Configure Bluetooth")
+  }
+
+  public var message: Text? {
+    Text("Use the Bluetooth settings to enable/disable background operation of \(displayName).")
+  }
+
+  public var image: Image? {
+    Image(systemName: "exclamationmark.triangle")
   }
 }

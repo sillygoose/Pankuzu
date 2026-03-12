@@ -25,24 +25,29 @@ public actor VwElectrics: ConnectedVehicleInterface {
   }
 
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
-    typealias CommandLookupDictionary = [ObdCommand: String]
-    let commandLookupDictionary: CommandLookupDictionary = [
-      .gearSelected:                    "STPX h:17FC0076, d:22210E",  //0x17fc0076 03 22 21 0e 55 55 55 55
-      .odometer:                        "STPX h:17FC0076, d:22295A",  //0x17fe0076 06 62 29 5a XX YY ZZ aa  (XX*2^16+YY*2^8+ZZ) = km in decimal
+    let obdLinkCommand: String?
+    switch command {
+    case .stpx(let header, let did):    obdLinkCommand = String(format: "STPX h:%X, d:22%0X", header, did)
+    case .ath(let enabled):             obdLinkCommand = "ATH\(enabled ? 1 : 0)"
 
-      .stateOfCharge:                   "STPX h:17FC007B, d:22028C",  //0x17fc007b 03 22 02 8c 55 55 55 55
-      .batteryTemperature:              "STPX h:17FC007B, d:222A0B",  //0x17fc007b 03 22 2a 0b
-      .batteryVoltage:                  "STPX h:17FC007B, d:221E3B",  //0x17fc007b 03 22 1e 3b 55 55 55 55
-      .batteryCurrent:                  "STPX h:17FC007B, d:221E3D",  //0x17fc007b 03 22 1e 3d 55 55 55 55
+    case .gearSelected:                 obdLinkCommand = "STPX h:17FC0076, d:22210E"    //0x17fc0076 03 22 21 0e 55 55 55 55
+    case .odometer:                     obdLinkCommand = "STPX h:17FC0076, d:22295A"    //0x17fe0076 06 62 29 5a XX YY ZZ aa  (XX*2^16+YY*2^8+ZZ) = km in decimal
 
-      .acChargerStatus:                 "STPX h:17FC007B, d:227448",  //0x17fc007b 03 22 74 48 55 55 55 55
-      .dcChargerStatus:                 "STPX h:17FC007B, d:227448",  //0x17fc007b 03 22 74 48 55 55 55 55
+    case .stateOfCharge:                obdLinkCommand = "STPX h:17FC007B, d:22028C"    //0x17fc007b 03 22 02 8c 55 55 55 55
+    case .batteryTemperature:           obdLinkCommand = "STPX h:17FC007B, d:222A0B"    //0x17fc007b 03 22 2a 0b
+    case .batteryVoltage:               obdLinkCommand = "STPX h:17FC007B, d:221E3B"    //0x17fc007b 03 22 1e 3b 55 55 55 55
+    case .batteryCurrent:               obdLinkCommand = "STPX h:17FC007B, d:221E3D"    //0x17fc007b 03 22 1e 3d 55 55 55 55
 
-      .position:                        "",
-      .weather:                         "",
-    ]
-    guard let obdLinkCommand = commandLookupDictionary[command] else {
-      DokoLogging.shared.postLoggingResponse(.error("VWE.vehicleObdCommand(\(command.description)): dictionary empty"))
+    case .acChargerStatus:              obdLinkCommand = "STPX h:17FC007B, d:227448"    //0x17fc007b 03 22 74 48 55 55 55 55
+    case .dcChargerStatus:              obdLinkCommand = "STPX h:17FC007B, d:227448"    //0x17fc007b 03 22 74 48 55 55 55 55
+
+    case .position:                     obdLinkCommand = ""
+    case .weather:                      obdLinkCommand = ""
+
+    default:                            obdLinkCommand = nil
+    }
+    guard let obdLinkCommand else {
+      DokoLogging.shared.postLoggingResponse(.error("FE.vehicleObdCommand: \(command.description) not found"))
       return nil
     }
     return obdLinkCommand
@@ -50,8 +55,14 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
   public func translateDokoCommandPacket(using packetType: DokoPacketType) async -> ObdCommandPacket? {
     switch packetType {
-    case .vehicleCapabilities:
-      return ObdCommandPacket(type: .vehicleCapabilities, commands: [
+    case .vehicleCustomization:
+      return ObdCommandPacket(type: .vehicleCustomization, commands: [
+        //### custom reinitialization
+        .ath(true),
+        .stpx(0x18DB33F1, 0xF190),
+        .stpx(0x18DB33F1, 0xF18C),
+        .ath(false),
+
         .gearSelected, .odometer,
         .acChargerStatus, .dcChargerStatus,
         .stateOfCharge, .batteryTemperature, .batteryVoltage, .batteryCurrent
