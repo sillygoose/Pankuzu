@@ -12,10 +12,32 @@ extension VwElectrics {
     do {
       var commandResponse: ObdResponse
       switch command {
+//      case .ath(let enabled):
+//        commandResponse = .ath(enabled)
+//      case .stpx(_, _):
+//        commandResponse = .stpx(response)
+      case .atz:
+        commandResponse = .atz(response)
+      case .ate(let enabled):
+        commandResponse = .ate(enabled)
       case .ath(let enabled):
         commandResponse = .ath(enabled)
-      case .stpx(_, _):
-        commandResponse = .stpx(response)
+      case .atcaf(let enabled):
+        commandResponse = .atcaf(enabled)
+      case .ats(let enabled):
+        commandResponse = .ats(enabled)
+      case .atsp(let canProtocol):
+        commandResponse = .atsp(canProtocol)
+      case .atsh(let header):
+        commandResponse = .atsh(header)
+      case .atcp(let header):
+        commandResponse = .atcp(header)
+      case .atcf(let pattern):
+        commandResponse = .atcf(pattern)
+      case .atcra(let pattern):
+        commandResponse = .atcra(pattern)
+      case .atcm(let mask):
+        commandResponse = .atcm(mask)
 
       case .position:
         guard let position = await CoreLocationManager.shared.currentLocation else {

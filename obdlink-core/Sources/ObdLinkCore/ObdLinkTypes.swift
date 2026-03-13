@@ -15,6 +15,7 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case atcp(Int)
   case atcf(Int)
   case atcra(Int)
+  case atcm(Int)
 
   case stp(Int)
   case stpbr(Int)
@@ -75,6 +76,8 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return String(format: ".atcf(%X)", filter)
       case .atcra(let address):
         return String(format: ".atcra(%X)", address)
+      case .atcm(let mask):
+        return String(format: ".atcm(%X)", mask)
       case .stp(let canProtocol):
         return ".stp(\(canProtocol))"
       case .stpbr(let baudRate):
@@ -204,6 +207,7 @@ public enum ObdResponse: Equatable, Sendable {
   case obdError(String, String)
   case info(String)
   case error(String)
+  
   case atz(String)
   case atd(String)
   case ate(Bool)
@@ -215,6 +219,8 @@ public enum ObdResponse: Equatable, Sendable {
   case atcp(Int)
   case atcf(Int)
   case atcra(Int)
+  case atcm(Int)
+
   case stp(Int)
   case stpbr(Int)
   case stpo(String)
@@ -277,6 +283,8 @@ public enum ObdResponse: Equatable, Sendable {
         return String(format: ".atcf(%X)", filter)
       case .atcra(let address):
         return String(format: ".atcra(%X)", address)
+      case .atcm(let mask):
+        return String(format: ".atcm(%X)", mask)
       case .stp(let canProtocol):
         return ".stp(\(canProtocol))"
       case .stpbr(let baudRate):

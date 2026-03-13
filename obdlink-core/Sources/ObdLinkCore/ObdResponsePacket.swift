@@ -61,6 +61,11 @@ extension ObdResponsePacket {
           case let .atcra(v) = entry.value.response else { return nil }
     return v
   }
+  public var atcm: Int? {
+    guard let entry = responses.first(where: { if case .atcm = $0.key { return true }; return false }),
+          case let .atcm(v) = entry.value.response else { return nil }
+    return v
+  }
   public var stp: Int? {
     guard let entry = responses.first(where: { if case .stp = $0.key { return true }; return false }),
           case let .stp(v) = entry.value.response else { return nil }
