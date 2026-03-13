@@ -7,6 +7,10 @@ extension ObdResponsePacket {
     guard case let .atz(v)? = responses[.atz]?.response else { return nil }
     return v
   }
+  public var atd: String? {
+    guard case let .atd(v)? = responses[.atd]?.response else { return nil }
+    return v
+  }
   public var ate: Bool? {
     guard let entry = responses.first(where: { if case .ate = $0.key { return true }; return false }),
           case let .ate(v) = entry.value.response else { return nil }
@@ -35,6 +39,26 @@ extension ObdResponsePacket {
   public var atsp: Int? {
     guard let entry = responses.first(where: { if case .atsp = $0.key { return true }; return false }),
           case let .atsp(v) = entry.value.response else { return nil }
+    return v
+  }
+  public var atsh: Int? {
+    guard let entry = responses.first(where: { if case .atsh = $0.key { return true }; return false }),
+          case let .atsh(v) = entry.value.response else { return nil }
+    return v
+  }
+  public var atcp: Int? {
+    guard let entry = responses.first(where: { if case .atcp = $0.key { return true }; return false }),
+          case let .atcp(v) = entry.value.response else { return nil }
+    return v
+  }
+  public var atcf: Int? {
+    guard let entry = responses.first(where: { if case .atcf = $0.key { return true }; return false }),
+          case let .atcf(v) = entry.value.response else { return nil }
+    return v
+  }
+  public var atcra: Int? {
+    guard let entry = responses.first(where: { if case .atcra = $0.key { return true }; return false }),
+          case let .atcra(v) = entry.value.response else { return nil }
     return v
   }
   public var stp: Int? {

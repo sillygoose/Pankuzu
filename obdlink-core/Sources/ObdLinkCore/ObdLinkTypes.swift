@@ -5,11 +5,17 @@ import DokoTypes
 
 public enum ObdCommand: Equatable, Hashable, Sendable {
   case atz
+  case atd
   case ate(Bool)
   case ath(Bool)
   case atcaf(Bool)
   case ats(Bool)
   case atsp(Int)
+  case atsh(Int)
+  case atcp(Int)
+  case atcf(Int)
+  case atcra(Int)
+
   case stp(Int)
   case stpbr(Int)
   case stpo
@@ -49,6 +55,8 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
       switch self {
       case .atz:
         return ".atz"
+      case .atd:
+        return ".atd"
       case .ate(let enabled):
         return ".ate(\(enabled))"
       case .ath(let enabled):
@@ -59,6 +67,14 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".ats(\(enabled))"
       case .atsp(let canProtocol):
         return ".atsp(\(canProtocol))"
+      case .atsh(let header):
+        return String(format: ".atsh(%X)", header)
+      case .atcp(let priority):
+        return String(format: ".atcp(%X)", priority)
+      case .atcf(let filter):
+        return String(format: ".atcf(%X)", filter)
+      case .atcra(let address):
+        return String(format: ".atcra(%X)", address)
       case .stp(let canProtocol):
         return ".stp(\(canProtocol))"
       case .stpbr(let baudRate):
@@ -189,11 +205,16 @@ public enum ObdResponse: Equatable, Sendable {
   case info(String)
   case error(String)
   case atz(String)
+  case atd(String)
   case ate(Bool)
   case ath(Bool)
   case atcaf(Bool)
   case ats(Bool)
   case atsp(Int)
+  case atsh(Int)
+  case atcp(Int)
+  case atcf(Int)
+  case atcra(Int)
   case stp(Int)
   case stpbr(Int)
   case stpo(String)
@@ -236,6 +257,8 @@ public enum ObdResponse: Equatable, Sendable {
 
       case .atz:
         return ".atz"
+      case .atd:
+        return ".atd"
       case .ate(let enabled):
         return ".ate(\(enabled))"
       case .ath(let enabled):
@@ -246,6 +269,14 @@ public enum ObdResponse: Equatable, Sendable {
         return ".ats(\(enabled))"
       case .atsp(let canProtocol):
         return ".atsp(\(canProtocol))"
+      case .atsh(let header):
+        return String(format: ".atsh(%X)", header)
+      case .atcp(let priority):
+        return String(format: ".atcp(%X)", priority)
+      case .atcf(let filter):
+        return String(format: ".atcf(%X)", filter)
+      case .atcra(let address):
+        return String(format: ".atcra(%X)", address)
       case .stp(let canProtocol):
         return ".stp(\(canProtocol))"
       case .stpbr(let baudRate):
