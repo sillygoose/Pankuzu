@@ -31,7 +31,10 @@ public final class DokoLocationManager: Sendable {
   public func updateLocation(id: Location.ID, latitude: Double, longitude: Double, elevation: Double, sharedLocation: Bool = true) -> Location.ID {
     @FetchAll var locations: [Location]
     @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
-    if sharedLocation, let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold) {
+    if sharedLocation,
+       let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold),
+       locationID != id
+    {
       DokoLogging.shared.postLoggingResponse(.location("reused location: \(locationID)"))
       @Dependency(\.defaultDatabase) var database
       withErrorReporting {
