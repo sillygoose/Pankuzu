@@ -56,7 +56,7 @@ extension ObdResponsePacket {
           case let .atcf(v) = entry.value.response else { return nil }
     return v
   }
-  public var atcra: Int? {
+  public var atcra: String? {
     guard let entry = responses.first(where: { if case .atcra = $0.key { return true }; return false }),
           case let .atcra(v) = entry.value.response else { return nil }
     return v

@@ -36,7 +36,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .atsh(let header):             obdLinkCommand = String(format: "ATSH %X", header)
     case .atcp(let header):             obdLinkCommand = String(format: "ATCP %X", header)
     case .atcf(let pattern):            obdLinkCommand = String(format: "ATCF %X", pattern)
-    case .atcra(let pattern):           obdLinkCommand = String(format: "ATCRA %X", pattern) //"ATCRA\(pattern)"
+    case .atcra(let pattern):           obdLinkCommand = "ATCRA \(pattern)" //obdLinkCommand = String(format: "ATCRA %X", pattern) //"ATCRA\(pattern)"
     case .atcm(let mask):               obdLinkCommand = String(format: "ATCM %X", mask) // "ATCM\(mask)"
 
     case .gearSelected:                 obdLinkCommand = "STPX h:17FC0076, d:22210E"    //0x17fc0076 03 22 21 0e 55 55 55 55
@@ -79,8 +79,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
          "ATCF 17FE7",
          "ATCRA17FE007B"
          */
-        .atz, .ate(false), .atsp(7), .atsh(0xFC007B), .atcp(0x17), .atcaf(false), .atcf(0x17FE7),
-        .atcra(0x17FE007B), .atcm(0xFFFFFFF0),
+        .atz, .ate(false), .atsp(7), .atsh(0xFC007B), .atcp(0x17), .atcaf(false), // .atcf(0x17FE7),
+        .atcra("17FE007X"),
+        //.atcm(0xFFFFFFF0),
 
         //### custom reinitialization
         .acChargerStatus, .dcChargerStatus,
