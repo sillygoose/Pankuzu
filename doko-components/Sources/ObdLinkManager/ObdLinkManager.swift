@@ -202,7 +202,12 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
           
           var commandResponse: String = ""
           if !obdLinkCommand.isEmpty {
-            let commandData = "\(obdLinkCommand)\r".data(using: .ascii)!
+            guard let commandData = "\(obdLinkCommand)\r".data(using: .ascii) else {
+              self.logger.error("\(timestamp()) ObdLinkManager.commandProcessingTask: failed to encode command '\(obdLinkCommand)'")
+              DokoLogging.shared.postLoggingResponse(.error("ObdLinkManager.commandProcessingTask: failed to encode command '\(obdLinkCommand)'"))
+              errorPackets += 1
+              continue
+            }
             _ = writeAll(commandData, to: outputStream)
 
             guard let trueCommandResponse = await self.waitForObdCommandResponse() else {

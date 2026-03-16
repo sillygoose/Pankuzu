@@ -9,8 +9,26 @@ public final class LiveActivityManager {
   public static let shared = LiveActivityManager()
   
   private init() {
+    endOrphanedActivities()
     startAccessoryNameObservation()
     startForegroundObservation()
+  }
+
+  private func endOrphanedActivities() {
+    Task {
+      for activity in Activity<TripActivityAttributes>.activities {
+        let final = TripActivityAttributes.ContentState(tripState: .ended)
+        let content = ActivityContent(state: final, staleDate: nil)
+        await activity.end(content, dismissalPolicy: .immediate)
+        DokoLogging.shared.postLoggingResponse(.liveActivity("ended orphaned trip activity \(activity.id)"))
+      }
+      for activity in Activity<ChargeActivityAttributes>.activities {
+        let final = ChargeActivityAttributes.ContentState(chargeState: .ended)
+        let content = ActivityContent(state: final, staleDate: nil)
+        await activity.end(content, dismissalPolicy: .immediate)
+        DokoLogging.shared.postLoggingResponse(.liveActivity("ended orphaned charge activity \(activity.id)"))
+      }
+    }
   }
   
   private enum AnyManagedActivity {
