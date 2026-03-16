@@ -78,7 +78,8 @@ public actor VwElectrics: ConnectedVehicleInterface {
         
         .atsh(0xFC0076),
         .gearSelected, .odometer,
-        
+
+        .ats(false), 
         .atcaf(true),
         .stcsegr(true),
       ])
