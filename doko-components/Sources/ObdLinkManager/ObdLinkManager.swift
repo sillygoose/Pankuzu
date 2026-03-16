@@ -262,7 +262,11 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
   private func waitForObdCommandResponse() async -> String? {
     guard let stream = obdResponseStream else { return nil }
     var iterator = stream.makeAsyncIterator()
-    return await iterator.next()
+    if let next = await iterator.next() {
+      return next
+    }
+    DokoLogging.shared.postLoggingResponse(.error("ObdLinkManager.waitForObdCommandResponse(nil)"))
+    return nil
   }
 
   @MainActor
