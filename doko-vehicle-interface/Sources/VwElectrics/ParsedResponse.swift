@@ -91,7 +91,7 @@ extension VwElectrics {
       return ObdCommandResponse(command: command, result: result, response: commandResponse, rawCommand: rawCommand, rawResponse: response)
     } catch {
       let errorResult = ObdResult.getObdError(errorString: response)
-      DokoLogging.shared.postLoggingResponse(.error("VWE.vehicleObdCommandResponse: \(command.description)(\(errorResult.description))"))
+//###      DokoLogging.shared.postLoggingResponse(.error("VWE.vehicleObdCommandResponse: \(command.description)(\(errorResult.description))"))
       let errorResponse: ObdResponse = .obdError(command.description, errorResult.description)
       return ObdCommandResponse(command: command, result: errorResult, response: errorResponse, rawCommand: rawCommand, rawResponse: response)
     }
