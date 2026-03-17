@@ -11,8 +11,7 @@ import CommonUI
 public final class ChargeDetailEnergyModel {
   var charge: Charge
 
-  @ObservationIgnored
-  @FetchOne(ChargeHistory.none) var chargeHistory
+  @ObservationIgnored @FetchOne(ChargeHistory.none) var chargeHistory
 
   var energyToEmpty: [DokoDataPoint] = []
   var calculatedEnergy: [DokoDataPoint] = []
@@ -37,9 +36,7 @@ public final class ChargeDetailEnergyModel {
       self.maxEnergy = ceil(100)
       return
     }
-
-    let rawData = chargeHistory.energyToEmpty
-    energyToEmpty = downsample(rawData, maxPoints: 60)
+    energyToEmpty = downsample(chargeHistory.energyToEmpty, maxPoints: 60)
 
     if let initialEnergy = charge.energyToEmptyStart {
       let rawBatteryEnergy = chargeHistory.batteryEnergy
@@ -49,16 +46,9 @@ public final class ChargeDetailEnergyModel {
       calculatedEnergy = downsample(calculatedEnergy, maxPoints: 60)
     }
 
-    var minValue: Double = .greatestFiniteMagnitude
-    var maxValue: Double = -.greatestFiniteMagnitude
-    for point in energyToEmpty {
-      minValue = min(minValue, point.datapoint)
-      maxValue = max(maxValue, point.datapoint)
-    }
-    for point in calculatedEnergy {
-      minValue = min(minValue, point.datapoint)
-      maxValue = max(maxValue, point.datapoint)
-    }
+    let datapoints = (energyToEmpty + calculatedEnergy).map(\.datapoint)
+    let minValue = datapoints.min() ?? .greatestFiniteMagnitude
+    let maxValue = datapoints.max() ?? -.greatestFiniteMagnitude
     self.minEnergy = floor(minValue)
     self.maxEnergy = ceil(maxValue)
   }

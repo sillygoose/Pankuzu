@@ -33,9 +33,7 @@ public final class TripDetailEnergyModel {
     useSecondsForXAxis = tripDuration < 300
 
     guard let tripData else { return }
-
-    let rawData = tripData.energyToEmpty
-    energyToEmpty = downsample(rawData, maxPoints: 60)
+    energyToEmpty = downsample(tripData.energyToEmpty, maxPoints: 60)
 
     if let initialEnergy = trip.energyToEmptyStart {
       let rawBatteryEnergy = tripData.batteryEnergy
@@ -44,17 +42,11 @@ public final class TripDetailEnergyModel {
       }
       calculatedEnergy = downsample(calculatedEnergy, maxPoints: 60)
     }
+    guard !energyToEmpty.isEmpty || !calculatedEnergy.isEmpty else { return }
 
-    var minEnergy: Double = .greatestFiniteMagnitude
-    var maxEnergy: Double = -.greatestFiniteMagnitude
-    for point in energyToEmpty {
-      minEnergy = min(minEnergy, point.datapoint)
-      maxEnergy = max(maxEnergy, point.datapoint)
-    }
-    for point in calculatedEnergy {
-      minEnergy = min(minEnergy, point.datapoint)
-      maxEnergy = max(maxEnergy, point.datapoint)
-    }
+    let datapoints = (energyToEmpty + calculatedEnergy).map(\.datapoint)
+    let minEnergy = datapoints.min() ?? .greatestFiniteMagnitude
+    let maxEnergy = datapoints.max() ?? -.greatestFiniteMagnitude
     minEnergyToEmpty = .init(value: floor(minEnergy), unit: .kilowattHours)
     maxEnergyToEmpty = .init(value: ceil(maxEnergy), unit: .kilowattHours)
   }
