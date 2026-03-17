@@ -53,7 +53,7 @@ public final class DokoVehicleManager: Sendable {
       for await newInterface in $connectedVehicleInterface.publisher.values {
         if Task.isCancelled { break }
         self.logger.info("\(timestamp()) DVM: \(newInterface.name)")
-        DokoLogging.shared.postLoggingResponse(.info("DVM: \(newInterface.name)"))
+        DokoLogging.shared.postLoggingResponse(.connect("\(newInterface.name)"))
         $connectedVehicleModel.withLock { $0 = newInterface.vehicle?.model }
       }
     }

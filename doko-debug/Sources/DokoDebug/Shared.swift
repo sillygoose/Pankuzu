@@ -24,4 +24,10 @@ extension SharedKey where Self == InMemoryKey<Bool>.Default {
     Self[.inMemory("DokoDebugShared-SimDcCharge"), default: false]
   }
 }
+
+extension SharedKey where Self == AppStorageKey<String>.Default {
+  public static var simVin: Self {
+    Self[.appStorage("DokoDebugShared-SimVin"), default: "1V2DNPE81PC030000"]
+  }
+}
 #endif

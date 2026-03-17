@@ -124,6 +124,7 @@ struct DebuggingView: View {
   @Shared(.simTrip) var simTrip
   @Shared(.simAcCharge) var simAcCharge
   @Shared(.simDcCharge) var simDcCharge
+  @Shared(.simVin) var simVin
 #endif
   
   var body: some View {
@@ -208,6 +209,17 @@ struct DebuggingView: View {
         )
       ) {
         VStack(alignment: .center, spacing: 20) {
+          Picker(
+            "Vehicle",
+            selection: Binding(
+              get: { simVin },
+              set: { vin in $simVin.withLock { $0 = vin } }
+            )
+          ) {
+            Text("2024 Ford F-150").tag("1FTVW3L76RWG00000")
+            Text("2025 Mustang Mach-E").tag("3FMTK3SU6SMA40000")
+            Text("2024 VW ID.4").tag("1V2DNPE81PC030000")
+          }
           HStack(spacing: 30) {
             Toggle(
               "Idle",
