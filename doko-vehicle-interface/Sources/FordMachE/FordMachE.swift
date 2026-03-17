@@ -12,8 +12,8 @@ public actor FordMachE: ConnectedVehicleInterface {
   nonisolated public let vehicle: Vehicle?
   nonisolated public let name: String = "FordMachE"
 
-  public var batteryPower: Double = 0.0
-  public var batteryEnergy: Double = 0.0
+  public var batteryPower: Double?
+  public var batteryEnergy: Double?
   public var lastEnergyUpdateTime: Date?
   public var lastBatteryPower: Double?
 
