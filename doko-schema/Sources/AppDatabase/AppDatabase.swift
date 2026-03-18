@@ -1,4 +1,5 @@
 import Foundation
+import Dependencies
 import OSLog
 
 import SQLiteData
@@ -6,6 +7,7 @@ import SQLiteData
 import Trips
 import Charges
 import Locations
+import Vehicles
 
 private let logger = Logger(subsystem: "DokoSchema", category: "AppDatabase")
 
@@ -363,7 +365,13 @@ public func appDatabase() throws -> any DatabaseWriter {
 }
 
 extension DependencyValues {
-  public mutating func bootstrapDatabase() throws {
+  mutating public func bootstrapDatabase() throws {
     defaultDatabase = try appDatabase()
+    defaultSyncEngine = try SyncEngine(
+      for: defaultDatabase,
+      tables: Vehicle.self, Location.self,
+      Trip.self, TripPosition.self, TripElevation.self, TripData.self, TripWeather.self,
+      Charge.self, ChargeHistory.self
+    )
   }
 }
