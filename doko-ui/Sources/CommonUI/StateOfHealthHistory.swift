@@ -64,6 +64,11 @@ public struct SoHHistoryView: View {
     self.model = model
   }
 
+  var yMin: Double {
+    guard let min = model.points.map(\.soh).min() else { return 0 }
+    return floor((min - 10) / 10) * 10
+  }
+
   public var body: some View {
     VStack {
       Chart {
@@ -93,7 +98,7 @@ public struct SoHHistoryView: View {
           }
         }
       }
-      .chartYScale(domain: 0...100)
+      .chartYScale(domain: yMin...100)
       .chartYAxis {
         AxisMarks(position: .trailing) { value in
           if let pct = value.as(Double.self) {
@@ -105,9 +110,8 @@ public struct SoHHistoryView: View {
       }
       .chartXAxis(.automatic)
       .chartLegend(position: .bottom)
+      .frame(maxHeight: .infinity)
       .padding()
-
-      Spacer()
     }
     .navigationTitle(Text("State of Health History"))
     .navigationBarTitleDisplayMode(.inline)
