@@ -59,6 +59,8 @@ public struct SoHHistoryView: View {
   @Bindable var model: SoHHistoryModel
 
   @Environment(\.dismiss) var dismiss
+  @State private var xDomainLength: TimeInterval? = nil
+  @State private var zoomBase: TimeInterval? = nil
 
   public init(model: SoHHistoryModel) {
     self.model = model
@@ -67,6 +69,16 @@ public struct SoHHistoryView: View {
   var yMin: Double {
     guard let min = model.points.map(\.soh).min() else { return 0 }
     return floor((min - 10) / 10) * 10
+  }
+
+  var fullRange: TimeInterval {
+    guard let first = model.points.first?.date,
+          let last = model.points.last?.date else { return 0 }
+    return last.timeIntervalSince(first) * 1.1
+  }
+
+  var visibleDomain: TimeInterval {
+    xDomainLength ?? max(fullRange, 1)
   }
 
   public var body: some View {
@@ -98,7 +110,7 @@ public struct SoHHistoryView: View {
           }
         }
       }
-      .chartYScale(domain: yMin...100)
+      .chartYScale(domain: yMin...101)
       .chartYAxis {
         AxisMarks(position: .trailing) { value in
           if let pct = value.as(Double.self) {
@@ -108,10 +120,21 @@ public struct SoHHistoryView: View {
           }
         }
       }
+      .chartScrollableAxes(.horizontal)
+      .chartXVisibleDomain(length: visibleDomain)
       .chartXAxis(.automatic)
       .chartLegend(position: .bottom)
       .frame(maxHeight: .infinity)
       .padding()
+      .gesture(
+        MagnificationGesture()
+          .onChanged { scale in
+            if zoomBase == nil { zoomBase = visibleDomain }
+            let newLength = zoomBase! / scale
+            xDomainLength = max(7 * 24 * 3600, min(fullRange, newLength))
+          }
+          .onEnded { _ in zoomBase = nil }
+      )
     }
     .navigationTitle(Text("State of Health History"))
     .navigationBarTitleDisplayMode(.inline)
