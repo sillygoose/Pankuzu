@@ -51,13 +51,6 @@ struct PankuzuApp: App {
     if context == .live {
       prepareDependencies {
         $0.defaultDatabase = try! appDatabase()
-//        $0.defaultSyncEngine = try! SyncEngine(
-//          for: $0.defaultDatabase,
-//          tables:
-//            Location.self, Vehicle.self,
-//            Trip.self, TripPosition.self, TripData.self, TripWeather.self,
-//            Charge.self, ChargeHistory.self
-//        )
       }
     }
   }
