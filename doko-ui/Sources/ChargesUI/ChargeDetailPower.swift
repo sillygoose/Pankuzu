@@ -27,7 +27,7 @@ public final class ChargeDetailPowerChartModel {
   var socBins: [SoCBin] = []
   var selectedBin: PowerBin?
   var selectedSoCBin: SoCBin?
-  var maxPower: Double = 0
+  var maxPower: Double = 10
 
   public init(
     charge: Charge
@@ -35,7 +35,12 @@ public final class ChargeDetailPowerChartModel {
     self.charge = charge
     _chargeHistory = FetchOne(ChargeHistory.find(charge.id))
 
-    guard let chargeHistory else { return }
+    guard
+      let chargeHistory,
+      chargeHistory.batteryPower.count > 5
+    else {
+      return
+    }
 
     powerBins = createPowerBins(from: chargeHistory.batteryPower, numberOfBins: 80)
     socBins = createSoCBins(from: chargeHistory.stateOfCharge, numberOfBins: 80)
