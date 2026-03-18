@@ -39,7 +39,13 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .atcra(let pattern):           obdLinkCommand = "ATCRA \(pattern)" //obdLinkCommand = String(format: "ATCRA %X", pattern) //"ATCRA\(pattern)"
     case .atcm(let mask):               obdLinkCommand = String(format: "ATCM %X", mask) // "ATCM\(mask)"
     case .stcsegr(let enabled):         obdLinkCommand = "STCSEGR \(enabled ? 1 : 0)"
-      
+
+    case .acChargerCouplerTemperature:  obdLinkCommand = "03221E3D"
+    case .dcChargerCouplerTemperature:  obdLinkCommand = "03221E3D"
+    case .distanceToEmpty:              obdLinkCommand = "221E3D"
+    case .energyToEmpty:                obdLinkCommand = "221E3D"
+    case .obdOdometer:                  obdLinkCommand = "221E3D"
+
     case .gearSelected:                 obdLinkCommand = "22210E" //"STPX h:17FC0076, d:22210E"    //0x17fc0076 03 22 21 0e 55 55 55 55
     case .odometer:                     obdLinkCommand = "22295A" //"STPX h:17FC0076, d:22295A"    //0x17fe0076 06 62 29 5a XX YY ZZ aa  (XX*2^16+YY*2^8+ZZ) = km in decimal
 
@@ -67,19 +73,33 @@ public actor VwElectrics: ConnectedVehicleInterface {
     switch packetType {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
-        .atz, .ate(false), .atsp(7),
-        .atcaf(false),
-        .atcp(0x17), // .atcf(0x17FE7),
-        .atcra("17FE007X"),
-
+        .atz,
+        .ate(false),
+        .atsp(7),
+        .ath(true),
         .ats(false),
+        .atcaf(false),
+        .atcp(0x17),
+        //
+        .atsh(0xFC007B),
+        .acChargerCouplerTemperature,
+        //
+        .atcra("17FE007X"),
+        .dcChargerCouplerTemperature,
+        //
         .atcaf(true),
+        .distanceToEmpty,
+        //
+        .ath(false),
+        .energyToEmpty,
+        //
+        .obdOdometer,
         .stcsegr(true),
-
+        //
         .atsh(0xFC007B),
         .acChargerStatus, .dcChargerStatus,
         .stateOfCharge, .batteryVoltage, .batteryCurrent, .batteryTemperature,
-
+        //
         .atsh(0xFC0076),
         .gearSelected, .odometer,
       ])

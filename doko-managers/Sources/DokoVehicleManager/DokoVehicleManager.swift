@@ -146,7 +146,6 @@ extension DokoVehicleManager {
       return nil
     }
     self.logger.debug("\(timestamp()) DVM.setVin: \(newVehicle.model), \(newVehicle.vehicleType.description)")
-    DokoLogging.shared.postLoggingResponse(.connect("DVM.setVin(\(newVehicle.vehicleType))"))
     $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: newVehicle) }
     return newVehicle
   }
