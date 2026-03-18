@@ -146,6 +146,10 @@ public struct TripDetailView: View {
       
       if let weatherTempStartMetric = trip.weatherTempStart, let weatherTempEndMetric = trip.weatherTempEnd,
          let weatherConditionsStart = trip.weatherConditionsStart, let weatherConditionsEnd = trip.weatherConditionsEnd {
+        let meanCondition: Measurement<UnitTemperature>? = {
+          guard let weighted = trip.weatherTempMeanWeighted, trip.duration > 0 else { return nil }
+          return Measurement(value: weighted / trip.duration, unit: UnitTemperature.celsius)
+        }()
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
           GridRow {
             DokoGridWeatherConditions(
@@ -153,6 +157,7 @@ public struct TripDetailView: View {
               startConditionSymbol: weatherConditionsStart,
               endCondition: Measurement(value: weatherTempEndMetric, unit: UnitTemperature.celsius),
               endConditionSymbol: weatherConditionsEnd,
+              meanCondition: meanCondition
             ) {
               model.destination = .weatherChart
             }

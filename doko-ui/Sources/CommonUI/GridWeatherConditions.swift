@@ -7,6 +7,7 @@ public struct DokoGridWeatherConditions: View {
   let startConditionSymbol: String
   let endCondition: Measurement<UnitTemperature>
   let endConditionSymbol: String
+  let meanCondition: Measurement<UnitTemperature>?
   let action: () -> Void
 
   public init(
@@ -14,6 +15,7 @@ public struct DokoGridWeatherConditions: View {
     startConditionSymbol: String,
     endCondition: Measurement<UnitTemperature>,
     endConditionSymbol: String,
+    meanCondition: Measurement<UnitTemperature>? = nil,
     action: @escaping () -> Void
   ) {
     @Shared(.metric) var metric
@@ -23,6 +25,8 @@ public struct DokoGridWeatherConditions: View {
     self.endCondition = endCondition
       .converted(to: metric ? .celsius : .fahrenheit)
     self.endConditionSymbol = endConditionSymbol
+    self.meanCondition = meanCondition?
+      .converted(to: metric ? .celsius : .fahrenheit)
     self.action = action
   }
 
@@ -30,7 +34,7 @@ public struct DokoGridWeatherConditions: View {
     Button(action: action) {
       VStack {
         HStack {
-          HStack(alignment: .center) {
+          HStack(alignment: .bottom) {
             HStack(alignment: .top, spacing: 2) {
               Text(startCondition.value, format: .number.precision(.fractionLength(0)))
               Text(startCondition.unit.symbol)
@@ -39,6 +43,14 @@ public struct DokoGridWeatherConditions: View {
               Image(systemName: startConditionSymbol)
             }
             Spacer()
+            
+            if meanCondition != nil {
+              Text("Mean")
+                .font(DesignTokens.Font.headline)
+                .opacity(DesignTokens.Opacity.muted)
+              Spacer()
+            }
+            
             HStack(alignment: .top, spacing: 2) {
               Image(systemName: endConditionSymbol)
               Text(endCondition.value, format: .number.precision(.fractionLength(0)))
@@ -52,8 +64,19 @@ public struct DokoGridWeatherConditions: View {
           .foregroundStyle(.white)
         }
 
-        Text("Conditions")
-          .foregroundStyle(.gray)
+        if let meanCondition {
+          HStack(alignment: .bottom, spacing: 6) {
+            HStack(alignment: .top, spacing: 2) {
+              Text(meanCondition.value, format: .number.precision(.fractionLength(0)))
+              Text(meanCondition.unit.symbol)
+                .font(DesignTokens.Font.headline)
+                .opacity(DesignTokens.Opacity.muted)
+            }
+          }
+          .font(DesignTokens.Font.title)
+          .bold()
+          .foregroundStyle(.white)
+        }
       }
     }
     .buttonStyle(.borderless)
