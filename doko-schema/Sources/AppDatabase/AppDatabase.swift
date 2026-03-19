@@ -2,8 +2,8 @@ import Foundation
 import Dependencies
 import OSLog
 
+import DokoLogging
 import DokoSharing
-import Sharing
 import SQLiteData
 
 import Trips
@@ -376,8 +376,11 @@ extension DependencyValues {
       Trip.self, TripPosition.self, TripElevation.self, TripData.self, TripWeather.self,
       Charge.self, ChargeHistory.self
     )
-    if !iCloudSync {
+    if iCloudSync {
+      DokoLogging.shared.postLoggingResponse(.iCloud("sync started"))
+    } else {
       defaultSyncEngine.stop()
+      DokoLogging.shared.postLoggingResponse(.iCloud("sync stopped"))
     }
   }
 }
