@@ -3,6 +3,7 @@ import Dependencies
 
 import CommonUI
 import DokoSharing
+import DokoLogging
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var iCloudSyncExpanded: Self {
@@ -15,11 +16,21 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
 class iCloudSettingsModel {
   @ObservationIgnored @Shared(.iCloudSync) var iCloudSync
 
-  func iCloudSyncToggleChanged(isOn: Bool) {
+  func iCloudSyncToggleChanged(isOn: Bool) async {
+    @Dependency(\.defaultSyncEngine) var syncEngine
     $iCloudSync.withLock { $0 = isOn }
-//    let _ = prepareDependencies {
-//      try! $0.iCloudSyncDatabase()
-//    }
+
+    if iCloudSync {
+      do {
+        try await syncEngine.start()
+        DokoLogging.shared.postLoggingResponse(.iCloud("iCloud Sync started"))
+      } catch {
+        DokoLogging.shared.postLoggingResponse(.error("\(String(describing: error))"))
+      }
+    } else {
+      syncEngine.stop()
+      DokoLogging.shared.postLoggingResponse(.iCloud("iCloud Sync stopped"))
+    }
   }
 }
 
@@ -40,7 +51,9 @@ struct iCloudSettingsView: View {
           "Enable iCloud Sync",
           isOn: Binding(
             get: { model.iCloudSync },
-            set: { isOn, _ in model.iCloudSyncToggleChanged(isOn: isOn) }
+            set: { isOn, _ in
+              Task { await model.iCloudSyncToggleChanged(isOn: isOn) }
+            }
           )
         )
       } label: {
