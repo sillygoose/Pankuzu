@@ -2,6 +2,8 @@ import Foundation
 import Dependencies
 import OSLog
 
+import DokoSharing
+import Sharing
 import SQLiteData
 
 import Trips
@@ -367,11 +369,20 @@ public func appDatabase() throws -> any DatabaseWriter {
 extension DependencyValues {
   mutating public func bootstrapDatabase() throws {
     defaultDatabase = try appDatabase()
-    defaultSyncEngine = try SyncEngine(
-      for: defaultDatabase,
-      tables: Vehicle.self, Location.self,
-      Trip.self, TripPosition.self, TripElevation.self, TripData.self, TripWeather.self,
-      Charge.self, ChargeHistory.self
-    )
+    try iCloudSyncDatabase()
+  }
+}
+
+extension DependencyValues {
+  mutating public func iCloudSyncDatabase() throws {
+    @Shared(.iCloudSync) var iCloudSync
+    if iCloudSync {
+      defaultSyncEngine = try SyncEngine(
+        for: defaultDatabase,
+        tables: Vehicle.self, Location.self,
+        Trip.self, TripPosition.self, TripElevation.self, TripData.self, TripWeather.self,
+        Charge.self, ChargeHistory.self
+      )
+    }
   }
 }

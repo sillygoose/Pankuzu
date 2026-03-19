@@ -16,6 +16,12 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
   }
 }
 
+extension SharedKey where Self == AppStorageKey<Bool>.Default {
+  public static var iCloudSync: Self {
+    Self[.appStorage("ApplicationSettings-iCloudSync"), default: false]
+  }
+}
+
 extension SharedKey where Self == AppStorageKey<Double>.Default {
   public static var poiThreshold: Self {
     Self[.appStorage("ApplicationSettings-poiThreshold"), default: 75]

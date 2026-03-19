@@ -130,6 +130,18 @@ public struct SettingsView: View {
               path.append(Destination.debugging)
             }
           }
+
+          GridRow {
+            DokoGridValueButton(
+              color: .blue,
+              value: nil,
+              units: nil,
+              iconName: "icloud",
+              title: "iCloud"
+            ) {
+              path.append(Destination.iCloudSettings)
+            }
+          }
         }
         .buttonStyle(.plain)
         .listRowBackground(Color.clear)
@@ -176,6 +188,10 @@ public struct SettingsView: View {
           DatabaseSeedingView(
             model: DatabaseSeedingModel()
           )
+        case .iCloudSettings:
+          iCloudSettingsView(
+            model: iCloudSettingsModel()
+          )
         }
       }
       .navigationTitle("")
@@ -191,6 +207,7 @@ public struct SettingsView: View {
     case about
     case debugging
     case databseSeeding
+    case iCloudSettings
   }
 }
 
