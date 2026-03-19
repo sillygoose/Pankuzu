@@ -23,13 +23,13 @@ class iCloudSettingsModel {
     if iCloudSync {
       do {
         try await syncEngine.start()
-        DokoLogging.shared.postLoggingResponse(.iCloud("iCloud Sync started"))
+        DokoLogging.shared.postLoggingResponse(.iCloud("sync started"))
       } catch {
         DokoLogging.shared.postLoggingResponse(.error("\(String(describing: error))"))
       }
     } else {
       syncEngine.stop()
-      DokoLogging.shared.postLoggingResponse(.iCloud("iCloud Sync stopped"))
+      DokoLogging.shared.postLoggingResponse(.iCloud("sync stopped"))
     }
   }
 }
