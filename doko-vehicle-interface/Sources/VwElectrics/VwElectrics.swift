@@ -42,14 +42,14 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
     case .batteryVoltage0:              obdLinkCommand = "STPX h:17FC007B, d:221E3B"
     case .batteryCurrent0:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
-      
-    case .batteryVoltage1:              obdLinkCommand = "03221E3B"
-    case .batteryCurrent1:              obdLinkCommand = "03221E3D"
+    case .batteryVoltage1:              obdLinkCommand = "221E3B"
+    case .batteryCurrent1:              obdLinkCommand = "221E3D"
+
     case .batteryVoltage2:              obdLinkCommand = "03221E3B"
     case .batteryCurrent2:              obdLinkCommand = "03221E3D"
-      
-    case .batteryVoltage3:              obdLinkCommand = "221E3B"
-    case .batteryCurrent3:              obdLinkCommand = "221E3D"
+    case .batteryVoltage3:              obdLinkCommand = "03221E3B"
+    case .batteryCurrent3:              obdLinkCommand = "03221E3D"
+
     case .batteryVoltage4:              obdLinkCommand = "221E3B"
     case .batteryCurrent4:              obdLinkCommand = "221E3D"
     case .batteryVoltage5:              obdLinkCommand = "221E3B"
@@ -90,7 +90,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .atsh("FC007B"),
         .atcra("17FE007X"),
         .batteryVoltage0, .batteryCurrent0,
-        .batteryVoltage3, .batteryCurrent3,
+        .batteryVoltage1, .batteryCurrent1,
+
+        .atcp(""),
+        .atsh(""),
 
         .atz,
         .ate(false),
@@ -101,24 +104,19 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .atcp("17"),
         //
         .atsh("FC007B"),
-        .batteryVoltage0, .batteryCurrent0,
-        .batteryVoltage1, .batteryCurrent1,
-        //
-        .atcra("17FE007X"),
-        .batteryVoltage0, .batteryCurrent0,
         .batteryVoltage2, .batteryCurrent2,
         //
-        .atcaf(true),
-        .batteryVoltage0, .batteryCurrent0,
+        .atcra("17FE007X"),
         .batteryVoltage3, .batteryCurrent3,
         //
-        .ath(false),
-        .batteryVoltage0, .batteryCurrent0,
+        .atcaf(true),
         .batteryVoltage4, .batteryCurrent4,
         //
-        .stcsegr(true),
-        .batteryVoltage0, .batteryCurrent0,
+        .ath(false),
         .batteryVoltage5, .batteryCurrent5,
+        //
+        .stcsegr(true),
+        .batteryVoltage6, .batteryCurrent6,
         //
         .atsh("FC007B"),
         .acChargerStatus, .dcChargerStatus,
