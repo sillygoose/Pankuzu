@@ -11,11 +11,11 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case atcaf(Bool)
   case ats(Bool)
   case atsp(Int)
-  case atsh(Int)
-  case atcp(Int)
-  case atcf(Int)
+  case atsh(String)
+  case atcp(String)
+  case atcf(String)
   case atcra(String)
-  case atcm(Int)
+  case atcm(String)
 
   case stp(Int)
   case stpbr(Int)
@@ -35,7 +35,23 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case stateOfHealth
   case batteryTemperature
   case batteryVoltage
+  case batteryVoltage0
+  case batteryVoltage1
+  case batteryVoltage2
+  case batteryVoltage3
+  case batteryVoltage4
+  case batteryVoltage5
+  case batteryVoltage6
+  case batteryVoltage7
   case batteryCurrent
+  case batteryCurrent0
+  case batteryCurrent1
+  case batteryCurrent2
+  case batteryCurrent3
+  case batteryCurrent4
+  case batteryCurrent5
+  case batteryCurrent6
+  case batteryCurrent7
 
   case acChargerStatus
   case acChargerCouplerTemperature
@@ -68,16 +84,16 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".ats(\(enabled))"
       case .atsp(let canProtocol):
         return ".atsp(\(canProtocol))"
-      case .atsh(let header):
-        return String(format: ".atsh(%X)", header)
       case .atcp(let priority):
-        return String(format: ".atcp(%X)", priority)
+        return ".atcp(\(priority))"
+      case .atsh(let header):
+        return ".atsh(\(header))"
       case .atcf(let filter):
-        return String(format: ".atcf(%X)", filter)
+        return ".atcf(\(filter))"
       case .atcra(let pattern):
         return ".atcra(\(pattern))"
       case .atcm(let mask):
-        return String(format: ".atcm(%X)", mask)
+        return ".atcm(\(mask))"
       case .stp(let canProtocol):
         return ".stp(\(canProtocol))"
       case .stpbr(let baudRate):
@@ -111,8 +127,40 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".batteryTemperature"
       case .batteryVoltage:
         return ".batteryVoltage"
+      case .batteryVoltage0:
+        return ".batteryVoltage0"
+      case .batteryVoltage1:
+        return ".batteryVoltage1"
+      case .batteryVoltage2:
+        return ".batteryVoltage2"
+      case .batteryVoltage3:
+        return ".batteryVoltage3"
+      case .batteryVoltage4:
+        return ".batteryVoltage4"
+      case .batteryVoltage5:
+        return ".batteryVoltage5"
+      case .batteryVoltage6:
+        return ".batteryVoltage6"
+      case .batteryVoltage7:
+        return ".batteryVoltage7"
       case .batteryCurrent:
         return ".batteryCurrent"
+      case .batteryCurrent0:
+        return ".batteryCurrent0"
+      case .batteryCurrent1:
+        return ".batteryCurrent1"
+      case .batteryCurrent2:
+        return ".batteryCurrent2"
+      case .batteryCurrent3:
+        return ".batteryCurrent3"
+      case .batteryCurrent4:
+        return ".batteryCurrent4"
+      case .batteryCurrent5:
+        return ".batteryCurrent5"
+      case .batteryCurrent6:
+        return ".batteryCurrent6"
+      case .batteryCurrent7:
+        return ".batteryCurrent7"
       case .acChargerStatus:
         return ".acChargerStatus"
       case .acChargerCouplerTemperature:
@@ -215,11 +263,11 @@ public enum ObdResponse: Equatable, Sendable {
   case atcaf(Bool)
   case ats(Bool)
   case atsp(Int)
-  case atsh(Int)
-  case atcp(Int)
-  case atcf(Int)
+  case atcp(String)
+  case atsh(String)
+  case atcf(String)
   case atcra(String)
-  case atcm(Int)
+  case atcm(String)
 
   case stp(Int)
   case stpbr(Int)
@@ -240,7 +288,23 @@ public enum ObdResponse: Equatable, Sendable {
   case stateOfHealth(Double)
   case batteryTemperature(Double)
   case batteryVoltage(Double)
+  case batteryVoltage0(Double)
+  case batteryVoltage1(Double)
+  case batteryVoltage2(Double)
+  case batteryVoltage3(Double)
+  case batteryVoltage4(Double)
+  case batteryVoltage5(Double)
+  case batteryVoltage6(Double)
+  case batteryVoltage7(Double)
   case batteryCurrent(Double)
+  case batteryCurrent0(Double)
+  case batteryCurrent1(Double)
+  case batteryCurrent2(Double)
+  case batteryCurrent3(Double)
+  case batteryCurrent4(Double)
+  case batteryCurrent5(Double)
+  case batteryCurrent6(Double)
+  case batteryCurrent7(Double)
 
   case acChargerStatus(Bool)
   case acChargerCouplerTemperature(Double)
@@ -275,16 +339,16 @@ public enum ObdResponse: Equatable, Sendable {
         return ".ats(\(enabled))"
       case .atsp(let canProtocol):
         return ".atsp(\(canProtocol))"
-      case .atsh(let header):
-        return String(format: ".atsh(%X)", header)
       case .atcp(let priority):
-        return String(format: ".atcp(%X)", priority)
+        return ".atcp \(priority)"
+      case .atsh(let header):
+        return ".atsh \(header)"
       case .atcf(let filter):
-        return String(format: ".atcf(%X)", filter)
+        return ".atcf(\(filter))"
       case .atcra(let pattern):
         return ".atcra(\(pattern))"
       case .atcm(let mask):
-        return String(format: ".atcm(%X)", mask)
+        return ".atcm(\(mask))"
         
       case .stp(let canProtocol):
         return ".stp(\(canProtocol))"
@@ -321,8 +385,40 @@ public enum ObdResponse: Equatable, Sendable {
         return String(format: ".batteryTemperature(%.0f℃)", temperature)
       case .batteryVoltage(let voltage):
         return String(format: ".batteryVoltage(%.1f)", voltage)
+      case .batteryVoltage0(let voltage):
+        return String(format: ".batteryVoltage0(%.1f)", voltage)
+      case .batteryVoltage1(let voltage):
+        return String(format: ".batteryVoltage1(%.1f)", voltage)
+      case .batteryVoltage2(let voltage):
+        return String(format: ".batteryVoltage2(%.1f)", voltage)
+      case .batteryVoltage3(let voltage):
+        return String(format: ".batteryVoltage3(%.1f)", voltage)
+      case .batteryVoltage4(let voltage):
+        return String(format: ".batteryVoltage4(%.1f)", voltage)
+      case .batteryVoltage5(let voltage):
+        return String(format: ".batteryVoltage5(%.1f)", voltage)
+      case .batteryVoltage6(let voltage):
+        return String(format: ".batteryVoltage6(%.1f)", voltage)
+      case .batteryVoltage7(let voltage):
+        return String(format: ".batteryVoltage7(%.1f)", voltage)
       case .batteryCurrent(let current):
         return String(format: ".batteryCurrent(%.1f)", current)
+      case .batteryCurrent0(let current):
+        return String(format: ".batteryCurrent0(%.1f)", current)
+      case .batteryCurrent1(let current):
+        return String(format: ".batteryCurrent1(%.1f)", current)
+      case .batteryCurrent2(let current):
+        return String(format: ".batteryCurrent2(%.1f)", current)
+      case .batteryCurrent3(let current):
+        return String(format: ".batteryCurrent3(%.1f)", current)
+      case .batteryCurrent4(let current):
+        return String(format: ".batteryCurrent4(%.1f)", current)
+      case .batteryCurrent5(let current):
+        return String(format: ".batteryCurrent5(%.1f)", current)
+      case .batteryCurrent6(let current):
+        return String(format: ".batteryCurrent6(%.1f)", current)
+      case .batteryCurrent7(let current):
+        return String(format: ".batteryCurrent7(%.1f)", current)
 
       case .acChargerStatus(let status):
         return ".acChargerStatus(\(status))"

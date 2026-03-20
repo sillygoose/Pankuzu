@@ -19,6 +19,8 @@ let package = Package(
   dependencies: [
     .package(path: "../doko-core"),
     .package(path: "../doko-managers"),
+    .package(path: "../doko-logging"),
+    .package(path: "../doko-sharing"),
     .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.6.0"),
   ],
   targets: [
@@ -68,6 +70,8 @@ let package = Package(
         "Trips",
         "Charges",
         "DokoSchemaTypes",
+        .product(name: "DokoLogging", package: "doko-logging"),
+        .product(name: "DokoSharing", package: "doko-sharing"),
         .product(name: "SQLiteData", package: "sqlite-data"),
       ]
     ),

@@ -41,6 +41,8 @@ func scheduleDatabasePruning() {
 
 @main
 struct PankuzuApp: App {
+  @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
+
   @Environment(\.scenePhase) private var phase
   @Dependency(\.context) var context
   
@@ -48,22 +50,13 @@ struct PankuzuApp: App {
   var locationManager = CoreLocationManager()
 
   init() {
-    if context == .live {
-      prepareDependencies {
-        $0.defaultDatabase = try! appDatabase()
-//        $0.defaultSyncEngine = try! SyncEngine(
-//          for: $0.defaultDatabase,
-//          tables:
-//            Location.self, Vehicle.self,
-//            Trip.self, TripPosition.self, TripData.self, TripWeather.self,
-//            Charge.self, ChargeHistory.self
-//        )
-      }
+    prepareDependencies {
+      try! $0.bootstrapDatabase()
     }
   }
 
   var body: some Scene {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+//    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     WindowGroup {
       if context == .live {
         AppView(model: Self.model)
