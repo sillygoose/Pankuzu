@@ -133,6 +133,16 @@ public struct SettingsView: View {
 
           GridRow {
             DokoGridValueButton(
+              color: .gray,
+              value: nil,
+              units: nil,
+              iconName: "gearshape.2.fill",
+              title: "Advanced"
+            ) {
+              path.append(Destination.advancedSettings)
+            }
+
+            DokoGridValueButton(
               color: .blue,
               value: nil,
               units: nil,
@@ -172,6 +182,12 @@ public struct SettingsView: View {
           ApplicationSettingsView(
             model: ApplicationSettingsModel()
           )
+        case .debugging:
+          DebuggingView(
+            model: DebuggingModel()
+          )
+        case .advancedSettings:
+          AdvancedSettingsView()
         case .databaseSettings:
           DatabaseSettingsView(
             model: DatabaseSettingsModel()
@@ -179,10 +195,6 @@ public struct SettingsView: View {
         case .about:
           AboutView(
             model: AboutModel()
-          )
-        case .debugging:
-          DebuggingView(
-            model: DebuggingModel()
           )
         case .databseSeeding:
           DatabaseSeedingView(
@@ -207,6 +219,7 @@ public struct SettingsView: View {
     case about
     case debugging
     case databseSeeding
+    case advancedSettings
     case iCloudSettings
   }
 }

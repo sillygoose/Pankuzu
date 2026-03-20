@@ -212,6 +212,33 @@ struct ApplicationSettingsView: View {
         Text("Map Styling")
       }
 
+    }
+    .listStyle(.plain)
+    .navigationTitle("Application")
+  }
+}
+
+@MainActor
+struct AdvancedSettingsView: View {
+  @State private var appModel = ApplicationSettingsModel()
+
+  @Shared(.advancedExpanded) var advancedExpanded
+  @Shared(.debuggingExpanded) var debuggingExpanded
+  @Shared(.tripPositionExpanded) var tripPositionExpanded
+  @Shared(.tripElevationExpanded) var tripElevationExpanded
+
+  let PoiThresholdSliderRangeMetric = 30.0...100.0
+  let PoiThresholdSliderRange = 100.0...300.0
+  let PoiThresholdSliderStepMetric = 10.0
+  let PoiThresholdSliderStep = 30.0
+
+  let DuplicateLocationThresholdSliderRangeMetric = 10.0...50.0
+  let DuplicateLocationThresholdSliderRange = 30.0...150.0
+  let DuplicateLocationThresholdSliderStepMetric = 5.0
+  let DuplicateLocationThresholdSliderStep = 15.0
+
+  var body: some View {
+    List {
       DisclosureGroup(
         isExpanded: Binding(
           get: { advancedExpanded },
@@ -220,20 +247,20 @@ struct ApplicationSettingsView: View {
       ) {
         Section {
           HStack {
-            let sliderRange = model.metric ? PoiThresholdSliderRangeMetric : PoiThresholdSliderRange
-            let sliderStep = model.metric ? PoiThresholdSliderStepMetric : PoiThresholdSliderStep
+            let sliderRange = appModel.metric ? PoiThresholdSliderRangeMetric : PoiThresholdSliderRange
+            let sliderStep = appModel.metric ? PoiThresholdSliderStepMetric : PoiThresholdSliderStep
             Slider(
               value: Binding(
-                get: { return model.metric ? model.poiThreshold : model.poiThreshold * 3 },
-                set: { model.setPoiThreshold(model.metric ? $0 : $0 / 3) }
+                get: { appModel.metric ? appModel.poiThreshold : appModel.poiThreshold * 3 },
+                set: { appModel.setPoiThreshold(appModel.metric ? $0 : $0 / 3) }
               ),
               in: sliderRange,
               step: sliderStep
             )
             Spacer()
             let poiThreshold = Measurement(
-              value: model.metric ? model.poiThreshold : model.poiThreshold * 3,
-              unit: model.metric ? UnitLength.meters : UnitLength.feet
+              value: appModel.metric ? appModel.poiThreshold : appModel.poiThreshold * 3,
+              unit: appModel.metric ? UnitLength.meters : UnitLength.feet
             )
             Text(
               poiThreshold.formatted(
@@ -248,29 +275,27 @@ struct ApplicationSettingsView: View {
         } header: {
           Text("POI Threshold")
         } footer: {
-          Text(
-            "Threshold used to find nearby Points of Interest."
-          )
-          .font(.caption)
-          .opacity(DesignTokens.Opacity.muted)
+          Text("Threshold used to find nearby Points of Interest.")
+            .font(.caption)
+            .opacity(DesignTokens.Opacity.muted)
         }
 
         Section {
           HStack {
-            let sliderRange = model.metric ? DuplicateLocationThresholdSliderRangeMetric : DuplicateLocationThresholdSliderRange
-            let sliderStep = model.metric ? DuplicateLocationThresholdSliderStepMetric : DuplicateLocationThresholdSliderStep
+            let sliderRange = appModel.metric ? DuplicateLocationThresholdSliderRangeMetric : DuplicateLocationThresholdSliderRange
+            let sliderStep = appModel.metric ? DuplicateLocationThresholdSliderStepMetric : DuplicateLocationThresholdSliderStep
             Slider(
               value: Binding(
-                get: { return model.metric ? model.duplicateLocationThreshold : model.duplicateLocationThreshold * 3 },
-                set: { model.setDuplicateLocationThreshold(model.metric ? $0 : $0 / 3) }
+                get: { appModel.metric ? appModel.duplicateLocationThreshold : appModel.duplicateLocationThreshold * 3 },
+                set: { appModel.setDuplicateLocationThreshold(appModel.metric ? $0 : $0 / 3) }
               ),
               in: sliderRange,
               step: sliderStep
             )
             Spacer()
             let duplicateLocationThreshold = Measurement(
-              value: model.metric ? model.duplicateLocationThreshold : model.duplicateLocationThreshold * 3,
-              unit: model.metric ? UnitLength.meters : UnitLength.feet
+              value: appModel.metric ? appModel.duplicateLocationThreshold : appModel.duplicateLocationThreshold * 3,
+              unit: appModel.metric ? UnitLength.meters : UnitLength.feet
             )
             Text(
               duplicateLocationThreshold.formatted(
@@ -285,14 +310,12 @@ struct ApplicationSettingsView: View {
         } header: {
           Text("Duplicate Location Threshold")
         } footer: {
-          Text(
-            "Threshold used to determine when two locations are the same."
-          )
-          .font(.caption)
-          .opacity(DesignTokens.Opacity.muted)
+          Text("Threshold used to determine when two locations are the same.")
+            .font(.caption)
+            .opacity(DesignTokens.Opacity.muted)
         }
       } label: {
-        Text("Advanced")
+        Text("Thresholds")
       }
 
 #if DEBUG
@@ -305,16 +328,16 @@ struct ApplicationSettingsView: View {
         Toggle(
           "Use polylines for path segments",
           isOn: Binding(
-            get: { model.tripMapPolyline },
-            set: { isOn, _ in model.setTripMapPolylineToggleChanged(isOn: isOn) }
+            get: { appModel.tripMapPolyline },
+            set: { isOn, _ in appModel.setTripMapPolylineToggleChanged(isOn: isOn) }
           )
         )
 
         Toggle(
           "Show elevation data on trip path",
           isOn: Binding(
-            get: { model.showElevationOnPath },
-            set: { isOn, _ in model.setShowElevationOnPathToggleChanged(isOn: isOn) }
+            get: { appModel.showElevationOnPath },
+            set: { isOn, _ in appModel.setShowElevationOnPathToggleChanged(isOn: isOn) }
           )
         )
 
@@ -322,14 +345,14 @@ struct ApplicationSettingsView: View {
           HStack {
             Slider(
               value: Binding(
-                get: { Double(model.deletedRecordRetentionDays) },
-                set: { model.setDeletedRecordRetentionDays(Int($0)) }
+                get: { Double(appModel.deletedRecordRetentionDays) },
+                set: { appModel.setDeletedRecordRetentionDays(Int($0)) }
               ),
               in: 1.0...30.0,
               step: 1.0
             )
             Spacer()
-            Text("\(model.deletedRecordRetentionDays) days")
+            Text("\(appModel.deletedRecordRetentionDays) days")
           }
         } header: {
           Text("Keep Deleted Trip/Charge For")
@@ -347,15 +370,15 @@ struct ApplicationSettingsView: View {
               let identicalTripPositionDistanceStep = 1.0
               Slider(
                 value: Binding(
-                  get: { return model.identicalTripPositionDistance },
-                  set: { model.setIdenticalTripPositionDistance($0) }
+                  get: { return appModel.identicalTripPositionDistance },
+                  set: { appModel.setIdenticalTripPositionDistance($0) }
                 ),
                 in: identicalTripPositionDistanceRange,
                 step: identicalTripPositionDistanceStep
               )
               Spacer()
               let identicalTripPositionDistance = Measurement(
-                value: model.identicalTripPositionDistance,
+                value: appModel.identicalTripPositionDistance,
                 unit: UnitLength.meters
               )
               Text(
@@ -384,15 +407,15 @@ struct ApplicationSettingsView: View {
               let positionCourseDeviationStep = 0.1
               Slider(
                 value: Binding(
-                  get: { return model.tripPositionCourseDeviation },
-                  set: { model.setPositionCourseDeviation($0) }
+                  get: { return appModel.tripPositionCourseDeviation },
+                  set: { appModel.setPositionCourseDeviation($0) }
                 ),
                 in: positionCourseDeviationRange,
                 step: positionCourseDeviationStep
               )
               Spacer()
               let positionCourseDeviation = Measurement(
-                value: model.tripPositionCourseDeviation,
+                value: appModel.tripPositionCourseDeviation,
                 unit: UnitAngle.degrees
               )
               Text(
@@ -421,15 +444,15 @@ struct ApplicationSettingsView: View {
               let maximumTripPositionDistanceStep = 20.0
               Slider(
                 value: Binding(
-                  get: { return model.maximumTripPositionDistance },
-                  set: { model.setMaximumTripPositionDistance($0) }
+                  get: { return appModel.maximumTripPositionDistance },
+                  set: { appModel.setMaximumTripPositionDistance($0) }
                 ),
                 in: maximumTripPositionDistanceRange,
                 step: maximumTripPositionDistanceStep
               )
               Spacer()
               let maximumTripPoitionDistance = Measurement(
-                value: model.maximumTripPositionDistance,
+                value: appModel.maximumTripPositionDistance,
                 unit: UnitLength.meters
               )
               Text(
@@ -467,15 +490,15 @@ struct ApplicationSettingsView: View {
               let maximumTripElevationDistanceStep = 20.0
               Slider(
                 value: Binding(
-                  get: { return model.maximumTripElevationDistance },
-                  set: { model.setMaximumTripElevationDistance($0) }
+                  get: { return appModel.maximumTripElevationDistance },
+                  set: { appModel.setMaximumTripElevationDistance($0) }
                 ),
                 in: maximumTripElevationDistanceRange,
                 step: maximumTripElevationDistanceStep
               )
               Spacer()
               let maximumTripElevaionDistance = Measurement(
-                value: model.maximumTripElevationDistance,
+                value: appModel.maximumTripElevationDistance,
                 unit: UnitLength.meters
               )
               Text(
@@ -504,15 +527,15 @@ struct ApplicationSettingsView: View {
               let minimumTripElevationChangeStep = 0.5
               Slider(
                 value: Binding(
-                  get: { return model.minimumTripElevationChange },
-                  set: { model.setMinimumTripElevationChange($0) }
+                  get: { return appModel.minimumTripElevationChange },
+                  set: { appModel.setMinimumTripElevationChange($0) }
                 ),
                 in: minimumTripElevaionChangeRange,
                 step: minimumTripElevationChangeStep
               )
               Spacer()
               let minimumTripElevationChange = Measurement(
-                value: model.minimumTripElevationChange,
+                value: appModel.minimumTripElevationChange,
                 unit: UnitLength.meters
               )
               Text(
@@ -543,7 +566,7 @@ struct ApplicationSettingsView: View {
 #endif
     }
     .listStyle(.plain)
-    .navigationTitle("Application")
+    .navigationTitle("Advanced Settings")
   }
 }
 
