@@ -8,8 +8,6 @@ public enum ABRPError: Error, Sendable {
 }
 
 public struct ABRPClient: Sendable {
-  // Developer API key for Pankuzu — register at contact@iternio.com
-  static let apiKey = "32b2162f-9599-4647-8139-66e9f9528370"
   static let baseURL = URL(string: "https://api.iternio.com/1/tlm/send")!
 
   public init() {}
@@ -19,9 +17,11 @@ public struct ABRPClient: Sendable {
       throw ABRPError.encodingFailed
     }
 
+    let apiKey = Bundle.main.object(forInfoDictionaryKey: "ABRPAPIKey") as? String ?? ""
+
     var components = URLComponents(url: Self.baseURL, resolvingAgainstBaseURL: false)!
     components.queryItems = [
-      URLQueryItem(name: "api_key", value: Self.apiKey),
+      URLQueryItem(name: "api_key", value: apiKey),
       URLQueryItem(name: "token", value: userToken),
       URLQueryItem(name: "tlm", value: tlmJSON),
     ]
