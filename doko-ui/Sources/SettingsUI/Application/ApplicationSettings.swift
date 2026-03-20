@@ -140,6 +140,58 @@ class ApplicationSettingsModel {
   }
 }
 
+struct UnitsSettingsView: View {
+  @Bindable var model: ApplicationSettingsModel
+
+  var body: some View {
+    List {
+      Toggle(
+        "Metric",
+        isOn: Binding(
+          get: { model.metric },
+          set: { isOn, _ in model.metricToggleChanged(isOn: isOn) }
+        )
+      )
+      if model.metric {
+        Toggle(
+          "kWh Per 100km",
+          isOn: Binding(
+            get: { model.kWhPer100km },
+            set: { isOn, _ in model.kWhPer100kmToggleChanged(isOn: isOn) }
+          )
+        )
+      }
+    }
+    .listStyle(.plain)
+    .navigationTitle("Units")
+  }
+}
+
+struct MapsSettingsView: View {
+  @Bindable var model: ApplicationSettingsModel
+
+  var body: some View {
+    List {
+      MapStylePicker(
+        selection: Binding(
+          get: { model.tripMapStyle },
+          set: { model.setTripMapStyle($0) }
+        ),
+        pickerName: "Trip Map Style"
+      )
+      MapStylePicker(
+        selection: Binding(
+          get: { model.chargeMapStyle },
+          set: { model.setChargeMapStyle($0) }
+        ),
+        pickerName: "Charge Map Style"
+      )
+    }
+    .listStyle(.plain)
+    .navigationTitle("Maps")
+  }
+}
+
 struct ApplicationSettingsView: View {
   @Bindable var model: ApplicationSettingsModel
 
