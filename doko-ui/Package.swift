@@ -24,6 +24,7 @@ let package = Package(
     .package(path: "../doko-schema"),
     .package(path: "../doko-state-engine"),
     .package(path: "../doko-managers"),
+    .package(path: "../doko-abrp"),
     .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.6.0"),
     .package(url: "https://github.com/pointfreeco/swift-navigation", from: "2.7.0"),
     .package(url: "https://github.com/pointfreeco/swift-case-paths", from: "1.7.2"),
@@ -74,6 +75,7 @@ let package = Package(
         .product(name: "DokoStateEngine", package: "doko-state-engine"),
         .product(name: "DokoSchema", package: "doko-schema"),
         .product(name: "DokoSharing", package: "doko-sharing"),
+        .product(name: "DokoABRP", package: "doko-abrp"),
         .product(name: "SwiftUINavigation", package: "swift-navigation"),
         .product(name: "CasePaths", package: "swift-case-paths"),
       ]

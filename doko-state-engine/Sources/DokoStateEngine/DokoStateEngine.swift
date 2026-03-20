@@ -5,6 +5,7 @@ import OSLog
 import DokoTypes
 import DokoSharing
 import DokoLogging
+import DokoABRP
 import CoreLocationManager
 import DokoPacketManager
 import DokoVehicleManager
@@ -187,6 +188,7 @@ public final class DokoStateEngine {
             guard let tripDraft = self.tripInProgress else {
               throw StateEngineError.tripDraftError
             }
+            await ABRPManager.shared.sendTripTelemetry(packet: dokoResponsePacket)
             do {
               let tripDraft = try Trip.postTripUpdateRecord(tripDraft: tripDraft, tripUpdateResponse: dokoResponsePacket)
               self.tripInProgress = tripDraft
@@ -391,6 +393,10 @@ public final class DokoStateEngine {
             guard let chargeDraft = self.chargeInProgress else {
               throw StateEngineError.chargeDraftError
             }
+            await ABRPManager.shared.sendChargeTelemetry(
+              packet: dokoResponsePacket,
+              isDCFC: dokoResponsePacket.type == .dcChargeUpdate
+            )
             do {
               self.chargeInProgress = try Charge.postChargeUpdateRecord(chargeDraft: chargeDraft, chargeUpdateResponse: dokoResponsePacket)
               if let chargeDraft = self.chargeInProgress, let stateOfCharge = chargeDraft.stateOfChargeEnd {
