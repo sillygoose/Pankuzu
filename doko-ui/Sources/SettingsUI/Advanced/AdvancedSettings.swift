@@ -7,37 +7,37 @@ import DokoSharing
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var displayUnitsExpanded: Self {
-    Self[.appStorage("ApplicationSettings-displayUnitsExpanded"), default: false]
+    Self[.appStorage("UnitSettings-displayUnitsExpanded"), default: false]
   }
 }
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var mapStylesExpanded: Self {
-    Self[.appStorage("ApplicationSettings-mapStylesExpanded"), default: false]
+    Self[.appStorage("MapSettings-mapStylesExpanded"), default: false]
   }
 }
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var advancedExpanded: Self {
-    Self[.appStorage("ApplicationSettings-advancedExpanded"), default: false]
+    Self[.appStorage("AdvancedSettings-advancedExpanded"), default: false]
   }
 }
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var debuggingExpanded: Self {
-    Self[.appStorage("ApplicationSettings-debuggingExpanded"), default: false]
+    Self[.appStorage("AdvancedSettings-debuggingExpanded"), default: false]
   }
 }
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var tripPositionExpanded: Self {
-    Self[.appStorage("ApplicationSettings-tripPositionExpanded"), default: false]
+    Self[.appStorage("AdvancedSettings-tripPositionExpanded"), default: false]
   }
 }
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var tripElevationExpanded: Self {
-    Self[.appStorage("ApplicationSettings-tripElevationExpanded"), default: false]
+    Self[.appStorage("AdvancedSettings-tripElevationExpanded"), default: false]
   }
 }
 
