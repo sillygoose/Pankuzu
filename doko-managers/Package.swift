@@ -15,6 +15,7 @@ let package = Package(
     .library(name: "DokoWeatherManager", targets: ["DokoWeatherManager"]),
     .library(name: "DokoNotificationManager", targets: ["DokoNotificationManager"]),
     .library(name: "DokoLiveActivityManager", targets: ["DokoLiveActivityManager"]),
+    .library(name: "DokoABRP", targets: ["DokoABRP"]),
   ],
   dependencies: [
     .package(path: "../doko-core"),
@@ -87,6 +88,14 @@ let package = Package(
       dependencies: [
         .product(name: "DokoSharing", package: "doko-sharing"),
         .product(name: "DokoLogging", package: "doko-logging"),
+      ]
+    ),
+    .target(
+      name: "DokoABRP",
+      dependencies: [
+        .product(name: "DokoTypes", package: "doko-core"),
+        .product(name: "DokoLogging", package: "doko-logging"),
+        .product(name: "DokoSharing", package: "doko-sharing"),
       ]
     ),
   ],

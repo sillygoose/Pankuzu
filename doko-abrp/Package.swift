@@ -1,4 +1,5 @@
 // swift-tools-version: 6.2
+// DokoABRP has moved to doko-managers
 
 import PackageDescription
 
@@ -7,23 +8,8 @@ let package = Package(
   platforms: [
     .iOS(.v26)
   ],
-  products: [
-    .library(name: "DokoABRP", targets: ["DokoABRP"]),
-  ],
-  dependencies: [
-    .package(path: "../doko-core"),
-    .package(path: "../doko-sharing"),
-    .package(path: "../doko-logging"),
-  ],
-  targets: [
-    .target(
-      name: "DokoABRP",
-      dependencies: [
-        .product(name: "DokoTypes", package: "doko-core"),
-        .product(name: "DokoSharing", package: "doko-sharing"),
-        .product(name: "DokoLogging", package: "doko-logging"),
-      ]
-    ),
-  ],
+  products: [],
+  dependencies: [],
+  targets: [],
   swiftLanguageModes: [.v6]
 )
