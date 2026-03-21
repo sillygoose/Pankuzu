@@ -22,49 +22,55 @@ struct IntegrationsView: View {
   @State private var model = IntegrationsModel()
   @Shared(.abrpExpanded) var abrpExpanded
 
+  private var abrpAPIKey: String {
+    Bundle.main.object(forInfoDictionaryKey: "ABRPAPIKey") as? String ?? ""
+  }
+
   var body: some View {
     List {
-      DisclosureGroup(
-        isExpanded: Binding(
-          get: { abrpExpanded },
-          set: { newValue in $abrpExpanded.withLock { $0 = newValue } }
-        )
-      ) {
-        Section {
-          Toggle(
-            "Enable",
-            isOn: Binding(
-              get: { model.abrpEnabled },
-              set: { isOn, _ in model.$abrpEnabled.withLock { $0 = isOn } }
-            )
+      if !abrpAPIKey.isEmpty {
+        DisclosureGroup(
+          isExpanded: Binding(
+            get: { abrpExpanded },
+            set: { newValue in $abrpExpanded.withLock { $0 = newValue } }
           )
-          HStack {
-            TextField(
-              "User Token",
-              text: Binding(
-                get: { model.abrpUserToken },
-                set: { token in model.$abrpUserToken.withLock { $0 = token } }
+        ) {
+          Section {
+            Toggle(
+              "Enable",
+              isOn: Binding(
+                get: { model.abrpEnabled },
+                set: { isOn, _ in model.$abrpEnabled.withLock { $0 = isOn } }
               )
             )
-            .autocorrectionDisabled()
-            .textInputAutocapitalization(.never)
-            if !model.abrpUserToken.isEmpty {
-              Button {
-                model.$abrpUserToken.withLock { $0 = "" }
-              } label: {
-                Image(systemName: "xmark.circle.fill")
-                  .foregroundStyle(.secondary)
+            HStack {
+              TextField(
+                "User Token",
+                text: Binding(
+                  get: { model.abrpUserToken },
+                  set: { token in model.$abrpUserToken.withLock { $0 = token } }
+                )
+              )
+              .autocorrectionDisabled()
+              .textInputAutocapitalization(.never)
+              if !model.abrpUserToken.isEmpty {
+                Button {
+                  model.$abrpUserToken.withLock { $0 = "" }
+                } label: {
+                  Image(systemName: "xmark.circle.fill")
+                    .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.borderless)
               }
-              .buttonStyle(.borderless)
             }
+          } footer: {
+            Text(
+              "Enter your ABRP user token to stream live telemetry to A Better Route Planner. Find your token in the ABRP app under Settings → Live Data."
+            )
           }
-        } footer: {
-          Text(
-            "Enter your ABRP user token to stream live telemetry to A Better Route Planner. Find your token in the ABRP app under Settings → Live Data."
-          )
+        } label: {
+          Text("A Better Route Planner")
         }
-      } label: {
-        Text("A Better Route Planner")
       }
     }
     .listStyle(.plain)

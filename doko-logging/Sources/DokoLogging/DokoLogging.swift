@@ -1,5 +1,7 @@
 import Foundation
 
+import Dependencies
+
 import DokoTypes
 import ObdLinkCore
 
@@ -46,7 +48,9 @@ public struct LoggingResponsePacket: Sendable {
   public let type: LoggingPacketType
 
   public init(type: LoggingPacketType) {
-    self.completedAt = Date.now
+    @Dependency(\.date.now) var now
+
+    self.completedAt = now
     self.type = type
   }
 }

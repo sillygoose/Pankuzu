@@ -1,6 +1,8 @@
 import Foundation
 import OSLog
 
+import DokoLogging
+
 public enum ABRPError: Error, Sendable {
   case encodingFailed
   case invalidURL
@@ -9,15 +11,16 @@ public enum ABRPError: Error, Sendable {
 
 public struct ABRPClient: Sendable {
   static let baseURL = URL(string: "https://api.iternio.com/1/tlm/send")!
+  let apiKey: String
 
-  public init() {}
+  public init() {
+    self.apiKey = Bundle.main.object(forInfoDictionaryKey: "ABRPAPIKey") as? String ?? ""
+  }
 
   public func send(telemetry: ABRPTelemetry, userToken: String) async throws {
     guard let tlmJSON = telemetry.jsonString else {
       throw ABRPError.encodingFailed
     }
-
-    let apiKey = Bundle.main.object(forInfoDictionaryKey: "ABRPAPIKey") as? String ?? ""
 
     var components = URLComponents(url: Self.baseURL, resolvingAgainstBaseURL: false)!
     components.queryItems = [
@@ -25,7 +28,6 @@ public struct ABRPClient: Sendable {
       URLQueryItem(name: "token", value: userToken),
       URLQueryItem(name: "tlm", value: tlmJSON),
     ]
-
     guard let url = components.url else {
       throw ABRPError.invalidURL
     }

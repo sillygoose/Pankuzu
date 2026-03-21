@@ -3,6 +3,8 @@ import CoreLocation
 
 import OrderedCollections
 
+import Dependencies
+
 public struct DokoCurrentWeather: Equatable, Hashable, Codable, Sendable {
   public var timestamp: Date
   public let temperature: Double
@@ -13,7 +15,7 @@ public struct DokoCurrentWeather: Equatable, Hashable, Codable, Sendable {
   public let conditionSymbol: String
 
   public init(
-    timestamp: Date = Date.now,
+    timestamp: Date,
     temperature: Double,
     windSpeed: Double,
     windGust: Double? = nil,

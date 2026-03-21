@@ -188,7 +188,7 @@ public final class DokoStateEngine {
             guard let tripDraft = self.tripInProgress else {
               throw StateEngineError.tripDraftError
             }
-            await ABRPManager.shared.sendTripTelemetry(packet: dokoResponsePacket)
+            ABRPManager.shared.sendTripTelemetry(packet: dokoResponsePacket)
             do {
               let tripDraft = try Trip.postTripUpdateRecord(tripDraft: tripDraft, tripUpdateResponse: dokoResponsePacket)
               self.tripInProgress = tripDraft
@@ -393,7 +393,7 @@ public final class DokoStateEngine {
             guard let chargeDraft = self.chargeInProgress else {
               throw StateEngineError.chargeDraftError
             }
-            await ABRPManager.shared.sendChargeTelemetry(
+            ABRPManager.shared.sendChargeTelemetry(
               packet: dokoResponsePacket,
               isDCFC: dokoResponsePacket.type == .dcChargeUpdate
             )

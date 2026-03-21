@@ -2,6 +2,8 @@ import CoreLocation
 import WeatherKit
 import OSLog
 
+import Dependencies
+
 import DokoTypes
 import DokoLogging
 
@@ -15,9 +17,10 @@ public final class DokoWeatherManager: Sendable {
   private var _latestWeatherUpdate: DokoCurrentWeather?
 
   public var latestWeather: DokoCurrentWeather? {
+    @Dependency(\.date.now) var now
     guard
       let latest = _latestWeatherUpdate,
-      Date.now.timeIntervalSince(latest.timestamp) < 660
+      now.timeIntervalSince(latest.timestamp) < 660
     else { return nil }
     return latest
   }
@@ -31,6 +34,7 @@ public final class DokoWeatherManager: Sendable {
       let weather = try await self.weatherService.weather(for: location)
       let currentWeather = weather.currentWeather
       let dokoCurrentWeather = DokoCurrentWeather(
+        timestamp: currentWeather.date,
         temperature: currentWeather.temperature.converted(to: .celsius).value,
         windSpeed: currentWeather.wind.speed.converted(to: .metersPerSecond).value,
         windGust: currentWeather.wind.gust?.converted(to: .metersPerSecond).value,

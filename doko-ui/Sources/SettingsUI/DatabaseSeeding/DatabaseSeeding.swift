@@ -1,6 +1,8 @@
 import SwiftUI
 import OSLog
 
+import Dependencies
+
 import DokoSharing
 import DokoDebug
 import DokoLogging
@@ -44,7 +46,7 @@ class DatabaseSeedingModel {
   }
 
   var dateWithinSelectedPeriod: Date {
-    let now = Date.now
+    @Dependency(\.date.now) var now
     let calendar = Calendar.current
 
     switch seedingTimePeriod {
