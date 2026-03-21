@@ -21,6 +21,7 @@ public enum LoggingPacketType: Sendable {
   case liveActivity(String)
   case packetManager(String)
   case iCloud(String)
+  case integration(String)
 
   public var description: String {
     switch self {
@@ -35,6 +36,7 @@ public enum LoggingPacketType: Sendable {
     case .liveActivity(let liveActivity): return ".liveActivity(\(liveActivity))"
     case .packetManager(let packetManager): return ".packetManager(\(packetManager))"
     case .iCloud(let iCloud): return ".iCloud(\(iCloud))"
+    case .integration(let integration): return ".integration(\(integration))"
     }
   }
 }
@@ -65,6 +67,7 @@ public final class DokoLogging: Sendable {
     @Shared(.logLiveActivityPackets) var logLiveActivityPackets
     @Shared(.logPacketManagerPackets) var logPacketManagerPackets
     @Shared(.logICloudPackets) var logICloudPackets
+    @Shared(.logIntegrationPackets) var logIntegrationPackets
 
     switch response {
     case .logging(let packet):
@@ -78,6 +81,7 @@ public final class DokoLogging: Sendable {
       case .state, .schedulers: shouldLog = logStatePackets
       case .packetManager: shouldLog = logPacketManagerPackets
       case .iCloud: shouldLog = logICloudPackets
+      case .integration: shouldLog = logIntegrationPackets
       }
       if shouldLog {
         $responseHistory.withLock { $0.prepend(response) }

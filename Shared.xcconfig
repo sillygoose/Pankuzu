@@ -1,4 +1,4 @@
 // Shared build configuration
 // Local overrides (like DEVELOPMENT_TEAM) go in Local.xcconfig
-ABRP_API_KEY = 32b2162f-9599-4647-8139-66e9f9528370
+
 #include? "Local.xcconfig"
