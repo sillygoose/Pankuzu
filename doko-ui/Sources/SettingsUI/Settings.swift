@@ -201,13 +201,9 @@ public struct SettingsView: View {
             model: LocationSettingsModel()
           )
         case .unitsSettings:
-          UnitsSettingsView(
-            model: ApplicationSettingsModel()
-          )
+          UnitsSettingsView()
         case .mapsSettings:
-          MapsSettingsView(
-            model: ApplicationSettingsModel()
-          )
+          MapsSettingsView()
         case .debugging:
           DebuggingView(
             model: DebuggingModel()

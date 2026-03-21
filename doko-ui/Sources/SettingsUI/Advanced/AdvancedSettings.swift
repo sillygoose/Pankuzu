@@ -1,21 +1,8 @@
 import SwiftUI
-import MapKit
 
 import CommonUI
 import DokoTypes
 import DokoSharing
-
-extension SharedKey where Self == AppStorageKey<Bool>.Default {
-  static var displayUnitsExpanded: Self {
-    Self[.appStorage("UnitSettings-displayUnitsExpanded"), default: false]
-  }
-}
-
-extension SharedKey where Self == AppStorageKey<Bool>.Default {
-  static var mapStylesExpanded: Self {
-    Self[.appStorage("MapSettings-mapStylesExpanded"), default: false]
-  }
-}
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var advancedExpanded: Self {
@@ -41,32 +28,10 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
   }
 }
 
-struct MapStylePicker: View {
-  @Binding var selection: DisplayMapStyle
-  let pickerName: String
-
-  var body: some View {
-    Picker(
-      pickerName,
-      selection: $selection
-    ) {
-      ForEach(DisplayMapStyle.allCases) { mapStyle in
-        Text(mapStyle.name)
-          .fixedSize(horizontal: false, vertical: true)
-          .tag(mapStyle)
-      }
-    }
-  }
-}
-
 @MainActor
 @Observable
-class ApplicationSettingsModel {
+class AdvancedSettingsModel {
   @ObservationIgnored @Shared(.metric) var metric
-  @ObservationIgnored @Shared(.kWhPer100km) var kWhPer100km
-
-  @ObservationIgnored @Shared(.tripMapStyle) var tripMapStyle
-  @ObservationIgnored @Shared(.chargeMapStyle) var chargeMapStyle
 
   @ObservationIgnored @Shared(.poiThreshold) var poiThreshold
   @ObservationIgnored @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
@@ -82,22 +47,6 @@ class ApplicationSettingsModel {
   @ObservationIgnored @Shared(.minimumTripElevationChange) var minimumTripElevationChange
 
   @ObservationIgnored @Shared(.deletedRecordRetentionDays) var deletedRecordRetentionDays
-
-  func metricToggleChanged(isOn: Bool) {
-    $metric.withLock { $0 = isOn }
-  }
-
-  func kWhPer100kmToggleChanged(isOn: Bool) {
-    $kWhPer100km.withLock { $0 = isOn }
-  }
-
-  func setTripMapStyle(_ style: DisplayMapStyle) {
-    $tripMapStyle.withLock { $0 = style }
-  }
-
-  func setChargeMapStyle(_ style: DisplayMapStyle) {
-    $chargeMapStyle.withLock { $0 = style }
-  }
 
   func setPoiThreshold(_ threshold: Double) {
     $poiThreshold.withLock { $0 = threshold }
@@ -140,139 +89,10 @@ class ApplicationSettingsModel {
   }
 }
 
-struct UnitsSettingsView: View {
-  @Bindable var model: ApplicationSettingsModel
-
-  var body: some View {
-    List {
-      Toggle(
-        "Metric",
-        isOn: Binding(
-          get: { model.metric },
-          set: { isOn, _ in model.metricToggleChanged(isOn: isOn) }
-        )
-      )
-      if model.metric {
-        Toggle(
-          "kWh Per 100km",
-          isOn: Binding(
-            get: { model.kWhPer100km },
-            set: { isOn, _ in model.kWhPer100kmToggleChanged(isOn: isOn) }
-          )
-        )
-      }
-    }
-    .listStyle(.plain)
-    .navigationTitle("Units")
-  }
-}
-
-struct MapsSettingsView: View {
-  @Bindable var model: ApplicationSettingsModel
-
-  var body: some View {
-    List {
-      MapStylePicker(
-        selection: Binding(
-          get: { model.tripMapStyle },
-          set: { model.setTripMapStyle($0) }
-        ),
-        pickerName: "Trip Map Style"
-      )
-      MapStylePicker(
-        selection: Binding(
-          get: { model.chargeMapStyle },
-          set: { model.setChargeMapStyle($0) }
-        ),
-        pickerName: "Charge Map Style"
-      )
-    }
-    .listStyle(.plain)
-    .navigationTitle("Maps")
-  }
-}
-
-struct ApplicationSettingsView: View {
-  @Bindable var model: ApplicationSettingsModel
-
-  let PoiThresholdSliderRangeMetric = 30.0...100.0
-  let PoiThresholdSliderRange = 100.0...300.0
-  let PoiThresholdSliderStepMetric = 10.0
-  let PoiThresholdSliderStep = 30.0
-
-  let DuplicateLocationThresholdSliderRangeMetric = 10.0...50.0
-  let DuplicateLocationThresholdSliderRange = 30.0...150.0
-  let DuplicateLocationThresholdSliderStepMetric = 5.0
-  let DuplicateLocationThresholdSliderStep = 15.0
-
-  @Shared(.displayUnitsExpanded) var displayUnitsExpanded
-  @Shared(.mapStylesExpanded) var mapStylesExpanded
-  @Shared(.advancedExpanded) var advancedExpanded
-  @Shared(.debuggingExpanded) var debuggingExpanded
-  @Shared(.tripPositionExpanded) var tripPositionExpanded
-  @Shared(.tripElevationExpanded) var tripElevationExpanded
-
-  var body: some View {
-    List {
-      DisclosureGroup(
-        isExpanded: Binding(
-          get: { displayUnitsExpanded },
-          set: { newValue in $displayUnitsExpanded.withLock { $0 = newValue } }
-        )
-      ) {
-        Toggle(
-          "Metric",
-          isOn: Binding(
-            get: { model.metric },
-            set: { isOn, _ in model.metricToggleChanged(isOn: isOn) }
-          )
-        )
-        if model.metric {
-          Toggle(
-            "kWh Per 100km",
-            isOn: Binding(
-              get: { model.kWhPer100km },
-              set: { isOn, _ in model.kWhPer100kmToggleChanged(isOn: isOn) }
-            )
-          )
-        }
-      } label: {
-        Text("Display Units")
-      }
-
-      DisclosureGroup(
-        isExpanded: Binding(
-          get: { mapStylesExpanded },
-          set: { newValue in $mapStylesExpanded.withLock { $0 = newValue } }
-        )
-      ) {
-        MapStylePicker(
-          selection: Binding(
-            get: { model.tripMapStyle },
-            set: { model.setTripMapStyle($0) }
-          ),
-          pickerName: "Trip Map Style"
-        )
-        MapStylePicker(
-          selection: Binding(
-            get: { model.chargeMapStyle },
-            set: { model.setChargeMapStyle($0) }
-          ),
-          pickerName: "Charge Map Style"
-        )
-      } label: {
-        Text("Map Styling")
-      }
-
-    }
-    .listStyle(.plain)
-    .navigationTitle("Application")
-  }
-}
 
 @MainActor
 struct AdvancedSettingsView: View {
-  @State private var appModel = ApplicationSettingsModel()
+  @State private var model = AdvancedSettingsModel()
 
   @Shared(.advancedExpanded) var advancedExpanded
   @Shared(.debuggingExpanded) var debuggingExpanded
@@ -299,20 +119,20 @@ struct AdvancedSettingsView: View {
       ) {
         Section {
           HStack {
-            let sliderRange = appModel.metric ? PoiThresholdSliderRangeMetric : PoiThresholdSliderRange
-            let sliderStep = appModel.metric ? PoiThresholdSliderStepMetric : PoiThresholdSliderStep
+            let sliderRange = model.metric ? PoiThresholdSliderRangeMetric : PoiThresholdSliderRange
+            let sliderStep = model.metric ? PoiThresholdSliderStepMetric : PoiThresholdSliderStep
             Slider(
               value: Binding(
-                get: { appModel.metric ? appModel.poiThreshold : appModel.poiThreshold * 3 },
-                set: { appModel.setPoiThreshold(appModel.metric ? $0 : $0 / 3) }
+                get: { model.metric ? model.poiThreshold : model.poiThreshold * 3 },
+                set: { model.setPoiThreshold(model.metric ? $0 : $0 / 3) }
               ),
               in: sliderRange,
               step: sliderStep
             )
             Spacer()
             let poiThreshold = Measurement(
-              value: appModel.metric ? appModel.poiThreshold : appModel.poiThreshold * 3,
-              unit: appModel.metric ? UnitLength.meters : UnitLength.feet
+              value: model.metric ? model.poiThreshold : model.poiThreshold * 3,
+              unit: model.metric ? UnitLength.meters : UnitLength.feet
             )
             Text(
               poiThreshold.formatted(
@@ -334,20 +154,20 @@ struct AdvancedSettingsView: View {
 
         Section {
           HStack {
-            let sliderRange = appModel.metric ? DuplicateLocationThresholdSliderRangeMetric : DuplicateLocationThresholdSliderRange
-            let sliderStep = appModel.metric ? DuplicateLocationThresholdSliderStepMetric : DuplicateLocationThresholdSliderStep
+            let sliderRange = model.metric ? DuplicateLocationThresholdSliderRangeMetric : DuplicateLocationThresholdSliderRange
+            let sliderStep = model.metric ? DuplicateLocationThresholdSliderStepMetric : DuplicateLocationThresholdSliderStep
             Slider(
               value: Binding(
-                get: { appModel.metric ? appModel.duplicateLocationThreshold : appModel.duplicateLocationThreshold * 3 },
-                set: { appModel.setDuplicateLocationThreshold(appModel.metric ? $0 : $0 / 3) }
+                get: { model.metric ? model.duplicateLocationThreshold : model.duplicateLocationThreshold * 3 },
+                set: { model.setDuplicateLocationThreshold(model.metric ? $0 : $0 / 3) }
               ),
               in: sliderRange,
               step: sliderStep
             )
             Spacer()
             let duplicateLocationThreshold = Measurement(
-              value: appModel.metric ? appModel.duplicateLocationThreshold : appModel.duplicateLocationThreshold * 3,
-              unit: appModel.metric ? UnitLength.meters : UnitLength.feet
+              value: model.metric ? model.duplicateLocationThreshold : model.duplicateLocationThreshold * 3,
+              unit: model.metric ? UnitLength.meters : UnitLength.feet
             )
             Text(
               duplicateLocationThreshold.formatted(
@@ -380,16 +200,16 @@ struct AdvancedSettingsView: View {
         Toggle(
           "Use polylines for path segments",
           isOn: Binding(
-            get: { appModel.tripMapPolyline },
-            set: { isOn, _ in appModel.setTripMapPolylineToggleChanged(isOn: isOn) }
+            get: { model.tripMapPolyline },
+            set: { isOn, _ in model.setTripMapPolylineToggleChanged(isOn: isOn) }
           )
         )
 
         Toggle(
           "Show elevation data on trip path",
           isOn: Binding(
-            get: { appModel.showElevationOnPath },
-            set: { isOn, _ in appModel.setShowElevationOnPathToggleChanged(isOn: isOn) }
+            get: { model.showElevationOnPath },
+            set: { isOn, _ in model.setShowElevationOnPathToggleChanged(isOn: isOn) }
           )
         )
 
@@ -397,14 +217,14 @@ struct AdvancedSettingsView: View {
           HStack {
             Slider(
               value: Binding(
-                get: { Double(appModel.deletedRecordRetentionDays) },
-                set: { appModel.setDeletedRecordRetentionDays(Int($0)) }
+                get: { Double(model.deletedRecordRetentionDays) },
+                set: { model.setDeletedRecordRetentionDays(Int($0)) }
               ),
               in: 1.0...30.0,
               step: 1.0
             )
             Spacer()
-            Text("\(appModel.deletedRecordRetentionDays) days")
+            Text("\(model.deletedRecordRetentionDays) days")
           }
         } header: {
           Text("Keep Deleted Trip/Charge For")
@@ -422,15 +242,15 @@ struct AdvancedSettingsView: View {
               let identicalTripPositionDistanceStep = 1.0
               Slider(
                 value: Binding(
-                  get: { return appModel.identicalTripPositionDistance },
-                  set: { appModel.setIdenticalTripPositionDistance($0) }
+                  get: { return model.identicalTripPositionDistance },
+                  set: { model.setIdenticalTripPositionDistance($0) }
                 ),
                 in: identicalTripPositionDistanceRange,
                 step: identicalTripPositionDistanceStep
               )
               Spacer()
               let identicalTripPositionDistance = Measurement(
-                value: appModel.identicalTripPositionDistance,
+                value: model.identicalTripPositionDistance,
                 unit: UnitLength.meters
               )
               Text(
@@ -459,15 +279,15 @@ struct AdvancedSettingsView: View {
               let positionCourseDeviationStep = 0.1
               Slider(
                 value: Binding(
-                  get: { return appModel.tripPositionCourseDeviation },
-                  set: { appModel.setPositionCourseDeviation($0) }
+                  get: { return model.tripPositionCourseDeviation },
+                  set: { model.setPositionCourseDeviation($0) }
                 ),
                 in: positionCourseDeviationRange,
                 step: positionCourseDeviationStep
               )
               Spacer()
               let positionCourseDeviation = Measurement(
-                value: appModel.tripPositionCourseDeviation,
+                value: model.tripPositionCourseDeviation,
                 unit: UnitAngle.degrees
               )
               Text(
@@ -496,15 +316,15 @@ struct AdvancedSettingsView: View {
               let maximumTripPositionDistanceStep = 20.0
               Slider(
                 value: Binding(
-                  get: { return appModel.maximumTripPositionDistance },
-                  set: { appModel.setMaximumTripPositionDistance($0) }
+                  get: { return model.maximumTripPositionDistance },
+                  set: { model.setMaximumTripPositionDistance($0) }
                 ),
                 in: maximumTripPositionDistanceRange,
                 step: maximumTripPositionDistanceStep
               )
               Spacer()
               let maximumTripPoitionDistance = Measurement(
-                value: appModel.maximumTripPositionDistance,
+                value: model.maximumTripPositionDistance,
                 unit: UnitLength.meters
               )
               Text(
@@ -542,15 +362,15 @@ struct AdvancedSettingsView: View {
               let maximumTripElevationDistanceStep = 20.0
               Slider(
                 value: Binding(
-                  get: { return appModel.maximumTripElevationDistance },
-                  set: { appModel.setMaximumTripElevationDistance($0) }
+                  get: { return model.maximumTripElevationDistance },
+                  set: { model.setMaximumTripElevationDistance($0) }
                 ),
                 in: maximumTripElevationDistanceRange,
                 step: maximumTripElevationDistanceStep
               )
               Spacer()
               let maximumTripElevaionDistance = Measurement(
-                value: appModel.maximumTripElevationDistance,
+                value: model.maximumTripElevationDistance,
                 unit: UnitLength.meters
               )
               Text(
@@ -579,15 +399,15 @@ struct AdvancedSettingsView: View {
               let minimumTripElevationChangeStep = 0.5
               Slider(
                 value: Binding(
-                  get: { return appModel.minimumTripElevationChange },
-                  set: { appModel.setMinimumTripElevationChange($0) }
+                  get: { return model.minimumTripElevationChange },
+                  set: { model.setMinimumTripElevationChange($0) }
                 ),
                 in: minimumTripElevaionChangeRange,
                 step: minimumTripElevationChangeStep
               )
               Spacer()
               let minimumTripElevationChange = Measurement(
-                value: appModel.minimumTripElevationChange,
+                value: model.minimumTripElevationChange,
                 unit: UnitLength.meters
               )
               Text(
@@ -624,9 +444,7 @@ struct AdvancedSettingsView: View {
 
 #Preview {
   NavigationStack {
-    ApplicationSettingsView(
-      model: ApplicationSettingsModel()
-    )
+    AdvancedSettingsView()
     .preferredColorScheme(.dark)
   }
 }
