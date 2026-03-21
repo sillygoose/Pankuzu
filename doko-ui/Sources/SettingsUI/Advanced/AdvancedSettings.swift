@@ -618,7 +618,7 @@ struct AdvancedSettingsView: View {
 #endif
     }
     .listStyle(.plain)
-    .navigationTitle("Advanced Settings")
+    .navigationTitle("Advanced")
   }
 }
 
