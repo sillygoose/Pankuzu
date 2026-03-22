@@ -12,12 +12,14 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../doko-core"),
+    .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.11.0"),
   ],
   targets: [
     .target(
       name: "ObdLinkCore",
       dependencies: [
         .product(name: "DokoTypes", package: "doko-core"),
+        .product(name: "Dependencies", package: "swift-dependencies"),
       ]
     ),
   ],

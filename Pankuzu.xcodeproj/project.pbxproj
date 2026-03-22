@@ -158,8 +158,10 @@
 		566DA71A2F05ACDB0044D201 = {
 			isa = PBXGroup;
 			children = (
-				565E9EE72F0A00E400FE33AF /* doko-ui */,
+				5692F18B2F09F7DD00D9F0AA /* doko-core */,
+				5692F1A12F09F98B00D9F0AA /* obdlink-core */,
 				56A31D062F0A000700E4F1B4 /* doko-sharing */,
+				565E9EE72F0A00E400FE33AF /* doko-ui */,
 				5692F1A92F09FCF800D9F0AA /* doko-vehicle-interface */,
 				5692F1A82F09FC9D00D9F0AA /* doko-components */,
 				5692F1A72F09FC6A00D9F0AA /* doko-state-engine */,
@@ -167,8 +169,6 @@
 				5692F1A42F09FB9E00D9F0AA /* doko-managers */,
 				5692F1A32F09FA7700D9F0AA /* doko-debug */,
 				5692F1A22F09FA0A00D9F0AA /* doko-logging */,
-				5692F1A12F09F98B00D9F0AA /* obdlink-core */,
-				5692F18B2F09F7DD00D9F0AA /* doko-core */,
 				566DA7252F05ACDB0044D201 /* Pankuzu */,
 				566DA7332F05ACDC0044D201 /* PankuzuTests */,
 				566710AA2F1FBBD20084A371 /* LiveActivityWidget */,
