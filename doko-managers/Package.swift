@@ -23,7 +23,7 @@ let package = Package(
     .package(path: "../doko-logging"),
     .package(path: "../doko-sharing"),
     .package(path: "../doko-vehicle-interface"),
-    .package(url: "https://github.com/pointfreeco/swift-dependncies", from: "1.11.0"),
+    .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.11.0"),
     .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.6.0"),
     .package(url: "https://github.com/pointfreeco/swift-sharing", from: "2.7.4"),
   ],
@@ -89,7 +89,7 @@ let package = Package(
       dependencies: [
         .product(name: "DokoSharing", package: "doko-sharing"),
         .product(name: "DokoLogging", package: "doko-logging"),
-        .product(name: "Dependancies", package: "swift-dependncies"),
+        .product(name: "Dependencies", package: "swift-dependencies"),
       ]
     ),
     .target(

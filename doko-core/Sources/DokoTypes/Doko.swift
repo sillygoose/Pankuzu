@@ -3,8 +3,6 @@ import CoreLocation
 
 import OrderedCollections
 
-import Dependencies
-
 public struct DokoCurrentWeather: Equatable, Hashable, Codable, Sendable {
   public var timestamp: Date
   public let temperature: Double
