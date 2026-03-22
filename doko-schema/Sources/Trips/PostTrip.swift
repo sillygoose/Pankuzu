@@ -44,9 +44,9 @@ extension Trip {
       odometerStart: odometer,
       odometerEnd: odometer,
     )
-    trip.energy = tripStartResponse.batteryEnergy
-    trip.energyToEmptyStart = tripStartResponse.energyToEmpty
-    trip.energyToEmptyEnd = tripStartResponse.energyToEmpty
+    trip.energy = tripStartResponse.batteryEnergy.map { -$0 }
+    trip.energyToEmptyStart = tripStartResponse.batteryEnergyToEmpty
+    trip.energyToEmptyEnd = tripStartResponse.batteryEnergyToEmpty
 
     trip.distanceToEmptyStart = tripStartResponse.distanceToEmpty
     trip.distanceToEmptyEnd = tripStartResponse.distanceToEmpty
@@ -108,8 +108,8 @@ extension Trip {
     tripDraft.odometerEnd = odometer
     tripDraft.distance = odometer - tripDraft.odometerStart
 
-    tripDraft.energy = tripEndResponse.batteryEnergy
-    tripDraft.energyToEmptyEnd = tripEndResponse.energyToEmpty
+    tripDraft.energy = tripEndResponse.batteryEnergy.map { -$0 }
+    tripDraft.energyToEmptyEnd = tripEndResponse.batteryEnergyToEmpty
 
     tripDraft.distanceToEmptyEnd = tripEndResponse.distanceToEmpty
     if let dteStart = tripDraft.distanceToEmptyStart, let dteEnd = tripEndResponse.distanceToEmpty {
@@ -166,8 +166,8 @@ extension Trip {
     tripDraft.odometerEnd = odometer
     tripDraft.distance = odometer - tripDraft.odometerStart
 
-    tripDraft.energy = tripUpdateResponse.batteryEnergy
-    tripDraft.energyToEmptyEnd = tripUpdateResponse.energyToEmpty
+    tripDraft.energy = tripUpdateResponse.batteryEnergy.map { -$0 }
+    tripDraft.energyToEmptyEnd = tripUpdateResponse.batteryEnergyToEmpty
 
     tripDraft.distanceToEmptyEnd = tripUpdateResponse.distanceToEmpty
     if let dteStart = tripDraft.distanceToEmptyStart, let dteEnd = tripUpdateResponse.distanceToEmpty {

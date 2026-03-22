@@ -35,8 +35,8 @@ extension Charge {
       chargerType: dcfcCharge ? Charge.ChargerType.dc : Charge.ChargerType.ac,
       odometer: odometer,
     )
-    charge.energyToEmptyStart = chargeStartResponse.energyToEmpty
-    charge.energyToEmptyEnd = chargeStartResponse.energyToEmpty
+    charge.energyToEmptyStart = chargeStartResponse.batteryEnergyToEmpty
+    charge.energyToEmptyEnd = chargeStartResponse.batteryEnergyToEmpty
     charge.energy = chargeStartResponse.batteryEnergy
 
     charge.distanceToEmptyStart = chargeStartResponse.distanceToEmpty
@@ -78,7 +78,7 @@ extension Charge {
     chargeDraft.timeEnd = chargeEndResponse.completedAt
     chargeDraft.duration = chargeEndResponse.completedAt.timeIntervalSince(chargeDraft.timeStart)
     
-    chargeDraft.energyToEmptyEnd = chargeEndResponse.energyToEmpty
+    chargeDraft.energyToEmptyEnd = chargeEndResponse.batteryEnergyToEmpty
     chargeDraft.energy = chargeEndResponse.batteryEnergy
 
     chargeDraft.distanceToEmptyEnd = chargeEndResponse.distanceToEmpty
@@ -109,7 +109,7 @@ extension Charge {
     chargeDraft.duration = chargeUpdateResponse.completedAt.timeIntervalSince(chargeDraft.timeStart)
 
     chargeDraft.energy = chargeUpdateResponse.batteryEnergy
-    chargeDraft.energyToEmptyEnd = chargeUpdateResponse.energyToEmpty
+    chargeDraft.energyToEmptyEnd = chargeUpdateResponse.batteryEnergyToEmpty
 
     chargeDraft.distanceToEmptyEnd = chargeUpdateResponse.distanceToEmpty
     if let dteStart = chargeDraft.energyToEmptyStart, let dteEnd = chargeUpdateResponse.distanceToEmpty {

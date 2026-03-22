@@ -27,7 +27,8 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case stpx(Int, Int)
 
   case vin
-  case odometer, obdOdometer
+  case odometer
+  case speed
 
   case gearSelected
   case distanceToEmpty
@@ -113,8 +114,9 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".vin"
       case .odometer:
         return ".odometer"
-      case .obdOdometer:
-        return ".obdOdometer"
+      case .speed:
+        return ".speed"
+
       case .gearSelected:
         return ".gearSelected"
       case .distanceToEmpty:
@@ -280,7 +282,7 @@ public enum ObdResponse: Equatable, Sendable {
 
   case vin(String)
   case odometer(Double)
-  case obdOdometer(Double)
+  case speed(Double)
 
   case gearSelected(Bool)
   case distanceToEmpty(Double)
@@ -369,8 +371,8 @@ public enum ObdResponse: Equatable, Sendable {
         return ".vin(\(vin))"
       case .odometer(let odometer):
         return String(format: ".odometer(%.1f)", odometer)
-      case .obdOdometer(let obdOdometer):
-        return String(format: ".obdOdometer(%.1f)", obdOdometer)
+      case .speed(let speed):
+        return String(format: ".speed(%.1f)", speed)
 
       case .gearSelected(let gear):
         return ".gearSelected(\(gear))"

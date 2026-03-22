@@ -209,7 +209,8 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
 
   case position
   case weather, meanTemperature
-  case odometer //###, obdOdometer
+  case odometer
+  case speed
   case distanceToEmpty
   
   case batteryStateOfCharge
@@ -298,9 +299,8 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".meanTemperature"
       case .odometer:
         return ".odometer"
-//      case .obdOdometer:
-//        return ".obdOdometer"
-
+      case .speed:
+        return ".speed"
       case .distanceToEmpty:
         return ".distanceToEmpty"
         
@@ -350,7 +350,7 @@ public enum DokoResponse: Equatable, Sendable {
   case weather(DokoCurrentWeather)
   case meanTemperature(Double)
   case odometer(Double)
-//  case obdOdometer(Double)
+  case speed(Double)
 
   case distanceToEmpty(Double)
   
@@ -388,8 +388,8 @@ public enum DokoResponse: Equatable, Sendable {
         return ".meanTemperature(\(String(format: "%.0f℃", temp)))"
       case .odometer(let odometer):
         return String(format: ".odometer(%.1f)", odometer)
-//      case .obdOdometer(let obdOdometer):
-//        return String(format: ".obdOdometer(%.1f)", obdOdometer)
+      case .speed(let speed):
+        return String(format: ".speed(%.1f)", speed)
       case .distanceToEmpty(let dte):
         return String(format: ".distanceToEmpty(%.1f)", dte)
         
@@ -445,6 +445,11 @@ extension DokoResponsePacket {
     return v
   }
 
+  public var speed: Double? {
+    guard case let .speed(v)? = responses[.speed]?.response else { return nil }
+    return v
+  }
+
   public var position: DokoPosition? {
     guard case let .position(v)? = responses[.position]?.response else { return nil }
     return v
@@ -465,7 +470,7 @@ extension DokoResponsePacket {
     return v
   }
 
-  public var energyToEmpty: Double? {
+  public var batteryEnergyToEmpty: Double? {
     guard case let .batteryEnergyToEmpty(v)? = responses[.batteryEnergyToEmpty]?.response else { return nil }
     return v
   }

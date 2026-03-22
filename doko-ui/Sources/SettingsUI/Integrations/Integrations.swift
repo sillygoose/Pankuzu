@@ -43,6 +43,12 @@ struct IntegrationsView: View {
                 set: { isOn, _ in model.$abrpEnabled.withLock { $0 = isOn } }
               )
             )
+          } footer: {
+            Text(
+              "Enabling A Better Route Planner will share your position and vehicle data with Iternio, the company behind ABRP."
+            )
+          }
+          Section {
             HStack {
               TextField(
                 "User Token",
@@ -68,6 +74,7 @@ struct IntegrationsView: View {
               "Enter your ABRP user token to stream live telemetry to A Better Route Planner. Find your token in the ABRP app under Settings → Vehicle → Live Data."
             )
           }
+
         } label: {
           Text("A Better Route Planner")
         }

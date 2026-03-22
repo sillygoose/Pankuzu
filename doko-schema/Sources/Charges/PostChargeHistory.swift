@@ -27,7 +27,7 @@ extension Charge {
     if let batteryEnergy = chargeHistoryPacket.batteryEnergy {
       chargeHistories.batteryEnergy.append(DokoDataPoint(timestamp: timestamp, double: batteryEnergy))
     }
-    if let energyToEmpty = chargeHistoryPacket.energyToEmpty {
+    if let energyToEmpty = chargeHistoryPacket.batteryEnergyToEmpty {
       chargeHistories.energyToEmpty.append(DokoDataPoint(timestamp: timestamp, double: energyToEmpty))
     }
     if let batteryTemperature = chargeHistoryPacket.batteryTemperature {
