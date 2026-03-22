@@ -44,8 +44,8 @@ extension Charge {
     if let _ = chargeStartResponse.distanceToEmpty {
       charge.range = 0.0
     }
-    charge.stateOfChargeStart = chargeStartResponse.stateOfCharge
-    charge.stateOfChargeEnd = chargeStartResponse.stateOfCharge
+    charge.stateOfChargeStart = chargeStartResponse.batteryStateOfCharge
+    charge.stateOfChargeEnd = chargeStartResponse.batteryStateOfCharge
     charge.batteryStateOfHealth = chargeStartResponse.batteryStateOfHealth
 
     charge.batteryTempStart = chargeStartResponse.batteryTemperature
@@ -86,7 +86,7 @@ extension Charge {
       chargeDraft.range = dteStart - dteEnd
     }
 
-    chargeDraft.stateOfChargeEnd = chargeEndResponse.stateOfCharge
+    chargeDraft.stateOfChargeEnd = chargeEndResponse.batteryStateOfCharge
     chargeDraft.batteryTempEnd = chargeEndResponse.batteryTemperature
     chargeDraft.couplerTempEnd = chargeEndResponse.couplerTemperature
 
@@ -116,7 +116,7 @@ extension Charge {
       chargeDraft.range = dteStart - dteEnd
     }
 
-    chargeDraft.stateOfChargeEnd = chargeUpdateResponse.stateOfCharge
+    chargeDraft.stateOfChargeEnd = chargeUpdateResponse.batteryStateOfCharge
     chargeDraft.batteryTempEnd = chargeUpdateResponse.batteryTemperature
     chargeDraft.couplerTempEnd = chargeUpdateResponse.couplerTemperature
 

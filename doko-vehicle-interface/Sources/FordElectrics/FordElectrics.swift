@@ -88,9 +88,9 @@ public actor FordElectrics: ConnectedVehicleInterface {
       ])
     case .tripUpdate:
       return ObdCommandPacket(type: .tripUpdate, commands: [
-        .position,
-        .odometer, .energyToEmpty, .stateOfCharge,
-        .batteryTemperature
+        .position, .odometer,
+        .stateOfCharge, .stateOfHealth,
+        .batteryTemperature,
       ])
     case .tripEnding:
       return ObdCommandPacket(type: .tripEnding, commands: [
@@ -120,8 +120,10 @@ public actor FordElectrics: ConnectedVehicleInterface {
       ])
     case .acChargeUpdate:
       return ObdCommandPacket(type: .acChargeUpdate, commands: [
-        .stateOfCharge, .energyToEmpty,
-        .batteryTemperature, .acChargerCouplerTemperature
+        .odometer,
+        .stateOfCharge, .stateOfHealth,
+        .batteryTemperature,
+        .acChargerCouplerTemperature
       ])
     case .acChargeEnding:
       return ObdCommandPacket(type: .acChargeEnding, commands: [
@@ -141,8 +143,10 @@ public actor FordElectrics: ConnectedVehicleInterface {
       ])
     case .dcChargeUpdate:
       return ObdCommandPacket(type: .dcChargeUpdate, commands: [
-        .stateOfCharge, .energyToEmpty,
-        .batteryTemperature, .dcChargerCouplerTemperature
+        .odometer,
+        .stateOfCharge, .stateOfHealth,
+        .batteryTemperature,
+        .acChargerCouplerTemperature
       ])
     case .dcChargeEnding:
       return ObdCommandPacket(type: .dcChargeEnding, commands: [

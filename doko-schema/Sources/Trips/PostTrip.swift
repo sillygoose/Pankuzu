@@ -53,8 +53,8 @@ extension Trip {
     if let _ = tripStartResponse.distanceToEmpty {
       trip.range = 0.0
     }
-    trip.stateOfChargeStart = tripStartResponse.stateOfCharge
-    trip.stateOfChargeEnd = tripStartResponse.stateOfCharge
+    trip.stateOfChargeStart = tripStartResponse.batteryStateOfCharge
+    trip.stateOfChargeEnd = tripStartResponse.batteryStateOfCharge
     trip.batteryStateOfHealth = tripStartResponse.batteryStateOfHealth
 
     trip.batteryTempStart = tripStartResponse.batteryTemperature
@@ -116,7 +116,7 @@ extension Trip {
       tripDraft.range = dteStart - dteEnd
     }
 
-    tripDraft.stateOfChargeEnd = tripEndResponse.stateOfCharge
+    tripDraft.stateOfChargeEnd = tripEndResponse.batteryStateOfCharge
     tripDraft.batteryTempEnd = tripEndResponse.batteryTemperature
 
     tripDraft.weatherTempEnd = tripEndResponse.weather?.temperature
@@ -174,7 +174,7 @@ extension Trip {
       tripDraft.range = dteStart - dteEnd
     }
 
-    tripDraft.stateOfChargeEnd = tripUpdateResponse.stateOfCharge
+    tripDraft.stateOfChargeEnd = tripUpdateResponse.batteryStateOfCharge
     tripDraft.batteryTempEnd = tripUpdateResponse.batteryTemperature
 
     if let weather = tripUpdateResponse.weather {

@@ -67,13 +67,6 @@ public actor FordMachE: ConnectedVehicleInterface {
     switch packetType {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
-        //### removed after 2025 mach-e test
-        .ath(true),
-        .stpx(0x7DF, 0x4888),
-        .stpx(0x7DF, 0x4897),
-        .stpx(0x7DF, 0x48A4),
-        .ath(false),
-        //### removed after 2025 mach-e test
         .stp(53), .stpbr(500000), .stpo
       ])
 
@@ -94,9 +87,9 @@ public actor FordMachE: ConnectedVehicleInterface {
       ])
     case .tripUpdate:
       return ObdCommandPacket(type: .tripUpdate, commands: [
-        .position,
-        .odometer, .energyToEmpty, .stateOfCharge,
-        .batteryTemperature
+        .position, .odometer,
+        .stateOfCharge, .stateOfHealth,
+        .batteryTemperature,
       ])
     case .tripEnding:
       return ObdCommandPacket(type: .tripEnding, commands: [
@@ -126,8 +119,10 @@ public actor FordMachE: ConnectedVehicleInterface {
       ])
     case .acChargeUpdate:
       return ObdCommandPacket(type: .acChargeUpdate, commands: [
-        .stateOfCharge, .energyToEmpty,
-        .batteryTemperature, .acChargerCouplerTemperature
+        .odometer,
+        .stateOfCharge, .stateOfHealth,
+        .batteryTemperature,
+        .acChargerCouplerTemperature
       ])
     case .acChargeEnding:
       return ObdCommandPacket(type: .acChargeEnding, commands: [
@@ -147,8 +142,10 @@ public actor FordMachE: ConnectedVehicleInterface {
       ])
     case .dcChargeUpdate:
       return ObdCommandPacket(type: .dcChargeUpdate, commands: [
-        .stateOfCharge, .energyToEmpty,
-        .batteryTemperature, .dcChargerCouplerTemperature
+        .odometer,
+        .stateOfCharge, .stateOfHealth,
+        .batteryTemperature,
+        .acChargerCouplerTemperature
       ])
     case .dcChargeEnding:
       return ObdCommandPacket(type: .dcChargeEnding, commands: [

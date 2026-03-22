@@ -120,7 +120,8 @@ public actor VwElectrics: ConnectedVehicleInterface {
         //
         .atsh("FC007B"),
         .acChargerStatus, .dcChargerStatus,
-        .stateOfCharge, .batteryVoltage, .batteryCurrent, .batteryTemperature,
+        .stateOfCharge,
+        .batteryTemperature,
         //
         .atsh("FC0076"),
         .gearSelected, .odometer,
@@ -130,12 +131,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
       return ObdCommandPacket(type: .idle, commands: [
         .atsh("FC007B"),
         .acChargerStatus, .dcChargerStatus,
-//        .stateOfCharge, .batteryVoltage, .batteryCurrent, .batteryTemperature,
-        
-          .atsh("FC0076"),
-        .gearSelected,
-//        .odometer,
 
+        .atsh("FC0076"),
+        .gearSelected,
 //        .gearSelected,
 //        .acChargerStatus, .dcChargerStatus
       ])
@@ -158,14 +156,14 @@ public actor VwElectrics: ConnectedVehicleInterface {
       ])
     case .tripUpdate:
       return ObdCommandPacket(type: .tripUpdate, commands: [
+        .position,
+
         .atsh("FC0076"),
         .odometer,
 
-          .atsh("FC007B"),
-        .stateOfCharge,
+        .atsh("FC007B"),
+        .stateOfCharge, //###.stateOfHealth,
         .batteryTemperature,
-
-        .position,
       ])
     case .tripEnding:
       return ObdCommandPacket(type: .tripEnding, commands: [
@@ -211,8 +209,11 @@ public actor VwElectrics: ConnectedVehicleInterface {
       ])
     case .acChargeUpdate:
       return ObdCommandPacket(type: .acChargeUpdate, commands: [
+        .atsh("FC0076"),
+        .odometer,
+
         .atsh("FC007B"),
-        .stateOfCharge,
+        .stateOfCharge, //###.stateOfHealth,
         .batteryTemperature,
       ])
     case .acChargeEnding:
@@ -239,8 +240,11 @@ public actor VwElectrics: ConnectedVehicleInterface {
       ])
     case .dcChargeUpdate:
       return ObdCommandPacket(type: .dcChargeUpdate, commands: [
+        .atsh("FC0076"),
+        .odometer,
+
         .atsh("FC007B"),
-        .stateOfCharge,
+        .stateOfCharge, //###.stateOfHealth,
         .batteryTemperature,
       ])
     case .dcChargeEnding:

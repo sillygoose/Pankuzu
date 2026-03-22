@@ -26,7 +26,7 @@ public final class ABRPManager: Sendable {
     guard enabled, !userToken.isEmpty, shouldSend() else { return }
 
     var telemetry = ABRPTelemetry(utc: Int(now.timeIntervalSince1970))
-    telemetry.soc = packet.stateOfCharge
+    telemetry.soc = packet.batteryStateOfCharge
     telemetry.soh = packet.batteryStateOfHealth
     telemetry.battTemp = packet.batteryTemperature
     telemetry.power = packet.batteryPower
@@ -55,7 +55,7 @@ public final class ABRPManager: Sendable {
     guard enabled, !userToken.isEmpty, shouldSend() else { return }
 
     var telemetry = ABRPTelemetry(utc: Int(now.timeIntervalSince1970))
-    telemetry.soc = packet.stateOfCharge
+    telemetry.soc = packet.batteryStateOfCharge
     telemetry.soh = packet.batteryStateOfHealth
     telemetry.battTemp = packet.batteryTemperature
     telemetry.power = packet.batteryPower
