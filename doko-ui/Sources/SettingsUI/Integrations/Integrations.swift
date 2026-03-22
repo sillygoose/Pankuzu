@@ -65,7 +65,7 @@ struct IntegrationsView: View {
             }
           } footer: {
             Text(
-              "Enter your ABRP user token to stream live telemetry to A Better Route Planner. Find your token in the ABRP app under Settings → Live Data."
+              "Enter your ABRP user token to stream live telemetry to A Better Route Planner. Find your token in the ABRP app under Settings → Vehicle → Live Data."
             )
           }
         } label: {
