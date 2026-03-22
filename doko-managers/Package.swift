@@ -15,6 +15,7 @@ let package = Package(
     .library(name: "DokoWeatherManager", targets: ["DokoWeatherManager"]),
     .library(name: "DokoNotificationManager", targets: ["DokoNotificationManager"]),
     .library(name: "DokoLiveActivityManager", targets: ["DokoLiveActivityManager"]),
+    .library(name: "DokoABRP", targets: ["DokoABRP"]),
   ],
   dependencies: [
     .package(path: "../doko-core"),
@@ -22,6 +23,7 @@ let package = Package(
     .package(path: "../doko-logging"),
     .package(path: "../doko-sharing"),
     .package(path: "../doko-vehicle-interface"),
+    .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.11.0"),
     .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.6.0"),
     .package(url: "https://github.com/pointfreeco/swift-sharing", from: "2.7.4"),
   ],
@@ -87,6 +89,15 @@ let package = Package(
       dependencies: [
         .product(name: "DokoSharing", package: "doko-sharing"),
         .product(name: "DokoLogging", package: "doko-logging"),
+        .product(name: "Dependencies", package: "swift-dependencies"),
+      ]
+    ),
+    .target(
+      name: "DokoABRP",
+      dependencies: [
+        .product(name: "DokoTypes", package: "doko-core"),
+        .product(name: "DokoLogging", package: "doko-logging"),
+        .product(name: "DokoSharing", package: "doko-sharing"),
       ]
     ),
   ],

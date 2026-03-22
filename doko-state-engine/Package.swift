@@ -29,6 +29,7 @@ let package = Package(
         .product(name: "DokoVehicleManager", package: "doko-managers"),
         .product(name: "CoreLocationManager", package: "doko-managers"),
         .product(name: "DokoLiveActivityManager", package: "doko-managers"),
+        .product(name: "DokoABRP", package: "doko-managers"),
         .product(name: "DokoSchema", package: "doko-schema"),
       ]
     ),

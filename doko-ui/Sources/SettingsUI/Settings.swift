@@ -45,13 +45,13 @@ public struct SettingsView: View {
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
           GridRow {
             DokoGridValueButton(
-              color: .gray,
+              color: .yellow,
               value: nil,
               units: nil,
-              iconName: "gear",
-              title: "Application"
+              iconName: "info.circle.fill",
+              title: "About"
             ) {
-              path.append(Destination.applicationSettings)
+              path.append(Destination.about)
             }
 
             DokoGridValueButton(
@@ -99,18 +99,6 @@ public struct SettingsView: View {
             }
 
             DokoGridValueButton(
-              color: .yellow,
-              value: nil,
-              units: nil,
-              iconName: "info.circle.fill",
-              title: "About"
-            ) {
-              path.append(Destination.about)
-            }
-          }
-
-          GridRow {
-            DokoGridValueButton(
               color: .purple,
               value: nil,
               units: nil,
@@ -119,15 +107,27 @@ public struct SettingsView: View {
             ) {
               path.append(Destination.databseSeeding)
             }
+          }
 
+          GridRow {
             DokoGridValueButton(
-              color: .red,
+              color: .orange,
               value: nil,
               units: nil,
-              iconName: "ladybug.circle.fill",
-              title: "Debugging"
+              iconName: "ruler",
+              title: "Units"
             ) {
-              path.append(Destination.debugging)
+              path.append(Destination.unitsSettings)
+            }
+
+            DokoGridValueButton(
+              color: .teal,
+              value: nil,
+              units: nil,
+              iconName: "map.fill",
+              title: "Maps"
+            ) {
+              path.append(Destination.mapsSettings)
             }
           }
 
@@ -140,6 +140,38 @@ public struct SettingsView: View {
               title: "iCloud"
             ) {
               path.append(Destination.iCloudSettings)
+            }
+
+            DokoGridValueButton(
+              color: .indigo,
+              value: nil,
+              units: nil,
+              iconName: "arrow.trianglehead.2.clockwise",
+              title: "Integrations"
+            ) {
+              path.append(Destination.integrations)
+            }
+          }
+
+          GridRow {
+            DokoGridValueButton(
+              color: .gray,
+              value: nil,
+              units: nil,
+              iconName: "gearshape.2.fill",
+              title: "Advanced"
+            ) {
+              path.append(Destination.advancedSettings)
+            }
+
+            DokoGridValueButton(
+              color: .red,
+              value: nil,
+              units: nil,
+              iconName: "ladybug.circle.fill",
+              title: "Debugging"
+            ) {
+              path.append(Destination.debugging)
             }
           }
         }
@@ -168,10 +200,16 @@ public struct SettingsView: View {
           LocationSettingsView(
             model: LocationSettingsModel()
           )
-        case .applicationSettings:
-          ApplicationSettingsView(
-            model: ApplicationSettingsModel()
+        case .unitsSettings:
+          UnitsSettingsView()
+        case .mapsSettings:
+          MapsSettingsView()
+        case .debugging:
+          DebuggingView(
+            model: DebuggingModel()
           )
+        case .advancedSettings:
+          AdvancedSettingsView()
         case .databaseSettings:
           DatabaseSettingsView(
             model: DatabaseSettingsModel()
@@ -179,10 +217,6 @@ public struct SettingsView: View {
         case .about:
           AboutView(
             model: AboutModel()
-          )
-        case .debugging:
-          DebuggingView(
-            model: DebuggingModel()
           )
         case .databseSeeding:
           DatabaseSeedingView(
@@ -192,6 +226,8 @@ public struct SettingsView: View {
           iCloudSettingsView(
             model: iCloudSettingsModel()
           )
+        case .integrations:
+          IntegrationsView()
         }
       }
       .navigationTitle("")
@@ -202,12 +238,15 @@ public struct SettingsView: View {
     case bluetooth
     case vehicleSettings
     case locationSettings
-    case applicationSettings
+    case unitsSettings
+    case mapsSettings
     case databaseSettings
     case about
     case debugging
     case databseSeeding
+    case advancedSettings
     case iCloudSettings
+    case integrations
   }
 }
 

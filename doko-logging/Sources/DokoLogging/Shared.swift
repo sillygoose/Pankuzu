@@ -66,3 +66,9 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
   }
 }
 
+extension SharedKey where Self == AppStorageKey<Bool>.Default {
+  public static var logIntegrationPackets: Self {
+    Self[.appStorage("ApplicationSettings-logIntegrationPackets"), default: false]
+  }
+}
+

@@ -1,6 +1,8 @@
 import Foundation
 import CoreLocation
 
+import Dependencies
+
 import DokoTypes
 
 public enum ObdCommand: Equatable, Hashable, Sendable {
@@ -463,7 +465,8 @@ public struct ObdCommandPacket: Equatable, Sendable {
   public let commands: [ObdCommand]
 
   public init(type: DokoPacketType, commands: [ObdCommand]) {
-    self.queuedAt = Date.now
+    @Dependency(\.date.now) var now
+    self.queuedAt = now
     self.type = type
     self.commands = commands
   }
@@ -477,8 +480,9 @@ public struct ObdResponsePacket: Equatable, Sendable {
   public var responses: ObdResponseDictionary
 
   public init(queuedAt: Date, type: DokoPacketType, errors: Int, responses: ObdResponseDictionary) {
+    @Dependency(\.date.now) var now
     self.queuedAt = queuedAt
-    self.completedAt = Date.now
+    self.completedAt = now
     self.type = type
     self.errors = errors
     self.responses = responses

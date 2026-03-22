@@ -74,6 +74,7 @@ let package = Package(
         .product(name: "DokoStateEngine", package: "doko-state-engine"),
         .product(name: "DokoSchema", package: "doko-schema"),
         .product(name: "DokoSharing", package: "doko-sharing"),
+        .product(name: "DokoABRP", package: "doko-managers"),
         .product(name: "SwiftUINavigation", package: "swift-navigation"),
         .product(name: "CasePaths", package: "swift-case-paths"),
       ]

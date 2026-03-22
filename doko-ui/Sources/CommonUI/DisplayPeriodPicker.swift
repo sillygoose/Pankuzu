@@ -1,6 +1,8 @@
 import Foundation
 import SwiftUI
 
+import Dependencies
+
 public enum DisplayPeriod: Codable, Hashable, Identifiable, Sendable {
   case today, pastWeek, pastMonth, custom(Date?, Date?)
 
@@ -16,7 +18,8 @@ public enum DisplayPeriod: Codable, Hashable, Identifiable, Sendable {
   }
 
   public var dateRange: (Date?, Date?) {
-    let startOfToday = Calendar.current.startOfDay(for: Date.now)
+    @Dependency(\.date.now) var now
+    let startOfToday = Calendar.current.startOfDay(for: now)
     let endOfToday = Calendar.current.date(byAdding: .day, value: 1, to: startOfToday)!
     switch self {
     case .today:
@@ -96,8 +99,9 @@ public struct DisplayPeriodPicker: View {
   }
 
   var bounds: Range<Date> {
+    @Dependency(\.date.now) var now
     let start = calendar.date(from: DateComponents(year: 2025, month: 10, day: 1))!
-    return start..<Date.now
+    return start..<now
   }
 
   public var body: some View {

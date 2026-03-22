@@ -1,72 +1,37 @@
 import SwiftUI
-import MapKit
 
 import CommonUI
 import DokoTypes
 import DokoSharing
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
-  static var displayUnitsExpanded: Self {
-    Self[.appStorage("ApplicationSettings-displayUnitsExpanded"), default: false]
-  }
-}
-
-extension SharedKey where Self == AppStorageKey<Bool>.Default {
-  static var mapStylesExpanded: Self {
-    Self[.appStorage("ApplicationSettings-mapStylesExpanded"), default: false]
-  }
-}
-
-extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var advancedExpanded: Self {
-    Self[.appStorage("ApplicationSettings-advancedExpanded"), default: false]
+    Self[.appStorage("AdvancedSettings-advancedExpanded"), default: false]
   }
 }
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var debuggingExpanded: Self {
-    Self[.appStorage("ApplicationSettings-debuggingExpanded"), default: false]
+    Self[.appStorage("AdvancedSettings-debuggingExpanded"), default: false]
   }
 }
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var tripPositionExpanded: Self {
-    Self[.appStorage("ApplicationSettings-tripPositionExpanded"), default: false]
+    Self[.appStorage("AdvancedSettings-tripPositionExpanded"), default: false]
   }
 }
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var tripElevationExpanded: Self {
-    Self[.appStorage("ApplicationSettings-tripElevationExpanded"), default: false]
-  }
-}
-
-struct MapStylePicker: View {
-  @Binding var selection: DisplayMapStyle
-  let pickerName: String
-
-  var body: some View {
-    Picker(
-      pickerName,
-      selection: $selection
-    ) {
-      ForEach(DisplayMapStyle.allCases) { mapStyle in
-        Text(mapStyle.name)
-          .fixedSize(horizontal: false, vertical: true)
-          .tag(mapStyle)
-      }
-    }
+    Self[.appStorage("AdvancedSettings-tripElevationExpanded"), default: false]
   }
 }
 
 @MainActor
 @Observable
-class ApplicationSettingsModel {
+class AdvancedSettingsModel {
   @ObservationIgnored @Shared(.metric) var metric
-  @ObservationIgnored @Shared(.kWhPer100km) var kWhPer100km
-
-  @ObservationIgnored @Shared(.tripMapStyle) var tripMapStyle
-  @ObservationIgnored @Shared(.chargeMapStyle) var chargeMapStyle
 
   @ObservationIgnored @Shared(.poiThreshold) var poiThreshold
   @ObservationIgnored @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
@@ -82,22 +47,6 @@ class ApplicationSettingsModel {
   @ObservationIgnored @Shared(.minimumTripElevationChange) var minimumTripElevationChange
 
   @ObservationIgnored @Shared(.deletedRecordRetentionDays) var deletedRecordRetentionDays
-
-  func metricToggleChanged(isOn: Bool) {
-    $metric.withLock { $0 = isOn }
-  }
-
-  func kWhPer100kmToggleChanged(isOn: Bool) {
-    $kWhPer100km.withLock { $0 = isOn }
-  }
-
-  func setTripMapStyle(_ style: DisplayMapStyle) {
-    $tripMapStyle.withLock { $0 = style }
-  }
-
-  func setChargeMapStyle(_ style: DisplayMapStyle) {
-    $chargeMapStyle.withLock { $0 = style }
-  }
 
   func setPoiThreshold(_ threshold: Double) {
     $poiThreshold.withLock { $0 = threshold }
@@ -140,8 +89,15 @@ class ApplicationSettingsModel {
   }
 }
 
-struct ApplicationSettingsView: View {
-  @Bindable var model: ApplicationSettingsModel
+
+@MainActor
+struct AdvancedSettingsView: View {
+  @State private var model = AdvancedSettingsModel()
+
+  @Shared(.advancedExpanded) var advancedExpanded
+  @Shared(.debuggingExpanded) var debuggingExpanded
+  @Shared(.tripPositionExpanded) var tripPositionExpanded
+  @Shared(.tripElevationExpanded) var tripElevationExpanded
 
   let PoiThresholdSliderRangeMetric = 30.0...100.0
   let PoiThresholdSliderRange = 100.0...300.0
@@ -153,65 +109,8 @@ struct ApplicationSettingsView: View {
   let DuplicateLocationThresholdSliderStepMetric = 5.0
   let DuplicateLocationThresholdSliderStep = 15.0
 
-  @Shared(.displayUnitsExpanded) var displayUnitsExpanded
-  @Shared(.mapStylesExpanded) var mapStylesExpanded
-  @Shared(.advancedExpanded) var advancedExpanded
-  @Shared(.debuggingExpanded) var debuggingExpanded
-  @Shared(.tripPositionExpanded) var tripPositionExpanded
-  @Shared(.tripElevationExpanded) var tripElevationExpanded
-
   var body: some View {
     List {
-      DisclosureGroup(
-        isExpanded: Binding(
-          get: { displayUnitsExpanded },
-          set: { newValue in $displayUnitsExpanded.withLock { $0 = newValue } }
-        )
-      ) {
-        Toggle(
-          "Metric",
-          isOn: Binding(
-            get: { model.metric },
-            set: { isOn, _ in model.metricToggleChanged(isOn: isOn) }
-          )
-        )
-        if model.metric {
-          Toggle(
-            "kWh Per 100km",
-            isOn: Binding(
-              get: { model.kWhPer100km },
-              set: { isOn, _ in model.kWhPer100kmToggleChanged(isOn: isOn) }
-            )
-          )
-        }
-      } label: {
-        Text("Display Units")
-      }
-
-      DisclosureGroup(
-        isExpanded: Binding(
-          get: { mapStylesExpanded },
-          set: { newValue in $mapStylesExpanded.withLock { $0 = newValue } }
-        )
-      ) {
-        MapStylePicker(
-          selection: Binding(
-            get: { model.tripMapStyle },
-            set: { model.setTripMapStyle($0) }
-          ),
-          pickerName: "Trip Map Style"
-        )
-        MapStylePicker(
-          selection: Binding(
-            get: { model.chargeMapStyle },
-            set: { model.setChargeMapStyle($0) }
-          ),
-          pickerName: "Charge Map Style"
-        )
-      } label: {
-        Text("Map Styling")
-      }
-
       DisclosureGroup(
         isExpanded: Binding(
           get: { advancedExpanded },
@@ -224,7 +123,7 @@ struct ApplicationSettingsView: View {
             let sliderStep = model.metric ? PoiThresholdSliderStepMetric : PoiThresholdSliderStep
             Slider(
               value: Binding(
-                get: { return model.metric ? model.poiThreshold : model.poiThreshold * 3 },
+                get: { model.metric ? model.poiThreshold : model.poiThreshold * 3 },
                 set: { model.setPoiThreshold(model.metric ? $0 : $0 / 3) }
               ),
               in: sliderRange,
@@ -248,11 +147,9 @@ struct ApplicationSettingsView: View {
         } header: {
           Text("POI Threshold")
         } footer: {
-          Text(
-            "Threshold used to find nearby Points of Interest."
-          )
-          .font(.caption)
-          .opacity(DesignTokens.Opacity.muted)
+          Text("Threshold used to find nearby Points of Interest.")
+            .font(.caption)
+            .opacity(DesignTokens.Opacity.muted)
         }
 
         Section {
@@ -261,7 +158,7 @@ struct ApplicationSettingsView: View {
             let sliderStep = model.metric ? DuplicateLocationThresholdSliderStepMetric : DuplicateLocationThresholdSliderStep
             Slider(
               value: Binding(
-                get: { return model.metric ? model.duplicateLocationThreshold : model.duplicateLocationThreshold * 3 },
+                get: { model.metric ? model.duplicateLocationThreshold : model.duplicateLocationThreshold * 3 },
                 set: { model.setDuplicateLocationThreshold(model.metric ? $0 : $0 / 3) }
               ),
               in: sliderRange,
@@ -285,14 +182,12 @@ struct ApplicationSettingsView: View {
         } header: {
           Text("Duplicate Location Threshold")
         } footer: {
-          Text(
-            "Threshold used to determine when two locations are the same."
-          )
-          .font(.caption)
-          .opacity(DesignTokens.Opacity.muted)
+          Text("Threshold used to determine when two locations are the same.")
+            .font(.caption)
+            .opacity(DesignTokens.Opacity.muted)
         }
       } label: {
-        Text("Advanced")
+        Text("Thresholds")
       }
 
 #if DEBUG
@@ -543,15 +438,13 @@ struct ApplicationSettingsView: View {
 #endif
     }
     .listStyle(.plain)
-    .navigationTitle("Application")
+    .navigationTitle("Advanced")
   }
 }
 
 #Preview {
   NavigationStack {
-    ApplicationSettingsView(
-      model: ApplicationSettingsModel()
-    )
+    AdvancedSettingsView()
     .preferredColorScheme(.dark)
   }
 }
