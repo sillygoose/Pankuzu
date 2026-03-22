@@ -95,13 +95,13 @@ extension ObdResponsePacket {
     return v
   }
   
-  public var obdOdometer: Double? {
-    guard case let .obdOdometer(v)? = responses[.obdOdometer]?.response else { return nil }
+  public var odometer: Double? {
+    guard case let .odometer(v)? = responses[.odometer]?.response else { return nil }
     return v
   }
 
-  public var odometer: Double? {
-    guard case let .odometer(v)? = responses[.odometer]?.response else { return nil }
+  public var speed: Double? {
+    guard case let .speed(v)? = responses[.speed]?.response else { return nil }
     return v
   }
 

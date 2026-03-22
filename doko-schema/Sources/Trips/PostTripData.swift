@@ -26,10 +26,10 @@ extension Trip {
     
     let timestamp = tripDataPacket.completedAt
     tripData.odometer.append(DokoDataPoint(timestamp: timestamp, double: odometer))
-    if let stateOfCharge = tripDataPacket.stateOfCharge {
+    if let stateOfCharge = tripDataPacket.batteryStateOfCharge {
       tripData.stateOfCharge.append(DokoDataPoint(timestamp: timestamp, double: stateOfCharge))
     }
-    if let energyToEmpty = tripDataPacket.energyToEmpty {
+    if let energyToEmpty = tripDataPacket.batteryEnergyToEmpty {
       tripData.energyToEmpty.append(DokoDataPoint(timestamp: timestamp, double: energyToEmpty))
     }
     if let batteryEnergy = tripDataPacket.batteryEnergy {

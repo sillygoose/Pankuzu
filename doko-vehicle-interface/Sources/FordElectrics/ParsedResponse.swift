@@ -37,6 +37,9 @@ extension FordElectrics {
       case .odometer:
         let odometer = try parseOdometer(response)
         commandResponse = .odometer(odometer)
+      case .speed:
+        let speed = try parseSpeed(response)
+        commandResponse = .speed(speed)
       case .gearSelected:
         let gearSelected = try parseGearSelected(response)
         commandResponse = .gearSelected(gearSelected)
@@ -80,7 +83,6 @@ extension FordElectrics {
       return ObdCommandResponse(command: command, result: result, response: commandResponse, rawCommand: rawCommand, rawResponse: response)
     } catch {
       let errorResult = ObdResult.getObdError(errorString: response)
-//###      DokoLogging.shared.postLoggingResponse(.error("\(command.description)(\(errorResult.description))"))
       let errorResponse: ObdResponse = .obdError(command.description, errorResult.description)
       return ObdCommandResponse(command: command, result: errorResult, response: errorResponse, rawCommand: rawCommand, rawResponse: response)
     }

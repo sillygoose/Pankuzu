@@ -26,20 +26,21 @@ public final class ABRPManager: Sendable {
     guard enabled, !userToken.isEmpty, shouldSend() else { return }
 
     var telemetry = ABRPTelemetry(utc: Int(now.timeIntervalSince1970))
-    telemetry.soc = packet.stateOfCharge
+    telemetry.soc = packet.batteryStateOfCharge
     telemetry.soh = packet.batteryStateOfHealth
     telemetry.battTemp = packet.batteryTemperature
-    telemetry.power = packet.batteryPower
+    telemetry.power = packet.batteryPower.map { -$0 }
     telemetry.odometer = packet.odometer
+    telemetry.speed = packet.speed
     telemetry.isCharging = 0
     telemetry.isDCFC = 0
     telemetry.isParked = 0
     if let position = packet.position {
       telemetry.lat = position.latitude
       telemetry.lon = position.longitude
-      telemetry.elevation = position.elevation
-      telemetry.heading = position.course
-      telemetry.speed = position.speed
+//      telemetry.elevation = position.elevation
+//      telemetry.heading = position.course
+//      telemetry.speed = position.speed
     }
     if let weather = packet.weather {
       telemetry.extTemp = weather.temperature
@@ -55,10 +56,10 @@ public final class ABRPManager: Sendable {
     guard enabled, !userToken.isEmpty, shouldSend() else { return }
 
     var telemetry = ABRPTelemetry(utc: Int(now.timeIntervalSince1970))
-    telemetry.soc = packet.stateOfCharge
+    telemetry.soc = packet.batteryStateOfCharge
     telemetry.soh = packet.batteryStateOfHealth
     telemetry.battTemp = packet.batteryTemperature
-    telemetry.power = packet.batteryPower
+    telemetry.power = packet.batteryPower.map { -$0 }
     telemetry.odometer = packet.odometer
     telemetry.isCharging = 1
     telemetry.isDCFC = isDCFC ? 1 : 0
@@ -86,8 +87,7 @@ public final class ABRPManager: Sendable {
     do {
       try await client.send(telemetry: telemetry, userToken: userToken)
       lastSentAt = now
-      let socStr = telemetry.soc.map { String(format: "%.1f%%", $0) } ?? "nil"
-      DokoLogging.shared.postLoggingResponse(.integration("ABRP.send ok soc=\(socStr)"))
+      DokoLogging.shared.postLoggingResponse(.integration("ABRP.send ok \(telemetry.description)"))
     } catch {
       DokoLogging.shared.postLoggingResponse(.error("ABRP.send: \(String(describing: error))"))
     }

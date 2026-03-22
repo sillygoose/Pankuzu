@@ -35,8 +35,8 @@ extension Charge {
       chargerType: dcfcCharge ? Charge.ChargerType.dc : Charge.ChargerType.ac,
       odometer: odometer,
     )
-    charge.energyToEmptyStart = chargeStartResponse.energyToEmpty
-    charge.energyToEmptyEnd = chargeStartResponse.energyToEmpty
+    charge.energyToEmptyStart = chargeStartResponse.batteryEnergyToEmpty
+    charge.energyToEmptyEnd = chargeStartResponse.batteryEnergyToEmpty
     charge.energy = chargeStartResponse.batteryEnergy
 
     charge.distanceToEmptyStart = chargeStartResponse.distanceToEmpty
@@ -44,8 +44,8 @@ extension Charge {
     if let _ = chargeStartResponse.distanceToEmpty {
       charge.range = 0.0
     }
-    charge.stateOfChargeStart = chargeStartResponse.stateOfCharge
-    charge.stateOfChargeEnd = chargeStartResponse.stateOfCharge
+    charge.stateOfChargeStart = chargeStartResponse.batteryStateOfCharge
+    charge.stateOfChargeEnd = chargeStartResponse.batteryStateOfCharge
     charge.batteryStateOfHealth = chargeStartResponse.batteryStateOfHealth
 
     charge.batteryTempStart = chargeStartResponse.batteryTemperature
@@ -78,7 +78,7 @@ extension Charge {
     chargeDraft.timeEnd = chargeEndResponse.completedAt
     chargeDraft.duration = chargeEndResponse.completedAt.timeIntervalSince(chargeDraft.timeStart)
     
-    chargeDraft.energyToEmptyEnd = chargeEndResponse.energyToEmpty
+    chargeDraft.energyToEmptyEnd = chargeEndResponse.batteryEnergyToEmpty
     chargeDraft.energy = chargeEndResponse.batteryEnergy
 
     chargeDraft.distanceToEmptyEnd = chargeEndResponse.distanceToEmpty
@@ -86,7 +86,7 @@ extension Charge {
       chargeDraft.range = dteStart - dteEnd
     }
 
-    chargeDraft.stateOfChargeEnd = chargeEndResponse.stateOfCharge
+    chargeDraft.stateOfChargeEnd = chargeEndResponse.batteryStateOfCharge
     chargeDraft.batteryTempEnd = chargeEndResponse.batteryTemperature
     chargeDraft.couplerTempEnd = chargeEndResponse.couplerTemperature
 
@@ -109,14 +109,14 @@ extension Charge {
     chargeDraft.duration = chargeUpdateResponse.completedAt.timeIntervalSince(chargeDraft.timeStart)
 
     chargeDraft.energy = chargeUpdateResponse.batteryEnergy
-    chargeDraft.energyToEmptyEnd = chargeUpdateResponse.energyToEmpty
+    chargeDraft.energyToEmptyEnd = chargeUpdateResponse.batteryEnergyToEmpty
 
     chargeDraft.distanceToEmptyEnd = chargeUpdateResponse.distanceToEmpty
     if let dteStart = chargeDraft.energyToEmptyStart, let dteEnd = chargeUpdateResponse.distanceToEmpty {
       chargeDraft.range = dteStart - dteEnd
     }
 
-    chargeDraft.stateOfChargeEnd = chargeUpdateResponse.stateOfCharge
+    chargeDraft.stateOfChargeEnd = chargeUpdateResponse.batteryStateOfCharge
     chargeDraft.batteryTempEnd = chargeUpdateResponse.batteryTemperature
     chargeDraft.couplerTempEnd = chargeUpdateResponse.couplerTemperature
 

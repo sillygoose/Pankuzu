@@ -209,15 +209,18 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
 
   case position
   case weather, meanTemperature
-  case odometer, obdOdometer
-  case energyToEmpty
-  case stateOfCharge
+  case odometer
+  case speed
   case distanceToEmpty
   
-  case batteryTemperature
+  case batteryStateOfCharge
   case batteryStateOfHealth
+  case batteryTemperature
+  case batteryVoltage
+  case batteryCurrent
   case batteryPower
   case batteryEnergy
+  case batteryEnergyToEmpty
 
   case couplerTemperature
   
@@ -296,24 +299,27 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".meanTemperature"
       case .odometer:
         return ".odometer"
-      case .obdOdometer:
-        return ".obdOdometer"
-
-      case .energyToEmpty:
-        return ".energyToEmpty"
-      case .stateOfCharge:
-        return ".stateOfCharge"
+      case .speed:
+        return ".speed"
       case .distanceToEmpty:
         return ".distanceToEmpty"
         
-      case .batteryTemperature:
-        return ".batteryTemperature"
+      case .batteryStateOfCharge:
+        return ".stateOfCharge"
       case .batteryStateOfHealth:
         return ".batteryStateOfHealth"
+      case .batteryTemperature:
+        return ".batteryTemperature"
+      case .batteryVoltage:
+        return ".batteryVoltage"
+      case .batteryCurrent:
+        return ".batteryCurrent"
       case .batteryPower:
         return ".batteryPower"
       case .batteryEnergy:
         return ".batteryEnergy"
+      case .batteryEnergyToEmpty:
+        return ".energyToEmpty"
 
       case .couplerTemperature:
         return ".couplerTemperature"
@@ -344,16 +350,18 @@ public enum DokoResponse: Equatable, Sendable {
   case weather(DokoCurrentWeather)
   case meanTemperature(Double)
   case odometer(Double)
-  case obdOdometer(Double)
+  case speed(Double)
 
-  case energyToEmpty(Double)
-  case stateOfCharge(Double)
   case distanceToEmpty(Double)
   
-  case batteryTemperature(Double)
+  case batteryStateOfCharge(Double)
   case batteryStateOfHealth(Double)
+  case batteryTemperature(Double)
+  case batteryVoltage(Double)
+  case batteryCurrent(Double)
   case batteryPower(Double)
   case batteryEnergy(Double)
+  case batteryEnergyToEmpty(Double)
 
   case couplerTemperature(Double)
 
@@ -380,24 +388,27 @@ public enum DokoResponse: Equatable, Sendable {
         return ".meanTemperature(\(String(format: "%.0f℃", temp)))"
       case .odometer(let odometer):
         return String(format: ".odometer(%.1f)", odometer)
-      case .obdOdometer(let obdOdometer):
-        return String(format: ".obdOdometer(%.1f)", obdOdometer)
-
-      case .energyToEmpty(let ete):
-        return String(format: ".energyToEmpty(%.1f)", ete)
-      case .stateOfCharge(let soc):
-        return String(format: ".stateOfCharge(%.1f)", soc)
+      case .speed(let speed):
+        return String(format: ".speed(%.1f)", speed)
       case .distanceToEmpty(let dte):
         return String(format: ".distanceToEmpty(%.1f)", dte)
         
-      case .batteryTemperature(let temp):
-        return String(format: ".batteryTemperature(%.0f)", temp)
+      case .batteryStateOfCharge(let soc):
+        return String(format: ".stateOfCharge(%.1f)", soc)
       case .batteryStateOfHealth(let soh):
         return String(format: ".batteryStateOfHealth(%.1f)", soh)
+      case .batteryTemperature(let temp):
+        return String(format: ".batteryTemperature(%.0f)", temp)
+      case .batteryVoltage(let voltage):
+        return String(format: ".batteryVoltage(%.1f)", voltage)
+      case .batteryCurrent(let current):
+        return String(format: ".batteryCurrent(%.1f)", current)
       case .batteryPower(let power):
         return String(format: ".batteryPower(%.1f)", power)
       case .batteryEnergy(let energy):
         return String(format: ".batteryEnergy(%.3f)", energy)
+      case .batteryEnergyToEmpty(let ete):
+        return String(format: ".energyToEmpty(%.1f)", ete)
 
       case .couplerTemperature(let temp):
         return String(format: ".couplerTemperature(%.0f)", temp)
@@ -434,6 +445,11 @@ extension DokoResponsePacket {
     return v
   }
 
+  public var speed: Double? {
+    guard case let .speed(v)? = responses[.speed]?.response else { return nil }
+    return v
+  }
+
   public var position: DokoPosition? {
     guard case let .position(v)? = responses[.position]?.response else { return nil }
     return v
@@ -454,13 +470,13 @@ extension DokoResponsePacket {
     return v
   }
 
-  public var energyToEmpty: Double? {
-    guard case let .energyToEmpty(v)? = responses[.energyToEmpty]?.response else { return nil }
+  public var batteryEnergyToEmpty: Double? {
+    guard case let .batteryEnergyToEmpty(v)? = responses[.batteryEnergyToEmpty]?.response else { return nil }
     return v
   }
 
-  public var stateOfCharge: Double? {
-    guard case let .stateOfCharge(v)? = responses[.stateOfCharge]?.response else { return nil }
+  public var batteryStateOfCharge: Double? {
+    guard case let .batteryStateOfCharge(v)? = responses[.batteryStateOfCharge]?.response else { return nil }
     return v
   }
 
