@@ -64,7 +64,7 @@ extension FordElectrics {
     if let batteryEnergy {
       dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .dcChargeUpdate, response: .batteryEnergy(batteryEnergy))
     }
-    if let odometer = responsePacket.stateOfCharge {
+    if let odometer = responsePacket.odometer {
       dokoResponses[.odometer] = DokoCommandResponse(command: .dcChargeUpdate, response: .odometer(odometer))
     }
     if let stateOfCharge = responsePacket.stateOfCharge {
