@@ -368,19 +368,19 @@ public func appDatabase() throws -> any DatabaseWriter {
 
 extension DependencyValues {
   mutating public func bootstrapDatabase() throws {
-    @Shared(.iCloudSync) var iCloudSync
+//    @Shared(.iCloudSync) var iCloudSync
     defaultDatabase = try appDatabase()
-    defaultSyncEngine = try SyncEngine(
-      for: defaultDatabase,
-      tables: Vehicle.self, Location.self,
-      Trip.self, TripPosition.self, TripElevation.self, TripData.self, TripWeather.self,
-      Charge.self, ChargeHistory.self
-    )
-    if iCloudSync {
-      DokoLogging.shared.postLoggingResponse(.iCloud("sync started"))
-    } else {
-      defaultSyncEngine.stop()
-      DokoLogging.shared.postLoggingResponse(.iCloud("sync stopped"))
-    }
+//    defaultSyncEngine = try SyncEngine(
+//      for: defaultDatabase,
+//      tables: Vehicle.self, Location.self,
+//      Trip.self, TripPosition.self, TripElevation.self, TripData.self, TripWeather.self,
+//      Charge.self, ChargeHistory.self
+//    )
+//    if iCloudSync {
+//      DokoLogging.shared.postLoggingResponse(.iCloud("sync started"))
+//    } else {
+//      defaultSyncEngine.stop()
+//      DokoLogging.shared.postLoggingResponse(.iCloud("sync stopped"))
+//    }
   }
 }
