@@ -132,15 +132,15 @@ public struct SettingsView: View {
           }
 
           GridRow {
-            DokoGridValueButton(
-              color: .blue,
-              value: nil,
-              units: nil,
-              iconName: "icloud",
-              title: "iCloud"
-            ) {
-              path.append(Destination.iCloudSettings)
-            }
+//            DokoGridValueButton(
+//              color: .blue,
+//              value: nil,
+//              units: nil,
+//              iconName: "icloud",
+//              title: "iCloud"
+//            ) {
+//              path.append(Destination.iCloudSettings)
+//            }
 
             DokoGridValueButton(
               color: .indigo,
@@ -151,9 +151,7 @@ public struct SettingsView: View {
             ) {
               path.append(Destination.integrations)
             }
-          }
-
-          GridRow {
+            
             DokoGridValueButton(
               color: .gray,
               value: nil,
@@ -163,6 +161,19 @@ public struct SettingsView: View {
             ) {
               path.append(Destination.advancedSettings)
             }
+
+          }
+
+          GridRow {
+//            DokoGridValueButton(
+//              color: .gray,
+//              value: nil,
+//              units: nil,
+//              iconName: "gearshape.2.fill",
+//              title: "Advanced"
+//            ) {
+//              path.append(Destination.advancedSettings)
+//            }
 
             DokoGridValueButton(
               color: .red,

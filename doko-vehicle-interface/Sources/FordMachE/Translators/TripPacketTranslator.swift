@@ -110,7 +110,7 @@ extension FordMachE {
     dokoResponses[.odometer] = DokoCommandResponse(command: .tripUpdate, response: .odometer(odometer))
     dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .tripUpdate, response: .batteryStateOfCharge(stateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripUpdate, response: .batteryTemperature(batteryTemperature))
-    if let stateOfHealth = responsePacket.batteryVoltage{
+    if let stateOfHealth = responsePacket.stateOfHealth {
       dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .tripUpdate, response: .batteryStateOfHealth(stateOfHealth))
     }
     if let voltage = responsePacket.batteryVoltage, let current = responsePacket.batteryCurrent {

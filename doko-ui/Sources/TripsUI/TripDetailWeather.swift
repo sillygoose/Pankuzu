@@ -26,6 +26,7 @@ public final class TripDetailWeatherModel {
 
   var minimumTemperature: Measurement<UnitTemperature> = .init(value: 0, unit: .celsius)
   var maximumTemperature: Measurement<UnitTemperature> = .init(value: 0, unit: .celsius)
+  var meanTemperature: Measurement<UnitTemperature>?
 
   public init(
     trip: Trip
@@ -49,6 +50,10 @@ public final class TripDetailWeatherModel {
       .converted(to: metric ? .celsius : .fahrenheit)
     maximumTemperature = Measurement(value: ceil(maxTemp + 1), unit: UnitTemperature.celsius)
       .converted(to: metric ? .celsius : .fahrenheit)
+    if let weighted = trip.weatherTempMeanWeighted, trip.duration > 0 {
+      meanTemperature = Measurement(value: weighted / trip.duration, unit: UnitTemperature.celsius)
+        .converted(to: metric ? .celsius : .fahrenheit)
+    }
   }
 
   private func downsample(_ data: [DokoWeather], maxPoints: Int) -> [DokoWeather] {
@@ -95,6 +100,25 @@ public struct TripDetailWeatherView: View {
   public var body: some View {
     VStack {
       VStack {
+        if let meanTemperature = model.meanTemperature {
+          HStack {
+            Text("Mean Temperature")
+              .font(DesignTokens.Font.headline)
+              .opacity(DesignTokens.Opacity.muted)
+            Spacer()
+            Text(meanTemperature.formatted(
+              .measurement(
+                width: .abbreviated,
+                usage: .asProvided,
+                numberFormatStyle: .number.precision(.fractionLength(0))
+              )
+            ))
+            .font(DesignTokens.Font.headline)
+            .bold()
+          }
+          .padding([.horizontal])
+          .padding(.top, 8)
+        }
         Chart {
           ForEach(model.weatherConditions) { weatherCondition in
             let temperature = Measurement(value: weatherCondition.temperature, unit: UnitTemperature.celsius)

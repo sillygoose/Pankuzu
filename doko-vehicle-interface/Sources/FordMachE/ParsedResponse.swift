@@ -43,6 +43,10 @@ extension FordMachE {
       case .odometer:
         let odometer = try parseOdometer(response)
         commandResponse = .odometer(odometer)
+      case .speed:
+        let speed = try parseSpeed(response)
+        commandResponse = .speed(speed)
+
       case .gearSelected:
         let gearSelected = try parseGearSelected(response)
         commandResponse = .gearSelected(gearSelected)

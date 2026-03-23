@@ -50,6 +50,7 @@ public actor FordMachE: ConnectedVehicleInterface {
     case .dcChargerStatus:              obdLinkCommand = "STPX h:7E4, d:22489E"
 
     case .odometer:                     obdLinkCommand = "STPX h:720, d:22404C"
+    case .speed:                        obdLinkCommand = "STPX h:7DF, d:221505"
 
     case .position:                     obdLinkCommand = ""
     case .weather:                      obdLinkCommand = ""
@@ -67,7 +68,8 @@ public actor FordMachE: ConnectedVehicleInterface {
     switch packetType {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
-        .stp(53), .stpbr(500000), .stpo
+        .stp(53), .stpbr(500000), .stpo,
+        .speed, .speed
       ])
 
     case .idle:

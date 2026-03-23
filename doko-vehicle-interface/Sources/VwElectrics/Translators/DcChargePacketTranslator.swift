@@ -61,7 +61,7 @@ extension VwElectrics {
     if let odometer = responsePacket.stateOfCharge {
       dokoResponses[.odometer] = DokoCommandResponse(command: .dcChargeUpdate, response: .odometer(odometer))
     }
-    if let stateOfCharge = responsePacket.stateOfCharge {
+    if let stateOfCharge = responsePacket.odometer {
       dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .dcChargeUpdate, response: .batteryStateOfCharge(stateOfCharge))
     }
     if let stateOfHealth = responsePacket.stateOfHealth {
