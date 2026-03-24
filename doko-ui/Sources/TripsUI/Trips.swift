@@ -319,6 +319,7 @@ public struct TripsView: View {
           }
         }
         .padding(.horizontal)
+        .padding(.bottom, 8)
 
         List {
           TipView(TripDetailsTip())

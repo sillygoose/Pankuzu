@@ -343,6 +343,7 @@ public struct ChargesView: View {
           }
         }
         .padding(.horizontal)
+        .padding(.bottom, 8)
 
         List {
           TipView(ChargeDetailsTip())
