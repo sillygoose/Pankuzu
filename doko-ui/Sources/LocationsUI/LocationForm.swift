@@ -4,6 +4,7 @@ import MapKit
 import CommonUI
 import DokoSharing
 import DokoSchema
+import DokoLocationManager
 
 @MainActor
 @Observable
@@ -15,14 +16,18 @@ public final class LocationFormModel: Identifiable {
   var saveErrorMessage: String?
   var isSaveErrorPresented = false
 
-  @ObservationIgnored
-  @Dependency(\.defaultDatabase) var database
+  @ObservationIgnored @Dependency(\.defaultDatabase) var database
 
   public init(
     location: Location.Draft
   ) {
     self.location = location
     self.unmodifiedLocation = location
+    if location.isUnresolved {
+      Task { @MainActor in
+        self.location = await DokoLocationManager.shared.geocode(location)
+      }
+    }
   }
 
   var unchanged: Bool {

@@ -92,6 +92,7 @@ let package = Package(
         "CommonUI",
         .product(name: "DokoSharing", package: "doko-sharing"),
         .product(name: "DokoSchema", package: "doko-schema"),
+        .product(name: "DokoLocationManager", package: "doko-managers"),
       ]
     ),
     .target(

@@ -76,48 +76,51 @@ public final class DokoLocationManager: Sendable {
     return locationID
   }
 
+  /// Geocodes a draft and returns an updated copy with address fields populated.
+  /// Does not save to the database.
+  public func geocode(_ draft: Location.Draft) async -> Location.Draft {
+    var result = draft
+    guard let request = MKReverseGeocodingRequest(location: CLLocation(latitude: draft.latitude, longitude: draft.longitude)) else {
+      DokoLogging.shared.postLoggingResponse(.error("Expected honest MKReverseGeocodingRequest()"))
+      return result
+    }
+    let mapItems: [MKMapItem]
+    do {
+      mapItems = try await request.mapItems
+    } catch {
+      DokoLogging.shared.postLoggingResponse(.error("MKReverseGeocodingRequest failed: \(error.localizedDescription)"))
+      return result
+    }
+    guard let mapItem = mapItems.first else {
+      DokoLogging.shared.postLoggingResponse(.location("MKReverseGeocodingRequest: no items"))
+      return result
+    }
+    if let addressRepresentations = mapItem.addressRepresentations {
+      DokoLogging.shared.postLoggingResponse(.location("cityName: \(addressRepresentations.cityName ?? "")"))
+      DokoLogging.shared.postLoggingResponse(.location("cityWithContext: \(addressRepresentations.cityWithContext ?? "")"))
+      DokoLogging.shared.postLoggingResponse(.location("regionName: \(addressRepresentations.regionName ?? "")"))
+      DokoLogging.shared.postLoggingResponse(.location("region: \(addressRepresentations.region?.identifier ?? "")"))
+      result.region = addressRepresentations.region?.identifier
+      result.city = addressRepresentations.cityName
+      result.stateProv = addressRepresentations.cityWithContext(.short)
+      if let city = result.city, let stateProv = result.stateProv {
+        result.stateProv = stateProv.replacingOccurrences(of: "\(city), ", with: "")
+      }
+      if let address = mapItem.address {
+        DokoLogging.shared.postLoggingResponse(.location("shortAddress: \(address.shortAddress ?? "")"))
+        if let shortAddress = address.shortAddress, let city = result.city {
+          result.street = shortAddress.replacingOccurrences(of: ", \(city)", with: "")
+        }
+      }
+      DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(result.placeName))"))
+    }
+    return result
+  }
+
   private func reverseGeocode(id: Location.ID, draft: Location.Draft, localSearch: Bool = true) {
     Task { [location = draft] in
-      guard let request = MKReverseGeocodingRequest(location: CLLocation(latitude: location.latitude, longitude: location.longitude)) else {
-        DokoLogging.shared.postLoggingResponse(.error("Expected honest MKReverseGeocodingRequest()"))
-        return
-      }
-      let mapItems: [MKMapItem]
-      do {
-        mapItems = try await request.mapItems
-      } catch {
-        DokoLogging.shared.postLoggingResponse(.error("MKReverseGeocodingRequest failed: \(error.localizedDescription)"))
-        return
-      }
+      var updatedDraft = await geocode(location)
 
-      guard let mapItem = mapItems.first else {
-        DokoLogging.shared.postLoggingResponse(.location("MKReverseGeocodingRequest: no items"))
-        return
-      }
-      
-      var updatedLocation = Location(id: id, latitude: location.latitude, longitude: location.longitude, elevation: location.elevation)
-      if let addressRepresentations = mapItem.addressRepresentations {
-        DokoLogging.shared.postLoggingResponse(.location("cityName: \(addressRepresentations.cityName ?? "")"))
-        DokoLogging.shared.postLoggingResponse(.location("cityWithContext: \(addressRepresentations.cityWithContext ?? "")"))
-        DokoLogging.shared.postLoggingResponse(.location("regionName: \(addressRepresentations.regionName ?? "")"))
-        DokoLogging.shared.postLoggingResponse(.location("region: \(addressRepresentations.region?.identifier ?? "")"))
-        updatedLocation.region = addressRepresentations.region?.identifier
-        updatedLocation.city = addressRepresentations.cityName
-        updatedLocation.stateProv = addressRepresentations.cityWithContext(.short)
-        if let city = updatedLocation.city, let stateProv = updatedLocation.stateProv {
-          let trimmedStateProv = stateProv.replacingOccurrences(of: "\(city), ", with: "")
-          updatedLocation.stateProv = trimmedStateProv
-        }
-        if let address = mapItem.address {
-          DokoLogging.shared.postLoggingResponse(.location("shortAddress: \(address.shortAddress ?? "")"))
-          if let shortAddress = address.shortAddress, let city = updatedLocation.city {
-            let trimmedStreet = shortAddress.replacingOccurrences(of: ", \(city)", with: "")
-            updatedLocation.street = trimmedStreet
-          }
-        }
-        DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(updatedLocation.placeName))"))
-      }
-      
       if localSearch {
         @Shared(.appSettings) var appSettings
         let poiSearch = MKLocalSearch(
@@ -128,11 +131,18 @@ public final class DokoLocationManager: Sendable {
         )
         let response = try? await poiSearch.start()
         if let response, let mapItem = response.mapItems.first {
-          updatedLocation.name = mapItem.name
-          DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(updatedLocation.placeName))"))
+          updatedDraft.name = mapItem.name
+          DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(updatedDraft.placeName))"))
         }
       }
-      
+
+      var updatedLocation = Location(id: id, latitude: location.latitude, longitude: location.longitude, elevation: location.elevation)
+      updatedLocation.name = updatedDraft.name
+      updatedLocation.street = updatedDraft.street
+      updatedLocation.city = updatedDraft.city
+      updatedLocation.stateProv = updatedDraft.stateProv
+      updatedLocation.region = updatedDraft.region
+
       @Dependency(\.defaultDatabase) var database
       withErrorReporting {
         try database.write { db in
