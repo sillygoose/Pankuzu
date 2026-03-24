@@ -94,22 +94,39 @@ public final class DokoLocationManager: Sendable {
       return result
     }
     if let addressRepresentations = mapItem.addressRepresentations {
-      DokoLogging.shared.postLoggingResponse(.location("fullAddress(): \(addressRepresentations.fullAddress(includingRegion: true, singleLine: true) ?? "")"))
-      DokoLogging.shared.postLoggingResponse(.location("cityWithContext: \(addressRepresentations.cityWithContext ?? "")"))
+      DokoLogging.shared.postLoggingResponse(.location("fullAddress(): \(addressRepresentations.fullAddress(includingRegion: false, singleLine: true) ?? "")"))
       DokoLogging.shared.postLoggingResponse(.location("cityName: \(addressRepresentations.cityName ?? "")"))
       DokoLogging.shared.postLoggingResponse(.location("cityWithContext: \(addressRepresentations.cityWithContext ?? "")"))
       DokoLogging.shared.postLoggingResponse(.location("regionName: \(addressRepresentations.regionName ?? "")"))
       DokoLogging.shared.postLoggingResponse(.location("region: \(addressRepresentations.region?.identifier ?? "")"))
       result.region = addressRepresentations.region?.identifier
       result.city = addressRepresentations.cityName
-      result.stateProv = addressRepresentations.cityWithContext(.short)
-      if let city = result.city, let stateProv = result.stateProv {
+      
+      if let city = result.city, let stateProv = addressRepresentations.cityWithContext(.short), !stateProv.isEmpty {
         result.stateProv = stateProv.replacingOccurrences(of: "\(city), ", with: "")
+        if result.stateProv == stateProv {
+          result.stateProv = stateProv.replacingOccurrences(of: "\(city) ", with: "")
+        }
+      }
+      
+      if result.stateProv == nil, let singleLine = addressRepresentations.fullAddress(includingRegion: false, singleLine: true),
+         let city = result.city {
+        // Canada: "180 Nichol Rd, Baltimore ON K0K 1C0, Canada" — city and province space-separated
+        // US:     "123 Main St, Springfield, IL 62701"          — city and state comma-separated
+        for sep in [" ", ", "] {
+          let tail = singleLine.components(separatedBy: city + sep).dropFirst().first ?? ""
+          let candidate = tail.components(separatedBy: CharacterSet(charactersIn: " ,")).first ?? ""
+          if candidate.count == 2, candidate.allSatisfy({ $0.isUppercase }) {
+            result.stateProv = candidate
+            break
+          }
+        }
       }
       if let address = mapItem.address {
         DokoLogging.shared.postLoggingResponse(.location("shortAddress: \(address.shortAddress ?? "")"))
         if let shortAddress = address.shortAddress, let city = result.city {
           result.street = shortAddress.replacingOccurrences(of: ", \(city)", with: "")
+          DokoLogging.shared.postLoggingResponse(.location("street: \(result.street ?? "")"))
         }
       }
       DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(result.placeName))"))
@@ -166,3 +183,4 @@ extension Array where Element == Location {
     return nil
   }
 }
+
