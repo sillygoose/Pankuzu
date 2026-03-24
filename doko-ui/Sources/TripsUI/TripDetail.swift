@@ -307,7 +307,7 @@ public struct TripDetailView: View {
               location: Location.Draft(location)
             )
           )
-          .presentationDetents([.medium])
+          .presentationDetents([.large])
         }
       case .editVehicleForm(let vehicle):
         NavigationStack {

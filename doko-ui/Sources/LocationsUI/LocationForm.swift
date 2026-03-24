@@ -100,6 +100,13 @@ public struct LocationFormView: View {
             set: { model.location.stateProv = $0.isEmpty ? nil : $0 }
           )
         )
+        TextField(
+          "Region",
+          text: Binding(
+            get: { model.location.region ?? "" },
+            set: { model.location.region = $0.isEmpty ? nil : $0 }
+          )
+        )
       }
       header: {
         Text("Location Info")
