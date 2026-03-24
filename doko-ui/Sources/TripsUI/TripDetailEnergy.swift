@@ -38,7 +38,7 @@ public final class TripDetailEnergyModel {
     if let initialEnergy = trip.energyToEmptyStart {
       let rawBatteryEnergy = tripData.batteryEnergy
       calculatedEnergy = rawBatteryEnergy.map { point in
-        DokoDataPoint(timestamp: point.timestamp, double: initialEnergy - point.datapoint)
+        DokoDataPoint(timestamp: point.timestamp, double: initialEnergy + point.datapoint)
       }
       calculatedEnergy = downsample(calculatedEnergy, maxPoints: 60)
     }
