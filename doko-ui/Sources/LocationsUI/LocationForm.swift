@@ -25,7 +25,7 @@ public final class LocationFormModel: Identifiable {
     self.unmodifiedLocation = location
     if location.isUnresolved {
       Task { @MainActor in
-        self.location = await DokoLocationManager.shared.geocode(location)
+        self.location = await DokoLocationManager.shared.reverseGeoCodeDraft(location)
       }
     }
   }

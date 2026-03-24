@@ -76,9 +76,7 @@ public final class DokoLocationManager: Sendable {
     return locationID
   }
 
-  /// Geocodes a draft and returns an updated copy with address fields populated.
-  /// Does not save to the database.
-  public func geocode(_ draft: Location.Draft) async -> Location.Draft {
+  public func reverseGeoCodeDraft(_ draft: Location.Draft) async -> Location.Draft {
     var result = draft
     guard let request = MKReverseGeocodingRequest(location: CLLocation(latitude: draft.latitude, longitude: draft.longitude)) else {
       DokoLogging.shared.postLoggingResponse(.error("Expected honest MKReverseGeocodingRequest()"))
@@ -96,6 +94,8 @@ public final class DokoLocationManager: Sendable {
       return result
     }
     if let addressRepresentations = mapItem.addressRepresentations {
+      DokoLogging.shared.postLoggingResponse(.location("fullAddress(): \(addressRepresentations.fullAddress(includingRegion: true, singleLine: true) ?? "")"))
+      DokoLogging.shared.postLoggingResponse(.location("cityWithContext: \(addressRepresentations.cityWithContext ?? "")"))
       DokoLogging.shared.postLoggingResponse(.location("cityName: \(addressRepresentations.cityName ?? "")"))
       DokoLogging.shared.postLoggingResponse(.location("cityWithContext: \(addressRepresentations.cityWithContext ?? "")"))
       DokoLogging.shared.postLoggingResponse(.location("regionName: \(addressRepresentations.regionName ?? "")"))
@@ -119,7 +119,7 @@ public final class DokoLocationManager: Sendable {
 
   private func reverseGeocode(id: Location.ID, draft: Location.Draft, localSearch: Bool = true) {
     Task { [location = draft] in
-      var updatedDraft = await geocode(location)
+      var updatedDraft = await reverseGeoCodeDraft(location)
 
       if localSearch {
         @Shared(.appSettings) var appSettings
