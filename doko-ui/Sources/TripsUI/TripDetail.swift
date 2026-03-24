@@ -274,7 +274,7 @@ public struct TripDetailView: View {
           GridRow {
             DokoGridValueButton(
               color: batteryStateOfHealthColor,
-              value: String(format: "%.1f", batteryStateOfHealth),
+              value: String(format: "%.0f", batteryStateOfHealth),
               units: "%",
               iconName: "minus.plus.batteryblock.stack",
               title: "State of Health"

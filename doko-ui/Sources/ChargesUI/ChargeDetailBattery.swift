@@ -43,7 +43,7 @@ public struct ChargeDetailBatteryView: View {
           }()
           DokoGridCount(
             color: stateOfChargeStartColor,
-            value: String(format: "%.1f", stateOfChargeStart),
+            value: String(format: "%.0f", stateOfChargeStart),
             units: "%",
             iconName: stateOfChargeStartIcon,
             title: "Start SoC"
@@ -55,7 +55,7 @@ public struct ChargeDetailBatteryView: View {
           }()
           DokoGridCount(
             color: stateOfChargeEndColor,
-            value: String(format: "%.1f", stateOfChargeEnd),
+            value: String(format: "%.0f", stateOfChargeEnd),
             units: "%",
             iconName: stateOfChargeEndIcon,
             title: "End SoC"
