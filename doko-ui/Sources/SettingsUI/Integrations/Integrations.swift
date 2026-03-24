@@ -12,8 +12,7 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
 @MainActor
 @Observable
 class IntegrationsModel {
-  @ObservationIgnored @Shared(.abrpEnabled) var abrpEnabled
-  @ObservationIgnored @Shared(.abrpUserToken) var abrpUserToken
+  @ObservationIgnored @Shared(.appSettings) var appSettings
 
   init() {}
 }
@@ -39,8 +38,8 @@ struct IntegrationsView: View {
             Toggle(
               "Enable",
               isOn: Binding(
-                get: { model.abrpEnabled },
-                set: { isOn, _ in model.$abrpEnabled.withLock { $0 = isOn } }
+                get: { model.appSettings.abrpEnabled },
+                set: { isOn, _ in model.$appSettings.abrpEnabled.withLock { $0 = isOn } }
               )
             )
           } footer: {
@@ -53,15 +52,15 @@ struct IntegrationsView: View {
               TextField(
                 "User Token",
                 text: Binding(
-                  get: { model.abrpUserToken },
-                  set: { token in model.$abrpUserToken.withLock { $0 = token } }
+                  get: { model.appSettings.abrpUserToken },
+                  set: { token in model.$appSettings.abrpUserToken.withLock { $0 = token } }
                 )
               )
               .autocorrectionDisabled()
               .textInputAutocapitalization(.never)
-              if !model.abrpUserToken.isEmpty {
+              if !model.appSettings.abrpUserToken.isEmpty {
                 Button {
-                  model.$abrpUserToken.withLock { $0 = "" }
+                  model.$appSettings.abrpUserToken.withLock { $0 = "" }
                 } label: {
                   Image(systemName: "xmark.circle.fill")
                     .foregroundStyle(.secondary)

@@ -53,8 +53,7 @@ public final class TripsModel {
   @ObservationIgnored @Shared(.tripsDisplayPeriod) var tripsDisplayPeriod
   @ObservationIgnored @Shared(.tripsCustomDisplayPeriod) var tripsCustomDisplayPeriod
 
-  @ObservationIgnored @Shared(.metric) var metric
-  @ObservationIgnored @Shared(.kWhPer100km) var kWhPer100km
+  @ObservationIgnored @Shared(.appSettings) var appSettings
 
   @ObservationIgnored @Dependency(\.defaultDatabase) var database
   @ObservationIgnored @Dependency(\.date.now) var now
@@ -230,7 +229,7 @@ public struct TripsView: View {
               value: model.tripStats.distance ?? 0.0,
               unit: UnitLength.kilometers
             )
-            let distance = metricDistance.converted(to: model.metric ? .kilometers : .miles)
+            let distance = metricDistance.converted(to: model.appSettings.metric ? .kilometers : .miles)
 
             GridRow {
               DokoGridCount(
@@ -263,7 +262,7 @@ public struct TripsView: View {
               
               if let meanTemperaturePeriodMetric = model.meanTemperature {
                 let meanTemperaturePeriod = Measurement(value: meanTemperaturePeriodMetric, unit: UnitTemperature.celsius)
-                  .converted(to: model.metric ? .celsius : .fahrenheit)
+                  .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
                 let (meanTemperaturePeriodColor, meanTemperaturePeriodIcon) = {
                   if meanTemperaturePeriodMetric <= 4 { return (Color.blue, "thermometer.low") }
                   if meanTemperaturePeriodMetric < 30 { return (Color.green,"thermometer.medium") }
@@ -278,7 +277,7 @@ public struct TripsView: View {
                 )
               } else {
                 let meanTemperaturePeriod = Measurement(value: 0, unit: UnitTemperature.celsius)
-                  .converted(to: model.metric ? .celsius : .fahrenheit)
+                  .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
                 DokoGridCount(
                   color: .green,
                   value: "-",
@@ -297,7 +296,7 @@ public struct TripsView: View {
               )
               let energyEfficiency = metricEfficiency
                 .converted(
-                  to: model.metric ? model.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
+                  to: model.appSettings.metric ? model.appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
                 )
               GridRow {
                 DokoGridCount(

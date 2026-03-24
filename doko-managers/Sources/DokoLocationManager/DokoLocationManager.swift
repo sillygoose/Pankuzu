@@ -30,9 +30,9 @@ public final class DokoLocationManager: Sendable {
 
   public func updateLocation(id: Location.ID, latitude: Double, longitude: Double, elevation: Double, sharedLocation: Bool = true) -> Location.ID {
     @FetchAll var locations: [Location]
-    @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
+    @Shared(.appSettings) var appSettings
     if sharedLocation,
-       let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold),
+       let locationID = locations.contains(latitude: latitude, longitude: longitude, within: appSettings.duplicateLocationThreshold),
        locationID != id
     {
       DokoLogging.shared.postLoggingResponse(.location("reused location: \(locationID)"))
@@ -51,8 +51,8 @@ public final class DokoLocationManager: Sendable {
 
   public func addLocation(latitude: Double, longitude: Double, elevation: Double, sharedLocation: Bool = true) -> Location.ID? {
     @FetchAll var locations: [Location]
-    @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
-    if sharedLocation, let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold) {
+    @Shared(.appSettings) var appSettings
+    if sharedLocation, let locationID = locations.contains(latitude: latitude, longitude: longitude, within: appSettings.duplicateLocationThreshold) {
       DokoLogging.shared.postLoggingResponse(.location("reused location: \(locationID)"))
       return locationID
     }
@@ -119,11 +119,11 @@ public final class DokoLocationManager: Sendable {
       }
       
       if localSearch {
-        @Shared(.poiThreshold) var poiThreshold
+        @Shared(.appSettings) var appSettings
         let poiSearch = MKLocalSearch(
           request: MKLocalPointsOfInterestRequest(
             center: CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude),
-            radius: poiThreshold
+            radius: appSettings.poiThreshold
           )
         )
         let response = try? await poiSearch.start()

@@ -51,8 +51,7 @@ public final class TripDetailModel {
   
   @ObservationIgnored @FetchAll var locations: [Location]
   @ObservationIgnored @FetchOne(Trip.none) var trip
-  @ObservationIgnored @Shared(.metric) var metric
-  @ObservationIgnored @Shared(.kWhPer100km) var kWhPer100km
+  @ObservationIgnored @Shared(.appSettings) var appSettings
   
   var vehicle: Vehicle?
   var fromLocation: Location = .unexpectedLocation
@@ -168,9 +167,9 @@ public struct TripDetailView: View {
         value: duration == .seconds(0) ? 0 : (metricDistance.value / Double(duration.components.seconds)) * 3600,
         unit: UnitSpeed.kilometersPerHour
       )
-      let odometer = metricOdometer.converted(to: model.metric ? .kilometers : .miles)
-      let distance = metricDistance.converted(to: model.metric ? .kilometers : .miles)
-      let averageSpeed = metricAverageSpeed.converted(to: model.metric ? .kilometersPerHour : .milesPerHour)
+      let odometer = metricOdometer.converted(to: model.appSettings.metric ? .kilometers : .miles)
+      let distance = metricDistance.converted(to: model.appSettings.metric ? .kilometers : .miles)
+      let averageSpeed = metricAverageSpeed.converted(to: model.appSettings.metric ? .kilometersPerHour : .milesPerHour)
       
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
@@ -220,7 +219,7 @@ public struct TripDetailView: View {
           )
           let efficiency = metricEfficiency
             .converted(
-              to:model.metric ? model.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
+              to:model.appSettings.metric ? model.appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
             )
           GridRow {
             DokoGridValueButton(
@@ -245,9 +244,9 @@ public struct TripDetailView: View {
         if let distanceToEmptyStartMetric = trip.distanceToEmptyStart, let distanceToEmptyEndMetric = trip.distanceToEmptyEnd {
           GridRow {
             let distanceToEmptyStart = Measurement(value: distanceToEmptyStartMetric, unit: UnitLength.kilometers)
-              .converted(to: model.metric ? .kilometers : .miles)
+              .converted(to: model.appSettings.metric ? .kilometers : .miles)
             let distanceToEmptyEnd = Measurement(value: distanceToEmptyEndMetric, unit: UnitLength.kilometers)
-              .converted(to: model.metric ? .kilometers : .miles)
+              .converted(to: model.appSettings.metric ? .kilometers : .miles)
             DokoGridCount(
               color: .blue,
               value: String(format: "%.0f", distanceToEmptyStart.value as CVarArg),

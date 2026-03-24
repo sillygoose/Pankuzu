@@ -192,13 +192,13 @@ public final class DokoStateEngine {
             do {
               let tripDraft = try Trip.postTripUpdateRecord(tripDraft: tripDraft, tripUpdateResponse: dokoResponsePacket)
               self.tripInProgress = tripDraft
-              @Shared(.metric) var metric
+              @Shared(.appSettings) var appSettings
               let windSock: WindSock? = if let course = dokoResponsePacket.position?.course, let weather = dokoResponsePacket.weather {
                 WindSock(
                   course: .init(value: course, unit: .degrees),
-                  temperature: .init(value: weather.temperature, unit: .celsius).converted(to: metric ? .celsius : .fahrenheit),
+                  temperature: .init(value: weather.temperature, unit: .celsius).converted(to: appSettings.metric ? .celsius : .fahrenheit),
                   conditions: weather.conditionSymbol,
-                  windSpeed: .init(value: weather.windSpeed, unit: .metersPerSecond).converted(to: metric ? .metersPerSecond : .milesPerHour),
+                  windSpeed: .init(value: weather.windSpeed, unit: .metersPerSecond).converted(to: appSettings.metric ? .metersPerSecond : .milesPerHour),
                   windDirection: .init(value: weather.windDirection, unit: .degrees),
                   windCompassDirection: weather.windCompassDirection
                 )
@@ -207,8 +207,8 @@ public final class DokoStateEngine {
                 state: TripActivityAttributes.ContentState(
                   tripState: .active,
                   duration: .seconds(tripDraft.duration),
-                  distance: Measurement(value: tripDraft.distance, unit: UnitLength.kilometers).converted(to: metric ? .kilometers : .miles),
-                  rangeConsumed: tripDraft.range.map { Measurement(value: $0, unit: UnitLength.kilometers).converted(to: metric ? .kilometers : .miles) },
+                  distance: Measurement(value: tripDraft.distance, unit: UnitLength.kilometers).converted(to: appSettings.metric ? .kilometers : .miles),
+                  rangeConsumed: tripDraft.range.map { Measurement(value: $0, unit: UnitLength.kilometers).converted(to: appSettings.metric ? .kilometers : .miles) },
                   windSock: windSock
                 )
               )

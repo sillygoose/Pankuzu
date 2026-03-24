@@ -19,7 +19,7 @@ final class ChargeDetailCouplerTempChartModel {
   @FetchOne(ChargeHistory.none) var chargeHistory
 
   @ObservationIgnored
-  @Shared(.metric) var metric
+  @Shared(.appSettings) var appSettings
 
   var tempBins: [CouplerTempBin] = []
   var selectedBin: CouplerTempBin?
@@ -78,13 +78,13 @@ final class ChargeDetailCouplerTempChartModel {
   }
 
   func displayTemp(_ celsius: Double) -> Double {
-    metric
+    appSettings.metric
       ? celsius
       : Measurement(value: celsius, unit: UnitTemperature.celsius).converted(to: .fahrenheit).value
   }
 
   var tempUnit: String {
-    metric ? UnitTemperature.celsius.symbol : UnitTemperature.fahrenheit.symbol
+    appSettings.metric ? UnitTemperature.celsius.symbol : UnitTemperature.fahrenheit.symbol
   }
 }
 

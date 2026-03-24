@@ -50,6 +50,7 @@ struct PankuzuApp: App {
   var locationManager = CoreLocationManager()
 
   init() {
+    AppSettings.migrateIfNeeded()
     prepareDependencies {
       try! $0.bootstrapDatabase()
     }
@@ -88,12 +89,12 @@ struct PankuzuApp: App {
     }
     .backgroundTask(.appRefresh(dbPruningTaskIdentifier)) {
       @Dependency(\.defaultDatabase) var database
-      @Shared(.deletedRecordRetentionDays) var deletedRecordRetentionDays
+      @Shared(.appSettings) var appSettings
       scheduleDatabasePruning()
       withErrorReporting {
         try database.write { db in
           try Trip
-            .where { $0.readyForDeletion(days: deletedRecordRetentionDays) }
+            .where { $0.readyForDeletion(days: appSettings.deletedRecordRetentionDays) }
             .delete()
             .execute(db)
         }
@@ -101,7 +102,7 @@ struct PankuzuApp: App {
       withErrorReporting {
         try database.write { db in
           try Charge
-            .where { $0.readyForDeletion(days: deletedRecordRetentionDays) }
+            .where { $0.readyForDeletion(days: appSettings.deletedRecordRetentionDays) }
             .delete()
             .execute(db)
         }

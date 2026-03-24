@@ -58,7 +58,7 @@ public struct LocationFormView: View {
   @State var selectedMapItem: MKMapItem?
   @State var mapItems: [MKMapItem] = []
 
-  @Shared(.poiThreshold) var poiThreshold
+  @Shared(.appSettings) var appSettings
 
   public init(model: LocationFormModel) {
     self.model = model
@@ -122,7 +122,7 @@ public struct LocationFormView: View {
     .onChange(of: model.isDismissed) {
       dismiss()
     }
-    .task(id: poiThreshold) {
+    .task(id: appSettings.poiThreshold) {
       let latitude = model.location.latitude
       let longitude = model.location.longitude
       do {
@@ -132,7 +132,7 @@ public struct LocationFormView: View {
               latitude: latitude,
               longitude: longitude
             ),
-            radius: poiThreshold
+            radius: appSettings.poiThreshold
           )
         )
         let response = try await localSearch.start()

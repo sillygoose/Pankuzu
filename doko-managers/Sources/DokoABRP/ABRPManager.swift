@@ -21,9 +21,8 @@ public final class ABRPManager: Sendable {
 
   public func sendTripTelemetry(packet: DokoResponsePacket) {
     @Dependency(\.date.now) var now
-    @Shared(.abrpEnabled) var enabled
-    @Shared(.abrpUserToken) var userToken
-    guard enabled, !userToken.isEmpty, shouldSend() else { return }
+    @Shared(.appSettings) var appSettings
+    guard appSettings.abrpEnabled, !appSettings.abrpUserToken.isEmpty, shouldSend() else { return }
 
     var telemetry = ABRPTelemetry(utc: Int(now.timeIntervalSince1970))
     telemetry.soc = packet.batteryStateOfCharge
@@ -46,14 +45,13 @@ public final class ABRPManager: Sendable {
       telemetry.extTemp = weather.temperature
     }
 
-    Task { await send(telemetry: telemetry, userToken: userToken) }
+    Task { await send(telemetry: telemetry, userToken: appSettings.abrpUserToken) }
   }
 
   public func sendChargeTelemetry(packet: DokoResponsePacket, isDCFC: Bool) {
     @Dependency(\.date.now) var now
-    @Shared(.abrpEnabled) var enabled
-    @Shared(.abrpUserToken) var userToken
-    guard enabled, !userToken.isEmpty, shouldSend() else { return }
+    @Shared(.appSettings) var appSettings
+    guard appSettings.abrpEnabled, !appSettings.abrpUserToken.isEmpty, shouldSend() else { return }
 
     var telemetry = ABRPTelemetry(utc: Int(now.timeIntervalSince1970))
     telemetry.soc = packet.batteryStateOfCharge.map { floor($0) }
@@ -73,7 +71,7 @@ public final class ABRPManager: Sendable {
       telemetry.extTemp = weather.temperature
     }
 
-    Task { await send(telemetry: telemetry, userToken: userToken) }
+    Task { await send(telemetry: telemetry, userToken: appSettings.abrpUserToken) }
   }
 
   private func shouldSend() -> Bool {

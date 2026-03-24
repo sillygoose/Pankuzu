@@ -54,8 +54,7 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
   @Shared(.connectedAccessoryName) var connectedAccessoryName
   @Shared(.connectedAccessorySerialNumber) var connectedAccessorySerialNumber
   @Shared(.connectedVehicleInterface) var connectedVehicleInterface
-  @Shared(.backgroundMode) var backgroundMode
-  @Shared(.accessorySerialNumber) var accessorySerialNumber
+  @Shared(.appSettings) var appSettings
   
   private override init() {
     super.init()
@@ -77,11 +76,11 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
   }
 
   private func startBackgroundModeObservation() {
-    @Shared(.backgroundMode) var observedBackgroundMode
+    @Shared(.appSettings) var observed
     Task { [weak self] in
       guard let self else { return }
-      var old: Bool = observedBackgroundMode
-      for await newMode in $observedBackgroundMode.publisher.values {
+      var old: Bool = observed.backgroundMode
+      for await newMode in $observed.backgroundMode.publisher.values {
         guard old != newMode else { continue }
         old = newMode
         if newMode {
@@ -96,13 +95,13 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
   public func connect() {
     $connectedAccessoryName.withLock { $0 = nil }
     $connectedAccessorySerialNumber.withLock { $0 = nil }
-    guard backgroundMode else { return }
+    guard appSettings.backgroundMode else { return }
     let accessories = EAAccessoryManager.shared().connectedAccessories
     do {
       guard let newAccessory = accessories.first(where: { $0.protocolStrings.contains(protocolString) }) else {
         throw ObdLinkError.accessoryNotFound(self.protocolString)
       }
-      if let requiredSerialNumber = accessorySerialNumber, newAccessory.serialNumber != requiredSerialNumber {
+      if let requiredSerialNumber = appSettings.accessorySerialNumber, newAccessory.serialNumber != requiredSerialNumber {
         throw ObdLinkError.accessorySerialNumberMismatch(requiredSerialNumber, newAccessory.serialNumber)
       }
       guard let newSession = EASession(accessory: newAccessory, forProtocol: protocolString) else {
@@ -288,7 +287,7 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
       self.logger.error("\(timestamp()) ObdLinkManager.\(streamType)(\(aStream.streamError?.localizedDescription ?? "Unknown error")")
       DokoLogging.shared.postLoggingResponse(.error("ObdLinkManager.\(streamType)(\(aStream.streamError?.localizedDescription ?? "Unknown error")"))
       disconnect()
-      guard backgroundMode else { break }
+      guard appSettings.backgroundMode else { break }
       Task {
         try? await Task.sleep(for: .seconds(1))
         let accessories = EAAccessoryManager.shared().connectedAccessories
@@ -303,7 +302,7 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
       self.logger.error("\(timestamp()) ObdLinkManager.\(streamType)(.endEncountered)")
       DokoLogging.shared.postLoggingResponse(.error("ObdLinkManager.\(streamType)(.endEncountered)"))
       disconnect()
-      guard backgroundMode else { break }
+      guard appSettings.backgroundMode else { break }
       Task {
         try? await Task.sleep(for: .seconds(1))
         let accessories = EAAccessoryManager.shared().connectedAccessories
@@ -342,11 +341,11 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
   }
 
   public func setBackgroundMode(_ enabled: Bool) {
-    $backgroundMode.withLock { $0 = enabled }
+    $appSettings.backgroundMode.withLock { $0 = enabled }
   }
 
   @objc func connectAccessory(connectingAccessory: NotificationCenter.Publisher.Output) {
-    guard backgroundMode else { return }
+    guard appSettings.backgroundMode else { return }
     if session == nil {
       connect()
     } else {

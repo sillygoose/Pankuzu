@@ -91,7 +91,7 @@ public struct AddChargeFormView: View {
   @Environment(\.dismiss) var dismiss
   @Bindable var model: AddChargeFormModel
 
-  @Shared(.metric) var metric
+  @Shared(.appSettings) var appSettings
   @State private var cameraPosition: MapCameraPosition = .userLocation(fallback: .automatic)
   @State private var selectedLatitude: Double = 0
   @State private var selectedLongitude: Double = 0
@@ -218,12 +218,12 @@ public struct AddChargeFormView: View {
         HStack {
           Text("Odometer")
           Spacer()
-          TextField(metric ? "km" : "mi", text: $model.odometerText)
+          TextField(appSettings.metric ? "km" : "mi", text: $model.odometerText)
             .multilineTextAlignment(.trailing)
             .keyboardType(.decimalPad)
             .focused($odometerFocused)
             .frame(width: 80)
-          Text(metric ? "km" : "mi")
+          Text(appSettings.metric ? "km" : "mi")
             .foregroundStyle(.secondary)
         }
 

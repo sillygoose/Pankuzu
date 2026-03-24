@@ -14,13 +14,13 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
 @MainActor
 @Observable
 class iCloudSettingsModel {
-  @ObservationIgnored @Shared(.iCloudSync) var iCloudSync
+  @ObservationIgnored @Shared(.appSettings) var appSettings
 
   func iCloudSyncToggleChanged(isOn: Bool) async {
     @Dependency(\.defaultSyncEngine) var syncEngine
-    $iCloudSync.withLock { $0 = isOn }
+    $appSettings.iCloudSync.withLock { $0 = isOn }
 
-    if iCloudSync {
+    if appSettings.iCloudSync {
       do {
         try await syncEngine.start()
         DokoLogging.shared.postLoggingResponse(.iCloud("sync started"))
@@ -50,7 +50,7 @@ struct iCloudSettingsView: View {
         Toggle(
           "Enable iCloud Sync",
           isOn: Binding(
-            get: { model.iCloudSync },
+            get: { model.appSettings.iCloudSync },
             set: { isOn, _ in
               Task { await model.iCloudSyncToggleChanged(isOn: isOn) }
             }

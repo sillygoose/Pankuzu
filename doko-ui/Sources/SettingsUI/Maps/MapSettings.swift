@@ -6,17 +6,16 @@ import DokoSharing
 @MainActor
 @Observable
 class MapsSettingsModel {
-  @ObservationIgnored @Shared(.tripMapStyle) var tripMapStyle
-  @ObservationIgnored @Shared(.chargeMapStyle) var chargeMapStyle
+  @ObservationIgnored @Shared(.appSettings) var appSettings
 
   init() {}
 
   func setTripMapStyle(_ style: DisplayMapStyle) {
-    $tripMapStyle.withLock { $0 = style }
+    $appSettings.tripMapStyle.withLock { $0 = style }
   }
 
   func setChargeMapStyle(_ style: DisplayMapStyle) {
-    $chargeMapStyle.withLock { $0 = style }
+    $appSettings.chargeMapStyle.withLock { $0 = style }
   }
 }
 
@@ -45,14 +44,14 @@ struct MapsSettingsView: View {
     List {
       MapStylePicker(
         selection: Binding(
-          get: { model.tripMapStyle },
+          get: { model.appSettings.tripMapStyle },
           set: { model.setTripMapStyle($0) }
         ),
         pickerName: "Trip Map Style"
       )
       MapStylePicker(
         selection: Binding(
-          get: { model.chargeMapStyle },
+          get: { model.appSettings.chargeMapStyle },
           set: { model.setChargeMapStyle($0) }
         ),
         pickerName: "Charge Map Style"

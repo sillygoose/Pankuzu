@@ -16,7 +16,7 @@ public final class TripDetailWeatherModel {
   @FetchOne(TripWeather.none) var tripWeather
   
   @ObservationIgnored
-  @Shared(.metric) var metric
+  @Shared(.appSettings) var appSettings
   
   var combinedMarkDarkURL: URL?
   var legalPageURL: URL?
@@ -47,12 +47,12 @@ public final class TripDetailWeatherModel {
       maxTemp = max(maxTemp, weatherCondition.temperature)
     }
     minimumTemperature = Measurement(value: floor(minTemp - 1), unit: UnitTemperature.celsius)
-      .converted(to: metric ? .celsius : .fahrenheit)
+      .converted(to: appSettings.metric ? .celsius : .fahrenheit)
     maximumTemperature = Measurement(value: ceil(maxTemp + 1), unit: UnitTemperature.celsius)
-      .converted(to: metric ? .celsius : .fahrenheit)
+      .converted(to: appSettings.metric ? .celsius : .fahrenheit)
     if let weighted = trip.weatherTempMeanWeighted, trip.duration > 0 {
       meanTemperature = Measurement(value: weighted / trip.duration, unit: UnitTemperature.celsius)
-        .converted(to: metric ? .celsius : .fahrenheit)
+        .converted(to: appSettings.metric ? .celsius : .fahrenheit)
     }
   }
 
@@ -122,7 +122,7 @@ public struct TripDetailWeatherView: View {
         Chart {
           ForEach(model.weatherConditions) { weatherCondition in
             let temperature = Measurement(value: weatherCondition.temperature, unit: UnitTemperature.celsius)
-              .converted(to: model.metric ? .celsius : .fahrenheit)
+              .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
             LineMark(
               x: .value("time", weatherCondition.timestamp),
               y: .value("temp", temperature.value)
@@ -133,7 +133,7 @@ public struct TripDetailWeatherView: View {
 
           ForEach(model.downsampledWeatherConditions) { weatherCondition in
             let temperature = Measurement(value: weatherCondition.temperature, unit: UnitTemperature.celsius)
-              .converted(to: model.metric ? .celsius : .fahrenheit)
+              .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
             PointMark(
               x: .value("time", weatherCondition.timestamp),
               y: .value("temp", temperature.value)
@@ -175,7 +175,7 @@ public struct TripDetailWeatherView: View {
                 VStack {
                   HStack {
                     let temperature = Measurement(value: weatherCondition.temperature, unit: UnitTemperature.celsius)
-                      .converted(to: model.metric ? .celsius : .fahrenheit)
+                      .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
 
                     Text("\(weatherCondition.timestamp.formatted(date: .omitted, time: .shortened))")
                     Spacer()
@@ -193,11 +193,11 @@ public struct TripDetailWeatherView: View {
 
                   let windCompassDirection = weatherCondition.windCompassDirection
                   let windSpeed = Measurement(value: weatherCondition.windSpeed, unit: UnitSpeed.metersPerSecond)
-                    .converted(to: model.metric ? .kilometersPerHour : .milesPerHour)
+                    .converted(to: model.appSettings.metric ? .kilometersPerHour : .milesPerHour)
                   let formattedWindSpeed = windSpeed.formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(0))))
                   if let windGustMetric = weatherCondition.windGust {
                     let windGust = Measurement(value: windGustMetric, unit: UnitSpeed.metersPerSecond)
-                      .converted(to: model.metric ? .kilometersPerHour : .milesPerHour)
+                      .converted(to: model.appSettings.metric ? .kilometersPerHour : .milesPerHour)
                     let formattedWindGust = windGust
                       .formatted(
                         .measurement(

@@ -12,7 +12,7 @@ public final class ChargeDetailBatteryModel {
   var charge: Charge
 
   @ObservationIgnored
-  @Shared(.metric) var metric
+  @Shared(.appSettings) var appSettings
   
   public init(
     charge: Charge
@@ -66,7 +66,7 @@ public struct ChargeDetailBatteryView: View {
       if let distanceToEmptyStart = model.charge.distanceToEmptyStart, let distanceToEmptyEnd = model.charge.distanceToEmptyEnd {
         GridRow {
           let dteStartMetric = Measurement(value: distanceToEmptyStart, unit: UnitLength.kilometers)
-          let dteStart = dteStartMetric.converted(to: model.metric ? .kilometers : .miles)
+          let dteStart = dteStartMetric.converted(to: model.appSettings.metric ? .kilometers : .miles)
           DokoGridCount(
             color: .blue,
             value: String(format: "%.0f", dteStart.value as CVarArg),
@@ -76,7 +76,7 @@ public struct ChargeDetailBatteryView: View {
           )
           
           let dteEndMetric = Measurement(value: distanceToEmptyEnd, unit: UnitLength.kilometers)
-          let dteEnd = dteEndMetric.converted(to: model.metric ? .kilometers : .miles)
+          let dteEnd = dteEndMetric.converted(to: model.appSettings.metric ? .kilometers : .miles)
           DokoGridCount(
             color: .blue,
             value: String(format: "%.0f", dteEnd.value as CVarArg),
@@ -126,7 +126,7 @@ public struct ChargeDetailBatteryView: View {
               return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
             }()
             let batteryTempStart = Measurement(value: batteryTempStartMetric, unit: UnitTemperature.celsius)
-              .converted(to: model.metric ? .celsius : .fahrenheit)
+              .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
             DokoGridCount(
               color: batteryTempStartColor,
               value: String(format: "%.0f", batteryTempStart.value as CVarArg),
@@ -141,7 +141,7 @@ public struct ChargeDetailBatteryView: View {
               return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
             }()
             let batteryTempEnd = Measurement(value: batteryTempEndMetric, unit: UnitTemperature.celsius)
-              .converted(to: model.metric ? .celsius : .fahrenheit)
+              .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
             DokoGridCount(
               color: batteryTempEndColor,
               value: String(format: "%.0f", batteryTempEnd.value as CVarArg),
@@ -161,7 +161,7 @@ public struct ChargeDetailBatteryView: View {
                 return (Color.red, "ev.plug.dc.nacs")
               }()
               let couplerTempStart = Measurement(value: couplerTempStartMetric, unit: UnitTemperature.celsius)
-                .converted(to: model.metric ? .celsius : .fahrenheit)
+                .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
               DokoGridValueButton(
                 color: couplerTempStartColor,
                 value: String(format: "%.0f", couplerTempStart.value as CVarArg),
@@ -177,7 +177,7 @@ public struct ChargeDetailBatteryView: View {
                 return (Color.red, "ev.plug.dc.nacs")
               }()
               let couplerTempEnd = Measurement(value: couplerTempEndMetric, unit: UnitTemperature.celsius)
-                .converted(to: model.metric ? .celsius : .fahrenheit)
+                .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
               DokoGridValueButton(
                 color: couplerTempEndColor,
                 value: String(format: "%.0f", couplerTempEnd.value as CVarArg),

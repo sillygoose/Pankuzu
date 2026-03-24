@@ -12,7 +12,7 @@ public final class TripDetailBatteryModel {
   var trip: Trip
   
   @ObservationIgnored
-  @Shared(.metric) var metric
+  @Shared(.appSettings) var appSettings
   
   public init(
     trip: Trip
@@ -104,7 +104,7 @@ public struct TripDetailBatteryView: View {
               return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
             }()
             let batteryTempStart = Measurement(value: batteryTempStartMetric, unit: UnitTemperature.celsius)
-              .converted(to: model.metric ? .celsius : .fahrenheit)
+              .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
             DokoGridCount(
               color: batteryTempStartColor,
               value: String(format: "%.0f", batteryTempStart.value as CVarArg),
@@ -119,7 +119,7 @@ public struct TripDetailBatteryView: View {
               return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
             }()
             let batteryTempEnd = Measurement(value: batteryTempEndMetric, unit: UnitTemperature.celsius)
-              .converted(to: model.metric ? .celsius : .fahrenheit)
+              .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
             DokoGridCount(
               color: batteryTempEndColor,
               value: String(format: "%.0f", batteryTempEnd.value as CVarArg),

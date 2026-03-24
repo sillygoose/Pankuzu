@@ -64,7 +64,7 @@ public final class ChargesModel {
   @ObservationIgnored @Shared(.chargesDisplayPeriod) var displayPeriod
   @ObservationIgnored @Shared(.chargesCustomDisplayPeriod) var customDisplayPeriod
 
-  @ObservationIgnored @Shared(.metric) var metric
+  @ObservationIgnored @Shared(.appSettings) var appSettings
 
   @ObservationIgnored @Dependency(\.defaultDatabase) var database
   @ObservationIgnored @Dependency(\.date.now) var now
