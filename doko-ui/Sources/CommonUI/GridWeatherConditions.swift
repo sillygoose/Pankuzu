@@ -18,12 +18,12 @@ public struct DokoGridWeatherConditions: View {
     title: String = "",
     action: @escaping () -> Void
   ) {
-    @Shared(.metric) var metric
+    @Shared(.appSettings) var appSettings
     self.startCondition = startCondition
-      .converted(to: metric ? .celsius : .fahrenheit)
+      .converted(to: appSettings.metric ? .celsius : .fahrenheit)
     self.startConditionSymbol = startConditionSymbol
     self.endCondition = endCondition
-      .converted(to: metric ? .celsius : .fahrenheit)
+      .converted(to: appSettings.metric ? .celsius : .fahrenheit)
     self.endConditionSymbol = endConditionSymbol
     self.title = title
     self.action = action

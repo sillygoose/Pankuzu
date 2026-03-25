@@ -9,7 +9,7 @@ import DokoSharing
 actor TripPositionDuplicateFilter: LocationFilter {
   private var lastLocation: CLLocation?
 
-  @Shared(.identicalTripPositionDistance) var identicalTripPositionDistance
+  @Shared(.appSettings) var appSettings
 
   func shouldAccept(_ location: CLLocation) -> Bool {
     guard let last = lastLocation else {
@@ -22,7 +22,7 @@ actor TripPositionDuplicateFilter: LocationFilter {
     }
 
     let distance = location.distance(from: last)
-    if distance < identicalTripPositionDistance {
+    if distance < appSettings.identicalTripPositionDistance {
       DokoLogging.shared.postLoggingResponse(.coreLocation("TripPositionDuplicateFilter.distance"))
       return false
     }
@@ -38,8 +38,7 @@ actor TripPositionDuplicateFilter: LocationFilter {
 actor TripPositionCourseChangeFilter: LocationFilter {
   private var lastAcceptedLocation: CLLocation?
 
-  @Shared(.tripPositionCourseDeviation) var tripPositionCourseDeviation
-  @Shared(.maximumTripPositionDistance) var maximumTripPositionDistance
+  @Shared(.appSettings) var appSettings
 
   func shouldAccept(_ location: CLLocation) -> Bool {
     let course = location.course
@@ -52,9 +51,9 @@ actor TripPositionCourseChangeFilter: LocationFilter {
       return true
     }
 
-    if abs(course - lastLocation.course) < tripPositionCourseDeviation {
+    if abs(course - lastLocation.course) < appSettings.tripPositionCourseDeviation {
       let distance = location.distance(from: lastLocation)
-      if distance > maximumTripPositionDistance {
+      if distance > appSettings.maximumTripPositionDistance {
         lastAcceptedLocation = location
         return true
       }

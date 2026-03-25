@@ -4,6 +4,7 @@ import MapKit
 import CommonUI
 import DokoSharing
 import DokoSchema
+import DokoLocationManager
 
 @MainActor
 @Observable
@@ -15,14 +16,18 @@ public final class LocationFormModel: Identifiable {
   var saveErrorMessage: String?
   var isSaveErrorPresented = false
 
-  @ObservationIgnored
-  @Dependency(\.defaultDatabase) var database
+  @ObservationIgnored @Dependency(\.defaultDatabase) var database
 
   public init(
     location: Location.Draft
   ) {
     self.location = location
     self.unmodifiedLocation = location
+    if location.isUnresolved {
+      Task { @MainActor in
+        self.location = await DokoLocationManager.shared.reverseGeoCodeDraft(location)
+      }
+    }
   }
 
   var unchanged: Bool {
@@ -58,7 +63,7 @@ public struct LocationFormView: View {
   @State var selectedMapItem: MKMapItem?
   @State var mapItems: [MKMapItem] = []
 
-  @Shared(.poiThreshold) var poiThreshold
+  @Shared(.appSettings) var appSettings
 
   public init(model: LocationFormModel) {
     self.model = model
@@ -95,6 +100,13 @@ public struct LocationFormView: View {
             set: { model.location.stateProv = $0.isEmpty ? nil : $0 }
           )
         )
+        TextField(
+          "Region",
+          text: Binding(
+            get: { model.location.region ?? "" },
+            set: { model.location.region = $0.isEmpty ? nil : $0 }
+          )
+        )
       }
       header: {
         Text("Location Info")
@@ -122,7 +134,7 @@ public struct LocationFormView: View {
     .onChange(of: model.isDismissed) {
       dismiss()
     }
-    .task(id: poiThreshold) {
+    .task(id: appSettings.poiThreshold) {
       let latitude = model.location.latitude
       let longitude = model.location.longitude
       do {
@@ -132,7 +144,7 @@ public struct LocationFormView: View {
               latitude: latitude,
               longitude: longitude
             ),
-            radius: poiThreshold
+            radius: appSettings.poiThreshold
           )
         )
         let response = try await localSearch.start()

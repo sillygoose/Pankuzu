@@ -95,9 +95,11 @@ let package = Package(
     .target(
       name: "DokoABRP",
       dependencies: [
+        "DokoVehicleManager",
         .product(name: "DokoTypes", package: "doko-core"),
         .product(name: "DokoLogging", package: "doko-logging"),
         .product(name: "DokoSharing", package: "doko-sharing"),
+        .product(name: "Dependencies", package: "swift-dependencies"),
       ]
     ),
   ],

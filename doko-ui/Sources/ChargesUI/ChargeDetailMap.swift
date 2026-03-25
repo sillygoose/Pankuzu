@@ -34,7 +34,7 @@ public struct ChargeDetailMapView: View {
 
   @State var mapCameraPosition: MapCameraPosition
 
-  @Shared(.chargeMapStyle) var chargeMapStyle
+  @Shared(.appSettings) var appSettings
   @Environment(\.dismiss) var dismiss
 
   public init(
@@ -59,7 +59,7 @@ public struct ChargeDetailMapView: View {
         )
         .tint(.indigo)
       }
-      .mapStyle(chargeMapStyle.mapStyle)
+      .mapStyle(appSettings.chargeMapStyle.mapStyle)
     }
     .toolbar {
       ToolbarItem {

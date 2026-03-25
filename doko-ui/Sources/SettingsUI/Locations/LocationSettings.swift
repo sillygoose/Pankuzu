@@ -38,7 +38,7 @@ struct LocationSettingsView: View {
           )
         )
       }
-      .presentationDetents([.medium])
+      .presentationDetents([.large])
     }
     .navigationTitle("Locations")
   }

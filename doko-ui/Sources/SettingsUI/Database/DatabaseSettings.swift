@@ -148,7 +148,7 @@ struct DatabaseSettingsView: View {
   @Shared(.deletedTripsExpanded) var deletedTripsExpanded
   @Shared(.deletedChargesExpanded) var deletedChargesExpanded
   @Shared(.databaseSaveRestoreExpanded) var databaseSaveRestoreExpanded
-  @Shared(.deletedRecordRetentionDays) var deletedRecordRetentionDays
+  @Shared(.appSettings) var appSettings
 
   @State var showFileImporter: Bool = false
   @State var showFileExporter: Bool = false
@@ -240,7 +240,7 @@ struct DatabaseSettingsView: View {
             .font(.headline)
         }
       } footer: {
-        Text("Deleted trips are available here for \(deletedRecordRetentionDays) days. After that time, they will be permanently deleted.")
+        Text("Deleted trips are available here for \(appSettings.deletedRecordRetentionDays) days. After that time, they will be permanently deleted.")
           .font(.caption)
       }
 
@@ -267,7 +267,7 @@ struct DatabaseSettingsView: View {
             .font(.headline)
         }
       } footer: {
-        Text("Deleted charges are available here for \(deletedRecordRetentionDays) days. After that time, they will be permanently deleted.")
+        Text("Deleted charges are available here for \(appSettings.deletedRecordRetentionDays) days. After that time, they will be permanently deleted.")
           .font(.caption)
       }
     }
@@ -277,6 +277,7 @@ struct DatabaseSettingsView: View {
       ToolbarItemGroup(placement: .navigationBarTrailing) {
         let disableActionButtons = model.selectedItems.isEmpty || (model.deletedTrips.isEmpty && model.deletedCharges.isEmpty)
         EditButton()
+          .disabled(model.deletedTrips.isEmpty && model.deletedCharges.isEmpty)
         
         if editMode?.wrappedValue == .active {
           Button {

@@ -45,7 +45,17 @@ public struct Location: Identifiable, Hashable, Codable, Sendable {
     self.region = region
   }
 }
-extension Location.Draft: Identifiable, Equatable {}
+extension Location.Draft: Identifiable, Equatable {
+  public var isUnresolved: Bool {
+    name == nil && street == nil && city == nil && stateProv == nil && region == nil
+  }
+  
+  public var placeName: String {
+    if let name { return name }
+    if let street { return street }
+    return String(format: "(%.5f, %.5f)", latitude, longitude)
+  }
+}
 extension Location: LocationProtocol {}
 extension Location.Draft: LocationProtocol {}
 
@@ -78,6 +88,10 @@ extension Location {
     return [city, stateProv]
       .compactMap({ $0 })
       .joined(separator: ", ")
+  }
+
+  public var isUnresolved: Bool {
+    name == nil && street == nil && city == nil && stateProv == nil && region == nil
   }
 
   public var placeNameCityState: String {

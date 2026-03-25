@@ -30,9 +30,9 @@ public final class DokoLocationManager: Sendable {
 
   public func updateLocation(id: Location.ID, latitude: Double, longitude: Double, elevation: Double, sharedLocation: Bool = true) -> Location.ID {
     @FetchAll var locations: [Location]
-    @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
+    @Shared(.appSettings) var appSettings
     if sharedLocation,
-       let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold),
+       let locationID = locations.contains(latitude: latitude, longitude: longitude, within: appSettings.duplicateLocationThreshold),
        locationID != id
     {
       DokoLogging.shared.postLoggingResponse(.location("reused location: \(locationID)"))
@@ -51,8 +51,8 @@ public final class DokoLocationManager: Sendable {
 
   public func addLocation(latitude: Double, longitude: Double, elevation: Double, sharedLocation: Bool = true) -> Location.ID? {
     @FetchAll var locations: [Location]
-    @Shared(.duplicateLocationThreshold) var duplicateLocationThreshold
-    if sharedLocation, let locationID = locations.contains(latitude: latitude, longitude: longitude, within: duplicateLocationThreshold) {
+    @Shared(.appSettings) var appSettings
+    if sharedLocation, let locationID = locations.contains(latitude: latitude, longitude: longitude, within: appSettings.duplicateLocationThreshold) {
       DokoLogging.shared.postLoggingResponse(.location("reused location: \(locationID)"))
       return locationID
     }
@@ -76,63 +76,90 @@ public final class DokoLocationManager: Sendable {
     return locationID
   }
 
-  private func reverseGeocode(id: Location.ID, draft: Location.Draft, localSearch: Bool = true) {
-    Task { [location = draft] in
-      guard let request = MKReverseGeocodingRequest(location: CLLocation(latitude: location.latitude, longitude: location.longitude)) else {
-        DokoLogging.shared.postLoggingResponse(.error("Expected honest MKReverseGeocodingRequest()"))
-        return
-      }
-      let mapItems: [MKMapItem]
-      do {
-        mapItems = try await request.mapItems
-      } catch {
-        DokoLogging.shared.postLoggingResponse(.error("MKReverseGeocodingRequest failed: \(error.localizedDescription)"))
-        return
-      }
-
-      guard let mapItem = mapItems.first else {
-        DokoLogging.shared.postLoggingResponse(.location("MKReverseGeocodingRequest: no items"))
-        return
+  public func reverseGeoCodeDraft(_ draft: Location.Draft) async -> Location.Draft {
+    var result = draft
+    guard let request = MKReverseGeocodingRequest(location: CLLocation(latitude: draft.latitude, longitude: draft.longitude)) else {
+      DokoLogging.shared.postLoggingResponse(.error("Expected honest MKReverseGeocodingRequest()"))
+      return result
+    }
+    let mapItems: [MKMapItem]
+    do {
+      mapItems = try await request.mapItems
+    } catch {
+      DokoLogging.shared.postLoggingResponse(.error("MKReverseGeocodingRequest failed: \(error.localizedDescription)"))
+      return result
+    }
+    guard let mapItem = mapItems.first else {
+      DokoLogging.shared.postLoggingResponse(.location("MKReverseGeocodingRequest: no items"))
+      return result
+    }
+    if let addressRepresentations = mapItem.addressRepresentations {
+      DokoLogging.shared.postLoggingResponse(.location("fullAddress(): \(addressRepresentations.fullAddress(includingRegion: false, singleLine: true) ?? "")"))
+      DokoLogging.shared.postLoggingResponse(.location("cityName: \(addressRepresentations.cityName ?? "")"))
+      DokoLogging.shared.postLoggingResponse(.location("cityWithContext: \(addressRepresentations.cityWithContext ?? "")"))
+      DokoLogging.shared.postLoggingResponse(.location("regionName: \(addressRepresentations.regionName ?? "")"))
+      DokoLogging.shared.postLoggingResponse(.location("region: \(addressRepresentations.region?.identifier ?? "")"))
+      result.region = addressRepresentations.region?.identifier
+      result.city = addressRepresentations.cityName
+      
+      if let city = result.city, let stateProv = addressRepresentations.cityWithContext(.short), !stateProv.isEmpty {
+        result.stateProv = stateProv.replacingOccurrences(of: "\(city), ", with: "")
+        if result.stateProv == stateProv {
+          result.stateProv = stateProv.replacingOccurrences(of: "\(city) ", with: "")
+        }
       }
       
-      var updatedLocation = Location(id: id, latitude: location.latitude, longitude: location.longitude, elevation: location.elevation)
-      if let addressRepresentations = mapItem.addressRepresentations {
-        DokoLogging.shared.postLoggingResponse(.location("cityName: \(addressRepresentations.cityName ?? "")"))
-        DokoLogging.shared.postLoggingResponse(.location("cityWithContext: \(addressRepresentations.cityWithContext ?? "")"))
-        DokoLogging.shared.postLoggingResponse(.location("regionName: \(addressRepresentations.regionName ?? "")"))
-        DokoLogging.shared.postLoggingResponse(.location("region: \(addressRepresentations.region?.identifier ?? "")"))
-        updatedLocation.region = addressRepresentations.region?.identifier
-        updatedLocation.city = addressRepresentations.cityName
-        updatedLocation.stateProv = addressRepresentations.cityWithContext(.short)
-        if let city = updatedLocation.city, let stateProv = updatedLocation.stateProv {
-          let trimmedStateProv = stateProv.replacingOccurrences(of: "\(city), ", with: "")
-          updatedLocation.stateProv = trimmedStateProv
-        }
-        if let address = mapItem.address {
-          DokoLogging.shared.postLoggingResponse(.location("shortAddress: \(address.shortAddress ?? "")"))
-          if let shortAddress = address.shortAddress, let city = updatedLocation.city {
-            let trimmedStreet = shortAddress.replacingOccurrences(of: ", \(city)", with: "")
-            updatedLocation.street = trimmedStreet
+      if result.stateProv == nil, let singleLine = addressRepresentations.fullAddress(includingRegion: false, singleLine: true),
+         let city = result.city {
+        // Canada: "180 Nichol Rd, Baltimore ON K0K 1C0, Canada" — city and province space-separated
+        // US:     "123 Main St, Springfield, IL 62701"          — city and state comma-separated
+        for sep in [" ", ", "] {
+          let tail = singleLine.components(separatedBy: city + sep).dropFirst().first ?? ""
+          let candidate = tail.components(separatedBy: CharacterSet(charactersIn: " ,")).first ?? ""
+          if candidate.count == 2, candidate.allSatisfy({ $0.isUppercase }) {
+            result.stateProv = candidate
+            break
           }
         }
-        DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(updatedLocation.placeName))"))
       }
-      
+      if let address = mapItem.address {
+        DokoLogging.shared.postLoggingResponse(.location("shortAddress: \(address.shortAddress ?? "")"))
+        if let shortAddress = address.shortAddress, let city = result.city {
+          result.street = shortAddress.replacingOccurrences(of: ", \(city)", with: "")
+          DokoLogging.shared.postLoggingResponse(.location("street: \(result.street ?? "")"))
+        }
+      }
+      DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(result.placeName))"))
+    }
+    return result
+  }
+
+  private func reverseGeocode(id: Location.ID, draft: Location.Draft, localSearch: Bool = true) {
+    Task { [location = draft] in
+      var updatedDraft = await reverseGeoCodeDraft(location)
+
       if localSearch {
-        @Shared(.poiThreshold) var poiThreshold
+        @Shared(.appSettings) var appSettings
         let poiSearch = MKLocalSearch(
           request: MKLocalPointsOfInterestRequest(
             center: CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude),
-            radius: poiThreshold
+            radius: appSettings.poiThreshold
           )
         )
         let response = try? await poiSearch.start()
         if let response, let mapItem = response.mapItems.first {
-          updatedLocation.name = mapItem.name
-          DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(updatedLocation.placeName))"))
+          updatedDraft.name = mapItem.name
+          DokoLogging.shared.postLoggingResponse(.location("reverseGeo(\(updatedDraft.placeName))"))
         }
       }
-      
+
+      var updatedLocation = Location(id: id, latitude: location.latitude, longitude: location.longitude, elevation: location.elevation)
+      updatedLocation.name = updatedDraft.name
+      updatedLocation.street = updatedDraft.street
+      updatedLocation.city = updatedDraft.city
+      updatedLocation.stateProv = updatedDraft.stateProv
+      updatedLocation.region = updatedDraft.region
+
       @Dependency(\.defaultDatabase) var database
       withErrorReporting {
         try database.write { db in
@@ -156,3 +183,4 @@ extension Array where Element == Location {
     return nil
   }
 }
+

@@ -20,7 +20,6 @@ import DokoSharing
   @ObservationIgnored @Shared(.connectedAccessoryName) var connectedAccessoryName
   @ObservationIgnored @Shared(.connectedVehicleModel) var connectedVehicleModel
   @ObservationIgnored @Shared(.activeSession) var activeSession
-  @ObservationIgnored @Shared(.backgroundMode) var backgroundMode
 
   public init() {}
 
@@ -32,7 +31,9 @@ import DokoSharing
 
 public struct SettingsView: View {
   @Bindable var model: SettingsModel
+  
   @State private var path = NavigationPath()
+  @Shared(.appSettings) var appSettings
 
   public init(model: SettingsModel) {
     self.model = model
@@ -55,10 +56,10 @@ public struct SettingsView: View {
             }
 
             DokoGridValueButton(
-              color: model.backgroundMode ? .blue : .red,
+              color: appSettings.backgroundMode ? .blue : .red,
               value: nil,
               units: nil,
-              iconName: model.backgroundMode ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash",
+              iconName: appSettings.backgroundMode ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash",
               title: "Bluetooth"
             ) {
               path.append(Destination.bluetooth)

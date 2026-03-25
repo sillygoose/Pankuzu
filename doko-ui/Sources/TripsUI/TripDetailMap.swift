@@ -66,9 +66,7 @@ public struct TripDetailMapView: View {
 
   @State var mapCameraPosition: MapCameraPosition
 
-  @Shared(.tripMapStyle) var tripMapStyle
-  @Shared(.tripMapPolyline) var tripMapPolyline
-  @Shared(.showElevationOnPath) var showElevationOnPath
+  @Shared(.appSettings) var appSettings
 
   @Environment(\.dismiss) var dismiss
 
@@ -103,7 +101,7 @@ public struct TripDetailMapView: View {
         )
         .tint(.cyan)
 
-        if tripMapPolyline {
+        if appSettings.tripMapPolyline {
           MapPolyline(
             MKPolyline(
               coordinates: model.tripPath,
@@ -121,7 +119,7 @@ public struct TripDetailMapView: View {
           }
         }
 
-        if showElevationOnPath {
+        if appSettings.showElevationOnPath {
           ForEach(Array(model.elevationPath.enumerated()), id: \.offset) { _, coord in
             Annotation("", coordinate: coord) {
               Circle()
@@ -131,7 +129,7 @@ public struct TripDetailMapView: View {
           }
         }
       }
-      .mapStyle(tripMapStyle.mapStyle)
+      .mapStyle(appSettings.tripMapStyle.mapStyle)
     }
     .toolbar {
       ToolbarItem {
@@ -173,10 +171,9 @@ public struct TripDetailMapView: View {
     init() { _trips = FetchAll() }
   }
   let loader = PreviewTripsLoader()
-  @Shared(.tripMapPolyline) var tripMapPolyline
-  @Shared(.showElevationOnPath) var showElevationOnPath
-  $tripMapPolyline.withLock { $0 = false }
-  $showElevationOnPath.withLock { $0 = true }
+  @Shared(.appSettings) var appSettings
+  $appSettings.tripMapPolyline.withLock { $0 = false }
+  $appSettings.showElevationOnPath.withLock { $0 = true }
   let tripID = loader.trips.first?.id ?? Trip.ID()
   return NavigationStack {
     TripDetailView(

@@ -11,20 +11,19 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
 }
 
 @MainActor @Observable class BluetoothSettingsModel {
-  @ObservationIgnored @Shared(.backgroundMode) var backgroundMode
-  @ObservationIgnored @Shared(.accessorySerialNumber) var accessorySerialNumber
+  @ObservationIgnored @Shared(.appSettings) var appSettings
   @ObservationIgnored @Shared(.connectedAccessorySerialNumber) var connectedAccessorySerialNumber
 
   func setBackgroundMode(_ isOn: Bool) {
-    $backgroundMode.withLock { $0 = isOn }
+    $appSettings.backgroundMode.withLock { $0 = isOn }
   }
 
   func clearAccessorySerialNumber() {
-    $accessorySerialNumber.withLock { $0 = nil }
+    $appSettings.accessorySerialNumber.withLock { $0 = nil }
   }
 
   func setAccessorySerialNumberFromConnected() {
-    $accessorySerialNumber.withLock { $0 = connectedAccessorySerialNumber }
+    $appSettings.accessorySerialNumber.withLock { $0 = connectedAccessorySerialNumber }
   }
 }
 
@@ -43,14 +42,14 @@ struct BluetoothSettingsView: View {
         ) {
           Section {
             HStack {
-              Text(model.accessorySerialNumber ?? "Any")
-                .foregroundStyle(model.accessorySerialNumber == nil ? .secondary : .primary)
+              Text(model.appSettings.accessorySerialNumber ?? "Any")
+                .foregroundStyle(model.appSettings.accessorySerialNumber == nil ? .secondary : .primary)
               Spacer()
               Button("Clear") {
                 model.clearAccessorySerialNumber()
               }
               .buttonStyle(.borderless)
-              .disabled(model.accessorySerialNumber == nil)
+              .disabled(model.appSettings.accessorySerialNumber == nil)
 
               Button("Set") {
                 model.setAccessorySerialNumberFromConnected()
@@ -73,17 +72,17 @@ struct BluetoothSettingsView: View {
       Divider()
 
       Button {
-        model.setBackgroundMode(!model.backgroundMode)
+        model.setBackgroundMode(!model.appSettings.backgroundMode)
       } label: {
         Label(
-          model.backgroundMode ? "Disable Background Mode" : "Enable Background Mode",
-          systemImage: model.backgroundMode ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash"
+          model.appSettings.backgroundMode ? "Disable Background Mode" : "Enable Background Mode",
+          systemImage: model.appSettings.backgroundMode ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash"
         )
         .frame(maxWidth: .infinity)
         .padding()
       }
       .buttonStyle(.borderedProminent)
-      .tint(model.backgroundMode ? .red : .blue)
+      .tint(model.appSettings.backgroundMode ? .red : .blue)
       .padding()
     }
     .navigationTitle("Bluetooth")

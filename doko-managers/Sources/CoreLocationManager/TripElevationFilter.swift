@@ -9,8 +9,7 @@ import DokoSharing
 actor TripElevationFilter: LocationFilter {
   private var lastLocation: CLLocation?
 
-  @Shared(.maximumTripElevationDistance) var maximumTripElevationDistance
-  @Shared(.minimumTripElevationChange) var minimumTripElevationChange
+  @Shared(.appSettings) var appSettings
 
   func shouldAccept(_ location: CLLocation) -> Bool {
     guard let last = lastLocation else {
@@ -23,12 +22,12 @@ actor TripElevationFilter: LocationFilter {
     }
 
     let distance = location.distance(from: last)
-    if distance > maximumTripElevationDistance {
+    if distance > appSettings.maximumTripElevationDistance {
       lastLocation = location
       return true
     }
 
-    if abs(last.altitude - location.altitude) < minimumTripElevationChange {
+    if abs(last.altitude - location.altitude) < appSettings.minimumTripElevationChange {
       DokoLogging.shared.postLoggingResponse(.coreLocation("TripElevationFilter.change"))
       return false
     }

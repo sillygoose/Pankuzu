@@ -48,7 +48,7 @@ import CommonUI
   @ObservationIgnored @FetchOne(Charge.none) var charge
   @ObservationIgnored @FetchOne(ChargeHistory.none) var chargeHistory
   @ObservationIgnored @FetchAll var locations: [Location]
-  @ObservationIgnored @Shared(.metric) var metric
+  @ObservationIgnored @Shared(.appSettings) var appSettings
 
   var chargeLocation: Location = .unexpectedLocation
   var vehicle: Vehicle?
@@ -80,7 +80,7 @@ public struct ChargeDetailView: View {
     let charge = model.charge ?? Charge.honestEmptyCharge
     let duration: Duration = .seconds(charge.duration)
     let odometer = Measurement(value: charge.odometer, unit: UnitLength.kilometers)
-      .converted(to: model.metric ? .kilometers : .miles)
+      .converted(to: model.appSettings.metric ? .kilometers : .miles)
     let peakPower = Measurement(value: model.maximumPower ?? 0.0, unit: UnitPower.kilowatts)
 
     ScrollView {
@@ -183,7 +183,7 @@ public struct ChargeDetailView: View {
             }()
             DokoGridCount(
               color: stateOfChargeStartColor,
-              value: String(format: "%.1f", stateOfChargeStart),
+              value: String(format: "%.0f", stateOfChargeStart),
               units: "%",
               iconName: stateOfChargeStartIcon,
               title: "Start SoC"
@@ -195,7 +195,7 @@ public struct ChargeDetailView: View {
             }()
             DokoGridCount(
               color: stateOfChargeEndColor,
-              value: String(format: "%.1f", stateOfChargeEnd),
+              value: String(format: "%.0f", stateOfChargeEnd),
               units: "%",
               iconName: stateOfChargeEndIcon,
               title: "End SoC"
@@ -206,7 +206,7 @@ public struct ChargeDetailView: View {
         if let distanceToEmptyStart = charge.distanceToEmptyStart, let distanceToEmptyEnd = charge.distanceToEmptyEnd {
           GridRow {
             let dteStartMetric = Measurement(value: distanceToEmptyStart, unit: UnitLength.kilometers)
-            let dteStart = dteStartMetric.converted(to: model.metric ? .kilometers : .miles)
+            let dteStart = dteStartMetric.converted(to: model.appSettings.metric ? .kilometers : .miles)
             DokoGridCount(
               color: .blue,
               value: String(format: "%.0f", dteStart.value as CVarArg),
@@ -216,7 +216,7 @@ public struct ChargeDetailView: View {
             )
             
             let dteEndMetric = Measurement(value: distanceToEmptyEnd, unit: UnitLength.kilometers)
-            let dteEnd = dteEndMetric.converted(to: model.metric ? .kilometers : .miles)
+            let dteEnd = dteEndMetric.converted(to: model.appSettings.metric ? .kilometers : .miles)
             DokoGridCount(
               color: .blue,
               value: String(format: "%.0f", dteEnd.value as CVarArg),
@@ -233,7 +233,7 @@ public struct ChargeDetailView: View {
             batteryStateOfHealth < 80 ? Color.red : batteryStateOfHealth < 90 ? .yellow : .green
             DokoGridValueButton(
               color: batteryStateOfHealthColor,
-              value: String(format: "%.1f", batteryStateOfHealth),
+              value: String(format: "%.0f", batteryStateOfHealth),
               units: "%",
               iconName: "minus.plus.batteryblock.stack",
               title: "State of Health"
@@ -285,7 +285,7 @@ public struct ChargeDetailView: View {
               location: Location.Draft(location)
             )
           )
-          .presentationDetents([.medium])
+          .presentationDetents([.large])
         }
       case .editVehicleForm(let vehicle):
         NavigationStack {

@@ -26,7 +26,7 @@ public final class TripDetailElevationModel {
   var selectedBin: ElevationBin?
 
   @ObservationIgnored
-  @Shared(.metric) var metric
+  @Shared(.appSettings) var appSettings
 
   public init(
     trip: Trip
@@ -43,27 +43,27 @@ public final class TripDetailElevationModel {
     var maxElevation: Double = -.greatestFiniteMagnitude
     for bin in elevationBins {
       let elevation = Measurement(value: bin.elevation, unit: UnitLength.meters)
-        .converted(to: metric ? .meters : .feet).value
+        .converted(to: appSettings.metric ? .meters : .feet).value
       minElevation = min(minElevation, elevation)
       maxElevation = max(maxElevation, elevation)
     }
     self.minimumElevation = Measurement(
       value: roundDownToNearest(number: minElevation),
-      unit: metric ? UnitLength.meters : UnitLength.feet
+      unit: appSettings.metric ? UnitLength.meters : UnitLength.feet
     )
     self.maximumElevation = Measurement(
       value: roundUpToNearest(number: maxElevation),
-      unit: metric ? UnitLength.meters : UnitLength.feet
+      unit: appSettings.metric ? UnitLength.meters : UnitLength.feet
     )
   }
 
   private func roundUpToNearest(number: Double) -> Double {
-    let step = metric ? 50.0 : 100.0
+    let step = appSettings.metric ? 50.0 : 100.0
     return ceil(number / step) * step + step
   }
 
   private func roundDownToNearest(number: Double) -> Double {
-    let step = metric ? 50.0 : 100.0
+    let step = appSettings.metric ? 50.0 : 100.0
     return floor(number / step) * step - step
   }
 
@@ -122,7 +122,7 @@ public struct TripDetailElevationView: View {
       Chart {
         ForEach(model.elevationBins) { bin in
           let elevation = Measurement(value: bin.elevation, unit: UnitLength.meters)
-            .converted(to: model.metric ? .meters : .feet)
+            .converted(to: model.appSettings.metric ? .meters : .feet)
           BarMark(
             x: .value("Time", bin.timestamp),
             yStart: .value("Elevation Min", model.minimumElevation.value),
@@ -134,7 +134,7 @@ public struct TripDetailElevationView: View {
 
         if let selected = model.selectedBin {
           let elevation = Measurement(value: selected.elevation, unit: UnitLength.meters)
-            .converted(to: model.metric ? .meters : .feet)
+            .converted(to: model.appSettings.metric ? .meters : .feet)
 
           RuleMark(x: .value("time", selected.timestamp))
             .foregroundStyle(.gray.opacity(0.5))
