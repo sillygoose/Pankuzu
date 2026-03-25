@@ -6,6 +6,7 @@ import Dependencies
 import DokoTypes
 import DokoLogging
 import DokoSharing
+import DokoVehicleManager
 
 @DokoEngineActor
 public final class ABRPManager: Sendable {
@@ -22,7 +23,17 @@ public final class ABRPManager: Sendable {
   public func sendTripTelemetry(packet: DokoResponsePacket) {
     @Dependency(\.date.now) var now
     @Shared(.appSettings) var appSettings
-    guard appSettings.abrpEnabled, !appSettings.abrpUserToken.isEmpty, shouldSend() else { return }
+    guard appSettings.abrpEnabled else { return }
+    guard let vin = DokoVehicleManager.shared.connectedVehicle?.vin,
+          let userToken = appSettings.abrpVehicleTokens[vin],
+          !userToken.isEmpty else {
+      DokoLogging.shared.postLoggingResponse(.error("ABRP.sendTripTelemetry: no token"))
+      return
+    }
+    guard shouldSend() else {
+      DokoLogging.shared.postLoggingResponse(.error("ABRP.sendTripTelemetry: too soon"))
+      return
+    }
 
     var telemetry = ABRPTelemetry(utc: Int(now.timeIntervalSince1970))
     telemetry.soc = packet.batteryStateOfCharge
@@ -37,21 +48,28 @@ public final class ABRPManager: Sendable {
     if let position = packet.position {
       telemetry.lat = position.latitude
       telemetry.lon = position.longitude
-//      telemetry.elevation = position.elevation
-//      telemetry.heading = position.course
-//      telemetry.speed = position.speed
     }
     if let weather = packet.weather {
       telemetry.extTemp = weather.temperature
     }
 
-    Task { await send(telemetry: telemetry, userToken: appSettings.abrpUserToken) }
+    Task { await send(telemetry: telemetry, userToken: userToken) }
   }
 
   public func sendChargeTelemetry(packet: DokoResponsePacket, isDCFC: Bool) {
     @Dependency(\.date.now) var now
     @Shared(.appSettings) var appSettings
-    guard appSettings.abrpEnabled, !appSettings.abrpUserToken.isEmpty, shouldSend() else { return }
+    guard appSettings.abrpEnabled else { return }
+    guard let vin = DokoVehicleManager.shared.connectedVehicle?.vin,
+          let userToken = appSettings.abrpVehicleTokens[vin],
+          !userToken.isEmpty else {
+      DokoLogging.shared.postLoggingResponse(.error("ABRP.sendChargeTelemetry: no token"))
+      return
+    }
+    guard shouldSend() else {
+      DokoLogging.shared.postLoggingResponse(.error("ABRP.sendChargeTelemetry: too soon"))
+      return
+    }
 
     var telemetry = ABRPTelemetry(utc: Int(now.timeIntervalSince1970))
     telemetry.soc = packet.batteryStateOfCharge.map { floor($0) }
@@ -71,7 +89,7 @@ public final class ABRPManager: Sendable {
       telemetry.extTemp = weather.temperature
     }
 
-    Task { await send(telemetry: telemetry, userToken: appSettings.abrpUserToken) }
+    Task { await send(telemetry: telemetry, userToken: userToken) }
   }
 
   private func shouldSend() -> Bool {

@@ -28,6 +28,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
   
   public var abrpEnabled: Bool = false
   public var abrpUserToken: String = ""
+  public var abrpVehicleTokens: [String: String] = [:]
 
   public init() {}
 
@@ -38,7 +39,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     case identicalTripPositionDistance, tripPositionCourseDeviation
     case maximumTripPositionDistance, maximumTripElevationDistance, minimumTripElevationChange
     case deletedRecordRetentionDays
-    case abrpEnabled, abrpUserToken
+    case abrpEnabled, abrpUserToken, abrpVehicleTokens
   }
 
   public func encode(to encoder: any Encoder) throws {
@@ -62,6 +63,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     try c.encode(deletedRecordRetentionDays, forKey: .deletedRecordRetentionDays)
     try c.encode(abrpEnabled, forKey: .abrpEnabled)
     try c.encode(abrpUserToken, forKey: .abrpUserToken)
+    try c.encode(abrpVehicleTokens, forKey: .abrpVehicleTokens)
   }
 
   // Future-proof decode: new fields added later fall back to defaults;
@@ -87,6 +89,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     deletedRecordRetentionDays = try c.decodeIfPresent(Int.self, forKey: .deletedRecordRetentionDays) ?? 30
     abrpEnabled = try c.decodeIfPresent(Bool.self, forKey: .abrpEnabled) ?? false
     abrpUserToken = try c.decodeIfPresent(String.self, forKey: .abrpUserToken) ?? ""
+    abrpVehicleTokens = try c.decodeIfPresent([String: String].self, forKey: .abrpVehicleTokens) ?? [:]
   }
 }
 

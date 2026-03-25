@@ -1,6 +1,6 @@
 import SwiftUI
 
-import DokoABRP
+import DokoSchema
 import DokoSharing
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
@@ -13,12 +13,34 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
 @Observable
 class IntegrationsModel {
   @ObservationIgnored @Shared(.appSettings) var appSettings
+  @ObservationIgnored @FetchAll var vehicles: [Vehicle]
 
   init() {}
+
+  func removeToken(forVIN vin: String) {
+    $appSettings.withLock { _ = $0.abrpVehicleTokens.removeValue(forKey: vin) }
+  }
+
+  func setToken(_ token: String, forVIN vin: String) {
+    $appSettings.withLock { $0.abrpVehicleTokens[vin] = token }
+  }
+
+  var configuredVehicles: [(vehicle: Vehicle, token: String)] {
+    vehicles
+      .compactMap { vehicle in
+        guard let token = appSettings.abrpVehicleTokens[vehicle.vin] else { return nil }
+        return (vehicle: vehicle, token: token)
+      }
+  }
+
+  var unconfiguredVehicles: [Vehicle] {
+    vehicles.filter { appSettings.abrpVehicleTokens[$0.vin] == nil }
+  }
 }
 
 struct IntegrationsView: View {
   @State private var model = IntegrationsModel()
+  @State private var isAddingVehicle = false
   @Shared(.abrpExpanded) var abrpExpanded
 
   private var abrpAPIKey: String {
@@ -43,48 +65,107 @@ struct IntegrationsView: View {
               )
             )
           } footer: {
-            Text(
-              "Enabling A Better Route Planner will share your position and vehicle data with Iternio, the company behind ABRP."
-            )
+            Text("Enabling A Better Route Planner will share your position and vehicle data with Iternio, the company behind ABRP.")
           }
+
           Section {
-            HStack {
-              TextField(
-                "User Token",
-                text: Binding(
-                  get: { model.appSettings.abrpUserToken },
-                  set: { token in model.$appSettings.abrpUserToken.withLock { $0 = token } }
-                )
-              )
-              .autocorrectionDisabled()
-              .textInputAutocapitalization(.never)
-              if !model.appSettings.abrpUserToken.isEmpty {
-                Button {
-                  model.$appSettings.abrpUserToken.withLock { $0 = "" }
-                } label: {
-                  Image(systemName: "xmark.circle.fill")
-                    .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.borderless)
+            ForEach(model.configuredVehicles, id: \.vehicle.vin) { entry in
+              VStack(alignment: .leading, spacing: 4) {
+                Text(entry.vehicle.yearMakeModel)
+                  .font(.headline)
+                Text(entry.vehicle.vin)
+                  .font(.subheadline)
+                  .foregroundStyle(.secondary)
+                Text(entry.token)
+                  .font(.subheadline)
+                  .foregroundStyle(.secondary)
+              }
+              .padding(.vertical, 4)
+            }
+            .onDelete { indexSet in
+              for index in indexSet {
+                let vin = model.configuredVehicles[index].vehicle.vin
+                model.removeToken(forVIN: vin)
+              }
+            }
+            if !model.unconfiguredVehicles.isEmpty {
+              Button {
+                isAddingVehicle = true
+              } label: {
+                Label("Add Vehicle", systemImage: "plus")
               }
             }
           } footer: {
-            Text(
-              "Enter your ABRP user token to stream live telemetry to A Better Route Planner. Find your token in the ABRP app under Settings → Vehicle → Live Data."
-            )
+            Text("Vehicles with an ABRP token will stream live telemetry to A Better Route Planner while driving or charging.")
           }
-
         } label: {
           Text("A Better Route Planner")
         }
       }
     }
-    .listStyle(.plain)
+    .listStyle(.insetGrouped)
     .navigationTitle("Integrations")
+    .sheet(isPresented: $isAddingVehicle) {
+      AddABRPVehicleSheet(model: model)
+    }
+  }
+}
+
+private struct AddABRPVehicleSheet: View {
+  var model: IntegrationsModel
+
+  @State private var selectedVehicle: Vehicle?
+  @State private var token = ""
+  @Environment(\.dismiss) private var dismiss
+
+  var body: some View {
+    NavigationStack {
+      Form {
+        Section("Vehicle") {
+          Picker("Vehicle", selection: $selectedVehicle) {
+            Text("Select a vehicle").tag(Vehicle?.none)
+            ForEach(model.unconfiguredVehicles) { vehicle in
+              Text(vehicle.yearMakeModel).tag(Vehicle?.some(vehicle))
+            }
+          }
+          .pickerStyle(.navigationLink)
+        }
+
+        Section {
+          TextField("User Token", text: $token)
+            .autocorrectionDisabled()
+            .textInputAutocapitalization(.never)
+        } header: {
+          Text("ABRP Token")
+        } footer: {
+          Text("Find your user token in the ABRP app under Settings → Vehicle → Live Data.")
+        }
+      }
+      .navigationTitle("Add Vehicle")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          Button("Cancel") { dismiss() }
+        }
+        ToolbarItem(placement: .confirmationAction) {
+          Button("Add") {
+            if let vehicle = selectedVehicle, !token.isEmpty {
+              model.setToken(token, forVIN: vehicle.vin)
+              dismiss()
+            }
+          }
+          .disabled(selectedVehicle == nil || token.isEmpty)
+        }
+      }
+    }
   }
 }
 
 #Preview {
+  let _ = prepareDependencies {
+    try? $0.bootstrapDatabase()
+    try? $0.defaultDatabase.seedPreviews()
+  }
   NavigationStack {
     IntegrationsView()
       .preferredColorScheme(.dark)
