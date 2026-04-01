@@ -41,30 +41,37 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .stcsegr(let enabled):         obdLinkCommand = "STCSEGR \(enabled ? 1 : 0)"
 
     case .batteryVoltage0:              obdLinkCommand = "STPX h:17FC007B, d:221E3B"
-    case .batteryCurrent0:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
-    case .batteryVoltage1:              obdLinkCommand = "221E3B"
-    case .batteryCurrent1:              obdLinkCommand = "221E3D"
+    case .batteryVoltage1:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
+    case .batteryVoltage2:              obdLinkCommand = "STPX h:17FC007B, d:227448"
+    case .batteryVoltage3:              obdLinkCommand = "STPX h:17FC007B, d:22028C"
+    case .batteryVoltage4:              obdLinkCommand = "STPX h:17FC007B, d:222A0B"
 
-    case .batteryVoltage2:              obdLinkCommand = "03221E3B"
-    case .batteryCurrent2:              obdLinkCommand = "03221E3D"
-    case .batteryVoltage3:              obdLinkCommand = "03221E3B"
-    case .batteryCurrent3:              obdLinkCommand = "03221E3D"
+    case .batteryCurrent0:              obdLinkCommand = "STPX h:17FC0076, d:22295A"
+    case .batteryCurrent1:              obdLinkCommand = "STPX h:17FC0076, d:22210E"
 
-    case .batteryVoltage4:              obdLinkCommand = "221E3B"
-    case .batteryCurrent4:              obdLinkCommand = "221E3D"
-    case .batteryVoltage5:              obdLinkCommand = "221E3B"
-    case .batteryCurrent5:              obdLinkCommand = "221E3D"
-    case .batteryVoltage6:              obdLinkCommand = "221E3B"
-    case .batteryCurrent6:              obdLinkCommand = "221E3D"
-    case .batteryVoltage7:              obdLinkCommand = "221E3B"
-    case .batteryCurrent7:              obdLinkCommand = "221E3D"
+//    case .batteryVoltage1:              obdLinkCommand = "221E3B"
+//    case .batteryCurrent1:              obdLinkCommand = "221E3D"
+
+//    case .batteryVoltage2:              obdLinkCommand = "03221E3B"
+//    case .batteryCurrent2:              obdLinkCommand = "03221E3D"
+//    case .batteryVoltage3:              obdLinkCommand = "03221E3B"
+//    case .batteryCurrent3:              obdLinkCommand = "03221E3D"
+//
+//    case .batteryVoltage4:              obdLinkCommand = "221E3B"
+//    case .batteryCurrent4:              obdLinkCommand = "221E3D"
+//    case .batteryVoltage5:              obdLinkCommand = "221E3B"
+//    case .batteryCurrent5:              obdLinkCommand = "221E3D"
+//    case .batteryVoltage6:              obdLinkCommand = "221E3B"
+//    case .batteryCurrent6:              obdLinkCommand = "221E3D"
+//    case .batteryVoltage7:              obdLinkCommand = "221E3B"
+//    case .batteryCurrent7:              obdLinkCommand = "221E3D"
 
     case .gearSelected:                 obdLinkCommand = "22210E" //"STPX h:17FC0076, d:22210E"    //0x17fc0076 03 22 21 0e 55 55 55 55
     case .odometer:                     obdLinkCommand = "22295A" //"STPX h:17FC0076, d:22295A"    //0x17fe0076 06 62 29 5a XX YY ZZ aa  (XX*2^16+YY*2^8+ZZ) = km in decimal
 
-    case .stateOfCharge:                obdLinkCommand = "22028C" //STPX h:17FC007B, d:22028C"    //0x17fc007b 03 22 02 8c 55 55 55 55
     case .batteryVoltage:               obdLinkCommand = "221E3B" //"03221E3B55555555" //STPX h:17FC007B, d:221E3B"    //0x17fc007b 03 22 1e 3b 55 55 55 55
     case .batteryCurrent:               obdLinkCommand = "221E3D" //"03221E3D55555555" //STPX h:17FC007B, d:221E3D"    //0x17fc007b 03 22 1e 3d 55 55 55 55
+    case .stateOfCharge:                obdLinkCommand = "22028C" //STPX h:17FC007B, d:22028C"    //0x17fc007b 03 22 02 8c 55 55 55 55
     case .batteryTemperature:           obdLinkCommand = "222A0B" //"STPX h:17FC007B, d:222A0B"    //0x17fc007b 03 22 2a 0b
 
     case .acChargerStatus:              obdLinkCommand = "227448" //"STPX h:17FC007B, d:227448"    //0x17fc007b 03 22 74 48 55 55 55 55
@@ -86,14 +93,21 @@ public actor VwElectrics: ConnectedVehicleInterface {
     switch packetType {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
-        .atcp("17"),
-        .atsh("FC007B"),
+        //.atcp("17"),
+        //.atsh("FC007B"),
         .atcra("17FE007X"),
-        .batteryVoltage0, .batteryCurrent0,
-        .batteryVoltage1, .batteryCurrent1,
+        
+        .batteryVoltage0,
+        .batteryVoltage1,
+        .batteryVoltage2,
+        .batteryVoltage3,
+        .batteryVoltage4,
 
-        .atcp(""),
-        .atsh(""),
+        .batteryCurrent0,
+        .batteryCurrent1,
+
+//        .atcp(""),
+//        .atsh(""),
 
         .atz,
         .ate(false),
@@ -104,19 +118,19 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .atcp("17"),
         //
         .atsh("FC007B"),
-        .batteryVoltage2, .batteryCurrent2,
+//        .batteryVoltage2, .batteryCurrent2,
         //
         .atcra("17FE007X"),
-        .batteryVoltage3, .batteryCurrent3,
+//        .batteryVoltage3, .batteryCurrent3,
         //
         .atcaf(true),
-        .batteryVoltage4, .batteryCurrent4,
+//        .batteryVoltage4, .batteryCurrent4,
         //
         .ath(false),
-        .batteryVoltage5, .batteryCurrent5,
+//        .batteryVoltage5, .batteryCurrent5,
         //
         .stcsegr(true),
-        .batteryVoltage6, .batteryCurrent6,
+//        .batteryVoltage6, .batteryCurrent6,
         //
         .atsh("FC007B"),
         .acChargerStatus, .dcChargerStatus,
