@@ -68,6 +68,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
     case .gearSelected:                 obdLinkCommand = "22210E" //"STPX h:17FC0076, d:22210E"    //0x17fc0076 03 22 21 0e 55 55 55 55
     case .odometer:                     obdLinkCommand = "22295A" //"STPX h:17FC0076, d:22295A"    //0x17fe0076 06 62 29 5a XX YY ZZ aa  (XX*2^16+YY*2^8+ZZ) = km in decimal
+    case .speed:                        obdLinkCommand = "010D"
 
     case .batteryVoltage:               obdLinkCommand = "221E3B" //"03221E3B55555555" //STPX h:17FC007B, d:221E3B"    //0x17fc007b 03 22 1e 3b 55 55 55 55
     case .batteryCurrent:               obdLinkCommand = "221E3D" //"03221E3D55555555" //STPX h:17FC007B, d:221E3D"    //0x17fc007b 03 22 1e 3d 55 55 55 55
@@ -102,6 +103,8 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .batteryVoltage2,
         .batteryVoltage3,
         .batteryVoltage4,
+
+        .speed,
 
         .batteryCurrent0,
         .batteryCurrent1,
