@@ -104,7 +104,7 @@ public struct SettingsView: View {
               value: nil,
               units: nil,
               iconName: "leaf",
-              title: "Database Seeding"
+              title: "Add Trip/Charge"
             ) {
               path.append(Destination.databseSeeding)
             }

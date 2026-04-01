@@ -19,7 +19,7 @@ public struct DokoGridLocation: View {
 
   public var body: some View {
     Button(action: action) {
-      HStack {
+      HStack(spacing: DesignTokens.Grid.horizontalSpacing) {
         VStack(alignment: .center) {
           Image(systemName: iconName)
             .font(DesignTokens.Font.largeTitle)
