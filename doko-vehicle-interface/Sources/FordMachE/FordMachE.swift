@@ -69,7 +69,6 @@ public actor FordMachE: ConnectedVehicleInterface {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
         .stp(53), .stpbr(500000), .stpo,
-        .speed,
       ])
 
     case .idle:
