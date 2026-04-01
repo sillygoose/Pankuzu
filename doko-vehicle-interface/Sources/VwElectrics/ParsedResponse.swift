@@ -64,6 +64,9 @@ extension VwElectrics {
       case .odometer:
         let odometer = try parseOdometer(response)
         commandResponse = .odometer(odometer)
+      case .speed:
+        let speed = try parseSpeed(response)
+        commandResponse = .speed(speed)
 
       case .stateOfCharge:
         let soc = try parseHvbStateOfCharge(response)
