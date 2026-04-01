@@ -64,11 +64,6 @@ public actor FordElectrics: ConnectedVehicleInterface {
     switch packetType {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
-        .ath(true),
-        .stpx(0x7DF, 0x4888),
-        .stpx(0x7DF, 0x4897),
-        .stpx(0x7DF, 0x48A4),
-        .ath(false),
         .odometer
       ])
 
