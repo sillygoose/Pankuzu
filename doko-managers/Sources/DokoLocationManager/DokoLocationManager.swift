@@ -125,7 +125,7 @@ public final class DokoLocationManager: Sendable {
       if let address = mapItem.address {
         DokoLogging.shared.postLoggingResponse(.location("shortAddress: \(address.shortAddress ?? "")"))
         if let shortAddress = address.shortAddress, let city = result.city {
-          result.street = shortAddress.replacingOccurrences(of: ", \(city)", with: "")
+          result.street = shortAddress.replacingOccurrences(of: ", +\(NSRegularExpression.escapedPattern(for: city))", with: "", options: .regularExpression)
           DokoLogging.shared.postLoggingResponse(.location("street: \(result.street ?? "")"))
         }
       }
