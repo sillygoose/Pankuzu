@@ -43,9 +43,7 @@ struct IntegrationsView: View {
   @State private var isAddingVehicle = false
   @Shared(.abrpExpanded) var abrpExpanded
 
-  private var abrpAPIKey: String {
-    Bundle.main.object(forInfoDictionaryKey: "ABRPAPIKey") as? String ?? ""
-  }
+  var abrpAPIKey: String = Bundle.main.object(forInfoDictionaryKey: "ABRPAPIKey") as? String ?? ""
 
   var body: some View {
     List {
@@ -64,11 +62,6 @@ struct IntegrationsView: View {
                 set: { isOn, _ in model.$appSettings.abrpEnabled.withLock { $0 = isOn } }
               )
             )
-          } footer: {
-            Text("Enabling A Better Route Planner will share your position and vehicle data with Iternio, the company behind ABRP.")
-          }
-
-          Section {
             Toggle(
               "Trip Telemetry",
               isOn: Binding(
@@ -76,6 +69,7 @@ struct IntegrationsView: View {
                 set: { isOn, _ in model.$appSettings.abrpSendTripUpdates.withLock { $0 = isOn } }
               )
             )
+            .disabled(!model.appSettings.abrpEnabled)
             Toggle(
               "Charge Telemetry",
               isOn: Binding(
@@ -83,6 +77,9 @@ struct IntegrationsView: View {
                 set: { isOn, _ in model.$appSettings.abrpSendChargeUpdates.withLock { $0 = isOn } }
               )
             )
+            .disabled(!model.appSettings.abrpEnabled)
+          } footer: {
+            Text("Enabling A Better Route Planner will share your position and vehicle data with Iternio, the company behind ABRP.")
           }
 
           Section {
@@ -184,7 +181,7 @@ private struct AddABRPVehicleSheet: View {
     try? $0.defaultDatabase.seedPreviews()
   }
   NavigationStack {
-    IntegrationsView()
+    IntegrationsView(abrpAPIKey: "preview-key")
       .preferredColorScheme(.dark)
   }
 }
