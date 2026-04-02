@@ -48,6 +48,7 @@ public final class ABRPManager: Sendable {
     if let position = packet.position {
       telemetry.lat = position.latitude
       telemetry.lon = position.longitude
+      telemetry.elevation = position.elevation
     }
     if let weather = packet.weather {
       telemetry.extTemp = weather.temperature
