@@ -69,6 +69,23 @@ struct IntegrationsView: View {
           }
 
           Section {
+            Toggle(
+              "Trip Telemetry",
+              isOn: Binding(
+                get: { model.appSettings.abrpSendTripUpdates },
+                set: { isOn, _ in model.$appSettings.abrpSendTripUpdates.withLock { $0 = isOn } }
+              )
+            )
+            Toggle(
+              "Charge Telemetry",
+              isOn: Binding(
+                get: { model.appSettings.abrpSendChargeUpdates },
+                set: { isOn, _ in model.$appSettings.abrpSendChargeUpdates.withLock { $0 = isOn } }
+              )
+            )
+          }
+
+          Section {
             ForEach(model.configuredVehicles, id: \.vehicle.vin) { entry in
               VStack(alignment: .leading, spacing: 4) {
                 Text(entry.vehicle.yearMakeModel)

@@ -24,6 +24,7 @@ public final class ABRPManager: Sendable {
     @Dependency(\.date.now) var now
     @Shared(.appSettings) var appSettings
     guard appSettings.abrpEnabled else { return }
+    guard appSettings.abrpSendTripUpdates else { return }
     guard let vin = DokoVehicleManager.shared.connectedVehicle?.vin,
           let userToken = appSettings.abrpVehicleTokens[vin],
           !userToken.isEmpty else {
@@ -61,6 +62,7 @@ public final class ABRPManager: Sendable {
     @Dependency(\.date.now) var now
     @Shared(.appSettings) var appSettings
     guard appSettings.abrpEnabled else { return }
+    guard appSettings.abrpSendChargeUpdates else { return }
     guard let vin = DokoVehicleManager.shared.connectedVehicle?.vin,
           let userToken = appSettings.abrpVehicleTokens[vin],
           !userToken.isEmpty else {
