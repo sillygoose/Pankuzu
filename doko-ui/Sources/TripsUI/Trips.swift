@@ -35,7 +35,7 @@ public final class TripsModel {
 
   @ObservationIgnored @FetchOne var tripStats: TripStats = TripStats()
 
-  @ObservationIgnored @FetchOne(Trip.select { Stats.Columns(count: $0.count(filter: !$0.isDeleted)) })
+  @ObservationIgnored @FetchOne(Trip.select { Stats.Columns(count: $0.count(filter: $0.isDeleted.eq(false))) })
   var myStats = Stats()
   @Selection
   struct Stats: Equatable {
@@ -83,7 +83,7 @@ public final class TripsModel {
       _tripStats = FetchOne(
         wrappedValue: TripStats(),
         Trip
-          .where { !$0.isDeleted }
+          .where { $0.isDeleted.eq(false) }
           .where { $0.timeStart.gte(queryStart) && $0.timeStart.lt(queryEnd)  }
           .where {
             if let vehicleID = displayVehicleID {
@@ -107,7 +107,7 @@ public final class TripsModel {
 
       _trips = FetchAll(
         Trip
-          .where { !$0.isDeleted }
+          .where { $0.isDeleted.eq(false) }
           .where { $0.timeStart.gte(queryStart) && $0.timeStart.lt(queryEnd) }
           .where {
             if let vehicleID = displayVehicleID {

@@ -27,14 +27,14 @@ public final class SoHHistoryModel {
     self.currentID = currentID
     _charges = FetchAll(
       Charge
-        .where { !$0.isDeleted }
+        .where { $0.isDeleted.eq(false) }
         .where { $0.vehicleID.eq(vehicleID) }
         .where { $0.batteryStateOfHealth.isNot(nil) }
         .order { $0.timeStart.asc() }
     )
     _trips = FetchAll(
       Trip
-        .where { !$0.isDeleted }
+        .where { $0.isDeleted.eq(false) }
         .where { $0.vehicleID.eq(vehicleID) }
         .where { $0.batteryStateOfHealth.isNot(nil) }
         .order { $0.timeStart.asc() }

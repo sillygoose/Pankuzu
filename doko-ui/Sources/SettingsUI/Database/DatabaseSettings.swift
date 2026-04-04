@@ -32,14 +32,14 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
 @MainActor @Observable class DatabaseSettingsModel {
   @ObservationIgnored @FetchAll(
     Trip
-      .where { $0.isDeleted }
+      .where { $0.isDeleted.eq(true) }
       .order { $0.deletedOrdering },
     animation: .default
   ) var deletedTrips
   
   @ObservationIgnored @FetchAll(
     Charge
-      .where { $0.isDeleted }
+      .where { $0.isDeleted.eq(true) }
       .order { $0.deletedOrdering },
     animation: .default
   ) var deletedCharges
@@ -152,10 +152,14 @@ struct DatabaseSettingsView: View {
 
   @State var showFileImporter: Bool = false
   @State var showFileExporter: Bool = false
-  
+  @State var showBackupOptions: Bool = false
+  @State var showRestoreOptions: Bool = false
+
   @State private var jsonDocument = JSONDocument(initialModel: DatabaseBackup())
   @State private var backupFilename: String?
   @State private var restoreFileURL: URL?
+  @State private var backupOptions: BackupOptions = BackupOptions()
+  @State private var restoreOptions: RestoreOptions = RestoreOptions()
   
   @Dependency(\.date.now) var now
   
@@ -164,11 +168,8 @@ struct DatabaseSettingsView: View {
       Section {
         HStack {
           Button{
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyyMMdd_HHmmss"
-            let dateString = dateFormatter.string(from: now)
-            let baseFilename = "Doko"
-            backupFilename = "\(baseFilename)-\(dateString)"
+            backupOptions = BackupOptions(now: now)
+            showBackupOptions = true
           } label: {
             HStack {
               Label("Backup", systemImage: "arrow.up.document.fill")
@@ -183,7 +184,8 @@ struct DatabaseSettingsView: View {
           .buttonStyle(.borderless)
           Spacer(minLength: 60)
           Button{
-            showFileImporter = true
+            restoreOptions = RestoreOptions()
+            showRestoreOptions = true
           } label: {
             Label("Restore", systemImage: "arrow.down.document.fill")
               .font(.headline)
@@ -310,7 +312,7 @@ struct DatabaseSettingsView: View {
     .task(id: backupFilename) {
       guard let _ = backupFilename else { return }
       do {
-        jsonDocument.backupModel = try backupDatabase()
+        jsonDocument.backupModel = try backupDatabase(options: backupOptions)
         showFileExporter = true
       } catch {
         model.destination = .alert(.databaseBackup(error.localizedDescription))
@@ -330,10 +332,23 @@ struct DatabaseSettingsView: View {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         self.jsonDocument.backupModel = try decoder.decode(DatabaseBackup.self, from: data)
-        try restoreDatabase(from: self.jsonDocument.backupModel)
+        try restoreDatabase(from: self.jsonDocument.backupModel, options: restoreOptions)
         model.destination = .alert(.databaseRestore())
       } catch {
         model.destination = .alert(.databaseRestore(error.localizedDescription))
+      }
+    }
+    .sheet(isPresented: $showBackupOptions) {
+      BackupOptionsView(options: $backupOptions) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd_HHmmss"
+        let dateString = dateFormatter.string(from: now)
+        backupFilename = "Doko-\(dateString)"
+      }
+    }
+    .sheet(isPresented: $showRestoreOptions) {
+      RestoreOptionsView(options: $restoreOptions) {
+        showFileImporter = true
       }
     }
     .fileExporter(

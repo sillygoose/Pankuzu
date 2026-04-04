@@ -45,7 +45,7 @@ public final class ChargesModel {
   @ObservationIgnored @FetchAll(Charge.none) var charges: [Charge]
   @ObservationIgnored @FetchOne var chargeStats: ChargeStats = ChargeStats()
 
-  @ObservationIgnored @FetchOne(Charge.select { Stats.Columns(count: $0.count(filter: !$0.isDeleted)) })
+  @ObservationIgnored @FetchOne(Charge.select { Stats.Columns(count: $0.count(filter: $0.isDeleted.eq(false))) })
   var myStats = Stats()
   @Selection
   struct Stats: Equatable {
@@ -94,7 +94,7 @@ public final class ChargesModel {
       _chargeStats = FetchOne(
         wrappedValue: ChargeStats(),
         Charge
-          .where { !$0.isDeleted }
+          .where { $0.isDeleted.eq(false) }
           .where { $0.timeStart.gte(queryStart) && $0.timeStart.lt(queryEnd) }
           .where {
             if showAcCharges && showDcCharges { !$0.isNoCharge }
@@ -118,7 +118,7 @@ public final class ChargesModel {
       
       _charges = FetchAll(
         Charge
-          .where { !$0.isDeleted }
+          .where { $0.isDeleted.eq(false) }
           .where { $0.timeStart.gte(queryStart) && $0.timeStart.lt(queryEnd) }
           .where {
             if showAcCharges && showDcCharges { !$0.isNoCharge }
