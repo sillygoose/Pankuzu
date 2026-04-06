@@ -36,18 +36,14 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .atsh(let header):             obdLinkCommand = "ATSH \(header)"
     case .atcp(let header):             obdLinkCommand = "ATCP \(header)"
     case .atcf(let pattern):            obdLinkCommand = "ATCF \(pattern)"
-    case .atcra(let pattern):           obdLinkCommand = "ATCRA \(pattern)" //obdLinkCommand = String(format: "ATCRA %X", pattern) //"ATCRA\(pattern)"
-    case .atcm(let mask):               obdLinkCommand = "ATCM \(mask)" // "ATCM\(mask)"
+    case .atcra(let pattern):           obdLinkCommand = "ATCRA \(pattern)"
+    case .atcm(let mask):               obdLinkCommand = "ATCM \(mask)"
     case .stcsegr(let enabled):         obdLinkCommand = "STCSEGR \(enabled ? 1 : 0)"
 
-    case .batteryVoltage0:              obdLinkCommand = "STPX h:17FC007B, d:221E3B"
-    case .batteryVoltage1:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
-    case .batteryVoltage2:              obdLinkCommand = "STPX h:17FC007B, d:227448"
-    case .batteryVoltage3:              obdLinkCommand = "STPX h:17FC007B, d:22028C"
-    case .batteryVoltage4:              obdLinkCommand = "STPX h:17FC007B, d:222A0B"
-
-    case .batteryCurrent0:              obdLinkCommand = "STPX h:17FC0076, d:22295A"
-    case .batteryCurrent1:              obdLinkCommand = "STPX h:17FC0076, d:22210E"
+    case .batteryCurrent0:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
+    case .batteryCurrent1:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
+    case .batteryCurrent2:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
+    case .batteryCurrent3:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
 
 //    case .batteryVoltage1:              obdLinkCommand = "221E3B"
 //    case .batteryCurrent1:              obdLinkCommand = "221E3D"
@@ -66,17 +62,17 @@ public actor VwElectrics: ConnectedVehicleInterface {
 //    case .batteryVoltage7:              obdLinkCommand = "221E3B"
 //    case .batteryCurrent7:              obdLinkCommand = "221E3D"
 
-    case .gearSelected:                 obdLinkCommand = "22210E" //"STPX h:17FC0076, d:22210E"    //0x17fc0076 03 22 21 0e 55 55 55 55
-    case .odometer:                     obdLinkCommand = "22295A" //"STPX h:17FC0076, d:22295A"    //0x17fe0076 06 62 29 5a XX YY ZZ aa  (XX*2^16+YY*2^8+ZZ) = km in decimal
+    case .gearSelected:                 obdLinkCommand = "STPX h:17FC0076, d:22210E"
+    case .odometer:                     obdLinkCommand = "STPX h:17FC0076, d:22295A"
     case .speed:                        obdLinkCommand = "010D"
 
-    case .batteryVoltage:               obdLinkCommand = "221E3B" //"03221E3B55555555" //STPX h:17FC007B, d:221E3B"    //0x17fc007b 03 22 1e 3b 55 55 55 55
-    case .batteryCurrent:               obdLinkCommand = "221E3D" //"03221E3D55555555" //STPX h:17FC007B, d:221E3D"    //0x17fc007b 03 22 1e 3d 55 55 55 55
-    case .stateOfCharge:                obdLinkCommand = "22028C" //STPX h:17FC007B, d:22028C"    //0x17fc007b 03 22 02 8c 55 55 55 55
-    case .batteryTemperature:           obdLinkCommand = "222A0B" //"STPX h:17FC007B, d:222A0B"    //0x17fc007b 03 22 2a 0b
+    case .batteryVoltage:               obdLinkCommand = "STPX h:17FC007B, d:221E3B"
+    case .batteryCurrent:               obdLinkCommand = "STPX h:17FC007B, d:221E3D"
+    case .stateOfCharge:                obdLinkCommand = "STPX h:17FC007B, d:22028C"
+    case .batteryTemperature:           obdLinkCommand = "STPX h:17FC007B, d:222A0B"
 
-    case .acChargerStatus:              obdLinkCommand = "227448" //"STPX h:17FC007B, d:227448"    //0x17fc007b 03 22 74 48 55 55 55 55
-    case .dcChargerStatus:              obdLinkCommand = "227448" //"STPX h:17FC007B, d:227448"    //0x17fc007b 03 22 74 48 55 55 55 55
+    case .acChargerStatus:              obdLinkCommand = "STPX h:17FC007B, d:227448"
+    case .dcChargerStatus:              obdLinkCommand = "STPX h:17FC007B, d:227448"
 
     case .position:                     obdLinkCommand = ""
     case .weather:                      obdLinkCommand = ""
@@ -94,113 +90,89 @@ public actor VwElectrics: ConnectedVehicleInterface {
     switch packetType {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
-        //.atcp("17"),
-        //.atsh("FC007B"),
+        //.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
         .atcra("17FE007X"),
-        
-        .batteryVoltage0,
-        .batteryVoltage1,
-        .batteryVoltage2,
-        .batteryVoltage3,
-        .batteryVoltage4,
 
-        .speed,
+        .ath(true),
 
+        .atcaf(false),
+        .stcsegr(false),
         .batteryCurrent0,
+        .atcaf(true),
+        .stcsegr(false),
         .batteryCurrent1,
+        .atcaf(false),
+        .stcsegr(true),
+        .batteryCurrent2,
+        .atcaf(true),
+        .stcsegr(true),
+        .batteryCurrent3,
+        
+        .stcsegr(true),
+        .atcaf(true),
+        .ath(false),
+        
+        //        .speed,
+//
+//        .batteryCurrent0,
+        
+//        .batteryCurrent1,
 
 //        .atcp(""),
 //        .atsh(""),
 
-        .atz,
-        .ate(false),
-        .atsp(7),
-        .ath(true),
-        .ats(false),
-        .atcaf(false),
-        .atcp("17"),
-        //
-        .atsh("FC007B"),
-//        .batteryVoltage2, .batteryCurrent2,
-        //
-        .atcra("17FE007X"),
-//        .batteryVoltage3, .batteryCurrent3,
-        //
-        .atcaf(true),
-//        .batteryVoltage4, .batteryCurrent4,
-        //
-        .ath(false),
-//        .batteryVoltage5, .batteryCurrent5,
-        //
-        .stcsegr(true),
-//        .batteryVoltage6, .batteryCurrent6,
-        //
-        .atsh("FC007B"),
+////        .batteryVoltage2, .batteryCurrent2,
+//        //
+//        .atcra("17FE007X"),
+////        .batteryVoltage3, .batteryCurrent3,
+//        //
+//        .atcaf(true),
+////        .batteryVoltage4, .batteryCurrent4,
+//        //
+//        .ath(false),
+////        .batteryVoltage5, .batteryCurrent5,
+//        //
+//        .stcsegr(true),
+////        .batteryVoltage6, .batteryCurrent6,
+//        //
         .acChargerStatus, .dcChargerStatus,
-        .stateOfCharge,
-        .batteryTemperature,
-        //
-        .atsh("FC0076"),
         .gearSelected, .odometer,
+        .stateOfCharge, .batteryTemperature,
+        .batteryVoltage, //.batteryCurrent,
       ])
 
     case .idle:
       return ObdCommandPacket(type: .idle, commands: [
-        .atsh("FC007B"),
         .acChargerStatus, .dcChargerStatus,
-
-        .atsh("FC0076"),
         .gearSelected,
-//        .gearSelected,
-//        .acChargerStatus, .dcChargerStatus
       ])
 
     case .tripStarting:
       return ObdCommandPacket(type: .tripStarting, commands: [
-        .atsh("FC0076"),
         .odometer,
-
-          .atsh("FC007B"),
-        .stateOfCharge,
-        .batteryTemperature,
-
+        .stateOfCharge, .batteryTemperature,
         .position, .weather,
       ])
     case .tripInProgress:
       return ObdCommandPacket(type: .tripInProgress, commands: [
-        .atsh("FC0076"),
         .gearSelected,
       ])
     case .tripUpdate:
       return ObdCommandPacket(type: .tripUpdate, commands: [
         .position,
-
-        .atsh("FC0076"),
         .odometer,
-
-        .atsh("FC007B"),
-        .stateOfCharge, //###.stateOfHealth,
-        .batteryTemperature,
+        .stateOfCharge, .batteryTemperature,
       ])
     case .tripEnding:
       return ObdCommandPacket(type: .tripEnding, commands: [
         .weather,
-
-        .atsh("FC0076"),
         .odometer,
-
-        .atsh("FC007B"),
-        .stateOfCharge,
-        .batteryTemperature,
-
+        .stateOfCharge, .batteryTemperature,
         .position,
       ])
     case .tripData:
       return ObdCommandPacket(type: .tripData, commands: [
-        .atsh("FC0076"),
         .odometer,
-
-        .atsh("FC007B"),
         .stateOfCharge, .batteryTemperature
       ])
     case .tripWeather:
@@ -210,98 +182,68 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
     case .acChargeStarting:
       return ObdCommandPacket(type: .acChargeStarting, commands: [
-        .atsh("FC0076"),
         .odometer,
-
-        .atsh("FC007B"),
-        .stateOfCharge,
-        .batteryTemperature,
-
+        .stateOfCharge, .batteryTemperature,
         .position, .weather,
       ])
     case .acChargeInProgress:
       return ObdCommandPacket(type: .acChargeInProgress, commands: [
-        .atsh("FC007B"),
         .acChargerStatus
       ])
     case .acChargeUpdate:
       return ObdCommandPacket(type: .acChargeUpdate, commands: [
-        .atsh("FC0076"),
         .odometer,
-
-        .atsh("FC007B"),
-        .stateOfCharge, //###.stateOfHealth,
-        .batteryTemperature,
+        .stateOfCharge, .batteryTemperature,
       ])
     case .acChargeEnding:
       return ObdCommandPacket(type: .acChargeEnding, commands: [
-        .atsh("FC007B"),
-        .stateOfCharge,
-        .batteryTemperature,
+        .stateOfCharge, .batteryTemperature,
       ])
 
     case .dcChargeStarting:
       return ObdCommandPacket(type: .dcChargeStarting, commands: [
-        .atsh("FC0076"),
         .odometer,
-
-        .atsh("FC007B"),
-        .stateOfCharge,
-        .batteryTemperature,
+        .stateOfCharge, .batteryTemperature,
         .position, .weather,
       ])
     case .dcChargeInProgress:
       return ObdCommandPacket(type: .dcChargeInProgress, commands: [
-        .atsh("FC007B"),
         .dcChargerStatus
       ])
     case .dcChargeUpdate:
       return ObdCommandPacket(type: .dcChargeUpdate, commands: [
-        .atsh("FC0076"),
         .odometer,
-
-        .atsh("FC007B"),
-        .stateOfCharge, //###.stateOfHealth,
-        .batteryTemperature,
+        .stateOfCharge, .batteryTemperature,
       ])
     case .dcChargeEnding:
       return ObdCommandPacket(type: .dcChargeEnding, commands: [
-        .atsh("FC007B"),
-        .stateOfCharge,
-        .batteryTemperature,
+        .stateOfCharge, .batteryTemperature,
       ])
 
     case .acChargeHistory:
       return ObdCommandPacket(type: .acChargeHistory, commands: [
-        .atsh("FC007B"),
-        .stateOfCharge,
-        .batteryTemperature,
+        .stateOfCharge, .batteryTemperature,
       ])
     case .dcChargeHistory:
       return ObdCommandPacket(type: .dcChargeHistory, commands: [
-        .atsh("FC007B"),
-        .stateOfCharge,
-        .batteryTemperature,
+        .stateOfCharge, .batteryTemperature,
       ])
 
-    case .tripEnergy:
-      return ObdCommandPacket(type: .tripEnergy, commands: [
-        .atsh("FC007B"),
-        .batteryVoltage, .batteryCurrent
-      ])
-    case .acChargeEnergy:
-      return ObdCommandPacket(type: .acChargeEnergy, commands: [
-        .atsh("FC007B"),
-        .batteryVoltage, .batteryCurrent
-      ])
-    case .dcChargeEnergy:
-      return ObdCommandPacket(type: .dcChargeEnergy, commands: [
-        .atsh("FC007B"),
-        .batteryVoltage, .batteryCurrent
-      ])
+//    case .tripEnergy:
+//      return ObdCommandPacket(type: .tripEnergy, commands: [
+//        .batteryVoltage, .batteryCurrent
+//      ])
+//    case .acChargeEnergy:
+//      return ObdCommandPacket(type: .acChargeEnergy, commands: [
+//        .batteryVoltage, .batteryCurrent
+//      ])
+//    case .dcChargeEnergy:
+//      return ObdCommandPacket(type: .dcChargeEnergy, commands: [
+//        .batteryVoltage, .batteryCurrent
+//      ])
 
     default:
-      DokoLogging.shared.postLoggingResponse(.error("VWE.translateDokoCommandPacket: no packet translation for '\(packetType.description)'"))
+//      DokoLogging.shared.postLoggingResponse(.error("VWE.translateDokoCommandPacket: no packet translation for '\(packetType.description)'"))
       return nil
     }
   }

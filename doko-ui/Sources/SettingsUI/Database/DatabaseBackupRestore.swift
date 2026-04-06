@@ -9,13 +9,13 @@ import DokoSharing
 struct RestoreOptions {
   var includeTrips: Bool = true
   var includeCharges: Bool = true
-  var includeSettings: Bool = true
+  var includeSettings: Bool = false
 }
 
 struct BackupOptions {
   var includeTrips: Bool = true
   var includeCharges: Bool = true
-  var includeSettings: Bool = true
+  var includeSettings: Bool = false
   var useDateRange: Bool = false
 
   // startDate is always midnight of the selected day.
