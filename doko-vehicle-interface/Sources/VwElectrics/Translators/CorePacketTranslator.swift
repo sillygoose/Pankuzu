@@ -74,7 +74,7 @@ extension VwElectrics {
     if let batteryTemperature = responsePacket.batteryTemperature {
       dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .vehicleCustomization, response: .batteryTemperature(batteryTemperature))
     }
-    if let stateOfCharge = responsePacket.stateOfCharge {
+    if let stateOfCharge = responsePacket.batteryStateOfCharge {
       dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .vehicleCustomization, response: .batteryStateOfCharge(stateOfCharge))
     }
     return DokoResponsePacket(type: .vehicleCustomization, responses: dokoResponses)

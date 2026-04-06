@@ -29,13 +29,12 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case vin
   case odometer
   case speed
-
   case gearSelected
-  case distanceToEmpty
-
-  case energyToEmpty
-  case stateOfCharge
-  case stateOfHealth
+  
+  case batteryDistanceToEmpty
+  case batteryEenergyToEmpty
+  case batteryStateOfCharge
+  case batteryStateOfHealth
   case batteryTemperature
   case batteryVoltage
   case batteryVoltage0
@@ -119,14 +118,14 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
 
       case .gearSelected:
         return ".gearSelected"
-      case .distanceToEmpty:
+      case .batteryDistanceToEmpty:
         return ".distanceToEmpty"
-      case .energyToEmpty:
-        return ".energyToEmpty"
-      case .stateOfCharge:
-        return ".stateOfCharge"
-      case .stateOfHealth:
-        return ".stateOfHealth"
+      case .batteryEenergyToEmpty:
+        return ".batteryEenergyToEmpty"
+      case .batteryStateOfCharge:
+        return ".batteryStateOfCharge"
+      case .batteryStateOfHealth:
+        return ".batteryStateOfHealth"
       case .batteryTemperature:
         return ".batteryTemperature"
       case .batteryVoltage:
@@ -283,13 +282,12 @@ public enum ObdResponse: Equatable, Sendable {
   case vin(String)
   case odometer(Double)
   case speed(Double)
-
   case gearSelected(Bool)
-  case distanceToEmpty(Double)
 
-  case energyToEmpty(Double)
-  case stateOfCharge(Double)
-  case stateOfHealth(Double)
+  case batteryDistanceToEmpty(Double)
+  case batteryEnergyToEmpty(Double)
+  case batteryStateOfCharge(Double)
+  case batteryStateOfHealth(Double)
   case batteryTemperature(Double)
   case batteryVoltage(Double)
   case batteryVoltage0(Double)
@@ -373,18 +371,17 @@ public enum ObdResponse: Equatable, Sendable {
         return String(format: ".odometer(%.1f)", odometer)
       case .speed(let speed):
         return String(format: ".speed(%.1f)", speed)
-
       case .gearSelected(let gear):
         return ".gearSelected(\(gear))"
-      case .distanceToEmpty(let dte):
-        return String(format: ".distanceToEmpty(%.3f)", dte)
 
-      case .energyToEmpty(let ete):
-        return String(format: ".energyToEmpty(%.3f)", ete)
-      case .stateOfCharge(let soc):
-        return String(format: ".stateOfCharge(%.1f)", soc)
-      case .stateOfHealth(let soh):
-        return String(format: ".stateOfHealth(%.1f)", soh)
+      case .batteryDistanceToEmpty(let dte):
+        return String(format: ".batteryDistanceToEmpty(%.3f)", dte)
+      case .batteryEnergyToEmpty(let ete):
+        return String(format: ".batteryEnergyToEmpty(%.3f)", ete)
+      case .batteryStateOfCharge(let soc):
+        return String(format: ".batteryStateOfCharge(%.1f)", soc)
+      case .batteryStateOfHealth(let soh):
+        return String(format: ".batteryStateOfHealth(%.1f)", soh)
       case .batteryTemperature(let temperature):
         return String(format: ".batteryTemperature(%.0f℃)", temperature)
       case .batteryVoltage(let voltage):

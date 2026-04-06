@@ -105,18 +105,18 @@ extension ObdResponsePacket {
     return v
   }
 
-  public var stateOfCharge: Double? {
-    guard case let .stateOfCharge(v)? = responses[.stateOfCharge]?.response else { return nil }
+  public var batteryStateOfCharge: Double? {
+    guard case let .batteryStateOfCharge(v)? = responses[.batteryStateOfCharge]?.response else { return nil }
     return v
   }
   
-  public var energyToEmpty: Double? {
-    guard case let .energyToEmpty(v)? = responses[.energyToEmpty]?.response else { return nil }
+  public var batteryEnergyToEmpty: Double? {
+    guard case let .batteryEnergyToEmpty(v)? = responses[.batteryEenergyToEmpty]?.response else { return nil }
     return v
   }
   
-  public var stateOfHealth: Double? {
-    guard case let .stateOfHealth(v)? = responses[.stateOfHealth]?.response else { return nil }
+  public var batteryStateOfHealth: Double? {
+    guard case let .batteryStateOfHealth(v)? = responses[.batteryStateOfHealth]?.response else { return nil }
     return v
   }
   
@@ -194,8 +194,8 @@ extension ObdResponsePacket {
     return v
   }
   
-  public var distanceToEmpty: Double? {
-    guard case let .distanceToEmpty(v)? = responses[.distanceToEmpty]?.response else { return nil }
+  public var batteryDistanceToEmpty: Double? {
+    guard case let .batteryDistanceToEmpty(v)? = responses[.batteryDistanceToEmpty]?.response else { return nil }
     return v
   }
   

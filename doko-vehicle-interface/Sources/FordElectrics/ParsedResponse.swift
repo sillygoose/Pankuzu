@@ -44,15 +44,15 @@ extension FordElectrics {
         let gearSelected = try parseGearSelected(response)
         commandResponse = .gearSelected(gearSelected)
 
-      case .energyToEmpty:
+      case .batteryEenergyToEmpty:
         let ete = try parseHvbEnergyToEmpty(response)
-        commandResponse = .energyToEmpty(ete)
-      case .stateOfCharge:
+        commandResponse = .batteryEnergyToEmpty(ete)
+      case .batteryStateOfCharge:
         let soc = try parseHvbStateOfCharge(response)
-        commandResponse = .stateOfCharge(soc)
-      case .stateOfHealth:
+        commandResponse = .batteryStateOfCharge(soc)
+      case .batteryStateOfHealth:
         let soh = try parseHvbStateOfHealth(response)
-        commandResponse = .stateOfHealth(soh)
+        commandResponse = .batteryStateOfHealth(soh)
       case .batteryTemperature:
         let temperature = try parseHvbTemperature(response)
         commandResponse = .batteryTemperature(temperature)

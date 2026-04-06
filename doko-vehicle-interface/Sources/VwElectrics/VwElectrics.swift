@@ -68,8 +68,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
     case .batteryVoltage:               obdLinkCommand = "STPX h:17FC007B, d:221E3B"
     case .batteryCurrent:               obdLinkCommand = "STPX h:17FC007B, d:221E3D"
-    case .stateOfCharge:                obdLinkCommand = "STPX h:17FC007B, d:22028C"
+    case .batteryStateOfCharge:         obdLinkCommand = "STPX h:17FC007B, d:22028C"
+    case .batteryStateOfHealth:         obdLinkCommand = "STPX h:17FC007B, d:222AB2"
     case .batteryTemperature:           obdLinkCommand = "STPX h:17FC007B, d:222A0B"
+    case .batteryDistanceToEmpty:       obdLinkCommand = "STPX h:17FC007B, d:222AB6"
 
     case .acChargerStatus:              obdLinkCommand = "STPX h:17FC007B, d:227448"
     case .dcChargerStatus:              obdLinkCommand = "STPX h:17FC007B, d:227448"
@@ -137,8 +139,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
 //        //
         .acChargerStatus, .dcChargerStatus,
         .gearSelected, .odometer,
-        .stateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryStateOfHealth, .batteryTemperature,
         .batteryVoltage, //.batteryCurrent,
+        .batteryDistanceToEmpty,
       ])
 
     case .idle:
@@ -150,7 +153,8 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .tripStarting:
       return ObdCommandPacket(type: .tripStarting, commands: [
         .odometer,
-        .stateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryStateOfHealth, .batteryTemperature,
+        .batteryDistanceToEmpty,
         .position, .weather,
       ])
     case .tripInProgress:
@@ -161,19 +165,21 @@ public actor VwElectrics: ConnectedVehicleInterface {
       return ObdCommandPacket(type: .tripUpdate, commands: [
         .position,
         .odometer,
-        .stateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryTemperature,
+        .batteryDistanceToEmpty,
       ])
     case .tripEnding:
       return ObdCommandPacket(type: .tripEnding, commands: [
         .weather,
         .odometer,
-        .stateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryStateOfHealth, .batteryTemperature,
+        .batteryDistanceToEmpty,
         .position,
       ])
     case .tripData:
       return ObdCommandPacket(type: .tripData, commands: [
         .odometer,
-        .stateOfCharge, .batteryTemperature
+        .batteryStateOfCharge, .batteryTemperature
       ])
     case .tripWeather:
       return ObdCommandPacket(type: .tripWeather, commands: [
@@ -183,7 +189,8 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .acChargeStarting:
       return ObdCommandPacket(type: .acChargeStarting, commands: [
         .odometer,
-        .stateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryStateOfHealth, .batteryTemperature,
+        .batteryDistanceToEmpty,
         .position, .weather,
       ])
     case .acChargeInProgress:
@@ -193,17 +200,19 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .acChargeUpdate:
       return ObdCommandPacket(type: .acChargeUpdate, commands: [
         .odometer,
-        .stateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryTemperature,
       ])
     case .acChargeEnding:
       return ObdCommandPacket(type: .acChargeEnding, commands: [
-        .stateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryTemperature,
+        .batteryDistanceToEmpty,
       ])
 
     case .dcChargeStarting:
       return ObdCommandPacket(type: .dcChargeStarting, commands: [
         .odometer,
-        .stateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryStateOfHealth, .batteryTemperature,
+        .batteryDistanceToEmpty,
         .position, .weather,
       ])
     case .dcChargeInProgress:
@@ -213,20 +222,21 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .dcChargeUpdate:
       return ObdCommandPacket(type: .dcChargeUpdate, commands: [
         .odometer,
-        .stateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryTemperature,
       ])
     case .dcChargeEnding:
       return ObdCommandPacket(type: .dcChargeEnding, commands: [
-        .stateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryTemperature,
+        .batteryDistanceToEmpty,
       ])
 
     case .acChargeHistory:
       return ObdCommandPacket(type: .acChargeHistory, commands: [
-        .stateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryTemperature,
       ])
     case .dcChargeHistory:
       return ObdCommandPacket(type: .dcChargeHistory, commands: [
-        .stateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryTemperature,
       ])
 
 //    case .tripEnergy:

@@ -9,9 +9,9 @@ extension FordMachE {
     guard
       let position = responsePacket.position,
       let odometer = responsePacket.odometer,
-      let energyToEmpty = responsePacket.energyToEmpty,
-      let stateOfCharge = responsePacket.stateOfCharge,
-      let stateOfHealth = responsePacket.stateOfHealth,
+      let energyToEmpty = responsePacket.batteryEnergyToEmpty,
+      let stateOfCharge = responsePacket.batteryStateOfCharge,
+      let stateOfHealth = responsePacket.batteryStateOfHealth,
       let batteryTemperature = responsePacket.batteryTemperature,
       let couplerTemperature = responsePacket.dcChargerCouplerTemperature
     else {
@@ -67,10 +67,10 @@ extension FordMachE {
     if let odometer = responsePacket.odometer {
       dokoResponses[.odometer] = DokoCommandResponse(command: .dcChargeUpdate, response: .odometer(odometer))
     }
-    if let stateOfCharge = responsePacket.stateOfCharge {
+    if let stateOfCharge = responsePacket.batteryStateOfCharge {
       dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .dcChargeUpdate, response: .batteryStateOfCharge(stateOfCharge))
     }
-    if let stateOfHealth = responsePacket.stateOfHealth {
+    if let stateOfHealth = responsePacket.batteryStateOfHealth {
       dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .dcChargeUpdate, response: .batteryStateOfHealth(stateOfHealth))
     }
     if let batteryTemperature = responsePacket.batteryTemperature {
@@ -85,9 +85,9 @@ extension FordMachE {
   func dcChargeEndingResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
     guard
-      let energyToEmpty = responsePacket.energyToEmpty,
-      let stateOfCharge = responsePacket.stateOfCharge,
-      let stateOfHealth = responsePacket.stateOfHealth,
+      let energyToEmpty = responsePacket.batteryEnergyToEmpty,
+      let stateOfCharge = responsePacket.batteryStateOfCharge,
+      let stateOfHealth = responsePacket.batteryStateOfHealth,
       let batteryTemperature = responsePacket.batteryTemperature,
       let couplerTemperature = responsePacket.dcChargerCouplerTemperature
     else {
@@ -133,8 +133,8 @@ extension FordMachE {
   func dcChargeHistoryPacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
     guard
-      let energyToEmpty = responsePacket.energyToEmpty,
-      let stateOfCharge = responsePacket.stateOfCharge,
+      let energyToEmpty = responsePacket.batteryEnergyToEmpty,
+      let stateOfCharge = responsePacket.batteryStateOfCharge,
       let batteryTemperature = responsePacket.batteryTemperature,
       let couplerTemperature = responsePacket.dcChargerCouplerTemperature
     else {

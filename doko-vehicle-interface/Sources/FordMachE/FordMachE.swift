@@ -38,9 +38,9 @@ public actor FordMachE: ConnectedVehicleInterface {
     case .acChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224888"
     case .dcChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224897"
 
-    case .energyToEmpty:                obdLinkCommand = "STPX h:7E4, d:224848"
-    case .stateOfCharge:                obdLinkCommand = "STPX h:7E4, d:224845"
-    case .stateOfHealth:                obdLinkCommand = "STPX h:7E4, d:22490C"
+    case .batteryEenergyToEmpty:                obdLinkCommand = "STPX h:7E4, d:224848"
+    case .batteryStateOfCharge:                obdLinkCommand = "STPX h:7E4, d:224845"
+    case .batteryStateOfHealth:                obdLinkCommand = "STPX h:7E4, d:22490C"
     case .batteryTemperature:           obdLinkCommand = "STPX h:7E4, d:224800"
       
     case .batteryVoltage:               obdLinkCommand = "STPX h:7E4, d:22480D"
@@ -78,8 +78,8 @@ public actor FordMachE: ConnectedVehicleInterface {
       
     case .tripStarting:
       return ObdCommandPacket(type: .tripStarting, commands: [
-        .odometer, .energyToEmpty, .stateOfCharge,
-        .stateOfHealth, .batteryTemperature,
+        .odometer, .batteryEenergyToEmpty, .batteryStateOfCharge,
+        .batteryStateOfHealth, .batteryTemperature,
         .position, .weather
       ])
     case .tripInProgress:
@@ -89,19 +89,19 @@ public actor FordMachE: ConnectedVehicleInterface {
     case .tripUpdate:
       return ObdCommandPacket(type: .tripUpdate, commands: [
         .position, .odometer, .speed,
-        .stateOfCharge, .stateOfHealth,
+        .batteryStateOfCharge, .batteryStateOfHealth,
         .batteryTemperature,
       ])
     case .tripEnding:
       return ObdCommandPacket(type: .tripEnding, commands: [
         .weather,
-        .odometer, .energyToEmpty, .stateOfCharge,
-        .stateOfHealth, .batteryTemperature,
+        .odometer, .batteryEenergyToEmpty, .batteryStateOfCharge,
+        .batteryStateOfHealth, .batteryTemperature,
         .position
       ])
     case .tripData:
       return ObdCommandPacket(type: .tripData, commands: [
-        .odometer, .stateOfCharge, .energyToEmpty, .batteryTemperature
+        .odometer, .batteryStateOfCharge, .batteryEenergyToEmpty, .batteryTemperature
       ])
     case .tripWeather:
       return ObdCommandPacket(type: .tripWeather, commands: [
@@ -110,8 +110,8 @@ public actor FordMachE: ConnectedVehicleInterface {
 
     case .acChargeStarting:
       return ObdCommandPacket(type: .acChargeStarting, commands: [
-        .odometer, .energyToEmpty, .stateOfCharge,
-        .stateOfHealth, .batteryTemperature, .acChargerCouplerTemperature,
+        .odometer, .batteryEenergyToEmpty, .batteryStateOfCharge,
+        .batteryStateOfHealth, .batteryTemperature, .acChargerCouplerTemperature,
         .position, .weather
       ])
     case .acChargeInProgress:
@@ -121,20 +121,20 @@ public actor FordMachE: ConnectedVehicleInterface {
     case .acChargeUpdate:
       return ObdCommandPacket(type: .acChargeUpdate, commands: [
         .odometer,
-        .stateOfCharge, .stateOfHealth,
+        .batteryStateOfCharge, .batteryStateOfHealth,
         .batteryTemperature,
         .acChargerCouplerTemperature
       ])
     case .acChargeEnding:
       return ObdCommandPacket(type: .acChargeEnding, commands: [
-        .energyToEmpty, .stateOfCharge,
-        .stateOfHealth, .batteryTemperature, .acChargerCouplerTemperature
+        .batteryEenergyToEmpty, .batteryStateOfCharge,
+        .batteryStateOfHealth, .batteryTemperature, .acChargerCouplerTemperature
       ])
 
     case .dcChargeStarting:
       return ObdCommandPacket(type: .dcChargeStarting, commands: [
-        .odometer, .energyToEmpty, .stateOfCharge,
-        .stateOfHealth, .batteryTemperature, .dcChargerCouplerTemperature,
+        .odometer, .batteryEenergyToEmpty, .batteryStateOfCharge,
+        .batteryStateOfHealth, .batteryTemperature, .dcChargerCouplerTemperature,
         .position, .weather
       ])
     case .dcChargeInProgress:
@@ -144,28 +144,28 @@ public actor FordMachE: ConnectedVehicleInterface {
     case .dcChargeUpdate:
       return ObdCommandPacket(type: .dcChargeUpdate, commands: [
         .odometer,
-        .stateOfCharge, .stateOfHealth,
+        .batteryStateOfCharge, .batteryStateOfHealth,
         .batteryTemperature,
         .acChargerCouplerTemperature
       ])
     case .dcChargeEnding:
       return ObdCommandPacket(type: .dcChargeEnding, commands: [
-        .energyToEmpty, .stateOfCharge,
-        .stateOfHealth, .batteryTemperature, .dcChargerCouplerTemperature
+        .batteryEenergyToEmpty, .batteryStateOfCharge,
+        .batteryStateOfHealth, .batteryTemperature, .dcChargerCouplerTemperature
       ])
 
     case .acChargeHistory:
       return ObdCommandPacket(
         type: .acChargeHistory,
         commands: [
-        .energyToEmpty, .stateOfCharge,
+        .batteryEenergyToEmpty, .batteryStateOfCharge,
         .batteryTemperature, .acChargerCouplerTemperature
       ])
     case .dcChargeHistory:
       return ObdCommandPacket(
         type: .dcChargeHistory,
         commands: [
-        .energyToEmpty, .stateOfCharge,
+        .batteryEenergyToEmpty, .batteryStateOfCharge,
         .batteryTemperature, .dcChargerCouplerTemperature
       ])
 
