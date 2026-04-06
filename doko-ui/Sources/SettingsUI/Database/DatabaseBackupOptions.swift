@@ -9,13 +9,13 @@ struct RestoreOptionsView: View {
   var body: some View {
     NavigationStack {
       Form {
-        Section("Content") {
-          Toggle("Include Trips", isOn: $options.includeTrips)
-          Toggle("Include Charges", isOn: $options.includeCharges)
-          Toggle("Include Settings", isOn: $options.includeSettings)
+        Section("Restore") {
+          Toggle("Trips", isOn: $options.includeTrips)
+          Toggle("Charges", isOn: $options.includeCharges)
+          Toggle("Settings", isOn: $options.includeSettings)
         }
       }
-      .navigationTitle("Restore Options")
+      .navigationTitle("Options")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
@@ -42,10 +42,10 @@ struct BackupOptionsView: View {
   var body: some View {
     NavigationStack {
       Form {
-        Section("Content") {
-          Toggle("Include Trips", isOn: $options.includeTrips)
-          Toggle("Include Charges", isOn: $options.includeCharges)
-          Toggle("Include Settings", isOn: $options.includeSettings)
+        Section("Backup") {
+          Toggle("Trips", isOn: $options.includeTrips)
+          Toggle("Charges", isOn: $options.includeCharges)
+          Toggle("Settings", isOn: $options.includeSettings)
         }
 
         Section {
@@ -74,14 +74,14 @@ struct BackupOptionsView: View {
           }
         }
       }
-      .navigationTitle("Backup Options")
+      .navigationTitle("Options")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button("Cancel") { dismiss() }
         }
         ToolbarItem(placement: .confirmationAction) {
-          Button("Export") {
+          Button("Backup") {
             onConfirm()
             dismiss()
           }
@@ -90,4 +90,16 @@ struct BackupOptionsView: View {
       }
     }
   }
+}
+
+#Preview("Backup") {
+  @Previewable @State var options = BackupOptions()
+  BackupOptionsView(options: $options) {}
+    .preferredColorScheme(.dark)
+}
+
+#Preview("Restore") {
+  @Previewable @State var options = RestoreOptions()
+  RestoreOptionsView(options: $options) {}
+    .preferredColorScheme(.dark)
 }
