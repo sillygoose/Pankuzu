@@ -86,13 +86,13 @@ public struct ChargeDetailView: View {
     ScrollView {
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
-          DokoGridButton(color: .blue, iconName: "map.fill", title: "Map") {
+          DokoGridButton(color: .blue, symbolName: "map.fill", title: "Map") {
             model.destination = .chargeLocationMap
           }
 
           DokoGridButton(
             color: .green,
-            iconName: "chart.xyaxis.line",
+            symbolName: "chart.xyaxis.line",
             title: "Power"
           ) {
             model.destination = .powerChart
@@ -100,7 +100,7 @@ public struct ChargeDetailView: View {
 
           DokoGridButton(
             color: .yellow,
-            iconName: "car",
+            symbolName: "car",
             title: model.vehicle?.name ?? (model.vehicle?.model ?? "Missing Vehicle")
           ) {
             if let vehicle = model.vehicle {
@@ -119,7 +119,7 @@ public struct ChargeDetailView: View {
                 placeName: model.chargeLocation.placeName,
                 cityState: model.chargeLocation.cityState,
                 label: charge.chargerType == .ac ? "AC" : "DCFC",
-                iconName: charge.chargerType == .ac ? "powerplug" : "ev.charger"
+                symbolName: charge.chargerType == .ac ? "powerplug" : "ev.charger"
               ) {
                 model.destination = .editLocationForm(model.chargeLocation)
               }
@@ -134,7 +134,7 @@ public struct ChargeDetailView: View {
             color: .yellow,
             value: String(format: "%.1f", odometer.value as CVarArg),
             units: odometer.unit.symbol,
-            iconName: "gauge.open.with.lines.needle.33percent",
+            symbolName: "gauge.open.with.lines.needle.33percent",
             title: "Odometer"
           )
 
@@ -144,7 +144,7 @@ public struct ChargeDetailView: View {
               .time(pattern: .hourMinute(padHourToLength: 2))
             ),
             units: "hh:mm",
-            iconName: "clock",
+            symbolName: "clock",
             title: "Duration"
           )
         }
@@ -157,7 +157,7 @@ public struct ChargeDetailView: View {
               color: .blue,
               value: String(format: "%.1f", displayEnergy as CVarArg),
               units: energyAdded.unit.symbol,
-              iconName: "bolt.circle.fill",
+              symbolName: "bolt.circle.fill",
               title: "Energy Added"
             ) {
               model.destination = .energyUsedChart
@@ -167,7 +167,7 @@ public struct ChargeDetailView: View {
               color: .red,
               value: String(format: "%.1f", peakPower.value as CVarArg),
               units: peakPower.unit.symbol,
-              iconName: "bolt",
+              symbolName: "bolt",
               title: "Peak Power"
             )
 
@@ -185,7 +185,7 @@ public struct ChargeDetailView: View {
               color: stateOfChargeStartColor,
               value: String(format: "%.0f", stateOfChargeStart),
               units: "%",
-              iconName: stateOfChargeStartIcon,
+              symbolName: stateOfChargeStartIcon,
               title: "Start SoC"
             )
             let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
@@ -197,7 +197,7 @@ public struct ChargeDetailView: View {
               color: stateOfChargeEndColor,
               value: String(format: "%.0f", stateOfChargeEnd),
               units: "%",
-              iconName: stateOfChargeEndIcon,
+              symbolName: stateOfChargeEndIcon,
               title: "End SoC"
             )
           }
@@ -211,7 +211,7 @@ public struct ChargeDetailView: View {
               color: .blue,
               value: String(format: "%.0f", dteStart.value as CVarArg),
               units: dteStart.unit.symbol,
-              iconName: "road.lanes.curved.left",
+              symbolName: "road.lanes.curved.left",
               title: "Start Range"
             )
             
@@ -221,7 +221,7 @@ public struct ChargeDetailView: View {
               color: .blue,
               value: String(format: "%.0f", dteEnd.value as CVarArg),
               units: dteEnd.unit.symbol,
-              iconName: "road.lanes.curved.right",
+              symbolName: "road.lanes.curved.right",
               title: "End Range"
             )
           }
@@ -235,7 +235,7 @@ public struct ChargeDetailView: View {
               color: batteryStateOfHealthColor,
               value: String(format: "%.0f", batteryStateOfHealth),
               units: "%",
-              iconName: "minus.plus.batteryblock.stack",
+              symbolName: "minus.plus.batteryblock.stack",
               title: "State of Health"
             ) {
               model.destination = .stateOfHealthChart
@@ -245,7 +245,7 @@ public struct ChargeDetailView: View {
               color: .orange,
               value: nil,
               units: nil,
-              iconName: "batteryblock.stack",
+              symbolName: "batteryblock.stack",
               title: "Battery Details"
             ) {
               model.destination = .batteryChart

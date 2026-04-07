@@ -4,21 +4,21 @@ public struct DokoGridCount: View {
   let color: Color
   let value: String
   let units: String
-  let iconName: String
+  let symbolName: String
   let title: String
 
-  public init(color: Color, value: String, units: String, iconName: String, title: String) {
+  public init(color: Color, value: String, units: String, symbolName: String, title: String) {
     self.color = color
     self.value = value
     self.units = units
-    self.iconName = iconName
+    self.symbolName = symbolName
     self.title = title
   }
 
   public var body: some View {
     VStack {
       HStack {
-        Image(systemName: iconName)
+        Image(systemName: symbolName)
           .font(DesignTokens.Font.title)
           .bold()
           .foregroundStyle(color)
@@ -56,7 +56,7 @@ public struct DokoGridCount: View {
             color: .yellow,
             value: String(format: "%.1f", odometer.value as CVarArg),
             units: odometer.unit.symbol,
-            iconName: "gauge.open.with.lines.needle.33percent",
+            symbolName: "gauge.open.with.lines.needle.33percent",
             title: "Odometer"
           )
         }
@@ -78,14 +78,14 @@ public struct DokoGridCount: View {
             color: .blue,
             value: String(format: "%.1f", distance.value as CVarArg),
             units: distance.unit.symbol,
-            iconName: "road.lanes",
+            symbolName: "road.lanes",
             title: "Distance"
           )
           DokoGridCount(
             color: .orange,
             value: String(format: "%.0f", averageSpeed.value as CVarArg),
             units: averageSpeed.unit.symbol,
-            iconName: "powermeter",
+            symbolName: "powermeter",
             title: "Avg. Speed"
           )
         }
@@ -100,7 +100,7 @@ public struct DokoGridCount: View {
             color: socStartColor,
             value: String(format: "%.0f", socStart),
             units: "%",
-            iconName: socStartIcon,
+            symbolName: socStartIcon,
             title: "SoC Start"
           )
           let socEnd = 75.0
@@ -113,7 +113,7 @@ public struct DokoGridCount: View {
             color: socEndColor,
             value: String(format: "%.0f", socEnd),
             units: "%",
-            iconName: socEndIcon,
+            symbolName: socEndIcon,
             title: "SoC End"
           )
         }

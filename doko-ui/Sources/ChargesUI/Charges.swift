@@ -236,7 +236,7 @@ public struct ChargesView: View {
               } label: {
                 DokoGridButton(
                   color: .mint,
-                  iconName: model.vehicleButtonImage,
+                  symbolName: model.vehicleButtonImage,
                   title: model.vehicleButtonTitle
                 ) {}
               }
@@ -260,7 +260,7 @@ public struct ChargesView: View {
             GridRow {
               DokoGridButton(
                 color: .orange,
-                iconName: "powerplug",
+                symbolName: "powerplug",
                 title: "AC"
               ) {
                 model.acChargingButtonTapped()
@@ -269,7 +269,7 @@ public struct ChargesView: View {
 
               DokoGridButton(
                 color: .green,
-                iconName: "ev.charger",
+                symbolName: "ev.charger",
                 title: "DC"
               ) {
                 model.dcChargingButtonTapped()
@@ -282,7 +282,7 @@ public struct ChargesView: View {
                 color: .orange,
                 value: "\(acChargeCount)",
                 units: "",
-                iconName: "bolt.car",
+                symbolName: "bolt.car",
                 title: "Charges"
               )
               .opacity(model.showAcCharges ? DesignTokens.Opacity.full : DesignTokens.Opacity.subtle)
@@ -291,7 +291,7 @@ public struct ChargesView: View {
                 color: .green,
                 value: "\(dcChargeCount)",
                 units: "",
-                iconName: "bolt.car",
+                symbolName: "bolt.car",
                 title: "Charges"
               )
               .opacity(model.showDcCharges ? DesignTokens.Opacity.full : DesignTokens.Opacity.subtle)
@@ -304,7 +304,7 @@ public struct ChargesView: View {
                   .time(pattern: .hourMinute(padHourToLength: 2))
                 ),
                 units: "hh:mm",
-                iconName: "clock.arrow.trianglehead.clockwise.rotate.90.path.dotted",
+                symbolName: "clock.arrow.trianglehead.clockwise.rotate.90.path.dotted",
                 title: "Time"
               )
               .opacity(model.showAcCharges ? DesignTokens.Opacity.full : DesignTokens.Opacity.subtle)
@@ -315,7 +315,7 @@ public struct ChargesView: View {
                   .time(pattern: .hourMinute(padHourToLength: 2))
                 ),
                 units: "hh:mm",
-                iconName: "clock.arrow.trianglehead.clockwise.rotate.90.path.dotted",
+                symbolName: "clock.arrow.trianglehead.clockwise.rotate.90.path.dotted",
                 title: "Time"
               )
               .opacity(model.showDcCharges ? DesignTokens.Opacity.full : DesignTokens.Opacity.subtle)
@@ -326,7 +326,7 @@ public struct ChargesView: View {
                 color: .orange,
                 value: String(format: "%.0f", acEnergy.value as CVarArg),
                 units: acEnergy.unit.symbol,
-                iconName: "bolt.batteryblock",
+                symbolName: "bolt.batteryblock",
                 title: "Energy"
               )
               .opacity(model.showAcCharges ? DesignTokens.Opacity.full : DesignTokens.Opacity.subtle)
@@ -335,7 +335,7 @@ public struct ChargesView: View {
                 color: .green,
                 value: String(format: "%.0f", dcEnergy.value as CVarArg),
                 units: dcEnergy.unit.symbol,
-                iconName: "bolt.batteryblock",
+                symbolName: "bolt.batteryblock",
                 title: "Energy"
               )
               .opacity(model.showDcCharges ? DesignTokens.Opacity.full : DesignTokens.Opacity.subtle)

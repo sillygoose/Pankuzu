@@ -5,15 +5,15 @@ public struct DokoGridLocation: View {
   let placeName: String
   let cityState: String
   let label: String
-  let iconName: String
+  let symbolName: String
   let action: () -> Void
 
-  public init(color: Color, placeName: String, cityState: String, label: String, iconName: String, action: @escaping () -> Void) {
+  public init(color: Color, placeName: String, cityState: String, label: String, symbolName: String, action: @escaping () -> Void) {
     self.color = color
     self.placeName = placeName
     self.cityState = cityState
     self.label = label
-    self.iconName = iconName
+    self.symbolName = symbolName
     self.action = action
   }
 
@@ -21,7 +21,7 @@ public struct DokoGridLocation: View {
     Button(action: action) {
       HStack(spacing: DesignTokens.Grid.horizontalSpacing) {
         VStack(alignment: .center) {
-          Image(systemName: iconName)
+          Image(systemName: symbolName)
             .font(DesignTokens.Font.largeTitle)
             .bold()
             .foregroundStyle(color)
@@ -56,7 +56,7 @@ public struct DokoGridLocation: View {
             placeName: "Bob's Barbeque",
             cityState: "Homer, NY",
             label: "From",
-            iconName: "mappin.and.ellipse.circle.fill"
+            symbolName: "mappin.and.ellipse.circle.fill"
           ) {
           }
         }
@@ -69,7 +69,7 @@ public struct DokoGridLocation: View {
             placeName: "Kwik-Fill",
             cityState: "7Skaneatekes, NY",
             label: "To",
-            iconName: "mappin.and.ellipse.circle.fill"
+            symbolName: "mappin.and.ellipse.circle.fill"
           ) {
           }
         }

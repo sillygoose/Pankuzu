@@ -48,7 +48,7 @@ public struct SettingsView: View {
               color: .yellow,
               value: nil,
               units: nil,
-              iconName: "info.circle.fill",
+              symbolName: "info.circle.fill",
               title: "About"
             ) {
               path.append(Destination.about)
@@ -58,10 +58,10 @@ public struct SettingsView: View {
               color: appSettings.backgroundMode ? .blue : .red,
               value: nil,
               units: nil,
-              iconName: appSettings.backgroundMode ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash",
+              symbolName: appSettings.backgroundMode ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash",
               title: "Bluetooth"
             ) {
-              path.append(Destination.bluetooth)
+              $appSettings.backgroundMode.withLock { $0.toggle() }
             }
           }
 
@@ -70,7 +70,7 @@ public struct SettingsView: View {
               color: .cyan,
               value: "\(model.vehicleStats.count)",
               units: nil,
-              iconName: "car.2",
+              symbolName: "car.2",
               title: "Vehicles"
             ) {
               path.append(Destination.vehicleSettings)
@@ -80,7 +80,7 @@ public struct SettingsView: View {
               color: .blue,
               value: "\(model.locationStats.count)",
               units: nil,
-              iconName: "location",
+              symbolName: "location",
               title: "Locations"
             ) {
               path.append(Destination.locationSettings)
@@ -92,7 +92,7 @@ public struct SettingsView: View {
               color: .green,
               value: nil,
               units: nil,
-              iconName: "network",
+              symbolName: "network",
               title: "Database"
             ) {
               path.append(Destination.databaseSettings)
@@ -102,7 +102,7 @@ public struct SettingsView: View {
               color: .purple,
               value: nil,
               units: nil,
-              iconName: "leaf",
+              symbolName: "leaf",
               title: "Add Trip/Charge"
             ) {
               path.append(Destination.databseSeeding)
@@ -114,7 +114,7 @@ public struct SettingsView: View {
               color: .orange,
               value: nil,
               units: nil,
-              iconName: "ruler",
+              symbolName: "ruler",
               title: "Units"
             ) {
               path.append(Destination.unitsSettings)
@@ -124,7 +124,7 @@ public struct SettingsView: View {
               color: .teal,
               value: nil,
               units: nil,
-              iconName: "map.fill",
+              symbolName: "map.fill",
               title: "Maps"
             ) {
               path.append(Destination.mapsSettings)
@@ -136,7 +136,7 @@ public struct SettingsView: View {
 //              color: .blue,
 //              value: nil,
 //              units: nil,
-//              iconName: "icloud",
+//              symbolName: "icloud",
 //              title: "iCloud"
 //            ) {
 //              path.append(Destination.iCloudSettings)
@@ -146,7 +146,7 @@ public struct SettingsView: View {
               color: .indigo,
               value: nil,
               units: nil,
-              iconName: "arrow.trianglehead.2.clockwise",
+              symbolName: "arrow.trianglehead.2.clockwise",
               title: "Integrations"
             ) {
               path.append(Destination.integrations)
@@ -156,7 +156,7 @@ public struct SettingsView: View {
               color: .gray,
               value: nil,
               units: nil,
-              iconName: "gearshape.2.fill",
+              symbolName: "gearshape.2.fill",
               title: "Advanced"
             ) {
               path.append(Destination.advancedSettings)
@@ -169,8 +169,8 @@ public struct SettingsView: View {
               color: .mint,
               value: nil,
               units: nil,
-              iconName: "wrench.and.screwdriver.fill",
-              title: "Scan Tools"
+              symbolName: "wrench.and.screwdriver.fill",
+              title: "Scan Tool"
             ) {
               path.append(Destination.scanTools)
             }
@@ -179,7 +179,7 @@ public struct SettingsView: View {
               color: .red,
               value: nil,
               units: nil,
-              iconName: "ladybug.circle.fill",
+              symbolName: "ladybug.circle.fill",
               title: "Debugging"
             ) {
               path.append(Destination.debugging)
@@ -199,10 +199,6 @@ public struct SettingsView: View {
       )
       .navigationDestination(for: Destination.self) { destination in
         switch destination {
-        case .bluetooth:
-          BluetoothSettingsView(
-            model: BluetoothSettingsModel()
-          )
         case .vehicleSettings:
           VehicleSettingsView(
             model: VehicleSettingsModel()
@@ -250,7 +246,6 @@ public struct SettingsView: View {
   }
 
   enum Destination: Hashable {
-    case bluetooth
     case vehicleSettings
     case locationSettings
     case unitsSettings

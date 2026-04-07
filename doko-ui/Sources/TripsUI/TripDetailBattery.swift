@@ -44,7 +44,7 @@ public struct TripDetailBatteryView: View {
               color: stateOfChargeStartColor,
               value: String(format: "%.0f", stateOfChargeStart),
               units: "%",
-              iconName: stateOfChargeStartIcon,
+              symbolName: stateOfChargeStartIcon,
               title: "Start SoC"
             )
             let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
@@ -56,7 +56,7 @@ public struct TripDetailBatteryView: View {
               color: stateOfChargeEndColor,
               value: String(format: "%.0f", stateOfChargeEnd),
               units: "%",
-              iconName: stateOfChargeEndIcon,
+              symbolName: stateOfChargeEndIcon,
               title: "End SoC"
             )
           }
@@ -75,7 +75,7 @@ public struct TripDetailBatteryView: View {
               color: energyToEmptyStartColor,
               value: String(format: "%.1f", energyToEmptyStart),
               units: "kWh",
-              iconName: energyToEmptyStartIcon,
+              symbolName: energyToEmptyStartIcon,
               title: "Start Energy"
             )
 
@@ -88,7 +88,7 @@ public struct TripDetailBatteryView: View {
               color: energyToEmptyEndColor,
               value: String(format: "%.1f", energyToEmptyStart - energyToEmptyEnd),
               units: "kWh",
-              iconName: energyToEmptyEndIcon,
+              symbolName: energyToEmptyEndIcon,
               title: "End Energy"
             )
           }
@@ -109,7 +109,7 @@ public struct TripDetailBatteryView: View {
               color: batteryTempStartColor,
               value: String(format: "%.0f", batteryTempStart.value as CVarArg),
               units: batteryTempStart.unit.symbol,
-              iconName: batteryTempStartIcon,
+              symbolName: batteryTempStartIcon,
               title: "Start Temp"
             )
             
@@ -124,7 +124,7 @@ public struct TripDetailBatteryView: View {
               color: batteryTempEndColor,
               value: String(format: "%.0f", batteryTempEnd.value as CVarArg),
               units: batteryTempEnd.unit.symbol,
-              iconName: batteryTempEndIcon,
+              symbolName: batteryTempEndIcon,
               title: "End Temp"
             )
           }

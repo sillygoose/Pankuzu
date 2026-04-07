@@ -2,13 +2,13 @@ import SwiftUI
 
 public struct DokoGridButton: View {
   let color: Color
-  let iconName: String
+  let symbolName: String
   let title: String
   let action: () -> Void
 
-  public init(color: Color, iconName: String, title: String, action: @escaping () -> Void) {
+  public init(color: Color, symbolName: String, title: String, action: @escaping () -> Void) {
     self.color = color
-    self.iconName = iconName
+    self.symbolName = symbolName
     self.title = title
     self.action = action
   }
@@ -16,10 +16,11 @@ public struct DokoGridButton: View {
   public var body: some View {
     Button(action: action) {
       VStack {
-        Image(systemName: iconName)
+        Image(systemName: symbolName)
           .font(DesignTokens.Font.title)
           .bold()
           .foregroundStyle(color)
+          .frame(width: 32, height: 32)
 
         Text(title)
           .lineLimit(1)
@@ -39,15 +40,15 @@ public struct DokoGridValueButton: View {
   let color: Color
   let value: String?
   let units: String?
-  let iconName: String
+  let symbolName: String
   let title: String
   let action: () -> Void
 
-  public init(color: Color, value: String?, units: String?, iconName: String, title: String, action: @escaping () -> Void) {
+  public init(color: Color, value: String?, units: String?, symbolName: String, title: String, action: @escaping () -> Void) {
     self.color = color
     self.value = value
     self.units = units
-    self.iconName = iconName
+    self.symbolName = symbolName
     self.title = title
     self.action = action
   }
@@ -56,10 +57,11 @@ public struct DokoGridValueButton: View {
     Button(action: action) {
       VStack {
         HStack {
-          Image(systemName: iconName)
+          Image(systemName: symbolName)
             .font(DesignTokens.Font.title)
             .bold()
             .foregroundStyle(color)
+            .frame(width: 32, height: 32)
           Spacer()
           if let value {
             Text("\(value)")
@@ -100,7 +102,7 @@ public struct DokoGridValueButton: View {
             color: .blue,
             value: "3210",
             units: "mi",
-            iconName: "point.topright.arrow.triangle.backward.to.point.bottomleft.scurvepath",
+            symbolName: "point.topright.arrow.triangle.backward.to.point.bottomleft.scurvepath",
             title: "Route"
           ) {
             print("Route button pressed")
@@ -109,7 +111,7 @@ public struct DokoGridValueButton: View {
             color: .yellow,
             value: "123",
             units: nil,
-            iconName: "car",
+            symbolName: "car",
             title: "F-150 Lightning"
           ) {
             print("F-150 Lightning button pressed")
@@ -123,14 +125,14 @@ public struct DokoGridValueButton: View {
         GridRow {
           DokoGridButton(
             color: .blue,
-            iconName: "map",
+            symbolName: "map",
             title: "Map"
           ) {
             print("Map button pressed")
           }
           DokoGridButton(
             color: .green,
-            iconName: "chart.bar.fill",
+            symbolName: "chart.bar.fill",
             title: "Elevation"
           ) {
             print("Elevation button pressed")
@@ -142,21 +144,21 @@ public struct DokoGridValueButton: View {
         GridRow {
           DokoGridButton(
             color: .red,
-            iconName: "bolt",
+            symbolName: "bolt",
             title: "Energy"
           ) {
             print("Energy button pressed")
           }
           DokoGridButton(
             color: .purple,
-            iconName: "chart.bar.fill",
+            symbolName: "chart.bar.fill",
             title: "Power"
           ) {
             print("Power button pressed")
           }
           DokoGridButton(
             color: .gray,
-            iconName: "truck.pickup.side",
+            symbolName: "truck.pickup.side",
             title: "F-150 Lightning"
           ) {
             print("F-150 Lightning button pressed")

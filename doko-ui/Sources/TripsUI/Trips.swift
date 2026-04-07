@@ -215,7 +215,7 @@ public struct TripsView: View {
               } label: {
                 DokoGridButton(
                   color: .mint,
-                  iconName: model.vehicleButtonImage,
+                  symbolName: model.vehicleButtonImage,
                   title: model.vehicleButtonTitle
                 ) {}
               }
@@ -236,7 +236,7 @@ public struct TripsView: View {
                 color: .blue,
                 value: "\(tripCount)",
                 units: "",
-                iconName: "bolt.car",
+                symbolName: "bolt.car",
                 title: "Trips"
               )
 
@@ -246,7 +246,7 @@ public struct TripsView: View {
                   .time(pattern: .hourMinute(padHourToLength: 2))
                 ),
                 units: "hh:mm",
-                iconName: "clock",
+                symbolName: "clock",
                 title: "Drive Time"
               )
             }
@@ -256,7 +256,7 @@ public struct TripsView: View {
                 color: .yellow,
                 value: String(format: "%.1f", distance.value as CVarArg),
                 units: distance.unit.symbol,
-                iconName: "road.lanes",
+                symbolName: "road.lanes",
                 title: "Distance"
               )
               
@@ -272,7 +272,7 @@ public struct TripsView: View {
                   color: meanTemperaturePeriodColor,
                   value: String(format: "%.0f", meanTemperaturePeriod.value as CVarArg),
                   units: meanTemperaturePeriod.unit.symbol,
-                  iconName: meanTemperaturePeriodIcon,
+                  symbolName: meanTemperaturePeriodIcon,
                   title: "Mean Temp"
                 )
               } else {
@@ -282,7 +282,7 @@ public struct TripsView: View {
                   color: .green,
                   value: "-",
                   units: meanTemperaturePeriod.unit.symbol,
-                  iconName: "thermometer.medium",
+                  symbolName: "thermometer.medium",
                   title: "Mean Temp"
                 )
               }
@@ -303,7 +303,7 @@ public struct TripsView: View {
                   color: .red,
                   value: String(format: "%.1f", energyKWh.value as CVarArg),
                   units: energyKWh.unit.symbol,
-                  iconName: "bolt.circle.fill",
+                  symbolName: "bolt.circle.fill",
                   title: "Energy Used"
                 )
 
@@ -311,7 +311,7 @@ public struct TripsView: View {
                   color: .green,
                   value: String(format: "%.1f", energyEfficiency.value as CVarArg),
                   units: energyEfficiency.unit.symbol,
-                  iconName: "powermeter",
+                  symbolName: "powermeter",
                   title: "Efficiency"
                 )
               }

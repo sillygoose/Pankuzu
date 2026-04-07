@@ -45,7 +45,7 @@ public struct ChargeDetailBatteryView: View {
             color: stateOfChargeStartColor,
             value: String(format: "%.0f", stateOfChargeStart),
             units: "%",
-            iconName: stateOfChargeStartIcon,
+            symbolName: stateOfChargeStartIcon,
             title: "Start SoC"
           )
           let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
@@ -57,7 +57,7 @@ public struct ChargeDetailBatteryView: View {
             color: stateOfChargeEndColor,
             value: String(format: "%.0f", stateOfChargeEnd),
             units: "%",
-            iconName: stateOfChargeEndIcon,
+            symbolName: stateOfChargeEndIcon,
             title: "End SoC"
           )
         }
@@ -71,7 +71,7 @@ public struct ChargeDetailBatteryView: View {
             color: .blue,
             value: String(format: "%.0f", dteStart.value as CVarArg),
             units: dteStart.unit.symbol,
-            iconName: "road.lanes.curved.left",
+            symbolName: "road.lanes.curved.left",
             title: "Start Range"
           )
           
@@ -81,7 +81,7 @@ public struct ChargeDetailBatteryView: View {
             color: .blue,
             value: String(format: "%.0f", dteEnd.value as CVarArg),
             units: dteEnd.unit.symbol,
-            iconName: "road.lanes.curved.right",
+            symbolName: "road.lanes.curved.right",
             title: "End Range"
           )
         }
@@ -98,7 +98,7 @@ public struct ChargeDetailBatteryView: View {
               color: energyToEmptyStartColor,
               value: String(format: "%.1f", energyToEmptyStart),
               units: "kWh",
-              iconName: energyToEmptyStartIcon,
+              symbolName: energyToEmptyStartIcon,
               title: "Start Energy"
             )
 
@@ -111,7 +111,7 @@ public struct ChargeDetailBatteryView: View {
               color: energyToEmptyEndColor,
               value: String(format: "%.1f", energyToEmptyEnd),
               units: "kWh",
-              iconName: energyToEmptyEndIcon,
+              symbolName: energyToEmptyEndIcon,
               title: "End Energy"
             )
           }
@@ -131,7 +131,7 @@ public struct ChargeDetailBatteryView: View {
               color: batteryTempStartColor,
               value: String(format: "%.0f", batteryTempStart.value as CVarArg),
               units: batteryTempStart.unit.symbol,
-              iconName: batteryTempStartIcon,
+              symbolName: batteryTempStartIcon,
               title: "Start Temp"
             )
             
@@ -146,7 +146,7 @@ public struct ChargeDetailBatteryView: View {
               color: batteryTempEndColor,
               value: String(format: "%.0f", batteryTempEnd.value as CVarArg),
               units: batteryTempEnd.unit.symbol,
-              iconName: batteryTempEndIcon,
+              symbolName: batteryTempEndIcon,
               title: "End Temp"
             )
           }
@@ -166,7 +166,7 @@ public struct ChargeDetailBatteryView: View {
                 color: couplerTempStartColor,
                 value: String(format: "%.0f", couplerTempStart.value as CVarArg),
                 units: couplerTempStart.unit.symbol,
-                iconName: couplerTempStartIcon,
+                symbolName: couplerTempStartIcon,
                 title: "Coupler Start"
               ) {
                 showCouplerTempChart = true
@@ -182,7 +182,7 @@ public struct ChargeDetailBatteryView: View {
                 color: couplerTempEndColor,
                 value: String(format: "%.0f", couplerTempEnd.value as CVarArg),
                 units: couplerTempEnd.unit.symbol,
-                iconName: couplerTempEndIcon,
+                symbolName: couplerTempEndIcon,
                 title: "Coupler End"
               ) {
                 showCouplerTempChart = true

@@ -86,7 +86,7 @@ public struct TripDetailView: View {
         GridRow {
           DokoGridButton(
             color: .blue,
-            iconName: "point.bottomleft.forward.to.point.topright.scurvepath.fill",
+            symbolName: "point.bottomleft.forward.to.point.topright.scurvepath.fill",
             title: "Route"
           ) {
             model.destination = .tripMap
@@ -94,7 +94,7 @@ public struct TripDetailView: View {
           
           DokoGridButton(
             color: .green,
-            iconName: "mountain.2.fill",
+            symbolName: "mountain.2.fill",
             title: "Elevation"
           ) {
             model.destination = .elevationChart
@@ -102,7 +102,7 @@ public struct TripDetailView: View {
           
           DokoGridButton(
             color: .yellow,
-            iconName: "car",
+            symbolName: "car",
             title: model.vehicle?.name ?? (model.vehicle?.model ?? "Missing Vehicle")
           ) {
             if let vehicle = model.vehicle {
@@ -121,7 +121,7 @@ public struct TripDetailView: View {
               placeName: model.fromLocation.placeName,
               cityState: model.fromLocation.cityState,
               label: "From",
-              iconName: "mappin.and.ellipse.circle.fill"
+              symbolName: "mappin.and.ellipse.circle.fill"
             ) {
               model.destination = .editLocationForm(model.fromLocation)
             }
@@ -135,7 +135,7 @@ public struct TripDetailView: View {
               placeName: model.toLocation.placeName,
               cityState: model.toLocation.cityState,
               label: "To",
-              iconName: "mappin.and.ellipse.circle.fill"
+              symbolName: "mappin.and.ellipse.circle.fill"
             ) {
               model.destination = .editLocationForm(model.toLocation)
             }
@@ -177,7 +177,7 @@ public struct TripDetailView: View {
             color: .yellow,
             value: String(format: "%.1f", odometer.value as CVarArg),
             units: odometer.unit.symbol,
-            iconName: "gauge.open.with.lines.needle.33percent",
+            symbolName: "gauge.open.with.lines.needle.33percent",
             title: "Odometer"
           )
           DokoGridCount(
@@ -186,7 +186,7 @@ public struct TripDetailView: View {
               .time(pattern: .hourMinute(padHourToLength: 2))
             ),
             units: "hh:mm",
-            iconName: "clock",
+            symbolName: "clock",
             title: "Duration"
           )
         }
@@ -197,14 +197,14 @@ public struct TripDetailView: View {
             color: .blue,
             value: String(format: "%.1f", distance.value as CVarArg),
             units: distance.unit.symbol,
-            iconName: "road.lanes",
+            symbolName: "road.lanes",
             title: "Distance"
           )
           DokoGridCount(
             color: .orange,
             value: String(format: "%.0f", averageSpeed.value as CVarArg),
             units: averageSpeed.unit.symbol,
-            iconName: "powermeter",
+            symbolName: "powermeter",
             title: "Speed"
           )
         }
@@ -226,7 +226,7 @@ public struct TripDetailView: View {
               color: .red,
               value: String(format: "%.1f", energyUsed.value as CVarArg),
               units: energyUsed.unit.symbol,
-              iconName: "bolt.circle.fill",
+              symbolName: "bolt.circle.fill",
               title: "Energy Used"
             ) {
               model.destination = .energyUsedChart
@@ -235,7 +235,7 @@ public struct TripDetailView: View {
               color: .green,
               value: String(format: "%.1f", efficiency.value as CVarArg),
               units: efficiency.unit.symbol,
-              iconName: "ev.charger",
+              symbolName: "ev.charger",
               title: "Efficiency"
             )
           }
@@ -251,14 +251,14 @@ public struct TripDetailView: View {
               color: .blue,
               value: String(format: "%.0f", distanceToEmptyStart.value as CVarArg),
               units: distanceToEmptyStart.unit.symbol,
-              iconName: "road.lanes.curved.left",
+              symbolName: "road.lanes.curved.left",
               title: "Start Range"
             )
             DokoGridCount(
               color: .blue,
               value: String(format: "%.0f", distanceToEmptyEnd.value as CVarArg),
               units: distanceToEmptyEnd.unit.symbol,
-              iconName: "road.lanes.curved.right",
+              symbolName: "road.lanes.curved.right",
               title: "End Range"
             )
           }
@@ -275,7 +275,7 @@ public struct TripDetailView: View {
               color: batteryStateOfHealthColor,
               value: String(format: "%.0f", batteryStateOfHealth),
               units: "%",
-              iconName: "minus.plus.batteryblock.stack",
+              symbolName: "minus.plus.batteryblock.stack",
               title: "State of Health"
             ) {
               model.destination = .stateOfHealthChart
@@ -285,7 +285,7 @@ public struct TripDetailView: View {
               color: .orange,
               value: nil,
               units: nil,
-              iconName: "batteryblock.stack",
+              symbolName: "batteryblock.stack",
               title: "Battery Details"
             ) {
               model.destination = .batteryChart
