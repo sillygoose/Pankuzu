@@ -44,6 +44,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .batteryCurrent1:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
     case .batteryCurrent2:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
     case .batteryCurrent3:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
+      
+    case .batteryCurrent4:              obdLinkCommand = "STPX h:17FC007B, d:03221E3D"
+    case .batteryCurrent5:              obdLinkCommand = "STPX h:17FC007B, d:03221E3D"
 
 //    case .batteryVoltage1:              obdLinkCommand = "221E3B"
 //    case .batteryCurrent1:              obdLinkCommand = "221E3D"
@@ -69,9 +72,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .batteryVoltage:               obdLinkCommand = "STPX h:17FC007B, d:221E3B"
     case .batteryCurrent:               obdLinkCommand = "STPX h:17FC007B, d:221E3D"
     case .batteryStateOfCharge:         obdLinkCommand = "STPX h:17FC007B, d:22028C"
-    case .batteryStateOfHealth:         obdLinkCommand = "STPX h:17FC007B, d:222AB2"
     case .batteryTemperature:           obdLinkCommand = "STPX h:17FC007B, d:222A0B"
-    case .batteryDistanceToEmpty:       obdLinkCommand = "STPX h:17FC007B, d:222AB6"
+
+    case .batteryStateOfHealth:         obdLinkCommand = "STPX h:710, d:222AB2"
+    case .batteryDistanceToEmpty:       obdLinkCommand = "STPX h:710, d:222AB6"
 
     case .acChargerStatus:              obdLinkCommand = "STPX h:17FC007B, d:227448"
     case .dcChargerStatus:              obdLinkCommand = "STPX h:17FC007B, d:227448"
@@ -93,6 +97,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
         //.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
+        .speed,
         .atcra("17FE007X"),
 
         .ath(true),
@@ -100,9 +105,11 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .atcaf(false),
         .stcsegr(false),
         .batteryCurrent0,
+        .batteryCurrent4,
         .atcaf(true),
         .stcsegr(false),
         .batteryCurrent1,
+        .batteryCurrent5,
         .atcaf(false),
         .stcsegr(true),
         .batteryCurrent2,
@@ -139,9 +146,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
 //        //
         .acChargerStatus, .dcChargerStatus,
         .gearSelected, .odometer,
-        .batteryStateOfCharge, .batteryStateOfHealth, .batteryTemperature,
+        .batteryStateOfCharge, .batteryTemperature,
         .batteryVoltage, //.batteryCurrent,
-        .batteryDistanceToEmpty,
+        .batteryStateOfHealth, .batteryDistanceToEmpty,
       ])
 
     case .idle:
