@@ -6,7 +6,6 @@ import CommonUI
 import DokoSchema
 import DokoSharing
 
-
 @MainActor @Observable public final class SettingsModel {
   @ObservationIgnored @FetchOne(Vehicle.select { Stats.Columns(count: $0.count()) })
   var vehicleStats = Stats()
@@ -166,15 +165,15 @@ public struct SettingsView: View {
           }
 
           GridRow {
-//            DokoGridValueButton(
-//              color: .gray,
-//              value: nil,
-//              units: nil,
-//              iconName: "gearshape.2.fill",
-//              title: "Advanced"
-//            ) {
-//              path.append(Destination.advancedSettings)
-//            }
+            DokoGridValueButton(
+              color: .mint,
+              value: nil,
+              units: nil,
+              iconName: "wrench.and.screwdriver.fill",
+              title: "Scan Tools"
+            ) {
+              path.append(Destination.scanTools)
+            }
 
             DokoGridValueButton(
               color: .red,
@@ -240,6 +239,10 @@ public struct SettingsView: View {
           )
         case .integrations:
           IntegrationsView()
+        case .scanTools:
+          ScanToolsView(
+            model: ScantoolSettingsModel()
+          )
         }
       }
       .navigationTitle("")
@@ -259,6 +262,7 @@ public struct SettingsView: View {
     case advancedSettings
     case iCloudSettings
     case integrations
+    case scanTools
   }
 }
 
