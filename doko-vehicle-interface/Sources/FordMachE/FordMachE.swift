@@ -38,9 +38,9 @@ public actor FordMachE: ConnectedVehicleInterface {
     case .acChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224888"
     case .dcChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224897"
 
-    case .batteryEenergyToEmpty:                obdLinkCommand = "STPX h:7E4, d:224848"
-    case .batteryStateOfCharge:                obdLinkCommand = "STPX h:7E4, d:224845"
-    case .batteryStateOfHealth:                obdLinkCommand = "STPX h:7E4, d:22490C"
+    case .batteryEenergyToEmpty:        obdLinkCommand = "STPX h:7E4, d:224848"
+    case .batteryStateOfCharge:         obdLinkCommand = "STPX h:7E4, d:224845"
+    case .batteryStateOfHealth:         obdLinkCommand = "STPX h:7E4, d:22490C"
     case .batteryTemperature:           obdLinkCommand = "STPX h:7E4, d:224800"
       
     case .batteryVoltage:               obdLinkCommand = "STPX h:7E4, d:22480D"
