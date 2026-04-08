@@ -39,11 +39,6 @@ import DokoSharing
     return .red
   }
 
-  /*
-   rightSymbol: model.activeSession?.symbol,
-   rightSymbolColor: .red
-
-   */
   public init() {}
 
   @Selection

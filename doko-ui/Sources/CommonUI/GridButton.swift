@@ -1,9 +1,9 @@
 import SwiftUI
 
 public struct DokoGridButton: View {
+  let title: String
   let color: Color
   let symbolName: String
-  let title: String
   let action: () -> Void
 
   public init(color: Color, symbolName: String, title: String, action: @escaping () -> Void) {
@@ -133,6 +133,7 @@ public struct DokoGridStatusButton: View {
           if let centerSymbol, let centerSymbolColor {
             Image(systemName: centerSymbol)
               .font(DesignTokens.Font.title)
+              .bold()
               .foregroundStyle(centerSymbolColor)
               .frame(width: 32, height: 32)
             Spacer()
@@ -140,8 +141,15 @@ public struct DokoGridStatusButton: View {
           if let rightSymbol, let rightSymbolColor {
             Image(systemName: rightSymbol)
               .font(DesignTokens.Font.title)
+              .bold()
               .symbolEffect(.pulse, options: .repeating)
               .foregroundStyle(rightSymbolColor)
+              .frame(width: 32, height: 32)
+          } else {
+            Image(systemName: "plug")
+              .font(DesignTokens.Font.title)
+              .bold()
+              .opacity(0)
               .frame(width: 32, height: 32)
           }
         }

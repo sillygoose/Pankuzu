@@ -237,6 +237,7 @@ public struct TripsView: View {
                 value: "\(tripCount)",
                 units: "",
                 symbolName: "bolt.car",
+                pulseSymbol: model.activeSession == .trip,
                 title: "Trips"
               )
 
@@ -346,11 +347,6 @@ public struct TripsView: View {
         }
         .listStyle(.plain)
       }
-      .sessionToolbar(
-        connectedAccessoryName: model.connectedAccessoryName,
-        connectedVehicleModel: model.connectedVehicleModel,
-        activeSession: model.activeSession
-      )
       .navigationDestination(for: Destination.self) { destination in
         switch destination {
         case .tripDetail(let trip):

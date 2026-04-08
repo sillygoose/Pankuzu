@@ -283,6 +283,7 @@ public struct ChargesView: View {
                 value: "\(acChargeCount)",
                 units: "",
                 symbolName: "bolt.car",
+                pulseSymbol: model.activeSession == .acCharge,
                 title: "Charges"
               )
               .opacity(model.showAcCharges ? DesignTokens.Opacity.full : DesignTokens.Opacity.subtle)
@@ -292,6 +293,7 @@ public struct ChargesView: View {
                 value: "\(dcChargeCount)",
                 units: "",
                 symbolName: "bolt.car",
+                pulseSymbol: model.activeSession == .dcCharge,
                 title: "Charges"
               )
               .opacity(model.showDcCharges ? DesignTokens.Opacity.full : DesignTokens.Opacity.subtle)
@@ -389,11 +391,6 @@ public struct ChargesView: View {
           }
         }
       }
-      .sessionToolbar(
-        connectedAccessoryName: model.connectedAccessoryName,
-        connectedVehicleModel: model.connectedVehicleModel,
-        activeSession: model.activeSession
-      )
       .navigationDestination(for: Destination.self) { destination in
         switch destination {
         case .chargeDetail(let charge):

@@ -5,23 +5,38 @@ public struct DokoGridCount: View {
   let value: String
   let units: String
   let symbolName: String
+  let pulseSymbol: Bool
   let title: String
 
-  public init(color: Color, value: String, units: String, symbolName: String, title: String) {
+  public init(
+    color: Color, value: String, units: String,
+    symbolName: String,
+    pulseSymbol: Bool = false,
+    title: String
+  ) {
     self.color = color
     self.value = value
     self.units = units
     self.symbolName = symbolName
+    self.pulseSymbol = pulseSymbol
     self.title = title
   }
 
   public var body: some View {
     VStack {
       HStack {
-        Image(systemName: symbolName)
-          .font(DesignTokens.Font.title)
-          .bold()
-          .foregroundStyle(color)
+        if pulseSymbol {
+          Image(systemName: symbolName)
+            .font(DesignTokens.Font.title)
+            .bold()
+            .foregroundStyle(color)
+            .symbolEffect(.pulse, options: .repeating)
+        } else {
+          Image(systemName: symbolName)
+            .font(DesignTokens.Font.title)
+            .bold()
+            .foregroundStyle(color)
+        }
         Spacer()
         Text(value)
           .font(DesignTokens.Font.title)
@@ -79,6 +94,7 @@ public struct DokoGridCount: View {
             value: String(format: "%.1f", distance.value as CVarArg),
             units: distance.unit.symbol,
             symbolName: "road.lanes",
+            pulseSymbol: true,
             title: "Distance"
           )
           DokoGridCount(
