@@ -93,6 +93,74 @@ public struct DokoGridValueButton: View {
   }
 }
 
+public struct DokoGridStatusButton: View {
+  let title: String
+  let leftSymbol: String
+  let leftSymbolColor: Color
+  let centerSymbol: String?
+  let centerSymbolColor: Color?
+  let rightSymbol: String?
+  let rightSymbolColor: Color?
+  let action: () -> Void
+
+  public init(
+    title: String,
+    leftSymbol: String, leftSymbolColor: Color,
+    centerSymbol: String? = nil, centerSymbolColor: Color? = nil,
+    rightSymbol: String? = nil, rightSymbolColor: Color? = nil,
+    action: @escaping () -> Void
+  ) {
+    self.title = title
+    self.leftSymbol = leftSymbol
+    self.leftSymbolColor = leftSymbolColor
+    self.centerSymbol = centerSymbol
+    self.centerSymbolColor = centerSymbolColor
+    self.rightSymbol = rightSymbol
+    self.rightSymbolColor = rightSymbolColor
+    self.action = action
+  }
+
+  public var body: some View {
+    Button(action: action) {
+      VStack {
+        HStack {
+          Image(systemName: leftSymbol)
+            .font(DesignTokens.Font.title)
+            .bold()
+            .foregroundStyle(leftSymbolColor)
+            .frame(width: 32, height: 32)
+          Spacer()
+          if let centerSymbol, let centerSymbolColor {
+            Image(systemName: centerSymbol)
+              .font(DesignTokens.Font.title)
+              .foregroundStyle(centerSymbolColor)
+              .frame(width: 32, height: 32)
+            Spacer()
+          }
+          if let rightSymbol, let rightSymbolColor {
+            Image(systemName: rightSymbol)
+              .font(DesignTokens.Font.title)
+              .symbolEffect(.pulse, options: .repeating)
+              .foregroundStyle(rightSymbolColor)
+              .frame(width: 32, height: 32)
+          }
+        }
+        HStack {
+          Text(title)
+            .lineLimit(1)
+            .font(DesignTokens.Font.headline)
+            .foregroundStyle(.gray)
+          Spacer()
+        }
+      }
+    }
+    .buttonStyle(.borderless)
+    .padding(DesignTokens.Padding.cardInsets)
+    .background(DesignTokens.Color.cardBackground)
+    .cornerRadius(DesignTokens.CornerRadius.medium)
+  }
+}
+
 #Preview("DokoGridButton") {
   NavigationStack {
     ScrollView {
@@ -162,6 +230,31 @@ public struct DokoGridValueButton: View {
             title: "F-150 Lightning"
           ) {
             print("F-150 Lightning button pressed")
+          }
+        }
+      }
+      
+      Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
+        GridRow {
+          DokoGridValueButton(
+            color: .yellow,
+            value: nil,
+            units: nil,
+            symbolName: "info.circle.fill",
+            title: "About"
+          ) {
+            print("About button pressed")
+          }
+          DokoGridStatusButton(
+            title: "Bluetooth",
+            leftSymbol: "togglepower",
+            leftSymbolColor: .green,
+            centerSymbol: "antenna.radiowaves.left.and.right",
+            centerSymbolColor: .blue,
+            rightSymbol: "car",
+            rightSymbolColor: .red
+          ) {
+            print("Bluetooth button pressed")
           }
         }
       }

@@ -19,7 +19,31 @@ import DokoSharing
   @ObservationIgnored @Shared(.connectedAccessoryName) var connectedAccessoryName
   @ObservationIgnored @Shared(.connectedVehicleModel) var connectedVehicleModel
   @ObservationIgnored @Shared(.activeSession) var activeSession
+  @ObservationIgnored @Shared(.appSettings) var appSettings
 
+  public var bluetoothEnableSymbol: String { return "power" }
+  public var bluetoothEnableSymbolColor: Color { return  appSettings.backgroundMode ? .blue : .gray }
+  
+  public var bluetoothConnectedSymbol: String? {
+    guard connectedAccessoryName != nil else { return "antenna.radiowaves.left.and.right.slash" }
+    return "antenna.radiowaves.left.and.right"
+  }
+  public var bluetoothConnectedSymbolColor: Color? {
+    guard connectedAccessoryName != nil else { return .gray }
+    return .blue
+  }
+
+  public var activeSessionSymbol: String? { return activeSession?.symbol }
+  public var activeSessionSymbolColor: Color? {
+    guard activeSession != nil else { return nil }
+    return .red
+  }
+
+  /*
+   rightSymbol: model.activeSession?.symbol,
+   rightSymbolColor: .red
+
+   */
   public init() {}
 
   @Selection
@@ -54,12 +78,14 @@ public struct SettingsView: View {
               path.append(Destination.about)
             }
 
-            DokoGridValueButton(
-              color: appSettings.backgroundMode ? .blue : .red,
-              value: nil,
-              units: nil,
-              symbolName: appSettings.backgroundMode ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash",
-              title: "Bluetooth"
+            DokoGridStatusButton(
+              title: "Bluetooth",
+              leftSymbol: model.bluetoothEnableSymbol,
+              leftSymbolColor: model.bluetoothEnableSymbolColor,
+              centerSymbol: model.bluetoothConnectedSymbol,
+              centerSymbolColor: model.bluetoothConnectedSymbolColor,
+              rightSymbol: model.activeSessionSymbol,
+              rightSymbolColor: model.activeSessionSymbolColor
             ) {
               $appSettings.backgroundMode.withLock { $0.toggle() }
             }
@@ -186,17 +212,9 @@ public struct SettingsView: View {
             }
           }
         }
-        .buttonStyle(.plain)
-        .listRowBackground(Color.clear)
-        .padding([.leading, .trailing], -20)
       }
       .listStyle(.plain)
-      .padding(EdgeInsets(top: 4, leading: 20, bottom: 4, trailing: 20))
-      .sessionToolbar(
-        connectedAccessoryName: model.connectedAccessoryName,
-        connectedVehicleModel: model.connectedVehicleModel,
-        activeSession: model.activeSession
-      )
+      .padding(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
       .navigationDestination(for: Destination.self) { destination in
         switch destination {
         case .vehicleSettings:
