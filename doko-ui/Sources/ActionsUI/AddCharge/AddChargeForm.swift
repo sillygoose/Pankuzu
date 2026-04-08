@@ -26,6 +26,7 @@ public final class AddChargeFormModel: Identifiable {
 
   @ObservationIgnored @FetchAll var vehicles: [Vehicle]
   @ObservationIgnored @Dependency(\.defaultDatabase) var database
+  @ObservationIgnored @Shared(.appSettings) var appSettings
 
   public init(vehicleID: Vehicle.ID? = nil) {
     self.vehicleID = vehicleID
@@ -47,7 +48,11 @@ public final class AddChargeFormModel: Identifiable {
   }
 
   func saveButtonTapped(latitude: Double, longitude: Double) {
-    guard let vehicleID, let odometer = Double(odometerText) else { return }
+    guard let vehicleID, let odometerInput = Double(odometerText) else { return }
+
+    let odometer = appSettings.metric
+      ? odometerInput
+      : Measurement(value: odometerInput, unit: UnitLength.miles).converted(to: .kilometers).value
 
     let timeEnd = timeStart.addingTimeInterval(TimeInterval(durationHours * 3600 + durationMinutes * 60))
 

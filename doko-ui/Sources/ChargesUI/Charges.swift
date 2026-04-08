@@ -193,7 +193,6 @@ public final class ChargesModel {
 public struct ChargesView: View {
   @Bindable var model: ChargesModel
   @State private var path = NavigationPath()
-  @State private var isAddingCharge = false
 
   public init(model: ChargesModel) {
     self.model = model
@@ -371,25 +370,6 @@ public struct ChargesView: View {
           }
         }
         .listStyle(.plain)
-      }
-      .sheet(isPresented: $isAddingCharge) {
-        NavigationStack {
-          AddChargeFormView(
-            model: AddChargeFormModel(vehicleID: model.displayVehicleID)
-          )
-          .navigationTitle("Add Charge")
-          .navigationBarTitleDisplayMode(.inline)
-          .presentationDetents([.large])
-        }
-      }
-      .toolbar {
-        ToolbarItem(placement: .topBarTrailing) {
-          Button {
-            isAddingCharge = true
-          } label: {
-            Image(systemName: "plus")
-          }
-        }
       }
       .navigationDestination(for: Destination.self) { destination in
         switch destination {

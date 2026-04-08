@@ -11,6 +11,7 @@ let package = Package(
     .library(name: "DokoUI", targets: ["DokoUI"]),
     .library(name: "TripsUI", targets: ["TripsUI"]),
     .library(name: "ChargesUI", targets: ["ChargesUI"]),
+    .library(name: "ActionsUI", targets: ["ActionsUI"]),
     .library(name: "SettingsUI", targets: ["SettingsUI"]),
     .library(name: "VehiclesUI", targets: ["VehiclesUI"]),
     .library(name: "LocationsUI", targets: ["LocationsUI"]),
@@ -31,7 +32,7 @@ let package = Package(
   targets: [
     .target(
       name: "DokoUI",
-      dependencies: ["TripsUI", "ChargesUI", "SettingsUI", "VehiclesUI", "LocationsUI"]
+      dependencies: ["TripsUI", "ChargesUI", "ActionsUI", "SettingsUI", "VehiclesUI", "LocationsUI"]
     ),
     .target(
       name: "TripsUI",
@@ -57,6 +58,14 @@ let package = Package(
         .product(name: "DokoVehicleManager", package: "doko-managers"),
         .product(name: "DokoLocationManager", package: "doko-managers"),
         .product(name: "DokoSchema", package: "doko-schema"),
+      ]
+    ),
+    .target(
+      name: "ActionsUI",
+      dependencies: [
+        "CommonUI",
+        "ChargesUI",
+        .product(name: "DokoSharing", package: "doko-sharing"),
       ]
     ),
     .target(

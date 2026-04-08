@@ -8,7 +8,7 @@ import DokoSharing
 @MainActor
 @Observable
 class AppModel {
-  enum Tab { case trips, charges, settings }
+  enum Tab { case trips, charges, actions, settings }
   var selectedTab: Tab
 
   init(
@@ -37,6 +37,12 @@ struct AppView: View {
       .tabItem { Label("Charges", systemImage: "bolt.fill") }
       .tag(AppModel.Tab.charges)
       
+      ActionsView(
+        model: ActionsModel()
+      )
+      .tabItem { Label("Actions", systemImage: "bolt.circle") }
+      .tag(AppModel.Tab.actions)
+
       SettingsView(
         model: SettingsModel()
       )
@@ -68,6 +74,18 @@ struct AppView: View {
   AppView(
     model: AppModel(
       selectedTab: .charges
+    )
+  )
+}
+
+#Preview("Actions") {
+  let _ = prepareDependencies {
+    try? $0.bootstrapDatabase()
+    try? $0.defaultDatabase.seedPreviews()
+  }
+  AppView(
+    model: AppModel(
+      selectedTab: .actions
     )
   )
 }

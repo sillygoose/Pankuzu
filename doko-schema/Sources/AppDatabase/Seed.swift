@@ -294,7 +294,7 @@ extension DatabaseWriter {
           timeEnd: todayTripEnd,
           odometerStart: 1000,
           odometerEnd: 1003.2,
-          energy: -1.2,
+          energy: 1.2,
           energyToEmptyStart: 67,
           energyToEmptyEnd: 65.8,
           distanceToEmptyStart: 83,
