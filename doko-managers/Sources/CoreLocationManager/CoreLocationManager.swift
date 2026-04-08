@@ -39,6 +39,27 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
     return _currentLocation
   }
 
+  private func startAccessoryNameObservation() {
+     @Shared(.connectedAccessoryName) var observedAccessoryName
+     Task { [weak self] in
+       guard let self else { return }
+       var oldAccessoryName: String? = nil
+       for await newAccessoryName in $observedAccessoryName.publisher.values {
+         if Task.isCancelled { break }
+         guard oldAccessoryName != newAccessoryName else { continue }
+         if newAccessoryName == nil {
+           if packetUpdatesEnabled {
+             stopPacketUpdates()
+           }
+           if locationUpdatesEnabled {
+             stopLocationUpdates()
+           }
+         }
+         oldAccessoryName = newAccessoryName
+       }
+     }
+   }
+
   override public init() {
     self.locationManager = CLLocationManager()
     self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -50,6 +71,7 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
     super.init()
     self.locationManager.delegate = self
     authorizationStatus = self.locationManager.authorizationStatus
+    startAccessoryNameObservation()
   }
 
   public func requestUserAuthorization() async -> CLAuthorizationStatus {
