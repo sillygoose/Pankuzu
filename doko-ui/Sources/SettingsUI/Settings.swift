@@ -52,6 +52,9 @@ public struct SettingsView: View {
   
   @State private var path = NavigationPath()
   @Shared(.appSettings) var appSettings
+  @State private var debuggingModel = DebuggingModel()
+  @State private var showLogDialog = false
+  @State private var debuggingLongPressed = false
 
   public init(model: SettingsModel) {
     self.model = model
@@ -203,13 +206,29 @@ public struct SettingsView: View {
               symbolName: "ladybug.circle.fill",
               title: "Debugging"
             ) {
-              path.append(Destination.debugging)
+              if debuggingLongPressed {
+                debuggingLongPressed = false
+              } else {
+                path.append(Destination.debugging)
+              }
             }
+            .simultaneousGesture(LongPressGesture().onEnded { _ in
+              debuggingLongPressed = true
+              showLogDialog = true
+            })
           }
         }
       }
       .listStyle(.plain)
       .padding(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+      .confirmationDialog("Log", isPresented: $showLogDialog) {
+        Button("Copy Log") {
+          debuggingModel.saveHistoryToClipboard()
+        }
+        Button("Clear Log", role: .destructive) {
+          debuggingModel.clearResponseHistory()
+        }
+      }
       .navigationDestination(for: Destination.self) { destination in
         switch destination {
         case .vehicleSettings:
