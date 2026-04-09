@@ -80,6 +80,38 @@ public struct EditChargeDetailTip: Tip {
   }
 }
 
+public struct BluetoothTip: Tip {
+  public init() {}
+
+  public var title: Text {
+    Text("Multi-Function Bluetooth Button")
+  }
+
+  public var message: Text? {
+    Text("The multi-function Bluetooth button allows you to enable and disable Bluetooth, see if connected to the scan tool, and if a trip or charge is in progress.")
+  }
+
+  public var image: Image? {
+    Image(systemName: "antenna.radiowaves.left.and.right")
+  }
+}
+
+public struct DebuggingTip: Tip {
+  public init() {}
+
+  public var title: Text {
+    Text("Debug Log Shortcuts")
+  }
+
+  public var message: Text? {
+    Text("Long press the Debugging button for shortcuts to copy and clear the debug log.")
+  }
+
+  public var image: Image? {
+    Image(systemName: "ladybug.circle.fill")
+  }
+}
+
 public struct SettingsTip: Tip {
   public init() {}
   

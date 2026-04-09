@@ -63,6 +63,7 @@ public struct SettingsView: View {
   public var body: some View {
     NavigationStack(path: $path) {
       TipView(SettingsTip())
+      TipView(BluetoothTip())
       List {
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
           GridRow {
@@ -218,6 +219,7 @@ public struct SettingsView: View {
             })
           }
         }
+        TipView(DebuggingTip())
       }
       .listStyle(.plain)
       .padding(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
