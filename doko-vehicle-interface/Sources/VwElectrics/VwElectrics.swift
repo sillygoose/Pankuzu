@@ -67,7 +67,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
     case .gearSelected:                 obdLinkCommand = "STPX h:17FC0076, d:22210E"
     case .odometer:                     obdLinkCommand = "STPX h:17FC0076, d:22295A"
-    case .speed:                        obdLinkCommand = "010D"
+    case .speed:                        obdLinkCommand = "STPX h:17FC007B, d:22F40D"
 
     case .batteryVoltage:               obdLinkCommand = "STPX h:17FC007B, d:221E3B"
     case .batteryCurrent:               obdLinkCommand = "STPX h:17FC007B, d:221E3D"
@@ -97,7 +97,6 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
         //.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
-        .speed,
         .atcra("17FE007X"),
 
         .ath(true),
@@ -145,7 +144,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
 ////        .batteryVoltage6, .batteryCurrent6,
 //        //
         .acChargerStatus, .dcChargerStatus,
-        .gearSelected, .odometer,
+        .gearSelected, .odometer, .speed,
         .batteryStateOfCharge, .batteryTemperature,
         .batteryVoltage, //.batteryCurrent,
         .batteryStateOfHealth, .batteryDistanceToEmpty,

@@ -2,7 +2,7 @@ import ParsingHelpers
 
 private struct speedParser: Parser {
   var body: some Parser<Substring.UTF8View, Double> {
-    "410D".utf8
+    "62F40D".utf8
     UInt8ToDouble()
   }
 }
