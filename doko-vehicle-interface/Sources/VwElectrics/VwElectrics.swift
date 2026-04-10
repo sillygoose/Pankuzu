@@ -119,30 +119,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .stcsegr(true),
         .atcaf(true),
         .ath(false),
-        
-        //        .speed,
-//
-//        .batteryCurrent0,
-        
-//        .batteryCurrent1,
 
-//        .atcp(""),
-//        .atsh(""),
+        .atcra("17FE007X"),
 
-////        .batteryVoltage2, .batteryCurrent2,
-//        //
-//        .atcra("17FE007X"),
-////        .batteryVoltage3, .batteryCurrent3,
-//        //
-//        .atcaf(true),
-////        .batteryVoltage4, .batteryCurrent4,
-//        //
-//        .ath(false),
-////        .batteryVoltage5, .batteryCurrent5,
-//        //
-//        .stcsegr(true),
-////        .batteryVoltage6, .batteryCurrent6,
-//        //
         .acChargerStatus, .dcChargerStatus,
         .gearSelected, .odometer, .speed,
         .batteryStateOfCharge, .batteryTemperature,

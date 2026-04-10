@@ -305,7 +305,7 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".distanceToEmpty"
         
       case .batteryStateOfCharge:
-        return ".stateOfCharge"
+        return ".batteryStateOfCharge"
       case .batteryStateOfHealth:
         return ".batteryStateOfHealth"
       case .batteryTemperature:
@@ -319,7 +319,7 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
       case .batteryEnergy:
         return ".batteryEnergy"
       case .batteryEnergyToEmpty:
-        return ".energyToEmpty"
+        return ".batteryEnergyToEmpty"
 
       case .couplerTemperature:
         return ".couplerTemperature"
@@ -394,7 +394,7 @@ public enum DokoResponse: Equatable, Sendable {
         return String(format: ".distanceToEmpty(%.1f)", dte)
         
       case .batteryStateOfCharge(let soc):
-        return String(format: ".stateOfCharge(%.1f)", soc)
+        return String(format: ".batteryStateOfCharge(%.1f)", soc)
       case .batteryStateOfHealth(let soh):
         return String(format: ".batteryStateOfHealth(%.1f)", soh)
       case .batteryTemperature(let temp):
@@ -408,7 +408,7 @@ public enum DokoResponse: Equatable, Sendable {
       case .batteryEnergy(let energy):
         return String(format: ".batteryEnergy(%.3f)", energy)
       case .batteryEnergyToEmpty(let ete):
-        return String(format: ".energyToEmpty(%.1f)", ete)
+        return String(format: ".batteryEnergyToEmpty(%.1f)", ete)
 
       case .couplerTemperature(let temp):
         return String(format: ".couplerTemperature(%.0f)", temp)

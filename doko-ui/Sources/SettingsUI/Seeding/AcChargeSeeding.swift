@@ -34,8 +34,8 @@ extension DatabaseSeedingModel {
     return batteryPower
   }
   
-  private func energyToEmpty(_ chargeStart: Date) -> [DokoDataPoint] {
-    let energyToEmpty: [DokoDataPoint] = [
+  private func batteryEnergyToEmpty(_ chargeStart: Date) -> [DokoDataPoint] {
+    let batteryEnergyToEmpty: [DokoDataPoint] = [
       DokoDataPoint(timestamp: chargeStart.addingTimeInterval(0 * 30 * 60), double: 20.0),
       DokoDataPoint(timestamp: chargeStart.addingTimeInterval(1 * 30 * 60), double: 23.1),
       DokoDataPoint(timestamp: chargeStart.addingTimeInterval(2 * 30 * 60), double: 26.0),
@@ -58,7 +58,7 @@ extension DatabaseSeedingModel {
       DokoDataPoint(timestamp: chargeStart.addingTimeInterval(19 * 30 * 60), double: 77.5),
       DokoDataPoint(timestamp: chargeStart.addingTimeInterval(20 * 30 * 60), double: 80.0),
     ]
-    return energyToEmpty
+    return batteryEnergyToEmpty
   }
 }
 
@@ -110,7 +110,7 @@ extension DatabaseSeedingModel {
     let chargeHistory = ChargeHistory(
       chargeID: chargeID,
       batteryPower: batteryPower(chargeStart),
-      energyToEmpty: energyToEmpty(chargeStart)
+      energyToEmpty: batteryEnergyToEmpty(chargeStart)
     )
     withErrorReporting {
       try database.write { db in
