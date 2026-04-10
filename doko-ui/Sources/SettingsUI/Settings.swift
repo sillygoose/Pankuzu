@@ -157,15 +157,15 @@ public struct SettingsView: View {
           }
 
           GridRow {
-//            DokoGridValueButton(
-//              color: .blue,
-//              value: nil,
-//              units: nil,
-//              symbolName: "icloud",
-//              title: "iCloud"
-//            ) {
-//              path.append(Destination.iCloudSettings)
-//            }
+            DokoGridValueButton(
+              color: .blue,
+              value: nil,
+              units: nil,
+              symbolName: "icloud",
+              title: "iCloud"
+            ) {
+              path.append(Destination.iCloudSettings)
+            }
 
             DokoGridValueButton(
               color: .indigo,
@@ -176,17 +176,6 @@ public struct SettingsView: View {
             ) {
               path.append(Destination.integrations)
             }
-            
-            DokoGridValueButton(
-              color: .gray,
-              value: nil,
-              units: nil,
-              symbolName: "gearshape.2.fill",
-              title: "Advanced"
-            ) {
-              path.append(Destination.advancedSettings)
-            }
-
           }
 
           GridRow {
@@ -201,23 +190,35 @@ public struct SettingsView: View {
             }
 
             DokoGridValueButton(
-              color: .red,
+              color: .gray,
               value: nil,
               units: nil,
-              symbolName: "ladybug.circle.fill",
-              title: "Debugging"
+              symbolName: "gearshape.2.fill",
+              title: "Advanced"
             ) {
-              if debuggingLongPressed {
-                debuggingLongPressed = false
-              } else {
-                path.append(Destination.debugging)
-              }
+              path.append(Destination.advancedSettings)
             }
-            .simultaneousGesture(LongPressGesture().onEnded { _ in
-              debuggingLongPressed = true
-              showLogDialog = true
-            })
           }
+        }
+
+        GridRow {
+          DokoGridValueButton(
+            color: .red,
+            value: nil,
+            units: nil,
+            symbolName: "ladybug.circle.fill",
+            title: "Debugging"
+          ) {
+            if debuggingLongPressed {
+              debuggingLongPressed = false
+            } else {
+              path.append(Destination.debugging)
+            }
+          }
+          .simultaneousGesture(LongPressGesture().onEnded { _ in
+            debuggingLongPressed = true
+            showLogDialog = true
+          })
         }
         TipView(DebuggingTip())
       }
