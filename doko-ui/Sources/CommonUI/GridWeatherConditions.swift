@@ -80,7 +80,8 @@ public struct DokoGridWeatherConditions: View {
             startCondition: Measurement(value: 20, unit: .celsius),
             startConditionSymbol: "cloud",
             endCondition: Measurement(value: 22, unit: .celsius),
-            endConditionSymbol: "cloud"
+            endConditionSymbol: "cloud",
+            title: "Trip Conditions"
           ) {
             print("Weather Conditions button pressed")
           }
