@@ -39,6 +39,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .atcra(let pattern):           obdLinkCommand = "ATCRA \(pattern)"
     case .atcm(let mask):               obdLinkCommand = "ATCM \(mask)"
     case .stcsegr(let enabled):         obdLinkCommand = "STCSEGR \(enabled ? 1 : 0)"
+    case .stpo:                         obdLinkCommand = "STPO"
+    case .stp(let canProtocol):         obdLinkCommand = "STP\(canProtocol)"
+    case .stpbr(let baudRate):          obdLinkCommand = "STPBR\(baudRate)"
 
     case .batteryCurrent0:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
     case .batteryCurrent1:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
@@ -97,29 +100,14 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
         //.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
-        .atcra("17FE007X"),
-
+        .atcra("7XX"),
+        .stp(33), .stpo,
         .ath(true),
-
-        .atcaf(false),
-        .stcsegr(false),
-        .batteryCurrent0,
-        .batteryCurrent4,
-        .atcaf(true),
-        .stcsegr(false),
-        .batteryCurrent1,
-        .batteryCurrent5,
-        .atcaf(false),
-        .stcsegr(true),
-        .batteryCurrent2,
-        .atcaf(true),
-        .stcsegr(true),
-        .batteryCurrent3,
-        
-        .stcsegr(true),
-        .atcaf(true),
+        .batteryStateOfHealth,
+        .batteryDistanceToEmpty,
         .ath(false),
-
+        
+        .stp(34), .stpo,
         .atcra("17FE007X"),
 
         .acChargerStatus, .dcChargerStatus,
