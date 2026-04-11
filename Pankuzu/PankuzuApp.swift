@@ -52,12 +52,11 @@ struct PankuzuApp: App {
   init() {
     AppSettings.migrateIfNeeded()
     prepareDependencies {
-      try! $0.bootstrapDatabase()
+      try? $0.bootstrapDatabase()
     }
   }
 
   var body: some Scene {
-//    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     WindowGroup {
       if context == .live {
         AppView(model: Self.model)

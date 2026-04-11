@@ -53,9 +53,6 @@ public final class ChargesModel {
   }
 
   @ObservationIgnored @Shared(.displayVehicleID) var displayVehicleID
-
-  @ObservationIgnored @Shared(.connectedAccessoryName) var connectedAccessoryName
-  @ObservationIgnored @Shared(.connectedVehicleModel) var connectedVehicleModel
   @ObservationIgnored @Shared(.activeSession) var activeSession
 
   @ObservationIgnored @Shared(.showAcCharges) var showAcCharges
@@ -396,8 +393,11 @@ public struct ChargesView: View {
   let _ = prepareDependencies {
     try? $0.bootstrapDatabase()
     try? $0.defaultDatabase.seedPreviews()
+    @Shared(.activeSession) var activeSession
+    $activeSession.withLock { $0 =  nil }
   }
   NavigationStack {
+    let _ = try? Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
     ChargesView(
       model: ChargesModel()
     )

@@ -1,5 +1,4 @@
 import SwiftUI
-import TipKit
 
 import DokoUI
 import DokoSchema
@@ -23,7 +22,6 @@ struct AppView: View {
   @State var isRecording = true
 
   var body: some View {
-    TipView(WelcomeTip())
     TabView(selection: $model.selectedTab) {
       TripsView(
         model: TripsModel()

@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import TipKit
 
 import DokoSharing
 import DokoLocationManager
@@ -84,6 +85,7 @@ public struct ChargeDetailView: View {
     let peakPower = Measurement(value: model.maximumPower ?? 0.0, unit: UnitPower.kilowatts)
 
     ScrollView {
+      TipView(EditChargeDetailTip())
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
           DokoGridButton(color: .blue, symbolName: "map.fill", title: "Map") {
@@ -355,6 +357,7 @@ public struct ChargeDetailView: View {
   }
   @FetchAll() var charges: [Charge]
   NavigationStack {
+    let _ = try? Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
     ChargeDetailView(
       model: ChargeDetailModel(
         chargeID: charges.first!.id

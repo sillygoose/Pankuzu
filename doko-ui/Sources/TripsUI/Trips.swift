@@ -43,9 +43,6 @@ public final class TripsModel {
   }
 
   @ObservationIgnored @Shared(.displayVehicleID) var displayVehicleID
-
-  @ObservationIgnored @Shared(.connectedAccessoryName) var connectedAccessoryName
-  @ObservationIgnored @Shared(.connectedVehicleModel) var connectedVehicleModel
   @ObservationIgnored @Shared(.activeSession) var activeSession
 
   var meanTemperature: Double? = nil
@@ -181,6 +178,7 @@ public struct TripsView: View {
   public var body: some View {
     NavigationStack(path: $path) {
       VStack(spacing: 0) {
+        TipView(WelcomeTip())
         VStack(spacing: 8) {
           DisplayPeriodPicker(
             datePicker: Binding(
@@ -372,34 +370,11 @@ public struct TripsView: View {
   let _ = prepareDependencies {
     try? $0.bootstrapDatabase()
     try? $0.defaultDatabase.seedPreviews()
-    @Shared(.connectedAccessoryName) var connectedAccessoryName
-    @Shared(.connectedVehicleModel) var connectedVehicleModel
     @Shared(.activeSession) var activeSession
-    $connectedAccessoryName.withLock { $0 = nil }
-    $connectedVehicleModel.withLock { $0 = nil }
     $activeSession.withLock { $0 =  nil }
   }
   NavigationStack {
-    TripsView(
-      model: TripsModel()
-    )
-    .preferredColorScheme(.dark)
-  }
-}
-
-#Preview("With Toolbar") {
-  let _ = prepareDependencies {
-    try? $0.bootstrapDatabase()
-    try? $0.defaultDatabase.seedPreviews()
-
-    @Shared(.connectedAccessoryName) var connectedAccessoryName
-    @Shared(.connectedVehicleModel) var connectedVehicleModel
-    @Shared(.activeSession) var activeSession
-    $connectedAccessoryName.withLock { $0 = "OBDLink MX+" }
-    $connectedVehicleModel.withLock { $0 = "2024 Ford Mach-E GT" }
-    $activeSession.withLock { $0 =  .trip }
-  }
-  NavigationStack {
+    let _ = try? Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
     TripsView(
       model: TripsModel()
     )

@@ -62,8 +62,7 @@ public struct SettingsView: View {
 
   public var body: some View {
     NavigationStack(path: $path) {
-      TipView(SettingsTip())
-      TipView(BluetoothTip())
+      TipView(ScanToolTip())
       List {
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
           DokoGridStatusButton(
@@ -304,6 +303,7 @@ public struct SettingsView: View {
     try? $0.defaultDatabase.seedPreviews()
   }
   NavigationStack {
+    let _ = try? Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
     SettingsView(
       model: SettingsModel()
     )

@@ -8,7 +8,7 @@ public struct WelcomeTip: Tip {
   }
 
   public var message: Text? {
-    Text("You can add sample trips and charges using the Seed Database button in the Settings tab - no OBDLink MX+ scan tool required.")
+    Text("You can add sample trips and charges using the Add Trip/Charge button in the Settings tab - no OBDLink MX+ scan tool required.")
   }
 
   public var image: Image? {
@@ -29,22 +29,6 @@ public struct TripDetailsTip: Tip {
 
   public var image: Image? {
     Image(systemName: "map")
-  }
-}
-
-public struct AddChargeTip: Tip {
-  public init() {}
-
-  public var title: Text {
-    Text("Add a Charge")
-  }
-
-  public var message: Text? {
-    Text("You can manually add a missed charge using a plus sign gesture, try it out.")
-  }
-
-  public var image: Image? {
-    Image(systemName: "plus.circle")
   }
 }
 
@@ -72,27 +56,11 @@ public struct EditChargeDetailTip: Tip {
   }
 
   public var message: Text? {
-    Text("You can edit an incomplete charge by drawing a circle gesture on the detailed charge.")
+    Text("You can update an incomplete charge by tappingthe Edit button and entering the values from the Ford app.")
   }
 
   public var image: Image? {
     Image(systemName: "pencil.circle")
-  }
-}
-
-public struct BluetoothTip: Tip {
-  public init() {}
-
-  public var title: Text {
-    Text("Multi-Function Bluetooth Button")
-  }
-
-  public var message: Text? {
-    Text("The multi-function Bluetooth button allows you to enable and disable Bluetooth, see if connected to the scan tool, and if a trip or charge is in progress.")
-  }
-
-  public var image: Image? {
-    Image(systemName: "antenna.radiowaves.left.and.right")
   }
 }
 
@@ -112,7 +80,7 @@ public struct DebuggingTip: Tip {
   }
 }
 
-public struct SettingsTip: Tip {
+public struct ScanToolTip: Tip {
   public init() {}
   
   private var displayName: String {
@@ -123,11 +91,11 @@ public struct SettingsTip: Tip {
   }
 
   public var title: Text {
-    Text("Configure Bluetooth")
+    Text("Manage the Scan Tool")
   }
 
   public var message: Text? {
-    Text("Use the Bluetooth settings to enable/disable background operation of \(displayName).")
+    Text("Use the Scan Tool button to enable/disable background operation of \(displayName). This can also be acomplished using shortcuts or asking Siri to 'Enable \(displayName) background mode'")
   }
 
   public var image: Image? {
