@@ -56,11 +56,27 @@ public struct EditChargeDetailTip: Tip {
   }
 
   public var message: Text? {
-    Text("You can update an incomplete charge by tappingthe Edit button and entering the values from the Ford app.")
+    Text("You can update an incomplete charge by tapping the Edit button and entering the values from the Ford app.")
   }
 
   public var image: Image? {
-    Image(systemName: "pencil.circle")
+    Image(systemName: "plus.circle")
+  }
+}
+
+public struct ActionAddChargeTip: Tip {
+  public init() {}
+
+  public var title: Text {
+    Text("Add Charge")
+  }
+
+  public var message: Text? {
+    Text("You can add a missing charge by tappingthe Add Charge button and entering the values from the Ford app.")
+  }
+
+  public var image: Image? {
+    Image(systemName: "ev.charger")
   }
 }
 

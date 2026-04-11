@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 
 import CommonUI
 import ChargesUI
@@ -19,6 +20,7 @@ public struct ActionsView: View {
 
   public var body: some View {
     NavigationStack {
+      TipView(ActionAddChargeTip())
       List {
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
           GridRow {
@@ -53,11 +55,11 @@ public struct ActionsView: View {
 }
 
 #Preview {
-//  let _ = prepareDependencies {
-//    try? $0.bootstrapDatabase()
-//  }
-  ActionsView(
-    model: ActionsModel()
-  )
-  .preferredColorScheme(.dark)
+  NavigationStack {
+    let _ = try? Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
+    ActionsView(
+      model: ActionsModel()
+    )
+    .preferredColorScheme(.dark)
+  }
 }
