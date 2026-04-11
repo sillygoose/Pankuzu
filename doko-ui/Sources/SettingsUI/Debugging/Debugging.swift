@@ -194,13 +194,13 @@ struct DebuggingView: View {
               set: { isOn, _ in model.$logPacketManagerPackets.withLock { $0 = isOn } }
             )
           )
-//###          Toggle(
-//            "iCloud",
-//            isOn: Binding(
-//              get: { model.logICloudPackets },
-//              set: { isOn, _ in model.$logICloudPackets.withLock { $0 = isOn } }
-//            )
-//          )
+          Toggle(
+            "iCloud",
+            isOn: Binding(
+              get: { model.logICloudPackets },
+              set: { isOn, _ in model.$logICloudPackets.withLock { $0 = isOn } }
+            )
+          )
           Toggle(
             "Integrations",
             isOn: Binding(
