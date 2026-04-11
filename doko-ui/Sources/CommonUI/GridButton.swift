@@ -146,7 +146,7 @@ public struct DokoGridStatusButton: View {
               .foregroundStyle(rightSymbolColor)
               .frame(width: 32, height: 32)
           } else {
-            Image(systemName: "plug")
+            Image(systemName: "figure.wave")
               .font(DesignTokens.Font.title)
               .bold()
               .opacity(0)
