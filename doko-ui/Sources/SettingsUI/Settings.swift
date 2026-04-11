@@ -67,16 +67,20 @@ public struct SettingsView: View {
       List {
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
           DokoGridStatusButton(
-            title: "Bluetooth",
             leftSymbol: model.bluetoothEnableSymbol,
             leftSymbolColor: model.bluetoothEnableSymbolColor,
+            leftSymbolTitle: "Emable",
             centerSymbol: model.bluetoothConnectedSymbol,
             centerSymbolColor: model.bluetoothConnectedSymbolColor,
+            centerSymbolTitle: "Bluetooth",
             rightSymbol: model.activeSessionSymbol,
-            rightSymbolColor: model.activeSessionSymbolColor
+            rightSymbolColor: model.activeSessionSymbolColor,
+            rightSymbolTitle: "Activity"
           ) {
             $appSettings.backgroundMode.withLock { $0.toggle() }
           }
+
+          Divider()
 
           GridRow {
             DokoGridValueButton(

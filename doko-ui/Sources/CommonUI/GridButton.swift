@@ -94,29 +94,32 @@ public struct DokoGridValueButton: View {
 }
 
 public struct DokoGridStatusButton: View {
-  let title: String
+  let leftSymbolTitle: String
   let leftSymbol: String
   let leftSymbolColor: Color
   let centerSymbol: String?
   let centerSymbolColor: Color?
+  let centerSymbolTitle: String?
   let rightSymbol: String?
   let rightSymbolColor: Color?
+  let rightSymbolTitle: String?
   let action: () -> Void
 
   public init(
-    title: String,
-    leftSymbol: String, leftSymbolColor: Color,
-    centerSymbol: String? = nil, centerSymbolColor: Color? = nil,
-    rightSymbol: String? = nil, rightSymbolColor: Color? = nil,
+    leftSymbol: String, leftSymbolColor: Color, leftSymbolTitle: String,
+    centerSymbol: String? = nil, centerSymbolColor: Color? = nil, centerSymbolTitle: String? = nil,
+    rightSymbol: String? = nil, rightSymbolColor: Color? = nil, rightSymbolTitle: String? = nil,
     action: @escaping () -> Void
   ) {
-    self.title = title
     self.leftSymbol = leftSymbol
     self.leftSymbolColor = leftSymbolColor
+    self.leftSymbolTitle = leftSymbolTitle
     self.centerSymbol = centerSymbol
     self.centerSymbolColor = centerSymbolColor
+    self.centerSymbolTitle = centerSymbolTitle
     self.rightSymbol = rightSymbol
     self.rightSymbolColor = rightSymbolColor
+    self.rightSymbolTitle = rightSymbolTitle
     self.action = action
   }
 
@@ -124,15 +127,21 @@ public struct DokoGridStatusButton: View {
     Button(action: action) {
       VStack {
         HStack {
+          Text("Scan Tool")
+            .lineLimit(1)
+            .font(DesignTokens.Font.headline)
+            .foregroundStyle(.gray)
+        }
+        HStack {
           Image(systemName: leftSymbol)
-            .font(DesignTokens.Font.title)
+            .font(DesignTokens.Font.largeTitle)
             .bold()
             .foregroundStyle(leftSymbolColor)
             .frame(width: 32, height: 32)
           Spacer()
           if let centerSymbol, let centerSymbolColor {
             Image(systemName: centerSymbol)
-              .font(DesignTokens.Font.title)
+              .font(DesignTokens.Font.largeTitle)
               .bold()
               .foregroundStyle(centerSymbolColor)
               .frame(width: 32, height: 32)
@@ -140,25 +149,38 @@ public struct DokoGridStatusButton: View {
           }
           if let rightSymbol, let rightSymbolColor {
             Image(systemName: rightSymbol)
-              .font(DesignTokens.Font.title)
+              .font(DesignTokens.Font.largeTitle)
               .bold()
               .symbolEffect(.pulse, options: .repeating)
               .foregroundStyle(rightSymbolColor)
               .frame(width: 32, height: 32)
           } else {
             Image(systemName: "figure.wave")
-              .font(DesignTokens.Font.title)
+              .font(DesignTokens.Font.largeTitle)
               .bold()
               .opacity(0)
               .frame(width: 32, height: 32)
           }
         }
         HStack {
-          Text(title)
+          Text(leftSymbolTitle)
             .lineLimit(1)
             .font(DesignTokens.Font.headline)
             .foregroundStyle(.gray)
           Spacer()
+          if let centerSymbolTitle {
+            Text(centerSymbolTitle)
+              .lineLimit(1)
+              .font(DesignTokens.Font.headline)
+              .foregroundStyle(.gray)
+            Spacer()
+          }
+          if let rightSymbolTitle {
+            Text(rightSymbolTitle)
+              .lineLimit(1)
+              .font(DesignTokens.Font.headline)
+              .foregroundStyle(.gray)
+          }
         }
       }
     }
@@ -243,7 +265,6 @@ public struct DokoGridStatusButton: View {
       }
       
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
-        GridRow {
           DokoGridValueButton(
             color: .yellow,
             value: nil,
@@ -254,18 +275,19 @@ public struct DokoGridStatusButton: View {
             print("About button pressed")
           }
           DokoGridStatusButton(
-            title: "Bluetooth",
             leftSymbol: "togglepower",
             leftSymbolColor: .green,
+            leftSymbolTitle: "Emable",
             centerSymbol: "antenna.radiowaves.left.and.right",
             centerSymbolColor: .blue,
+            centerSymbolTitle: "Bluetooth",
             rightSymbol: "car",
-            rightSymbolColor: .red
+            rightSymbolColor: .red,
+            rightSymbolTitle: "Activity"
           ) {
             print("Bluetooth button pressed")
           }
         }
-      }
     }
     .buttonStyle(.plain)
     .listRowBackground(Color.clear)

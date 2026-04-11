@@ -41,14 +41,9 @@ struct iCloudSettingsView: View {
 
   var body: some View {
     List {
-      DisclosureGroup(
-        isExpanded: Binding(
-          get: { iCloudSyncExpanded },
-          set: { newValue in $iCloudSyncExpanded.withLock { $0 = newValue } }
-        )
-      ) {
+      Section {
         Toggle(
-          "Enable iCloud Sync",
+          "iCloud Sync",
           isOn: Binding(
             get: { model.appSettings.iCloudSync },
             set: { isOn, _ in
@@ -56,11 +51,13 @@ struct iCloudSettingsView: View {
             }
           )
         )
-      } label: {
-        Text("iCloud Sync")
+//      } header: {
+//        Text("iCloud Sync")
+      } footer: {
+        Text("iCloud Sync will share your trips, charges, and settings across all your devices signed into the same iCloud account. This feature is currently in early beta so keep current backups of your data in case you need to restore from a backup.")
       }
     }
-    .listStyle(.plain)
+    .listStyle(.insetGrouped)
     .navigationTitle("iCloud")
   }
 }
