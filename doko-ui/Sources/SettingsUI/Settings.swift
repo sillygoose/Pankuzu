@@ -66,28 +66,16 @@ public struct SettingsView: View {
       TipView(BluetoothTip())
       List {
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
-          GridRow {
-            DokoGridValueButton(
-              color: .yellow,
-              value: nil,
-              units: nil,
-              symbolName: "info.circle.fill",
-              title: "About"
-            ) {
-              path.append(Destination.about)
-            }
-
-            DokoGridStatusButton(
-              title: "Bluetooth",
-              leftSymbol: model.bluetoothEnableSymbol,
-              leftSymbolColor: model.bluetoothEnableSymbolColor,
-              centerSymbol: model.bluetoothConnectedSymbol,
-              centerSymbolColor: model.bluetoothConnectedSymbolColor,
-              rightSymbol: model.activeSessionSymbol,
-              rightSymbolColor: model.activeSessionSymbolColor
-            ) {
-              $appSettings.backgroundMode.withLock { $0.toggle() }
-            }
+          DokoGridStatusButton(
+            title: "Bluetooth",
+            leftSymbol: model.bluetoothEnableSymbol,
+            leftSymbolColor: model.bluetoothEnableSymbolColor,
+            centerSymbol: model.bluetoothConnectedSymbol,
+            centerSymbolColor: model.bluetoothConnectedSymbolColor,
+            rightSymbol: model.activeSessionSymbol,
+            rightSymbolColor: model.activeSessionSymbolColor
+          ) {
+            $appSettings.backgroundMode.withLock { $0.toggle() }
           }
 
           GridRow {
@@ -199,26 +187,36 @@ public struct SettingsView: View {
               path.append(Destination.advancedSettings)
             }
           }
-        }
-
-        GridRow {
-          DokoGridValueButton(
-            color: .red,
-            value: nil,
-            units: nil,
-            symbolName: "ladybug.circle.fill",
-            title: "Debugging"
-          ) {
-            if debuggingLongPressed {
-              debuggingLongPressed = false
-            } else {
-              path.append(Destination.debugging)
+          
+          GridRow {
+            DokoGridValueButton(
+              color: .yellow,
+              value: nil,
+              units: nil,
+              symbolName: "info.circle.fill",
+              title: "About"
+            ) {
+              path.append(Destination.about)
             }
+
+            DokoGridValueButton(
+              color: .red,
+              value: nil,
+              units: nil,
+              symbolName: "ladybug.circle.fill",
+              title: "Debugging"
+            ) {
+              if debuggingLongPressed {
+                debuggingLongPressed = false
+              } else {
+                path.append(Destination.debugging)
+              }
+            }
+            .simultaneousGesture(LongPressGesture().onEnded { _ in
+              debuggingLongPressed = true
+              showLogDialog = true
+            })
           }
-          .simultaneousGesture(LongPressGesture().onEnded { _ in
-            debuggingLongPressed = true
-            showLogDialog = true
-          })
         }
         TipView(DebuggingTip())
       }
