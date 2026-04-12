@@ -62,22 +62,22 @@ struct IntegrationsView: View {
                 set: { isOn, _ in model.$appSettings.abrpEnabled.withLock { $0 = isOn } }
               )
             )
-            Toggle(
-              "Trip Telemetry",
-              isOn: Binding(
-                get: { model.appSettings.abrpSendTripUpdates },
-                set: { isOn, _ in model.$appSettings.abrpSendTripUpdates.withLock { $0 = isOn } }
+            if model.appSettings.abrpEnabled {
+              Toggle(
+                "Trip Telemetry",
+                isOn: Binding(
+                  get: { model.appSettings.abrpSendTripUpdates },
+                  set: { isOn, _ in model.$appSettings.abrpSendTripUpdates.withLock { $0 = isOn } }
+                )
               )
-            )
-            .disabled(!model.appSettings.abrpEnabled)
-            Toggle(
-              "Charge Telemetry",
-              isOn: Binding(
-                get: { model.appSettings.abrpSendChargeUpdates },
-                set: { isOn, _ in model.$appSettings.abrpSendChargeUpdates.withLock { $0 = isOn } }
+              Toggle(
+                "Charge Telemetry",
+                isOn: Binding(
+                  get: { model.appSettings.abrpSendChargeUpdates },
+                  set: { isOn, _ in model.$appSettings.abrpSendChargeUpdates.withLock { $0 = isOn } }
+                )
               )
-            )
-            .disabled(!model.appSettings.abrpEnabled)
+            }
           } footer: {
             Text("Enabling A Better Route Planner will share your position and vehicle data with Iternio, the company behind ABRP.")
           }
