@@ -30,6 +30,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .atz:                          obdLinkCommand = "ATZ"
     case .ate(let enabled):             obdLinkCommand = "ATE \(enabled ? 1 : 0)"
     case .ath(let enabled):             obdLinkCommand = "ATH \(enabled ? 1 : 0)"
+    case .atcfc(let enabled):           obdLinkCommand = "ATCFC\(enabled ? 1 : 0)"
     case .atcaf(let enabled):           obdLinkCommand = "ATCAF \(enabled ? 1 : 0)"
     case .ats(let enabled):             obdLinkCommand = "ATS \(enabled ? 1 : 0)"
     case .atsp(let canProtocol):        obdLinkCommand = "ATSP \(canProtocol)"
@@ -100,20 +101,24 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
         //.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
+        .atcfc(true),
+
         .atcra("7XX"),
         .stp(33), .stpo,
         .ath(true),
         .batteryStateOfHealth,
         .batteryDistanceToEmpty,
-        .ath(false),
-        
+
         .stp(34), .stpo,
         .atcra("17FE007X"),
+
+        .batteryCurrent0,
+        .ath(false),
 
         .acChargerStatus, .dcChargerStatus,
         .gearSelected, .odometer, .speed,
         .batteryStateOfCharge, .batteryTemperature,
-        .batteryVoltage, //.batteryCurrent,
+        .batteryVoltage, .batteryCurrent,
         .batteryStateOfHealth, .batteryDistanceToEmpty,
       ])
 

@@ -22,6 +22,8 @@ extension VwElectrics {
         commandResponse = .ate(enabled)
       case .ath(let enabled):
         commandResponse = .ath(enabled)
+      case .atcfc(let enabled):
+        commandResponse = .atcfc(enabled)
       case .atcaf(let enabled):
         commandResponse = .atcaf(enabled)
       case .ats(let enabled):

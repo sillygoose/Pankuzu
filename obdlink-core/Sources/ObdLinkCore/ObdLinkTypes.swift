@@ -10,6 +10,7 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case atd
   case ate(Bool)
   case ath(Bool)
+  case atcfc(Bool)
   case atcaf(Bool)
   case ats(Bool)
   case atsp(Int)
@@ -80,6 +81,8 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".ate(\(enabled))"
       case .ath(let enabled):
         return ".ath(\(enabled))"
+      case .atcfc(let enabled):
+        return ".atcfc(\(enabled))"
       case .atcaf(let enabled):
         return ".atcaf(\(enabled))"
       case .ats(let enabled):
@@ -263,6 +266,7 @@ public enum ObdResponse: Equatable, Sendable {
   case atd(String)
   case ate(Bool)
   case ath(Bool)
+  case atcfc(Bool)
   case atcaf(Bool)
   case ats(Bool)
   case atsp(Int)
@@ -335,6 +339,8 @@ public enum ObdResponse: Equatable, Sendable {
         return ".ate(\(enabled))"
       case .ath(let enabled):
         return ".ath(\(enabled))"
+      case .atcfc(let enabled):
+        return ".atcfc(\(enabled))"
       case .atcaf(let enabled):
         return ".atcaf(\(enabled))"
       case .ats(let enabled):
