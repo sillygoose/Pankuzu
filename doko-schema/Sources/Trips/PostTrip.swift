@@ -188,7 +188,7 @@ extension Trip {
       }
     }
 
-//    @Dependency(\.defaultDatabase) var database
+//###    @Dependency(\.defaultDatabase) var database
 //    withErrorReporting {
 //      try database.write { db in
 //        try Trip.upsert { tripDraft }.fetchOne(db)
