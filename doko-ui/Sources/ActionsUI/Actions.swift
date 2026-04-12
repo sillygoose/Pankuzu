@@ -5,22 +5,22 @@ import CommonUI
 import ChargesUI
 import DokoSharing
 
-@MainActor @Observable public final class ActionsModel {
+@MainActor @Observable public final class ToolsModel {
   public init() {}
 }
 
-public struct ActionsView: View {
-  @Bindable var model: ActionsModel
+public struct ToolsView: View {
+  @Bindable var model: ToolsModel
 
   @State private var isAddingCharge = false
 
-  public init(model: ActionsModel) {
+  public init(model: ToolsModel) {
     self.model = model
   }
 
   public var body: some View {
     NavigationStack {
-      TipView(ActionAddChargeTip())
+      TipView(ToolsAddChargeTip())
       List {
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
           GridRow {
@@ -49,7 +49,7 @@ public struct ActionsView: View {
           .presentationDetents([.large])
         }
       }
-      .navigationTitle("Actions")
+      .navigationTitle("Tools")
     }
   }
 }
@@ -57,8 +57,8 @@ public struct ActionsView: View {
 #Preview {
   NavigationStack {
     let _ = try? Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
-    ActionsView(
-      model: ActionsModel()
+    ToolsView(
+      model: ToolsModel()
     )
     .preferredColorScheme(.dark)
   }

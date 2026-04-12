@@ -7,7 +7,7 @@ import DokoSharing
 @MainActor
 @Observable
 class AppModel {
-  enum Tab { case trips, charges, actions, settings }
+  enum Tab { case trips, charges, tools, settings }
   var selectedTab: Tab
 
   init(
@@ -35,11 +35,11 @@ struct AppView: View {
       .tabItem { Label("Charges", systemImage: "bolt.fill") }
       .tag(AppModel.Tab.charges)
       
-      ActionsView(
-        model: ActionsModel()
+      ToolsView(
+        model: ToolsModel()
       )
-      .tabItem { Label("Actions", systemImage: "bolt.circle") }
-      .tag(AppModel.Tab.actions)
+      .tabItem { Label("Tools", systemImage: "hammer.circle") }
+      .tag(AppModel.Tab.tools)
 
       SettingsView(
         model: SettingsModel()
@@ -83,7 +83,7 @@ struct AppView: View {
   }
   AppView(
     model: AppModel(
-      selectedTab: .actions
+      selectedTab: .tools
     )
   )
 }

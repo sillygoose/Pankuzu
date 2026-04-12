@@ -127,7 +127,7 @@ public struct DokoGridStatusButton: View {
     Button(action: action) {
       VStack {
         HStack {
-          Text("Scan Tool")
+          Text("Scan Tool Status")
             .lineLimit(1)
             .font(DesignTokens.Font.headline)
             .foregroundStyle(.gray)

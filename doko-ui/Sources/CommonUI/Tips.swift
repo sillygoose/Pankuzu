@@ -64,7 +64,7 @@ public struct EditChargeDetailTip: Tip {
   }
 }
 
-public struct ActionAddChargeTip: Tip {
+public struct ToolsAddChargeTip: Tip {
   public init() {}
 
   public var title: Text {
@@ -72,7 +72,7 @@ public struct ActionAddChargeTip: Tip {
   }
 
   public var message: Text? {
-    Text("You can add a missing charge by tappingthe Add Charge button and entering the values from the Ford app.")
+    Text("You can add a missing charge by tapping the Add Charge button and entering the values from the Ford app.")
   }
 
   public var image: Image? {
@@ -111,7 +111,7 @@ public struct ScanToolTip: Tip {
   }
 
   public var message: Text? {
-    Text("Use the Scan Tool button to enable/disable background operation of \(displayName). This can also be acomplished using shortcuts or asking Siri to 'Enable \(displayName) background mode'")
+    Text("Use the Scan Tool Status button to enable/disable background operation. This can also be acomplished using shortcuts or asking Siri to 'Enable \(displayName) background mode'")
   }
 
   public var image: Image? {
