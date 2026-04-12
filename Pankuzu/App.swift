@@ -76,7 +76,7 @@ struct AppView: View {
   )
 }
 
-#Preview("Actions") {
+#Preview("Tools") {
   let _ = prepareDependencies {
     try? $0.bootstrapDatabase()
     try? $0.defaultDatabase.seedPreviews()

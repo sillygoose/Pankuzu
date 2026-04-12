@@ -11,7 +11,7 @@ let package = Package(
     .library(name: "DokoUI", targets: ["DokoUI"]),
     .library(name: "TripsUI", targets: ["TripsUI"]),
     .library(name: "ChargesUI", targets: ["ChargesUI"]),
-    .library(name: "ActionsUI", targets: ["ActionsUI"]),
+    .library(name: "ToolsUI", targets: ["ToolsUI"]),
     .library(name: "SettingsUI", targets: ["SettingsUI"]),
     .library(name: "VehiclesUI", targets: ["VehiclesUI"]),
     .library(name: "LocationsUI", targets: ["LocationsUI"]),
@@ -32,7 +32,7 @@ let package = Package(
   targets: [
     .target(
       name: "DokoUI",
-      dependencies: ["TripsUI", "ChargesUI", "ActionsUI", "SettingsUI", "VehiclesUI", "LocationsUI"]
+      dependencies: ["TripsUI", "ChargesUI", "ToolsUI", "SettingsUI", "VehiclesUI", "LocationsUI"]
     ),
     .target(
       name: "TripsUI",
@@ -61,7 +61,7 @@ let package = Package(
       ]
     ),
     .target(
-      name: "ActionsUI",
+      name: "ToolsUI",
       dependencies: [
         "CommonUI",
         "ChargesUI",
