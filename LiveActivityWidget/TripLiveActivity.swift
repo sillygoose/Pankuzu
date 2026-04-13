@@ -6,20 +6,75 @@ import DokoLiveActivityManager
 
 struct TripLockScreen: View {
   let context: ActivityViewContext<TripActivityAttributes>
-  
+
+  @Environment(\.activityFamily) var activityFamily
+
   var body: some View {
-    switch context.state.tripState {
-    case .starting:
-      TripStartingView()
-    case .active:
-      TripActiveView(
-        duration: context.state.duration,
-        distance: context.state.distance,
-        rangeConsumed: context.state.rangeConsumed,
-        windSock: context.state.windSock
-      )
-    case .ended:
-      TripEndedView()
+    if activityFamily == .small {
+      TripSmallView(context: context)
+    } else {
+      switch context.state.tripState {
+      case .starting:
+        TripStartingView()
+      case .active:
+        TripActiveView(
+          duration: context.state.duration,
+          distance: context.state.distance,
+          rangeConsumed: context.state.rangeConsumed,
+          windSock: context.state.windSock
+        )
+      case .ended:
+        TripEndedView()
+      }
+    }
+  }
+}
+
+private struct TripSmallView: View {
+  let context: ActivityViewContext<TripActivityAttributes>
+
+  var body: some View {
+    if let windSock = context.state.windSock {
+      let relativeDirection = windSock.windDirection.value - windSock.course.value
+
+      HStack {
+        VStack(alignment: .trailing, spacing: 2) {
+          Text(context.state.duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
+            .font(DesignTokens.Font.title.monospacedDigit())
+            .foregroundStyle(DesignTokens.Color.duration)
+            .frame(minWidth: 60, alignment: .trailing)
+          HStack(alignment: .firstTextBaseline, spacing: 2) {
+            Text(String(format: "%5.1f", context.state.distance.value))
+              .font(DesignTokens.Font.title.monospacedDigit())
+              .foregroundStyle(DesignTokens.Color.primary)
+            Text(context.state.distance.unit.symbol)
+              .font(DesignTokens.Font.caption)
+              .foregroundStyle(.secondary)
+          }
+        }
+        Spacer()
+        VStack(spacing: 2) {
+          HStack(spacing: 4) {
+            Image(systemName: windSock.conditions)
+            Text(windSock.temperature.formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(0)))))
+          }
+          .font(DesignTokens.Font.caption)
+
+          Image(systemName: "arrow.down")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .rotationEffect(.degrees(relativeDirection))
+            .foregroundStyle(abs(relativeDirection) < 90 ? .red : .green)
+            .fontWeight(.black)
+            .animation(.linear, value: relativeDirection)
+            .frame(width: 28, height: 28)
+
+          Text("\(windSock.windCompassDirection), \(windSock.windSpeed.formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(0)))))")
+            .font(DesignTokens.Font.caption)
+        }
+        .foregroundStyle(DesignTokens.Color.primary)
+      }
+      .padding()
     }
   }
 }

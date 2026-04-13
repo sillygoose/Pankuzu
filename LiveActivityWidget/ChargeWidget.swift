@@ -36,5 +36,6 @@ struct ChargeLiveActivityWidget: Widget {
           .foregroundStyle(DesignTokens.Color.record)
       }
     }
+    .supplementalActivityFamilies([.small])
   }
 }

@@ -7,20 +7,73 @@ import DokoLiveActivityManager
 struct ChargeLockScreen: View {
   let context: ActivityViewContext<ChargeActivityAttributes>
 
+  @Environment(\.activityFamily) var activityFamily
+
   var body: some View {
-    switch context.state.chargeState {
-    case .starting:
-      ChargeStartingView()
-    case .active:
-      ChargeActiveView(
-        duration: context.state.duration,
-        stateOfCharge: context.state.stateOfCharge,
-        rangeAdded: context.state.rangeAdded,
-        measuredPower: context.state.measuredPower
-      )
-    case .ended:
-      ChargeEndedView()
+    if activityFamily == .small {
+      ChargeSmallView(context: context)
+    } else {
+      switch context.state.chargeState {
+      case .starting:
+        ChargeStartingView()
+      case .active:
+        ChargeActiveView(
+          duration: context.state.duration,
+          stateOfCharge: context.state.stateOfCharge,
+          rangeAdded: context.state.rangeAdded,
+          measuredPower: context.state.measuredPower
+        )
+      case .ended:
+        ChargeEndedView()
+      }
     }
+  }
+}
+
+private struct ChargeSmallView: View {
+  let context: ActivityViewContext<ChargeActivityAttributes>
+
+  var body: some View {
+    HStack(spacing: 12) {
+      Image(systemName: "ev.charger")
+        .font(DesignTokens.Font.title)
+        .foregroundStyle(DesignTokens.Color.charging)
+
+      switch context.state.chargeState {
+      case .starting:
+        Text("Charge Starting")
+          .font(DesignTokens.Font.largeTitle)
+          .foregroundStyle(DesignTokens.Color.primary)
+      case .active:
+        HStack(spacing: 16) {
+          VStack(alignment: .leading, spacing: 2) {
+            Text(context.state.stateOfCharge.formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(0)))))
+              .font(DesignTokens.Font.largeTitle)
+              .foregroundStyle(DesignTokens.Color.charging)
+            Text(context.state.duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
+              .font(DesignTokens.Font.title)
+              .foregroundStyle(DesignTokens.Color.primary)
+          }
+          if let measuredPower = context.state.measuredPower {
+            VStack(alignment: .leading, spacing: 2) {
+              Text("Power")
+                .font(DesignTokens.Font.caption)
+                .foregroundStyle(.secondary)
+              Text(measuredPower.formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(1)))))
+                .font(DesignTokens.Font.title)
+                .foregroundStyle(DesignTokens.Color.charging)
+            }
+          }
+        }
+      case .ended:
+        Text("Charge Ended")
+          .font(DesignTokens.Font.largeTitle)
+          .foregroundStyle(DesignTokens.Color.primary)
+      }
+
+      Spacer()
+    }
+    .padding()
   }
 }
 

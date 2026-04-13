@@ -29,6 +29,7 @@ struct TripLiveActivityWidget: Widget {
           .foregroundStyle(DesignTokens.Color.record)
       }
     }
+    .supplementalActivityFamilies([.small])
   }
 }
 
