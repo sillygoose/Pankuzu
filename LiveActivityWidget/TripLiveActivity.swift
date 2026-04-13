@@ -38,18 +38,31 @@ private struct TripSmallView: View {
       let relativeDirection = windSock.windDirection.value - windSock.course.value
 
       HStack {
-        VStack(alignment: .trailing, spacing: 2) {
-          Text(context.state.duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
-            .font(DesignTokens.Font.title.monospacedDigit())
-            .foregroundStyle(DesignTokens.Color.duration)
-            .frame(minWidth: 60, alignment: .trailing)
-          HStack(alignment: .firstTextBaseline, spacing: 2) {
+        Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
+          GridRow {
+            Image(systemName: "clock")
+              .font(DesignTokens.Font.caption)
+              .foregroundStyle(DesignTokens.Color.duration)
+              .gridColumnAlignment(.leading)
+            Text(context.state.duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
+              .font(DesignTokens.Font.title.monospacedDigit())
+              .foregroundStyle(DesignTokens.Color.duration)
+              .gridColumnAlignment(.trailing)
+            Color.clear.frame(width: 0)
+          }
+          GridRow(alignment: .lastTextBaseline) {
+            Image(systemName: "road.lanes")
+              .font(DesignTokens.Font.caption)
+              .foregroundStyle(DesignTokens.Color.primary)
+              .gridColumnAlignment(.leading)
             Text(String(format: "%5.1f", context.state.distance.value))
               .font(DesignTokens.Font.title.monospacedDigit())
               .foregroundStyle(DesignTokens.Color.primary)
+              .gridColumnAlignment(.trailing)
             Text(context.state.distance.unit.symbol)
               .font(DesignTokens.Font.caption)
               .foregroundStyle(.secondary)
+              .gridColumnAlignment(.leading)
           }
         }
         Spacer()
@@ -67,7 +80,7 @@ private struct TripSmallView: View {
             .foregroundStyle(abs(relativeDirection) < 90 ? .red : .green)
             .fontWeight(.black)
             .animation(.linear, value: relativeDirection)
-            .frame(width: 28, height: 28)
+            .frame(width: 32, height: 32)
 
           Text("\(windSock.windCompassDirection), \(windSock.windSpeed.formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(0)))))")
             .font(DesignTokens.Font.caption)
