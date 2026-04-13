@@ -11,6 +11,9 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case ate(Bool)
   case ath(Bool)
   case atcfc(Bool)
+  case atfcsh(String)
+  case atfcsm(Int)
+  case atfcsd(String)
   case atcaf(Bool)
   case ats(Bool)
   case atsp(Int)
@@ -83,6 +86,12 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".ath(\(enabled))"
       case .atcfc(let enabled):
         return ".atcfc(\(enabled))"
+      case .atfcsm(let enabled):
+        return ".atfcsm(\(enabled))"
+      case .atfcsh(let header):
+        return ".atfcsh(\(header))"
+      case .atfcsd(let data):
+        return ".atfcsd(\(data))"
       case .atcaf(let enabled):
         return ".atcaf(\(enabled))"
       case .ats(let enabled):
@@ -267,6 +276,9 @@ public enum ObdResponse: Equatable, Sendable {
   case ate(Bool)
   case ath(Bool)
   case atcfc(Bool)
+  case atfcsh(String)
+  case atfcsm(Int)
+  case atfcsd(String)
   case atcaf(Bool)
   case ats(Bool)
   case atsp(Int)
@@ -341,6 +353,12 @@ public enum ObdResponse: Equatable, Sendable {
         return ".ath(\(enabled))"
       case .atcfc(let enabled):
         return ".atcfc(\(enabled))"
+      case .atfcsm(let enabled):
+        return ".atfcsm(\(enabled))"
+      case .atfcsh(let header):
+        return ".atfcsh(\(header))"
+      case .atfcsd(let data):
+        return ".atfcsd(\(data))"
       case .atcaf(let enabled):
         return ".atcaf(\(enabled))"
       case .ats(let enabled):

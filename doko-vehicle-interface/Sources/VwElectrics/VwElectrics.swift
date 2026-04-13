@@ -30,7 +30,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .atz:                          obdLinkCommand = "ATZ"
     case .ate(let enabled):             obdLinkCommand = "ATE \(enabled ? 1 : 0)"
     case .ath(let enabled):             obdLinkCommand = "ATH \(enabled ? 1 : 0)"
-    case .atcfc(let enabled):           obdLinkCommand = "ATCFC\(enabled ? 1 : 0)"
+    case .atcfc(let enabled):           obdLinkCommand = "ATCFC \(enabled ? 1 : 0)"
+    case .atfcsm(let mode):             obdLinkCommand = "ATFCSM \(mode)"
+    case .atfcsh(let header):           obdLinkCommand = "ATFCSH \(header)"
+    case .atfcsd(let data):             obdLinkCommand = "ATFCSD \(data)"
     case .atcaf(let enabled):           obdLinkCommand = "ATCAF \(enabled ? 1 : 0)"
     case .ats(let enabled):             obdLinkCommand = "ATS \(enabled ? 1 : 0)"
     case .atsp(let canProtocol):        obdLinkCommand = "ATSP \(canProtocol)"
@@ -41,8 +44,8 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .atcm(let mask):               obdLinkCommand = "ATCM \(mask)"
     case .stcsegr(let enabled):         obdLinkCommand = "STCSEGR \(enabled ? 1 : 0)"
     case .stpo:                         obdLinkCommand = "STPO"
-    case .stp(let canProtocol):         obdLinkCommand = "STP\(canProtocol)"
-    case .stpbr(let baudRate):          obdLinkCommand = "STPBR\(baudRate)"
+    case .stp(let canProtocol):         obdLinkCommand = "STP \(canProtocol)"
+    case .stpbr(let baudRate):          obdLinkCommand = "STPBR \(baudRate)"
 
     case .batteryCurrent0:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
     case .batteryCurrent1:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
@@ -101,8 +104,23 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
         //.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
-        .atcfc(true),
+        //.atcfc(true),
+        .atsh("FC0076"),
+        .atcp("17"),
+        .atcra("17FE007X"),
+        .atfcsh("17FC0076"),
+        .atfcsd("300000"),
+        .atfcsm(1),
+        .batteryCurrent,
 
+        /*
+ ATSH FC0076
+ ATCP 17
+ ATCRA 17FE0076
+ ATFCSH 17FC0076
+ ATFCSD 300000
+ ATFCSM1
+ */
         .atcra("7XX"),
         .stp(33), .stpo,
         .ath(true),
@@ -112,13 +130,12 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .stp(34), .stpo,
         .atcra("17FE007X"),
 
-        .batteryCurrent0,
         .ath(false),
 
         .acChargerStatus, .dcChargerStatus,
         .gearSelected, .odometer, .speed,
         .batteryStateOfCharge, .batteryTemperature,
-        .batteryVoltage, .batteryCurrent,
+        .batteryVoltage, //.batteryCurrent,
         .batteryStateOfHealth, .batteryDistanceToEmpty,
       ])
 

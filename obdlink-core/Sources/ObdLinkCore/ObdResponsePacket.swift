@@ -26,6 +26,21 @@ extension ObdResponsePacket {
           case let .atcfc(v) = entry.value.response else { return nil }
     return v
   }
+  public var atfcsh: String? {
+    guard let entry = responses.first(where: { if case .atfcsh = $0.key { return true }; return false }),
+          case let .atfcsh(v) = entry.value.response else { return nil }
+    return v
+  }
+  public var atfcsm: Int? {
+    guard let entry = responses.first(where: { if case .atfcsm = $0.key { return true }; return false }),
+          case let .atfcsm(v) = entry.value.response else { return nil }
+    return v
+  }
+  public var atfcsd: String? {
+    guard let entry = responses.first(where: { if case .atfcsd = $0.key { return true }; return false }),
+          case let .atfcsd(v) = entry.value.response else { return nil }
+    return v
+  }
   public var atcaf: Bool? {
     guard let entry = responses.first(where: { if case .atcaf = $0.key { return true }; return false }),
           case let .atcaf(v) = entry.value.response else { return nil }
