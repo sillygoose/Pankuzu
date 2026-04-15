@@ -11,7 +11,18 @@ struct TripLockScreen: View {
 
   var body: some View {
     if activityFamily == .small {
-      TripSmallView(context: context)
+      switch context.state.tripState {
+      case .starting:
+        TripSmallStartingView()
+      case .active:
+        TripSmallActiveView(
+          duration: context.state.duration,
+          distance: context.state.distance,
+          windSock: context.state.windSock
+        )
+      case .ended:
+        TripSmallEndedView()
+      }
     } else {
       switch context.state.tripState {
       case .starting:
@@ -30,11 +41,27 @@ struct TripLockScreen: View {
   }
 }
 
-private struct TripSmallView: View {
-  let context: ActivityViewContext<TripActivityAttributes>
+private struct TripSmallStartingView: View {
+  var body: some View {
+    HStack(alignment: .center) {
+      Image(systemName: "car")
+        .foregroundStyle(DesignTokens.Color.tripping)
+      Spacer()
+      Text("Started")
+        .foregroundStyle(DesignTokens.Color.primary)
+    }
+    .font(DesignTokens.Font.title)
+    .padding()
+  }
+}
+
+private struct TripSmallActiveView: View {
+  let duration: Duration
+  let distance: Measurement<UnitLength>
+  let windSock: WindSock?
 
   var body: some View {
-    if let windSock = context.state.windSock {
+    if let windSock {
       let relativeDirection = windSock.windDirection.value - windSock.course.value
 
       HStack {
@@ -44,7 +71,7 @@ private struct TripSmallView: View {
               .font(DesignTokens.Font.caption)
               .foregroundStyle(DesignTokens.Color.duration)
               .gridColumnAlignment(.leading)
-            Text(context.state.duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
+            Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
               .font(DesignTokens.Font.title.monospacedDigit())
               .foregroundStyle(DesignTokens.Color.duration)
               .gridColumnAlignment(.trailing)
@@ -55,11 +82,11 @@ private struct TripSmallView: View {
               .font(DesignTokens.Font.caption)
               .foregroundStyle(DesignTokens.Color.primary)
               .gridColumnAlignment(.leading)
-            Text(String(format: "%5.1f", context.state.distance.value))
+            Text(String(format: "%5.1f", distance.value))
               .font(DesignTokens.Font.title.monospacedDigit())
               .foregroundStyle(DesignTokens.Color.primary)
               .gridColumnAlignment(.trailing)
-            Text(context.state.distance.unit.symbol)
+            Text(distance.unit.symbol)
               .font(DesignTokens.Font.caption)
               .foregroundStyle(.secondary)
               .gridColumnAlignment(.leading)
@@ -89,6 +116,20 @@ private struct TripSmallView: View {
       }
       .padding()
     }
+  }
+}
+
+private struct TripSmallEndedView: View {
+  var body: some View {
+    HStack(alignment: .center) {
+      Image(systemName: "car")
+        .foregroundStyle(DesignTokens.Color.tripping)
+      Spacer()
+      Text("Ended")
+        .foregroundStyle(DesignTokens.Color.primary)
+    }
+    .font(DesignTokens.Font.title)
+    .padding()
   }
 }
 
@@ -300,4 +341,3 @@ extension TripActivityAttributes.ContentState {
 //  TripActivityAttributes.ContentState.noWind
 //  TripActivityAttributes.ContentState.ended
 }
-
