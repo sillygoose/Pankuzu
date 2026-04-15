@@ -44,8 +44,7 @@ struct TripLockScreen: View {
 private struct TripSmallStartingView: View {
   var body: some View {
     HStack(alignment: .center) {
-      Image(systemName: "car")
-        .foregroundStyle(DesignTokens.Color.tripping)
+      DokoWidgetIcon()
       Spacer()
       Text("Started")
         .foregroundStyle(DesignTokens.Color.primary)
@@ -61,38 +60,38 @@ private struct TripSmallActiveView: View {
   let windSock: WindSock?
 
   var body: some View {
-    if let windSock {
-      let relativeDirection = windSock.windDirection.value - windSock.course.value
-
-      HStack {
-        Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
-          GridRow {
-            Image(systemName: "clock")
-              .font(DesignTokens.Font.caption)
-              .foregroundStyle(DesignTokens.Color.duration)
-              .gridColumnAlignment(.leading)
-            Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
-              .font(DesignTokens.Font.title.monospacedDigit())
-              .foregroundStyle(DesignTokens.Color.duration)
-              .gridColumnAlignment(.trailing)
-            Color.clear.frame(width: 0)
-          }
-          GridRow(alignment: .lastTextBaseline) {
-            Image(systemName: "road.lanes")
-              .font(DesignTokens.Font.caption)
-              .foregroundStyle(DesignTokens.Color.primary)
-              .gridColumnAlignment(.leading)
-            Text(String(format: "%5.1f", distance.value))
-              .font(DesignTokens.Font.title.monospacedDigit())
-              .foregroundStyle(DesignTokens.Color.primary)
-              .gridColumnAlignment(.trailing)
-            Text(distance.unit.symbol)
-              .font(DesignTokens.Font.caption)
-              .foregroundStyle(.secondary)
-              .gridColumnAlignment(.leading)
-          }
+    HStack {
+      DokoWidgetIcon()
+      Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
+        GridRow {
+          Image(systemName: "clock")
+            .font(DesignTokens.Font.caption)
+            .foregroundStyle(DesignTokens.Color.duration)
+            .gridColumnAlignment(.leading)
+          Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
+            .font(DesignTokens.Font.title.monospacedDigit())
+            .foregroundStyle(DesignTokens.Color.duration)
+            .gridColumnAlignment(.trailing)
+          Color.clear.frame(width: 0)
         }
-        Spacer()
+        GridRow(alignment: .lastTextBaseline) {
+          Image(systemName: "road.lanes")
+            .font(DesignTokens.Font.caption)
+            .foregroundStyle(DesignTokens.Color.primary)
+            .gridColumnAlignment(.leading)
+          Text(String(format: "%5.1f", distance.value))
+            .font(DesignTokens.Font.title.monospacedDigit())
+            .foregroundStyle(DesignTokens.Color.primary)
+            .gridColumnAlignment(.trailing)
+          Text(distance.unit.symbol)
+            .font(DesignTokens.Font.caption)
+            .foregroundStyle(.secondary)
+            .gridColumnAlignment(.leading)
+        }
+      }
+      Spacer()
+      if let windSock {
+        let relativeDirection = windSock.windDirection.value - windSock.course.value
         VStack(spacing: 2) {
           HStack(spacing: 4) {
             Image(systemName: windSock.conditions)
@@ -114,16 +113,15 @@ private struct TripSmallActiveView: View {
         }
         .foregroundStyle(DesignTokens.Color.primary)
       }
-      .padding()
     }
+    .padding()
   }
 }
 
 private struct TripSmallEndedView: View {
   var body: some View {
     HStack(alignment: .center) {
-      Image(systemName: "car")
-        .foregroundStyle(DesignTokens.Color.tripping)
+      DokoWidgetIcon()
       Spacer()
       Text("Ended")
         .foregroundStyle(DesignTokens.Color.primary)
@@ -136,8 +134,7 @@ private struct TripSmallEndedView: View {
 struct TripStartingView: View {
   var body: some View {
     HStack(alignment: .center) {
-      Image(systemName: "car")
-        .foregroundStyle(DesignTokens.Color.tripping)
+      DokoWidgetIcon()
       Spacer()
       Text("Trip Started")
         .foregroundStyle(DesignTokens.Color.primary)
@@ -244,8 +241,7 @@ struct TripActiveView: View {
 struct TripEndedView: View {
   var body: some View {
     HStack(alignment: .center) {
-      Image(systemName: "car")
-        .foregroundStyle(DesignTokens.Color.tripping)
+      DokoWidgetIcon()
       Spacer()
       Text("Trip Ended")
         .foregroundStyle(DesignTokens.Color.primary)
@@ -339,5 +335,5 @@ extension TripActivityAttributes.ContentState {
   TripActivityAttributes.ContentState.headWind
 //  TripActivityAttributes.ContentState.noRange
 //  TripActivityAttributes.ContentState.noWind
-//  TripActivityAttributes.ContentState.ended
+  TripActivityAttributes.ContentState.ended
 }
