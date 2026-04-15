@@ -236,7 +236,7 @@ extension TripActivityAttributes.ContentState {
         temperature: .init(value: 15, unit: .celsius),
         conditions: "sun.snow",
         windSpeed: .init(value: 125, unit: .metersPerSecond),
-        windDirection: .init(value: 180, unit: .degrees),
+        windDirection: .init(value: 90, unit: .degrees),
         windCompassDirection: "S"
       )
     )
@@ -294,10 +294,10 @@ extension TripActivityAttributes.ContentState {
   TripLiveActivityWidget()
 } contentStates: {
   TripActivityAttributes.ContentState.starting
-  TripActivityAttributes.ContentState.headWind
   TripActivityAttributes.ContentState.tailWind
-  TripActivityAttributes.ContentState.noRange
-  TripActivityAttributes.ContentState.noWind
-  TripActivityAttributes.ContentState.ended
+  TripActivityAttributes.ContentState.headWind
+//  TripActivityAttributes.ContentState.noRange
+//  TripActivityAttributes.ContentState.noWind
+//  TripActivityAttributes.ContentState.ended
 }
 

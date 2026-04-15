@@ -183,6 +183,7 @@ public struct DokoGridStatusButton: View {
           }
         }
       }
+      .padding(.horizontal)
     }
     .buttonStyle(.borderless)
     .padding(DesignTokens.Padding.cardInsets)
