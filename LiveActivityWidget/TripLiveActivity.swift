@@ -4,38 +4,28 @@ import WidgetKit
 
 import DokoLiveActivityManager
 
-struct TripLockScreen: View {
+struct TripLiveActivities: View {
   let context: ActivityViewContext<TripActivityAttributes>
-
   @Environment(\.activityFamily) var activityFamily
 
   var body: some View {
     if activityFamily == .small {
       switch context.state.tripState {
       case .starting:
-        TripSmallStartingView()
+        TripSmallStartingView(context: context)
       case .active:
-        TripSmallActiveView(
-          duration: context.state.duration,
-          distance: context.state.distance,
-          windSock: context.state.windSock
-        )
+        TripSmallActiveView(context: context)
       case .ended:
-        TripSmallEndedView()
+        TripSmallEndedView(context: context)
       }
     } else {
       switch context.state.tripState {
       case .starting:
-        TripStartingView()
+        TripStartingMediumView(context: context)
       case .active:
-        TripActiveView(
-          duration: context.state.duration,
-          distance: context.state.distance,
-          rangeConsumed: context.state.rangeConsumed,
-          windSock: context.state.windSock
-        )
+        TripActiveMediumView(context: context)
       case .ended:
-        TripEndedView()
+        TripEndedMediumView(context: context)
       }
     }
   }
@@ -131,7 +121,9 @@ struct TripLockScreen: View {
 //  }
 //}
 
-struct TripStartingView: View {
+struct TripStartingMediumView: View {
+  let context: ActivityViewContext<TripActivityAttributes>
+
   var body: some View {
     HStack(alignment: .center) {
       DokoWidgetIcon()
@@ -144,14 +136,17 @@ struct TripStartingView: View {
   }
 }
 
-struct TripActiveView: View {
-  let duration: Duration
-  let distance: Measurement<UnitLength>
-  let rangeConsumed: Measurement<UnitLength>?
-  let windSock: WindSock?
+struct TripActiveMediumView: View {
+  let context: ActivityViewContext<TripActivityAttributes>
 
   var body: some View {
+    let duration = context.state.duration
+    let distance = context.state.distance
+    let rangeConsumed = context.state.rangeConsumed
+    let windSock = context.state.windSock
+
     HStack(alignment: .center) {
+      DokoWidgetIcon()
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 12) {
         let distanceColor = rangeConsumed.map { $0.value > distance.value } == true
           ? DesignTokens.Color.rangeOver
@@ -238,7 +233,9 @@ struct TripActiveView: View {
   }
 }
 
-struct TripEndedView: View {
+struct TripEndedMediumView: View {
+  let context: ActivityViewContext<TripActivityAttributes>
+
   var body: some View {
     HStack(alignment: .center) {
       DokoWidgetIcon()

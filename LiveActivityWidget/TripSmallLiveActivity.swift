@@ -5,6 +5,8 @@ import WidgetKit
 import DokoLiveActivityManager
 
 struct TripSmallStartingView: View {
+  let context: ActivityViewContext<TripActivityAttributes>
+
   var body: some View {
     HStack(alignment: .center) {
       DokoWidgetIcon()
@@ -18,6 +20,8 @@ struct TripSmallStartingView: View {
 }
 
 struct TripSmallEndedView: View {
+  let context: ActivityViewContext<TripActivityAttributes>
+
   var body: some View {
     HStack(alignment: .center) {
       DokoWidgetIcon()
@@ -31,11 +35,12 @@ struct TripSmallEndedView: View {
 }
 
 struct TripSmallActiveView: View {
-  let duration: Duration
-  let distance: Measurement<UnitLength>
-  let windSock: WindSock?
+  let context: ActivityViewContext<TripActivityAttributes>
 
   var body: some View {
+    let duration = context.state.duration
+    let distance = context.state.distance
+    let windSock = context.state.windSock
     HStack {
       DokoWidgetIcon()
       Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {

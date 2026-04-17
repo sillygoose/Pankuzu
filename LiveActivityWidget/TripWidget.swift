@@ -7,7 +7,7 @@ import DokoLiveActivityManager
 struct TripLiveActivityWidget: Widget {
   var body: some WidgetConfiguration {
     ActivityConfiguration(for: TripActivityAttributes.self) { context in
-      TripLockScreen(context: context)
+      TripLiveActivities(context: context)
     } dynamicIsland: { context in
       DynamicIsland {
         DynamicIslandExpandedRegion(.leading) {
