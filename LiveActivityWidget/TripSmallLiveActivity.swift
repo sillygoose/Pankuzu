@@ -9,7 +9,20 @@ struct TripSmallStartingView: View {
     HStack(alignment: .center) {
       DokoWidgetIcon()
       Spacer()
-      Text("Started")
+      Text("Small Started")
+        .foregroundStyle(DesignTokens.Color.primary)
+    }
+    .font(DesignTokens.Font.title)
+    .padding()
+  }
+}
+
+struct TripSmallEndedView: View {
+  var body: some View {
+    HStack(alignment: .center) {
+      DokoWidgetIcon()
+      Spacer()
+      Text("Small Ended")
         .foregroundStyle(DesignTokens.Color.primary)
     }
     .font(DesignTokens.Font.title)
@@ -133,18 +146,5 @@ struct TripSmallActiveView: View {
       .font(.caption)
       .foregroundStyle(DesignTokens.Color.primary)
     }
-  }
-}
-
-struct TripSmallEndedView: View {
-  var body: some View {
-    HStack(alignment: .center) {
-      DokoWidgetIcon()
-      Spacer()
-      Text("Ended")
-        .foregroundStyle(DesignTokens.Color.primary)
-    }
-    .font(DesignTokens.Font.title)
-    .padding()
   }
 }

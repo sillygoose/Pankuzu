@@ -41,7 +41,7 @@ private struct ChargeSmallView: View {
 
       switch context.state.chargeState {
       case .starting:
-        Text("Charge Starting")
+        Text("Small Starting")
           .font(DesignTokens.Font.largeTitle)
           .foregroundStyle(DesignTokens.Color.primary)
       case .active:
@@ -66,7 +66,7 @@ private struct ChargeSmallView: View {
           }
         }
       case .ended:
-        Text("Charge Ended")
+        Text("Small Ended")
           .font(DesignTokens.Font.largeTitle)
           .foregroundStyle(DesignTokens.Color.primary)
       }
@@ -83,7 +83,21 @@ private struct ChargeStartingView: View {
       Image(systemName: "ev.charger")
         .foregroundStyle(DesignTokens.Color.charging)
       Spacer()
-      Text("Charge Started")
+      Text("Medium Started")
+        .foregroundStyle(DesignTokens.Color.primary)
+    }
+    .font(DesignTokens.Font.largeTitle)
+    .padding()
+  }
+}
+
+struct ChargeEndedView: View {
+  var body: some View {
+    HStack(alignment: .center) {
+      Image(systemName: "ev.charger")
+        .foregroundStyle(DesignTokens.Color.charging)
+      Spacer()
+      Text("Medium Ended")
         .foregroundStyle(DesignTokens.Color.primary)
     }
     .font(DesignTokens.Font.largeTitle)
@@ -164,20 +178,6 @@ struct ChargeActiveView: View {
     }
     .padding()
     .frame(height: 160)
-  }
-}
-
-struct ChargeEndedView: View {
-  var body: some View {
-    HStack(alignment: .center) {
-      Image(systemName: "ev.charger")
-        .foregroundStyle(DesignTokens.Color.charging)
-      Spacer()
-      Text("Charge Ended")
-        .foregroundStyle(DesignTokens.Color.primary)
-    }
-    .font(DesignTokens.Font.largeTitle)
-    .padding()
   }
 }
 

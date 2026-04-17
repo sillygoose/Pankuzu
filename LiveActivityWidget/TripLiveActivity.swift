@@ -136,7 +136,7 @@ struct TripStartingView: View {
     HStack(alignment: .center) {
       DokoWidgetIcon()
       Spacer()
-      Text("Trip Started")
+      Text("Medium Started")
         .foregroundStyle(DesignTokens.Color.primary)
     }
     .font(DesignTokens.Font.largeTitle)
@@ -243,7 +243,7 @@ struct TripEndedView: View {
     HStack(alignment: .center) {
       DokoWidgetIcon()
       Spacer()
-      Text("Trip Ended")
+      Text("Medium Ended")
         .foregroundStyle(DesignTokens.Color.primary)
     }
     .font(DesignTokens.Font.largeTitle)
