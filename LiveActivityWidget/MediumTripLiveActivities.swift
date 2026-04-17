@@ -4,124 +4,22 @@ import WidgetKit
 
 import DokoLiveActivityManager
 
-struct TripLiveActivities: View {
+struct MediumTripLiveActivities: View {
   let context: ActivityViewContext<TripActivityAttributes>
-  @Environment(\.activityFamily) var activityFamily
-
+  
   var body: some View {
-    if activityFamily == .small {
-      switch context.state.tripState {
-      case .starting:
-        TripSmallStartingView(context: context)
-      case .active:
-        TripSmallActiveView(context: context)
-      case .ended:
-        TripSmallEndedView(context: context)
-      }
-    } else {
-      switch context.state.tripState {
-      case .starting:
-        TripStartingMediumView(context: context)
-      case .active:
-        TripActiveMediumView(context: context)
-      case .ended:
-        TripEndedMediumView(context: context)
-      }
+    switch context.state.tripState {
+    case .starting:
+      StartingView(context: context)
+    case .active:
+      ActiveView(context: context)
+    case .ended:
+      EndedView(context: context)
     }
   }
 }
 
-//private struct TripSmallStartingView: View {
-//  var body: some View {
-//    HStack(alignment: .center) {
-//      DokoWidgetIcon()
-//      Spacer()
-//      Text("Started")
-//        .foregroundStyle(DesignTokens.Color.primary)
-//    }
-//    .font(DesignTokens.Font.title)
-//    .padding()
-//  }
-//}
-//
-//private struct TripSmallActiveView: View {
-//  let duration: Duration
-//  let distance: Measurement<UnitLength>
-//  let windSock: WindSock?
-//
-//  var body: some View {
-//    HStack {
-//      DokoWidgetIcon()
-//      Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
-//        GridRow {
-//          Image(systemName: "clock")
-//            .font(DesignTokens.Font.caption)
-//            .foregroundStyle(DesignTokens.Color.duration)
-//            .gridColumnAlignment(.leading)
-//          Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
-//            .font(DesignTokens.Font.title.monospacedDigit())
-//            .foregroundStyle(DesignTokens.Color.duration)
-//            .gridColumnAlignment(.trailing)
-//          Color.clear.frame(width: 0)
-//        }
-//        GridRow(alignment: .lastTextBaseline) {
-//          Image(systemName: "road.lanes")
-//            .font(DesignTokens.Font.caption)
-//            .foregroundStyle(DesignTokens.Color.primary)
-//            .gridColumnAlignment(.leading)
-//          Text(String(format: "%5.1f", distance.value))
-//            .font(DesignTokens.Font.title.monospacedDigit())
-//            .foregroundStyle(DesignTokens.Color.primary)
-//            .gridColumnAlignment(.trailing)
-//          Text(distance.unit.symbol)
-//            .font(DesignTokens.Font.caption)
-//            .foregroundStyle(.secondary)
-//            .gridColumnAlignment(.leading)
-//        }
-//      }
-//      Spacer()
-//      if let windSock {
-//        let relativeDirection = windSock.windDirection.value - windSock.course.value
-//        VStack(spacing: 2) {
-//          HStack(spacing: 4) {
-//            Image(systemName: windSock.conditions)
-//            Text(windSock.temperature.formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(0)))))
-//          }
-//          .font(DesignTokens.Font.caption)
-//
-//          Image(systemName: "arrow.down")
-//            .resizable()
-//            .aspectRatio(contentMode: .fit)
-//            .rotationEffect(.degrees(relativeDirection))
-//            .foregroundStyle(abs(relativeDirection) < 90 ? .red : .green)
-//            .fontWeight(.black)
-//            .animation(.linear, value: relativeDirection)
-//            .frame(width: 32, height: 32)
-//
-//          Text("\(windSock.windCompassDirection), \(windSock.windSpeed.formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(0)))))")
-//            .font(DesignTokens.Font.caption)
-//        }
-//        .foregroundStyle(DesignTokens.Color.primary)
-//      }
-//    }
-//    .padding()
-//  }
-//}
-//
-//private struct TripSmallEndedView: View {
-//  var body: some View {
-//    HStack(alignment: .center) {
-//      DokoWidgetIcon()
-//      Spacer()
-//      Text("Ended")
-//        .foregroundStyle(DesignTokens.Color.primary)
-//    }
-//    .font(DesignTokens.Font.title)
-//    .padding()
-//  }
-//}
-
-struct TripStartingMediumView: View {
+private struct StartingView: View {
   let context: ActivityViewContext<TripActivityAttributes>
 
   var body: some View {
@@ -136,7 +34,7 @@ struct TripStartingMediumView: View {
   }
 }
 
-struct TripActiveMediumView: View {
+private struct ActiveView: View {
   let context: ActivityViewContext<TripActivityAttributes>
 
   var body: some View {
@@ -233,7 +131,7 @@ struct TripActiveMediumView: View {
   }
 }
 
-struct TripEndedMediumView: View {
+private struct EndedView: View {
   let context: ActivityViewContext<TripActivityAttributes>
 
   var body: some View {

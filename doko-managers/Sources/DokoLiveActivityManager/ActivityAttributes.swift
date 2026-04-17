@@ -50,6 +50,7 @@ public struct TripActivityAttributes: ActivityAttributes, Sendable {
     public let tripState: TripState
     public let duration: Duration
     public let distance: Measurement<UnitLength>
+    public let elevation: Measurement<UnitLength>?
     public let rangeConsumed: Measurement<UnitLength>?
     public let windSock: WindSock?
 
@@ -57,12 +58,14 @@ public struct TripActivityAttributes: ActivityAttributes, Sendable {
       tripState: TripState,
       duration: Duration = .seconds(0),
       distance: Measurement<UnitLength> = .init(value: 0.0, unit: .kilometers),
+      elevation: Measurement<UnitLength>? = nil,
       rangeConsumed: Measurement<UnitLength>? = nil,
       windSock: WindSock? = nil
     ) {
       self.tripState = tripState
       self.duration = duration
       self.distance = distance
+      self.elevation = elevation
       self.rangeConsumed = rangeConsumed
       self.windSock = windSock
     }

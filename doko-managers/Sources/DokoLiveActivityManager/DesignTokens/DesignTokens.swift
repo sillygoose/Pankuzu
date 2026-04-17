@@ -21,7 +21,8 @@ public enum DesignTokens {
   
   public enum Font {
     public static let largeTitle = SwiftUI.Font.largeTitle
-    public static let title = SwiftUI.Font.headline
+    public static let title = SwiftUI.Font.title
+    public static let headline = SwiftUI.Font.headline
     public static let body = SwiftUI.Font.subheadline
     public static let caption = SwiftUI.Font.caption
 

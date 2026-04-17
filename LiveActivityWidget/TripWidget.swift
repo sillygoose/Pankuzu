@@ -33,6 +33,19 @@ struct TripLiveActivityWidget: Widget {
   }
 }
 
+struct TripLiveActivities: View {
+  let context: ActivityViewContext<TripActivityAttributes>
+  @Environment(\.activityFamily) var activityFamily
+
+  var body: some View {
+    if activityFamily == .small {
+      SmallTripLiveActivities(context: context)
+    } else {
+      MediumTripLiveActivities(context: context)
+    }
+  }
+}
+
 extension TripActivityAttributes {
   fileprivate static var preview: TripActivityAttributes {
     TripActivityAttributes()

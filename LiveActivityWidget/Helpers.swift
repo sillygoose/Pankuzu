@@ -25,7 +25,7 @@ struct MeasurementValueView<U: Dimension>: View {
       let formattedMeasurement = String(format: "%.1f", measurement.value)
       Text(formattedMeasurement)
       Text(measurement.unit.symbol)
-        .font(DesignTokens.Font.body)
+        .font(DesignTokens.Font.title)
     }
     .foregroundStyle(color)
   }

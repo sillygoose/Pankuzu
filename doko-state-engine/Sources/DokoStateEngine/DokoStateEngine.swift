@@ -208,6 +208,7 @@ public final class DokoStateEngine {
                   tripState: .active,
                   duration: .seconds(tripDraft.duration),
                   distance: Measurement(value: tripDraft.distance, unit: UnitLength.kilometers).converted(to: appSettings.metric ? .kilometers : .miles),
+                  elevation: Measurement(value: tripDraft.elevationEnd, unit: UnitLength.meters).converted(to: appSettings.metric ? .meters : .feet),
                   rangeConsumed: tripDraft.range.map { Measurement(value: $0, unit: UnitLength.kilometers).converted(to: appSettings.metric ? .kilometers : .miles) },
                   windSock: windSock
                 )
