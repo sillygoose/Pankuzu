@@ -116,7 +116,6 @@ public actor FordElectrics: ConnectedVehicleInterface {
       ])
     case .acChargeUpdate:
       return ObdCommandPacket(type: .acChargeUpdate, commands: [
-        .odometer,
         .batteryStateOfCharge, .batteryStateOfHealth,
         .batteryTemperature,
         .acChargerCouplerTemperature
@@ -139,7 +138,6 @@ public actor FordElectrics: ConnectedVehicleInterface {
       ])
     case .dcChargeUpdate:
       return ObdCommandPacket(type: .dcChargeUpdate, commands: [
-        .odometer,
         .batteryStateOfCharge, .batteryStateOfHealth,
         .batteryTemperature,
         .acChargerCouplerTemperature

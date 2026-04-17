@@ -197,7 +197,6 @@ public actor VwElectrics: ConnectedVehicleInterface {
       ])
     case .acChargeUpdate:
       return ObdCommandPacket(type: .acChargeUpdate, commands: [
-        .odometer,
         .batteryStateOfCharge, .batteryTemperature,
       ])
     case .acChargeEnding:
@@ -220,7 +219,6 @@ public actor VwElectrics: ConnectedVehicleInterface {
       ])
     case .dcChargeUpdate:
       return ObdCommandPacket(type: .dcChargeUpdate, commands: [
-        .odometer,
         .batteryStateOfCharge, .batteryTemperature,
       ])
     case .dcChargeEnding:
