@@ -490,6 +490,16 @@ extension DokoResponsePacket {
     return v
   }
 
+  public var batteryVoltage: Double? {
+    guard case let .batteryVoltage(v)? = responses[.batteryVoltage]?.response else { return nil }
+    return v
+  }
+
+  public var batteryCurrent: Double? {
+    guard case let .batteryCurrent(v)? = responses[.batteryCurrent]?.response else { return nil }
+    return v
+  }
+
   public var batteryPower: Double? {
     guard case let .batteryPower(v)? = responses[.batteryPower]?.response else { return nil }
     return v

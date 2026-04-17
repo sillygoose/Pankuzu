@@ -136,7 +136,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .gearSelected, .odometer, .speed,
         .batteryStateOfCharge, .batteryTemperature,
         .batteryVoltage, //.batteryCurrent,
-        .batteryStateOfHealth, .batteryDistanceToEmpty,
+        //.batteryStateOfHealth, .batteryDistanceToEmpty,
       ])
 
     case .idle:
@@ -148,8 +148,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .tripStarting:
       return ObdCommandPacket(type: .tripStarting, commands: [
         .odometer,
-        .batteryStateOfCharge, .batteryStateOfHealth, .batteryTemperature,
-        .batteryDistanceToEmpty,
+        .batteryStateOfCharge, //.batteryStateOfHealth,
+        .batteryTemperature,
+        //.batteryDistanceToEmpty,
         .position, .weather,
       ])
     case .tripInProgress:
@@ -161,14 +162,15 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .position,
         .odometer,
         .batteryStateOfCharge, .batteryTemperature,
-        .batteryDistanceToEmpty,
+        //.batteryDistanceToEmpty,
       ])
     case .tripEnding:
       return ObdCommandPacket(type: .tripEnding, commands: [
         .weather,
         .odometer,
-        .batteryStateOfCharge, .batteryStateOfHealth, .batteryTemperature,
-        .batteryDistanceToEmpty,
+        .batteryStateOfCharge, //.batteryStateOfHealth,
+        .batteryTemperature,
+        //.batteryDistanceToEmpty,
         .position,
       ])
     case .tripData:
@@ -184,8 +186,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .acChargeStarting:
       return ObdCommandPacket(type: .acChargeStarting, commands: [
         .odometer,
-        .batteryStateOfCharge, .batteryStateOfHealth, .batteryTemperature,
-        .batteryDistanceToEmpty,
+        .batteryStateOfCharge, //.batteryStateOfHealth,
+        .batteryTemperature,
+        //.batteryDistanceToEmpty,
         .position, .weather,
       ])
     case .acChargeInProgress:
@@ -200,14 +203,15 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .acChargeEnding:
       return ObdCommandPacket(type: .acChargeEnding, commands: [
         .batteryStateOfCharge, .batteryTemperature,
-        .batteryDistanceToEmpty,
+        //.batteryDistanceToEmpty,
       ])
 
     case .dcChargeStarting:
       return ObdCommandPacket(type: .dcChargeStarting, commands: [
         .odometer,
-        .batteryStateOfCharge, .batteryStateOfHealth, .batteryTemperature,
-        .batteryDistanceToEmpty,
+        .batteryStateOfCharge,//.batteryStateOfHealth,
+        .batteryTemperature,
+        //.batteryDistanceToEmpty,
         .position, .weather,
       ])
     case .dcChargeInProgress:
@@ -222,7 +226,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .dcChargeEnding:
       return ObdCommandPacket(type: .dcChargeEnding, commands: [
         .batteryStateOfCharge, .batteryTemperature,
-        .batteryDistanceToEmpty,
+        //.batteryDistanceToEmpty,
       ])
 
     case .acChargeHistory:

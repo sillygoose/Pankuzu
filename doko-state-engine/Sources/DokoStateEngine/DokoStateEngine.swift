@@ -103,6 +103,7 @@ public final class DokoStateEngine {
     Task {
       @Shared(.connectedVehicleInterface) var connectedVehicle
       @Shared(.activeSession) var activeSession
+      @Shared(.appSettings) var appSettings
       self.logger.info("\(timestamp()) SE.obdResponseProcessing() started")
       while !Task.isCancelled {
         guard let dokoResponsePacket = await DokoPacketManager.shared.removeDokoResponsePacket() else {
@@ -192,7 +193,6 @@ public final class DokoStateEngine {
             do {
               let tripDraft = try Trip.postTripUpdateRecord(tripDraft: tripDraft, tripUpdateResponse: dokoResponsePacket)
               self.tripInProgress = tripDraft
-              @Shared(.appSettings) var appSettings
               let windSock: WindSock? = if let course = dokoResponsePacket.position?.course, let weather = dokoResponsePacket.weather {
                 WindSock(
                   course: .init(value: course, unit: .degrees),
@@ -406,7 +406,11 @@ public final class DokoStateEngine {
                     duration: .seconds(chargeDraft.duration),
                     stateOfCharge: .init(value: stateOfCharge, unit: .percent),
                     rangeAdded: nil,
-                    measuredPower: dokoResponsePacket.batteryPower.map { .init(value: $0, unit: .kilowatts) }
+                    measuredPower: dokoResponsePacket.batteryPower.map { .init(value: $0, unit: .kilowatts) },
+                    batteryVoltage: dokoResponsePacket.batteryVoltage.map { .init(value: $0, unit: .volts) },
+                    batteryCurrent: dokoResponsePacket.batteryCurrent.map { .init(value: $0, unit: .amperes) },
+                    batteryTemperature: dokoResponsePacket.batteryTemperature.map { .init(value: $0, unit: .celsius).converted(to: appSettings.metric ? .celsius : .fahrenheit) },
+                    couplerTemperature: dokoResponsePacket.couplerTemperature.map { .init(value: $0, unit: .celsius).converted(to: appSettings.metric ? .celsius : .fahrenheit) },
                   )
                 )
               }

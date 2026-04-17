@@ -94,6 +94,10 @@ public struct ChargeActivityAttributes: ActivityAttributes, Sendable {
     public let stateOfCharge: Measurement<UnitPercent>
     public let rangeAdded: Measurement<UnitLength>?
     public let measuredPower: Measurement<UnitPower>?
+    public let batteryVoltage: Measurement<UnitElectricPotentialDifference>?
+    public let batteryCurrent: Measurement<UnitElectricCurrent>?
+    public let batteryTemperature: Measurement<UnitTemperature>?
+    public let couplerTemperature: Measurement<UnitTemperature>?
 
     public init(
       chargeState: ChargeState,
@@ -101,12 +105,20 @@ public struct ChargeActivityAttributes: ActivityAttributes, Sendable {
       stateOfCharge: Measurement<UnitPercent> = .init(value: 0.0, unit: .percent),
       rangeAdded: Measurement<UnitLength>? = nil,
       measuredPower: Measurement<UnitPower>? = nil,
+      batteryVoltage: Measurement<UnitElectricPotentialDifference>? = nil,
+      batteryCurrent: Measurement<UnitElectricCurrent>? = nil,
+      batteryTemperature: Measurement<UnitTemperature>? = nil,
+      couplerTemperature: Measurement<UnitTemperature>? = nil,
     ) {
       self.chargeState = chargeState
       self.duration = duration
       self.stateOfCharge = stateOfCharge
       self.rangeAdded = rangeAdded
       self.measuredPower = measuredPower
+      self.batteryVoltage = batteryVoltage
+      self.batteryCurrent = batteryCurrent
+      self.batteryTemperature = batteryTemperature
+      self.couplerTemperature = couplerTemperature
     }
   }
 }
