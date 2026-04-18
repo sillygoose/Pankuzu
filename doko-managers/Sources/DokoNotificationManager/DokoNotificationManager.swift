@@ -4,6 +4,12 @@ import OSLog
 
 import DokoLogging
 
+public extension Notification.Name {
+  static let pankuzuOpenTrips    = Notification.Name("com.unchan.pankuzu.openTrips")
+  static let pankuzuOpenCharges  = Notification.Name("com.unchan.pankuzu.openCharges")
+  static let pankuzuOpenSettings = Notification.Name("com.unchan.pankuzu.openSettings")
+}
+
 public final class DokoNotificationManager: NSObject, Sendable {
   let logger = Logger(
     subsystem: Bundle.main.bundleIdentifier!,
@@ -49,30 +55,34 @@ public final class DokoNotificationManager: NSObject, Sendable {
     content.title = "Scan Tool Connected"
     content.body = "Connected to the \(accessoryName) scan tool."
     content.sound = .default
+    content.userInfo = ["destination": "settings"]
     await sendNotification(content: content)
   }
-  
+
   public func accessoryDisconnectedNotification(accessoryName: String) async {
     let content = UNMutableNotificationContent()
     content.title = "Scan Tool Disconnected"
     content.body = "No longer connected to the \(accessoryName) scan tool."
     content.sound = .default
+    content.userInfo = ["destination": "settings"]
     await sendNotification(content: content)
   }
-  
+
   public func startTripNotification(vehicle: String) async {
     let content = UNMutableNotificationContent()
     content.title = "Starting New Trip"
     content.body = "Logging a new trip in your \(vehicle), tap to enable Live Activities."
     content.sound = .default
+    content.userInfo = ["destination": "trips"]
     await sendNotification(content: content)
   }
-  
+
   public func startChargeNotification(vehicle: String) async {
     let content = UNMutableNotificationContent()
     content.title = "Starting New Charge"
     content.body = "Logging a new charge in your \(vehicle), tap to enable Live Activities."
     content.sound = .default
+    content.userInfo = ["destination": "charges"]
     await sendNotification(content: content)
   }
 }
@@ -84,5 +94,20 @@ extension DokoNotificationManager: UNUserNotificationCenterDelegate {
     withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
   ) {
     completionHandler([.banner, .sound])
+  }
+
+  nonisolated public func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    didReceive response: UNNotificationResponse,
+    withCompletionHandler completionHandler: @escaping () -> Void
+  ) {
+    let userInfo = response.notification.request.content.userInfo
+    switch userInfo["destination"] as? String {
+    case "trips":    NotificationCenter.default.post(name: .pankuzuOpenTrips,    object: nil)
+    case "charges":  NotificationCenter.default.post(name: .pankuzuOpenCharges,  object: nil)
+    case "settings": NotificationCenter.default.post(name: .pankuzuOpenSettings, object: nil)
+    default: break
+    }
+    completionHandler()
   }
 }

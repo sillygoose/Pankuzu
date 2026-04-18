@@ -3,6 +3,7 @@ import SwiftUI
 import DokoUI
 import DokoSchema
 import DokoSharing
+import DokoNotificationManager
 
 @MainActor
 @Observable
@@ -49,6 +50,15 @@ struct AppView: View {
     }
     .tabBarMinimizeBehavior(.onScrollDown)
     .preferredColorScheme(.dark)
+    .onReceive(NotificationCenter.default.publisher(for: .pankuzuOpenTrips)) { _ in
+      model.selectedTab = .trips
+    }
+    .onReceive(NotificationCenter.default.publisher(for: .pankuzuOpenCharges)) { _ in
+      model.selectedTab = .charges
+    }
+    .onReceive(NotificationCenter.default.publisher(for: .pankuzuOpenSettings)) { _ in
+      model.selectedTab = .settings
+    }
   }
 }
 

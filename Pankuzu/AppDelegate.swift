@@ -1,15 +1,18 @@
 import Foundation
 import UIKit
+import UserNotifications
 
 import CoreLocationManager
+import DokoNotificationManager
 
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
   ) -> Bool {
-    let locationsHandler = CoreLocationManager.shared
+    UNUserNotificationCenter.current().delegate = DokoNotificationManager.shared
 
+    let locationsHandler = CoreLocationManager.shared
     if locationsHandler.backgroundActivity {
       locationsHandler.backgroundActivity = true
     }
