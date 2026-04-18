@@ -28,7 +28,7 @@ struct MediumTripLiveActivities: View {
         Text("Trip Starting")
           .foregroundStyle(DesignTokens.Color.primary)
       }
-      .font(DesignTokens.Font.largeTitle)
+      .font(DesignTokens.Font.mlaTitle)
       .padding()
     }
   }
@@ -51,23 +51,26 @@ struct MediumTripLiveActivities: View {
           
           GridRow {
             Image(systemName: "clock")
-              .font(DesignTokens.Font.title)
+              .font(DesignTokens.Font.mlaSymbol)
               .gridColumnAlignment(.trailing)
             Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
-              .font(DesignTokens.Font.largeTitle)
+              .font(DesignTokens.Font.mlaValue)
               .gridColumnAlignment(.leading)
           }
           .foregroundStyle(DesignTokens.Color.duration)
           
           GridRow {
             Image(systemName: "road.lanes")
-              .font(DesignTokens.Font.title)
+              .font(DesignTokens.Font.mlaSymbol)
               .foregroundStyle(distanceColor)
-            MeasurementValueView(
-              measurement: distance,
-              color: distanceColor,
-              fractionDigits: 1
-            )
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+              let formattedMeasurement = String(format: "%.1f", distance.value)
+              Text(formattedMeasurement)
+                .font(DesignTokens.Font.mlaValue)
+              Text(distance.unit.symbol)
+                .font(DesignTokens.Font.mlaUnit)
+            }
+            .foregroundStyle(distanceColor)
           }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -109,8 +112,8 @@ struct MediumTripLiveActivities: View {
               temperature.formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(0))))
             )
           }
-          .font(DesignTokens.Font.title)
-          
+          .font(DesignTokens.Font.mlaLabel)
+
           Image(systemName: "arrow.down")
             .resizable()
             .aspectRatio(contentMode: .fit)
@@ -119,10 +122,11 @@ struct MediumTripLiveActivities: View {
             .foregroundStyle(abs(relativeDirection) < 90 ? .red : .green)
             .fontWeight(.black)
             .animation(.linear, value: relativeDirection)
-            .frame(width: 100, height: 90)
-          
+//            .font(DesignTokens.Font.mlaTitle)
+            //.frame(width: 60, height: 60)
+
           Text("\(windCompassDirection), \(windSpeed.formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(0)))))")
-            .font(DesignTokens.Font.title)
+            .font(DesignTokens.Font.mlaLabel)
         }
         .font(.caption)
         .foregroundStyle(DesignTokens.Color.primary)
@@ -140,7 +144,7 @@ struct MediumTripLiveActivities: View {
         Text("Trip Ended")
           .foregroundStyle(DesignTokens.Color.primary)
       }
-      .font(DesignTokens.Font.largeTitle)
+      .font(DesignTokens.Font.mlaTitle)
       .padding()
     }
   }
