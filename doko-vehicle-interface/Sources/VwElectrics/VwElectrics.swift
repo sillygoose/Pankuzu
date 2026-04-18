@@ -105,10 +105,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
         //.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
         //.atcfc(true),
-        .atsh("FC0076"),
+        .atsh("FC007B"),
         .atcp("17"),
         .atcra("17FE007X"),
-        .atfcsh("17FC0076"),
+        .atfcsh("17FC007B"),
         .atfcsd("300000"),
         .atfcsm(1),
         .batteryCurrent,

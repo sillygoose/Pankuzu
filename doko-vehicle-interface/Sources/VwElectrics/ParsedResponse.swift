@@ -48,6 +48,10 @@ extension VwElectrics {
         commandResponse = .atcm(mask)
       case .stcsegr(let enabled):
         commandResponse = .stcsegr(enabled)
+      case .stp(let proto):
+        commandResponse = .stp(proto)
+      case .stpo:
+        commandResponse = .stpo(response)
 
       case .position:
         guard let position = await CoreLocationManager.shared.currentLocation else {

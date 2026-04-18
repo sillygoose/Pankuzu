@@ -26,9 +26,13 @@ public enum DesignTokens {
     public static let body = SwiftUI.Font.subheadline
     public static let caption = SwiftUI.Font.caption
 
-    public static let laSymbol = SwiftUI.Font.system(size: 25)
-    public static let laValue = SwiftUI.Font.system(size: 44)
-    public static let laUnit = SwiftUI.Font.system(size: 25)
+    public static let mlaSymbol = SwiftUI.Font.system(size: 20)
+    public static let mlaValue = SwiftUI.Font.system(size: 36)
+    public static let mlaUnit = SwiftUI.Font.system(size: 20)
+
+    public static let slaSymbol = SwiftUI.Font.system(size: 7)
+    public static let slaValue = SwiftUI.Font.system(size: 16)
+    public static let slaUnit = SwiftUI.Font.system(size: 7)
 
   }
   
