@@ -19,7 +19,11 @@ public enum DesignTokens {
     public static let rangeOver = SwiftUI.Color.red
     public static let charging = SwiftUI.Color.green
     public static let power = SwiftUI.Color.orange
+    public static let voltage = SwiftUI.Color.purple
+    public static let current = SwiftUI.Color.cyan
     public static let weather = SwiftUI.Color.white
+    public static let vbatteryTemperature = SwiftUI.Color.yellow
+    public static let couplerTemperature = SwiftUI.Color.red
   }
   
   public enum Font {

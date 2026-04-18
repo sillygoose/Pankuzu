@@ -54,13 +54,108 @@ struct ChargeLiveActivities: View, ChargeLiveActivityFonts {
     @Environment(\.activityFamily) var activityFamily
 
     var body: some View {
+      let duration = context.state.duration
+      //      let stateOfCharge = context.state.stateOfCharge
+      //      let rangeAdded = context.state.rangeAdded
+      let measuredPower = context.state.measuredPower
+      let batteryVoltage = context.state.batteryVoltage
+      let batteryCurrent = context.state.batteryCurrent
+      let batteryTemperature = context.state.batteryTemperature
+      let couplerTemperature = context.state.couplerTemperature
+
       HStack(alignment: .center) {
         DokoWidgetIcon()
         Spacer()
-        Text("Charge Active")
-          .foregroundStyle(DesignTokens.Color.primary)
+
+        Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
+          GridRow(alignment: .lastTextBaseline) {
+            Image(systemName: "clock")
+              .font(laSymbol)
+              .foregroundStyle(DesignTokens.Color.duration)
+              .gridColumnAlignment(.leading)
+            Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
+              .font(laValue.monospacedDigit())
+              .foregroundStyle(DesignTokens.Color.duration)
+              .gridColumnAlignment(.trailing)
+            Color.clear.frame(width: 0)
+          }
+          if let batteryTemperature {
+            GridRow(alignment: .lastTextBaseline) {
+              Image(systemName: "batteryblock.stack")
+                .font(laSymbol)
+                .foregroundStyle(DesignTokens.Color.distance)
+                .gridColumnAlignment(.leading)
+              Text(String(format: "%3.0f", batteryTemperature.value))
+                .font(laValue.monospacedDigit())
+                .foregroundStyle(DesignTokens.Color.vbatteryTemperature)
+                .gridColumnAlignment(.trailing)
+              Text(batteryTemperature.unit.symbol)
+                .font(laUnit)
+                .foregroundStyle(.secondary)
+                .gridColumnAlignment(.leading)
+            }
+          }
+          if let couplerTemperature {
+            GridRow(alignment: .lastTextBaseline) {
+              Image(systemName: "ev.plug.dc.ccs1")
+                .font(laSymbol)
+                .foregroundStyle(DesignTokens.Color.elevation)
+                .gridColumnAlignment(.leading)
+              Text(String(format: "%3.0f", couplerTemperature.value))
+                .font(laValue.monospacedDigit())
+                .foregroundStyle(DesignTokens.Color.couplerTemperature)
+                .gridColumnAlignment(.trailing)
+              Text(couplerTemperature.unit.symbol)
+                .font(laUnit)
+                .foregroundStyle(.secondary)
+                .gridColumnAlignment(.leading)
+            }
+          }
+        }
+        Spacer()
+        Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
+          if let batteryVoltage {
+            GridRow(alignment: .lastTextBaseline) {
+              //              Image(systemName: "mountain.2")
+              //                .font(laSymbol)
+              //                .foregroundStyle(DesignTokens.Color.elevation)
+              //                .gridColumnAlignment(.leading)
+              Text(String(format: "%5.1f", batteryVoltage.value))
+                .font(laValue.monospacedDigit())
+                .foregroundStyle(DesignTokens.Color.voltage)
+                .gridColumnAlignment(.trailing)
+              Text(batteryVoltage.unit.symbol)
+                .font(laUnit)
+                .foregroundStyle(.secondary)
+                .gridColumnAlignment(.leading)
+            }
+          }
+          if let batteryCurrent {
+            GridRow(alignment: .lastTextBaseline) {
+              Text(String(format: "%4.1f", batteryCurrent.value))
+                .font(laValue.monospacedDigit())
+                .foregroundStyle(DesignTokens.Color.current)
+                .gridColumnAlignment(.trailing)
+              Text(batteryCurrent.unit.symbol)
+                .font(laUnit)
+                .foregroundStyle(.secondary)
+                .gridColumnAlignment(.leading)
+            }
+          }
+          if let measuredPower {
+            GridRow(alignment: .lastTextBaseline) {
+              Text(String(format: "%4.1f", measuredPower.value))
+                .font(laValue.monospacedDigit())
+                .foregroundStyle(DesignTokens.Color.power)
+                .gridColumnAlignment(.trailing)
+              Text(measuredPower.unit.symbol)
+                .font(laUnit)
+                .foregroundStyle(.secondary)
+                .gridColumnAlignment(.leading)
+            }
+          }
+        }
       }
-      .font(laTitle)
       .padding()
     }
   }
@@ -93,8 +188,18 @@ extension ChargeActivityAttributes.ContentState {
     ChargeActivityAttributes.ContentState(chargeState: .starting)
   }
 
-  fileprivate static var active: ChargeActivityAttributes.ContentState {
-    ChargeActivityAttributes.ContentState(chargeState: .active)
+  fileprivate static var full: ChargeActivityAttributes.ContentState {
+    ChargeActivityAttributes.ContentState(
+      chargeState: .active,
+      duration: .seconds(1200),
+      stateOfCharge: .init(value: 71.5, unit: .percent),
+      rangeAdded: .init(value: 5.0, unit: .kilometers),
+      measuredPower: .init(value: 10.0, unit: .kilowatts),
+      batteryVoltage: .init(value: 370.3, unit: .volts),
+      batteryCurrent: .init(value: 40.3, unit: .amperes),
+      batteryTemperature: .init(value: 40.3, unit: .celsius),
+      couplerTemperature: .init(value: 60.3, unit: .celsius),
+    )
   }
 
   fileprivate static var ended: ChargeActivityAttributes.ContentState {
@@ -106,7 +211,7 @@ extension ChargeActivityAttributes.ContentState {
   ChargeLiveActivityWidget()
 } contentStates: {
   ChargeActivityAttributes.ContentState.starting
-  ChargeActivityAttributes.ContentState.active
+  ChargeActivityAttributes.ContentState.full
   ChargeActivityAttributes.ContentState.ended
 }
 
