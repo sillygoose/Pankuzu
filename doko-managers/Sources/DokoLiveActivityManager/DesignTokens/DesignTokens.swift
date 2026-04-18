@@ -12,13 +12,14 @@ public enum DesignTokens {
     public static let record = SwiftUI.Color.red
 
     public static let duration = SwiftUI.Color.yellow
-    public static let distance = SwiftUI.Color.green
-    public static let elevation = SwiftUI.Color.blue
+    public static let distance = SwiftUI.Color.blue
+    public static let elevation = SwiftUI.Color.green
     public static let tripping = SwiftUI.Color.cyan
     public static let rangeUnder = SwiftUI.Color.green
     public static let rangeOver = SwiftUI.Color.red
     public static let charging = SwiftUI.Color.green
     public static let power = SwiftUI.Color.orange
+    public static let weather = SwiftUI.Color.white
   }
   
   public enum Font {
