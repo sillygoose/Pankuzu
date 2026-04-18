@@ -70,21 +70,92 @@ struct ChargeLiveActivityWidget: Widget {
   }
 }
 
-struct ChargeLiveActivities: View {
-  let context: ActivityViewContext<ChargeActivityAttributes>
-  @Environment(\.activityFamily) var activityFamily
-
-  var body: some View {
-    if activityFamily == .small {
-      SmallChargeLiveActivities(context: context)
-    } else {
-      MediumChargeLiveActivities(context: context)
-    }
-  }
-}
+//struct ChargeLiveActivities: View {
+//  let context: ActivityViewContext<ChargeActivityAttributes>
+//  @Environment(\.activityFamily) var activityFamily
+//
+//  var body: some View {
+//    if activityFamily == .small {
+//      SmallChargeLiveActivities(context: context)
+//    } else {
+//      MediumChargeLiveActivities(context: context)
+//    }
+//  }
+//}
 
 extension ChargeActivityAttributes {
   fileprivate static var preview: ChargeActivityAttributes {
     ChargeActivityAttributes()
   }
 }
+
+/*
+ extension TripActivityAttributes.ContentState {
+   fileprivate static var starting: TripActivityAttributes.ContentState {
+     TripActivityAttributes.ContentState(
+       tripState: .starting,
+       duration: .seconds(0),
+       distance: .init(value: 0, unit: .kilometers),
+       rangeConsumed: .init(value: 0, unit: .kilometers),
+       windSock: WindSock(
+         course: .init(value: 90, unit: .degrees),
+         temperature: .init(value: 15, unit: .celsius),
+         conditions: "cloud.fill",
+         windSpeed: .init(value: 20, unit: .metersPerSecond),
+         windDirection: .init(value: 180, unit: .degrees),
+         windCompassDirection: "S"
+       )
+     )
+   }
+
+   fileprivate static var active: TripActivityAttributes.ContentState {
+     TripActivityAttributes.ContentState(
+       tripState: .active,
+       duration: .seconds(3661),
+       distance: .init(value: 42.5, unit: .kilometers),
+       rangeConsumed: .init(value: 48.2, unit: .kilometers),
+       windSock: WindSock(
+         course: .init(value: 180, unit: .degrees),
+         temperature: .init(value: 15, unit: .celsius),
+         conditions: "cloud.fill",
+         windSpeed: .init(value: 16, unit: .metersPerSecond),
+         windDirection: .init(value: 180, unit: .degrees),
+         windCompassDirection: "S"
+       )
+     )
+   }
+
+   fileprivate static var ended: TripActivityAttributes.ContentState {
+     TripActivityAttributes.ContentState(
+       tripState: .ended,
+       duration: .seconds(7200),
+       distance: .init(value: 85.0, unit: .kilometers),
+       rangeConsumed: .init(value: 92.0, unit: .kilometers)
+     )
+   }
+ }
+
+ #Preview("Dynamic Island: Minimal", as: .dynamicIsland(.minimal), using: TripActivityAttributes.preview) {
+   TripLiveActivityWidget()
+ } contentStates: {
+   TripActivityAttributes.ContentState.starting
+   TripActivityAttributes.ContentState.active
+   TripActivityAttributes.ContentState.ended
+ }
+
+ #Preview("Dynamic Island: Compact", as: .dynamicIsland(.compact), using: TripActivityAttributes.preview) {
+   TripLiveActivityWidget()
+ } contentStates: {
+   TripActivityAttributes.ContentState.starting
+   TripActivityAttributes.ContentState.active
+   TripActivityAttributes.ContentState.ended
+ }
+
+ #Preview("Dynamic Island: Expanded", as: .dynamicIsland(.expanded), using: TripActivityAttributes.preview) {
+   TripLiveActivityWidget()
+ } contentStates: {
+   TripActivityAttributes.ContentState.starting
+   TripActivityAttributes.ContentState.active
+   TripActivityAttributes.ContentState.ended
+ }
+ */

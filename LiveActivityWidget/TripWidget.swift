@@ -107,4 +107,3 @@ extension TripActivityAttributes.ContentState {
   TripActivityAttributes.ContentState.active
   TripActivityAttributes.ContentState.ended
 }
-
