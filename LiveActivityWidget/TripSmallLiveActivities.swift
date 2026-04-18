@@ -44,7 +44,7 @@ struct SmallTripLiveActivities: View {
       HStack {
         DokoWidgetIcon()
         Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
-          GridRow {
+          GridRow(alignment: .lastTextBaseline) {
             Image(systemName: "clock")
               .font(DesignTokens.Font.slaSymbol)
               .foregroundStyle(DesignTokens.Color.duration)
@@ -58,11 +58,11 @@ struct SmallTripLiveActivities: View {
           GridRow(alignment: .lastTextBaseline) {
             Image(systemName: "road.lanes")
               .font(DesignTokens.Font.slaSymbol)
-              .foregroundStyle(DesignTokens.Color.primary)
+              .foregroundStyle(DesignTokens.Color.distance)
               .gridColumnAlignment(.leading)
             Text(String(format: "%5.1f", distance.value))
               .font(DesignTokens.Font.slaValue.monospacedDigit())
-              .foregroundStyle(DesignTokens.Color.primary)
+              .foregroundStyle(DesignTokens.Color.distance)
               .gridColumnAlignment(.trailing)
             Text(distance.unit.symbol)
               .font(DesignTokens.Font.slaUnit)
@@ -73,11 +73,11 @@ struct SmallTripLiveActivities: View {
             GridRow(alignment: .lastTextBaseline) {
               Image(systemName: "mountain.2")
                 .font(DesignTokens.Font.slaSymbol)
-                .foregroundStyle(DesignTokens.Color.primary)
+                .foregroundStyle(DesignTokens.Color.elevation)
                 .gridColumnAlignment(.leading)
               Text(String(format: "%5.0f", elevation.value))
                 .font(DesignTokens.Font.slaValue.monospacedDigit())
-                .foregroundStyle(DesignTokens.Color.primary)
+                .foregroundStyle(DesignTokens.Color.elevation)
                 .gridColumnAlignment(.trailing)
               Text(elevation.unit.symbol)
                 .font(DesignTokens.Font.slaUnit)

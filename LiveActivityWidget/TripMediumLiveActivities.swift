@@ -45,44 +45,41 @@ struct MediumTripLiveActivities: View {
       
       HStack(alignment: .center) {
         DokoWidgetIcon()
-        Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 12) {
-          let distanceColor = rangeConsumed.map { $0.value > distance.value } == true
-          ? DesignTokens.Color.rangeOver
-          : DesignTokens.Color.rangeUnder
-          
-          GridRow {
+        Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
+          GridRow(alignment: .lastTextBaseline) {
             Image(systemName: "clock")
               .font(DesignTokens.Font.mlaSymbol)
-              .gridColumnAlignment(.trailing)
-            Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
-              .font(DesignTokens.Font.mlaValue)
+              .foregroundStyle(DesignTokens.Color.duration)
               .gridColumnAlignment(.leading)
+            Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
+              .font(DesignTokens.Font.mlaValue.monospacedDigit())
+              .foregroundStyle(DesignTokens.Color.duration)
+              .gridColumnAlignment(.trailing)
+            Color.clear.frame(width: 0)
           }
-          .foregroundStyle(DesignTokens.Color.duration)
-          
-          GridRow {
+          GridRow(alignment: .lastTextBaseline) {
             Image(systemName: "road.lanes")
               .font(DesignTokens.Font.mlaSymbol)
-              .foregroundStyle(distanceColor)
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
-              let formattedMeasurement = String(format: "%.1f", distance.value)
-              Text(formattedMeasurement)
-                .font(DesignTokens.Font.mlaValue.monospacedDigit())
-              Text(distance.unit.symbol)
-                .font(DesignTokens.Font.mlaUnit)
-            }
-            .foregroundStyle(distanceColor)
+              .foregroundStyle(DesignTokens.Color.distance)
+              .gridColumnAlignment(.leading)
+            Text(String(format: "%5.1f", distance.value))
+              .font(DesignTokens.Font.mlaValue.monospacedDigit())
+              .foregroundStyle(DesignTokens.Color.distance)
+              .gridColumnAlignment(.trailing)
+            Text(distance.unit.symbol)
+              .font(DesignTokens.Font.mlaUnit)
+              .foregroundStyle(.secondary)
+              .gridColumnAlignment(.leading)
           }
-
           if let elevation {
             GridRow(alignment: .lastTextBaseline) {
               Image(systemName: "mountain.2")
                 .font(DesignTokens.Font.mlaSymbol)
-                .foregroundStyle(DesignTokens.Color.primary)
+                .foregroundStyle(DesignTokens.Color.elevation)
                 .gridColumnAlignment(.leading)
-              Text(String(format: "%4.0f", elevation.value))
+              Text(String(format: "%5.0f", elevation.value))
                 .font(DesignTokens.Font.mlaValue.monospacedDigit())
-                .foregroundStyle(DesignTokens.Color.primary)
+                .foregroundStyle(DesignTokens.Color.elevation)
                 .gridColumnAlignment(.trailing)
               Text(elevation.unit.symbol)
                 .font(DesignTokens.Font.mlaUnit)
@@ -91,9 +88,65 @@ struct MediumTripLiveActivities: View {
             }
           }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        
+//        Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 6) {
+//          let distanceColor = rangeConsumed.map { $0.value > distance.value } == true
+//          ? DesignTokens.Color.rangeOver
+//          : DesignTokens.Color.rangeUnder
+//          
+//          GridRow(alignment: .lastTextBaseline) {
+//            Image(systemName: "clock")
+//              .font(DesignTokens.Font.mlaSymbol)
+//              .gridColumnAlignment(.leading)
+//            HStack(alignment: .firstTextBaseline, spacing: 2) {
+//              Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
+//                .font(DesignTokens.Font.mlaValue)
+//            }
+//            .gridColumnAlignment(.trailing)
+//            Text("")
+//              .font(DesignTokens.Font.mlaUnit)
+//          }
+//          .foregroundStyle(DesignTokens.Color.duration)
+//          
+//          GridRow(alignment: .lastTextBaseline) {
+//            Image(systemName: "road.lanes")
+//              .font(DesignTokens.Font.mlaSymbol)
+//              .foregroundStyle(distanceColor)
+//              .gridColumnAlignment(.leading)
+//            HStack(alignment: .firstTextBaseline, spacing: 2) {
+//              let formattedMeasurement = String(format: "%.1f", distance.value)
+//              Text(formattedMeasurement)
+//                .font(DesignTokens.Font.mlaValue.monospacedDigit())
+//              Text(distance.unit.symbol)
+//                .font(DesignTokens.Font.mlaUnit)
+//            }
+//            .foregroundStyle(distanceColor)
+//            .gridColumnAlignment(.trailing)
+//          }
+//
+//          if let elevation {
+//            GridRow(alignment: .lastTextBaseline) {
+//              Image(systemName: "mountain.2")
+//                .font(DesignTokens.Font.mlaSymbol)
+//                .foregroundStyle(DesignTokens.Color.primary)
+//                .gridColumnAlignment(.leading)
+//              HStack(alignment: .firstTextBaseline, spacing: 2) {
+//                Text(String(format: "%4.0f", elevation.value))
+//                  .font(DesignTokens.Font.mlaValue.monospacedDigit())
+//                  .foregroundStyle(DesignTokens.Color.primary)
+//                  .gridColumnAlignment(.trailing)
+//                Text(elevation.unit.symbol)
+//                  .font(DesignTokens.Font.mlaUnit)
+//                  .foregroundStyle(.secondary)
+//                  .gridColumnAlignment(.leading)
+//              }
+//              .gridColumnAlignment(.trailing)
+//            }
+//          }
+//        }
+        //.frame(maxWidth: .infinity, alignment: .leading)
+
         if let windSock {
+          Spacer()
           WindIndicator(
             temperature: windSock.temperature,
             conditions: windSock.conditions,
@@ -102,7 +155,7 @@ struct MediumTripLiveActivities: View {
             windDirection: windSock.windDirection,
             windCompassDirection: windSock.windCompassDirection
           )
-          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          //.frame(maxWidth: .infinity, maxHeight: .infinity)
         }
       }
       .padding()
