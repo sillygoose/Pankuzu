@@ -39,6 +39,7 @@ struct MediumTripLiveActivities: View {
     var body: some View {
       let duration = context.state.duration
       let distance = context.state.distance
+      let elevation = context.state.elevation
       let rangeConsumed = context.state.rangeConsumed
       let windSock = context.state.windSock
       
@@ -66,11 +67,28 @@ struct MediumTripLiveActivities: View {
             HStack(alignment: .firstTextBaseline, spacing: 2) {
               let formattedMeasurement = String(format: "%.1f", distance.value)
               Text(formattedMeasurement)
-                .font(DesignTokens.Font.mlaValue)
+                .font(DesignTokens.Font.mlaValue.monospacedDigit())
               Text(distance.unit.symbol)
                 .font(DesignTokens.Font.mlaUnit)
             }
             .foregroundStyle(distanceColor)
+          }
+
+          if let elevation {
+            GridRow(alignment: .lastTextBaseline) {
+              Image(systemName: "mountain.2")
+                .font(DesignTokens.Font.mlaSymbol)
+                .foregroundStyle(DesignTokens.Color.primary)
+                .gridColumnAlignment(.leading)
+              Text(String(format: "%4.0f", elevation.value))
+                .font(DesignTokens.Font.mlaValue.monospacedDigit())
+                .foregroundStyle(DesignTokens.Color.primary)
+                .gridColumnAlignment(.trailing)
+              Text(elevation.unit.symbol)
+                .font(DesignTokens.Font.mlaUnit)
+                .foregroundStyle(.secondary)
+                .gridColumnAlignment(.leading)
+            }
           }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -166,6 +184,7 @@ extension TripActivityAttributes.ContentState {
       tripState: .active,
       duration: .seconds(1000),
       distance: .init(value: 22.0, unit: .kilometers),
+      elevation: .init(value: 322.5, unit: .meters),
       rangeConsumed: .init(value: 26.4, unit: .kilometers),
       windSock: WindSock(
         course: .init(value: 90, unit: .degrees),
@@ -183,6 +202,7 @@ extension TripActivityAttributes.ContentState {
       tripState: .active,
       duration: .seconds(1000),
       distance: .init(value: 22.0, unit: .kilometers),
+      elevation: .init(value: 322.5, unit: .meters),
       rangeConsumed: .init(value: 20.4, unit: .kilometers),
       windSock: WindSock(
         course: .init(value: 180, unit: .degrees),
