@@ -77,7 +77,6 @@ struct ChargeLiveActivities: View, ChargeLiveActivityFonts {
                 .font(laValue.monospacedDigit())
                 .foregroundStyle(DesignTokens.Color.duration)
                 .gridColumnAlignment(.trailing)
-//              Color.clear.frame(width: 0)
             }
             if let batteryTemperature {
               GridRow(alignment: .lastTextBaseline) {
