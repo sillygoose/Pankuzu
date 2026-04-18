@@ -146,8 +146,10 @@ public final class LiveActivityManager {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.endTrip: no activity"))
       return
     }
-    let content = ActivityContent(state: TripActivityAttributes.ContentState(tripState: .ended), staleDate: nil)
-    await activity.end(content, dismissalPolicy: .after(now.addingTimeInterval(seconds)))
+    let endedState = TripActivityAttributes.ContentState(tripState: .ended)
+    await activity.update(ActivityContent(state: endedState, staleDate: nil))
+    try? await Task.sleep(for: .seconds(30))
+    await activity.end(ActivityContent(state: endedState, staleDate: nil), dismissalPolicy: .after(now.addingTimeInterval(seconds)))
     self.managedActivity = nil
     self.pendingActivity = nil
     DokoLogging.shared.postLoggingResponse(.liveActivity(".endTrip"))
@@ -197,9 +199,11 @@ public final class LiveActivityManager {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.endCharge: no activity"))
       return
     }
-    let content = ActivityContent(state: ChargeActivityAttributes.ContentState(chargeState: .ended), staleDate: nil)
     @Dependency(\.date.now) var now
-    await activity.end(content, dismissalPolicy: .after(now.addingTimeInterval(seconds)))
+    let endedState = ChargeActivityAttributes.ContentState(chargeState: .ended)
+    await activity.update(ActivityContent(state: endedState, staleDate: nil))
+    try? await Task.sleep(for: .seconds(30))
+    await activity.end(ActivityContent(state: endedState, staleDate: nil), dismissalPolicy: .after(now.addingTimeInterval(seconds)))
     self.managedActivity = nil
     self.pendingActivity = nil
     DokoLogging.shared.postLoggingResponse(.liveActivity(".endCharge"))
