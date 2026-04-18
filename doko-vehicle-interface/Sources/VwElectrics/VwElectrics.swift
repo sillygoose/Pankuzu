@@ -48,29 +48,14 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .stpbr(let baudRate):          obdLinkCommand = "STPBR \(baudRate)"
 
     case .batteryCurrent0:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
-    case .batteryCurrent1:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
+    case .batteryCurrent1:              obdLinkCommand = "221E3D"
     case .batteryCurrent2:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
-    case .batteryCurrent3:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
-      
+    case .batteryCurrent3:              obdLinkCommand = "221E3D"
+
     case .batteryCurrent4:              obdLinkCommand = "STPX h:17FC007B, d:03221E3D"
-    case .batteryCurrent5:              obdLinkCommand = "STPX h:17FC007B, d:03221E3D"
-
-//    case .batteryVoltage1:              obdLinkCommand = "221E3B"
-//    case .batteryCurrent1:              obdLinkCommand = "221E3D"
-
-//    case .batteryVoltage2:              obdLinkCommand = "03221E3B"
-//    case .batteryCurrent2:              obdLinkCommand = "03221E3D"
-//    case .batteryVoltage3:              obdLinkCommand = "03221E3B"
-//    case .batteryCurrent3:              obdLinkCommand = "03221E3D"
-//
-//    case .batteryVoltage4:              obdLinkCommand = "221E3B"
-//    case .batteryCurrent4:              obdLinkCommand = "221E3D"
-//    case .batteryVoltage5:              obdLinkCommand = "221E3B"
-//    case .batteryCurrent5:              obdLinkCommand = "221E3D"
-//    case .batteryVoltage6:              obdLinkCommand = "221E3B"
-//    case .batteryCurrent6:              obdLinkCommand = "221E3D"
-//    case .batteryVoltage7:              obdLinkCommand = "221E3B"
-//    case .batteryCurrent7:              obdLinkCommand = "221E3D"
+    case .batteryCurrent5:              obdLinkCommand = "03221E3D"
+    case .batteryCurrent6:              obdLinkCommand = "STPX h:17FC007B, d:03221E3D"
+    case .batteryCurrent7:              obdLinkCommand = "03221E3D"
 
     case .gearSelected:                 obdLinkCommand = "STPX h:17FC0076, d:22210E"
     case .odometer:                     obdLinkCommand = "STPX h:17FC0076, d:22295A"
@@ -105,30 +90,46 @@ public actor VwElectrics: ConnectedVehicleInterface {
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
         //.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
         //.atcfc(true),
+        .ath(true),
         .atsh("FC007B"),
         .atcp("17"),
         .atcra("17FE007X"),
         .atfcsh("17FC007B"),
         .atfcsd("300000"),
         .atfcsm(1),
-        .batteryCurrent,
+        
+        .atcaf(false),
+        .stcsegr(false),
+        .batteryCurrent4,
+        .batteryCurrent5,
+        .atcaf(false),
+        .stcsegr(true),
+        .batteryCurrent6,
+        .batteryCurrent7,
+        .atcaf(true),
+        .stcsegr(false),
+        .batteryCurrent0,
+        .batteryCurrent1,
+        .atcaf(true),
+        .stcsegr(true),
+        .batteryCurrent2,
+        .batteryCurrent3,
 
         /*
- ATSH FC0076
- ATCP 17
- ATCRA 17FE0076
- ATFCSH 17FC0076
- ATFCSD 300000
- ATFCSM1
- */
-        .atcra("7XX"),
-        .stp(33), .stpo,
-        .ath(true),
-        .batteryStateOfHealth,
-        .batteryDistanceToEmpty,
+         ATSH FC007B / ATCP 17 / ATCRA 17FE007B / ATFCSH 17FC007B / ATFCSD 300000 / ATFCSM1
+         ATSH FC0076 / ATCP 17 / ATCRA 17FE0076 / ATFCSH 17FC0076 / ATFCSD 300000 / ATFCSM1
+         */
+        
+        /*
+         .atcra("7XX"),
+         .stp(33), .stpo,
+         .ath(true),
+         .batteryStateOfHealth,
+         .batteryDistanceToEmpty,
 
-        .stp(34), .stpo,
-        .atcra("17FE007X"),
+         .stp(34), .stpo,
+         .atcra("17FE007X"),
+         */
 
         .ath(false),
 
