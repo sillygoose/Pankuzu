@@ -71,7 +71,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
               .font(laValue.monospacedDigit())
               .foregroundStyle(DesignTokens.Color.duration)
               .gridColumnAlignment(.trailing)
-            Color.clear.frame(width: 0)
+//            Color.clear.frame(width: 0)
           }
           GridRow(alignment: .lastTextBaseline) {
             Image(systemName: "road.lanes")

@@ -65,93 +65,90 @@ struct ChargeLiveActivities: View, ChargeLiveActivityFonts {
 
       HStack(alignment: .center) {
         DokoWidgetIcon()
-        Spacer()
-
-        Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
-          GridRow(alignment: .lastTextBaseline) {
-            Image(systemName: "clock")
-              .font(laSymbol)
-              .foregroundStyle(DesignTokens.Color.duration)
-              .gridColumnAlignment(.leading)
-            Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
-              .font(laValue.monospacedDigit())
-              .foregroundStyle(DesignTokens.Color.duration)
-              .gridColumnAlignment(.trailing)
-            Color.clear.frame(width: 0)
-          }
-          if let batteryTemperature {
+        //Spacer()
+        HStack {
+          Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
             GridRow(alignment: .lastTextBaseline) {
-              Image(systemName: "batteryblock.stack")
+              Image(systemName: "clock")
                 .font(laSymbol)
-                .foregroundStyle(DesignTokens.Color.distance)
+                .foregroundStyle(DesignTokens.Color.duration)
                 .gridColumnAlignment(.leading)
-              Text(String(format: "%3.0f", batteryTemperature.value))
+              Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
                 .font(laValue.monospacedDigit())
-                .foregroundStyle(DesignTokens.Color.vbatteryTemperature)
+                .foregroundStyle(DesignTokens.Color.duration)
                 .gridColumnAlignment(.trailing)
-              Text(batteryTemperature.unit.symbol)
-                .font(laUnit)
-                .foregroundStyle(.secondary)
-                .gridColumnAlignment(.leading)
+//              Color.clear.frame(width: 0)
+            }
+            if let batteryTemperature {
+              GridRow(alignment: .lastTextBaseline) {
+                Image(systemName: "batteryblock.stack")
+                  .font(laSymbol)
+                  .foregroundStyle(DesignTokens.Color.distance)
+                  .gridColumnAlignment(.leading)
+                Text(String(format: "%.0f", batteryTemperature.value))
+                  .font(laValue.monospacedDigit())
+                  .foregroundStyle(DesignTokens.Color.vbatteryTemperature)
+                  .gridColumnAlignment(.trailing)
+                Text(batteryTemperature.unit.symbol)
+                  .font(laUnit)
+                  .foregroundStyle(.secondary)
+                  .gridColumnAlignment(.leading)
+              }
+            }
+            if let couplerTemperature {
+              GridRow(alignment: .lastTextBaseline) {
+                Image(systemName: "ev.plug.dc.ccs1")
+                  .font(laSymbol)
+                  .foregroundStyle(DesignTokens.Color.elevation)
+                  .gridColumnAlignment(.leading)
+                Text(String(format: "%.0f", couplerTemperature.value))
+                  .font(laValue.monospacedDigit())
+                  .foregroundStyle(DesignTokens.Color.couplerTemperature)
+                  .gridColumnAlignment(.trailing)
+                Text(couplerTemperature.unit.symbol)
+                  .font(laUnit)
+                  .foregroundStyle(.secondary)
+                  .gridColumnAlignment(.leading)
+              }
             }
           }
-          if let couplerTemperature {
-            GridRow(alignment: .lastTextBaseline) {
-              Image(systemName: "ev.plug.dc.ccs1")
-                .font(laSymbol)
-                .foregroundStyle(DesignTokens.Color.elevation)
-                .gridColumnAlignment(.leading)
-              Text(String(format: "%3.0f", couplerTemperature.value))
-                .font(laValue.monospacedDigit())
-                .foregroundStyle(DesignTokens.Color.couplerTemperature)
-                .gridColumnAlignment(.trailing)
-              Text(couplerTemperature.unit.symbol)
-                .font(laUnit)
-                .foregroundStyle(.secondary)
-                .gridColumnAlignment(.leading)
+          Spacer()
+          Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
+            if let batteryVoltage {
+              GridRow(alignment: .lastTextBaseline) {
+                Text(String(format: "%5.1f", batteryVoltage.value))
+                  .font(laValue.monospacedDigit())
+                  .foregroundStyle(DesignTokens.Color.voltage)
+                  .gridColumnAlignment(.trailing)
+                Text(batteryVoltage.unit.symbol)
+                  .font(laUnit)
+                  .foregroundStyle(.secondary)
+                  .gridColumnAlignment(.leading)
+              }
             }
-          }
-        }
-        Spacer()
-        Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
-          if let batteryVoltage {
-            GridRow(alignment: .lastTextBaseline) {
-              //              Image(systemName: "mountain.2")
-              //                .font(laSymbol)
-              //                .foregroundStyle(DesignTokens.Color.elevation)
-              //                .gridColumnAlignment(.leading)
-              Text(String(format: "%5.1f", batteryVoltage.value))
-                .font(laValue.monospacedDigit())
-                .foregroundStyle(DesignTokens.Color.voltage)
-                .gridColumnAlignment(.trailing)
-              Text(batteryVoltage.unit.symbol)
-                .font(laUnit)
-                .foregroundStyle(.secondary)
-                .gridColumnAlignment(.leading)
+            if let batteryCurrent {
+              GridRow(alignment: .lastTextBaseline) {
+                Text(String(format: "%5.1f", batteryCurrent.value))
+                  .font(laValue.monospacedDigit())
+                  .foregroundStyle(DesignTokens.Color.current)
+                  .gridColumnAlignment(.trailing)
+                Text(batteryCurrent.unit.symbol)
+                  .font(laUnit)
+                  .foregroundStyle(.secondary)
+                  .gridColumnAlignment(.leading)
+              }
             }
-          }
-          if let batteryCurrent {
-            GridRow(alignment: .lastTextBaseline) {
-              Text(String(format: "%4.1f", batteryCurrent.value))
-                .font(laValue.monospacedDigit())
-                .foregroundStyle(DesignTokens.Color.current)
-                .gridColumnAlignment(.trailing)
-              Text(batteryCurrent.unit.symbol)
-                .font(laUnit)
-                .foregroundStyle(.secondary)
-                .gridColumnAlignment(.leading)
-            }
-          }
-          if let measuredPower {
-            GridRow(alignment: .lastTextBaseline) {
-              Text(String(format: "%4.1f", measuredPower.value))
-                .font(laValue.monospacedDigit())
-                .foregroundStyle(DesignTokens.Color.power)
-                .gridColumnAlignment(.trailing)
-              Text(measuredPower.unit.symbol)
-                .font(laUnit)
-                .foregroundStyle(.secondary)
-                .gridColumnAlignment(.leading)
+            if let measuredPower {
+              GridRow(alignment: .lastTextBaseline) {
+                Text(String(format: "%5.1f", measuredPower.value))
+                  .font(laValue.monospacedDigit())
+                  .foregroundStyle(DesignTokens.Color.power)
+                  .gridColumnAlignment(.trailing)
+                Text(measuredPower.unit.symbol)
+                  .font(laUnit)
+                  .foregroundStyle(.secondary)
+                  .gridColumnAlignment(.leading)
+              }
             }
           }
         }
