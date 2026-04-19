@@ -207,9 +207,12 @@ public final class DokoStateEngine {
                 state: TripActivityAttributes.ContentState(
                   tripState: .active,
                   duration: .seconds(tripDraft.duration),
-                  distance: Measurement(value: tripDraft.distance, unit: UnitLength.kilometers).converted(to: appSettings.metric ? .kilometers : .miles),
-                  elevation: Measurement(value: tripDraft.elevationEnd, unit: UnitLength.meters).converted(to: appSettings.metric ? .meters : .feet),
-                  rangeConsumed: tripDraft.range.map { Measurement(value: $0, unit: UnitLength.kilometers).converted(to: appSettings.metric ? .kilometers : .miles) },
+                  distance: Measurement(value: tripDraft.distance, unit: UnitLength.kilometers)
+                    .converted(to: appSettings.metric ? .kilometers : .miles),
+                  elevation: Measurement(value: tripDraft.elevationEnd, unit: UnitLength.meters)
+                    .converted(to: appSettings.metric ? .meters : .feet),
+                  rangeConsumed: tripDraft.range.map { Measurement(value: $0, unit: UnitLength.kilometers)
+                    .converted(to: appSettings.metric ? .kilometers : .miles) },
                   windSock: windSock
                 )
               )
@@ -234,7 +237,12 @@ public final class DokoStateEngine {
                     distance: Measurement(value: finalizedTrip.distance, unit: UnitLength.kilometers).converted(to: appSettings.metric ? .kilometers : .miles),
                     energy: finalizedTrip.energy.map { Measurement(value: $0, unit: UnitEnergy.kilowattHours) },
                     efficiency: finalizedTrip.energy.map { energy in
-                      Measurement(value: finalizedTrip.distance / energy, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
+                      if energy == 0.0 {
+                        return Measurement(value: 0.0, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
+                          .converted(to: appSettings.metric ? appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour)
+
+                      }
+                      return Measurement(value: finalizedTrip.distance / energy, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
                         .converted(to: appSettings.metric ? appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour)
                     },
                     rangeConsumed: finalizedTrip.range.map { Measurement(value: $0, unit: UnitLength.kilometers).converted(to: appSettings.metric ? .kilometers : .miles) },

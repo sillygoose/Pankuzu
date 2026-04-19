@@ -18,8 +18,8 @@ public enum DesignTokens {
     public static let rangeUnder = SwiftUI.Color.green
     public static let rangeOver = SwiftUI.Color.red
     public static let charging = SwiftUI.Color.green
-    public static let power = SwiftUI.Color.orange
-    public static let energy = SwiftUI.Color.red
+    public static let power = SwiftUI.Color.red
+    public static let energy = SwiftUI.Color.orange
     public static let efficiency = SwiftUI.Color.green
     public static let voltage = SwiftUI.Color.purple
     public static let current = SwiftUI.Color.cyan

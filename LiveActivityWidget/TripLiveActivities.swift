@@ -14,7 +14,7 @@ extension TripLiveActivityFonts {
   var laUnit: Font   { activityFamily == .small ? DesignTokens.Font.slaUnit   : DesignTokens.Font.mlaUnit   }
   var laTitle: Font  { activityFamily == .small ? DesignTokens.Font.slaTitle  : DesignTokens.Font.mlaTitle  }
   var laLabel: Font  { activityFamily == .small ? DesignTokens.Font.slaLabel  : DesignTokens.Font.mlaLabel  }
-  var laIconFrame: Double  { activityFamily == .small ? 36 : 60 }
+  var laIconFrame: Double  { activityFamily == .small ? 24 : 45 }
   var laArrowFrame: Double  { activityFamily == .small ? 36 : 60 }
 }
 
@@ -62,6 +62,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
 
       HStack(alignment: .center) {
         DokoWidgetIcon(height: laIconFrame)
+        Spacer()
         Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
           GridRow(alignment: .lastTextBaseline) {
             Image(systemName: "clock")
