@@ -128,7 +128,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
     }
   }
 
-  private struct  : View, TripLiveActivityFonts {
+  private struct EndedView : View, TripLiveActivityFonts {
     let context: ActivityViewContext<TripActivityAttributes>
     @Environment(\.activityFamily) var activityFamily
     @Shared(.appSettings) var appSettings
