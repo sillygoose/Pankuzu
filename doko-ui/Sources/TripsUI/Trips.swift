@@ -1,6 +1,7 @@
 import SwiftUI
 import TipKit
 
+import DokoLiveActivityManager
 import DokoVehicleManager
 import DokoSchema
 import DokoSharing

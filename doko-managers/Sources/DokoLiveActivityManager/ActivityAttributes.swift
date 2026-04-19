@@ -51,6 +51,7 @@ public struct TripActivityAttributes: ActivityAttributes, Sendable {
     public let duration: Duration
     public let distance: Measurement<UnitLength>
     public let energy: Measurement<UnitEnergy>?
+    public let efficiency: Measurement<UnitEnergyEfficiency>?
     public let elevation: Measurement<UnitLength>?
     public let rangeConsumed: Measurement<UnitLength>?
     public let windSock: WindSock?
@@ -60,7 +61,7 @@ public struct TripActivityAttributes: ActivityAttributes, Sendable {
       duration: Duration = .seconds(0),
       distance: Measurement<UnitLength> = .init(value: 0.0, unit: .kilometers),
       energy: Measurement<UnitEnergy>? = nil,
-//      efficiency: Measurement<UnitEnergyEfficiency>? = nil,
+      efficiency: Measurement<UnitEnergyEfficiency>? = nil,
       elevation: Measurement<UnitLength>? = nil,
       rangeConsumed: Measurement<UnitLength>? = nil,
       windSock: WindSock? = nil
@@ -69,6 +70,7 @@ public struct TripActivityAttributes: ActivityAttributes, Sendable {
       self.duration = duration
       self.distance = distance
       self.energy = energy
+      self.efficiency = efficiency
       self.elevation = elevation
       self.rangeConsumed = rangeConsumed
       self.windSock = windSock

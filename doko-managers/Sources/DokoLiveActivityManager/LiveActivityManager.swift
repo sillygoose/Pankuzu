@@ -9,7 +9,7 @@ import DokoSharing
 @MainActor
 public final class LiveActivityManager {
   public static let shared = LiveActivityManager()
-  
+
   private init() {
     endOrphanedActivities()
     startAccessoryNameObservation()
@@ -32,25 +32,25 @@ public final class LiveActivityManager {
       }
     }
   }
-  
+
   private enum AnyManagedActivity {
     case trip(Activity<TripActivityAttributes>)
     case charge(Activity<ChargeActivityAttributes>)
-    
+
     var id: String {
       switch self {
       case .trip(let trip): return trip.id
       case .charge(let charge): return charge.id
       }
     }
-    
+
     func endImmediately() async {
       switch self {
       case .trip(let activity):
         let final = TripActivityAttributes.ContentState(tripState: .ended)
         let content = ActivityContent(state: final, staleDate: nil)
         await activity.end(content, dismissalPolicy: .immediate)
-        
+
       case .charge(let activity):
         let final = ChargeActivityAttributes.ContentState(chargeState: .ended)
         let content = ActivityContent(state: final, staleDate: nil)
@@ -58,16 +58,16 @@ public final class LiveActivityManager {
       }
     }
   }
-  
+
   private var managedActivity: AnyManagedActivity?
-  
+
   private enum PendingActivity {
     case trip
     case charge
   }
-  
+
   private var pendingActivity: PendingActivity?
-  
+
   private func startForegroundObservation() {
     Task {
       for await _ in NotificationCenter.default.notifications(named: Notification.Name("UIApplicationDidBecomeActiveNotification")) {
@@ -80,7 +80,7 @@ public final class LiveActivityManager {
       }
     }
   }
-  
+
   private func startAccessoryNameObservation() {
     @Shared(.connectedAccessoryName) var observedAccessoryName
     Task { [weak self] in
@@ -100,7 +100,7 @@ public final class LiveActivityManager {
       }
     }
   }
-  
+
   public func startTrip() async {
     @Dependency(\.date.now) var now
     guard ActivityAuthorizationInfo().areActivitiesEnabled else {
@@ -126,7 +126,7 @@ public final class LiveActivityManager {
     self.managedActivity = .trip(activity)
     DokoLogging.shared.postLoggingResponse(.liveActivity(".startTrip"))
   }
-  
+
   public func updateTrip(state: TripActivityAttributes.ContentState, staleAfter seconds: TimeInterval = 60) async {
     @Dependency(\.date.now) var now
     if pendingActivity == .trip { return }
@@ -138,7 +138,7 @@ public final class LiveActivityManager {
     await activity.update(content)
     DokoLogging.shared.postLoggingResponse(.liveActivity(".updateTrip"))
   }
-  
+
   public func endTrip(state: TripActivityAttributes.ContentState, removeAfter seconds: TimeInterval = 15) async {
     @Dependency(\.date.now) var now
     if pendingActivity == .trip { pendingActivity = nil; return }
@@ -146,17 +146,16 @@ public final class LiveActivityManager {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.endTrip: no activity"))
       return
     }
-    let content = ActivityContent(state: state, staleDate: now.addingTimeInterval(seconds))
-    await activity.update(content)
-    DokoLogging.shared.postLoggingResponse(.liveActivity(".updateTrip"))
-//    await activity.update(ActivityContent(state: endedState, staleDate: nil))
-    try? await Task.sleep(for: .seconds(30))
-    await activity.end(ActivityContent(state: state, staleDate: nil), dismissalPolicy: .after(now.addingTimeInterval(seconds)))
     self.managedActivity = nil
     self.pendingActivity = nil
+    await activity.update(ActivityContent(state: state, staleDate: now.addingTimeInterval(seconds)))
     DokoLogging.shared.postLoggingResponse(.liveActivity(".endTrip"))
+    Task {
+      try? await Task.sleep(for: .seconds(30))
+      await activity.end(ActivityContent(state: state, staleDate: nil), dismissalPolicy: .after(now.addingTimeInterval(seconds)))
+    }
   }
-  
+
   public func startCharge() async {
     @Dependency(\.date.now) var now
     guard ActivityAuthorizationInfo().areActivitiesEnabled else {
@@ -182,7 +181,7 @@ public final class LiveActivityManager {
     self.managedActivity = .charge(activity)
     DokoLogging.shared.postLoggingResponse(.liveActivity(".startCharge"))
   }
-  
+
   public func updateCharge(state: ChargeActivityAttributes.ContentState, staleAfter seconds: TimeInterval = 60) async {
     @Dependency(\.date.now) var now
     if pendingActivity == .charge { return }
@@ -194,7 +193,7 @@ public final class LiveActivityManager {
     await activity.update(content)
     DokoLogging.shared.postLoggingResponse(.liveActivity(".updateCharge"))
   }
-  
+
   public func endCharge(removeAfter seconds: TimeInterval = 15) async {
     if pendingActivity == .charge { pendingActivity = nil; return }
     guard case .charge(let activity)? = managedActivity else {
@@ -202,12 +201,14 @@ public final class LiveActivityManager {
       return
     }
     @Dependency(\.date.now) var now
-    let endedState = ChargeActivityAttributes.ContentState(chargeState: .ended)
-    await activity.update(ActivityContent(state: endedState, staleDate: nil))
-    try? await Task.sleep(for: .seconds(30))
-    await activity.end(ActivityContent(state: endedState, staleDate: nil), dismissalPolicy: .after(now.addingTimeInterval(seconds)))
     self.managedActivity = nil
     self.pendingActivity = nil
+    let endedState = ChargeActivityAttributes.ContentState(chargeState: .ended)
+    await activity.update(ActivityContent(state: endedState, staleDate: nil))
     DokoLogging.shared.postLoggingResponse(.liveActivity(".endCharge"))
+    Task {
+      try? await Task.sleep(for: .seconds(30))
+      await activity.end(ActivityContent(state: endedState, staleDate: nil), dismissalPolicy: .after(now.addingTimeInterval(seconds)))
+    }
   }
 }

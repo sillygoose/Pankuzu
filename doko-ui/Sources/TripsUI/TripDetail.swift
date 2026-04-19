@@ -4,6 +4,7 @@ import MapKit
 
 import Sharing
 
+import DokoLiveActivityManager
 import DokoLocationManager
 import DokoVehicleManager
 import DokoSchema

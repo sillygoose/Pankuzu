@@ -233,6 +233,10 @@ public final class DokoStateEngine {
                     duration: .seconds(finalizedTrip.duration),
                     distance: Measurement(value: finalizedTrip.distance, unit: UnitLength.kilometers).converted(to: appSettings.metric ? .kilometers : .miles),
                     energy: finalizedTrip.energy.map { Measurement(value: $0, unit: UnitEnergy.kilowattHours) },
+                    efficiency: finalizedTrip.energy.map { energy in
+                      Measurement(value: finalizedTrip.distance / energy, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
+                        .converted(to: appSettings.metric ? appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour)
+                    },
                     rangeConsumed: finalizedTrip.range.map { Measurement(value: $0, unit: UnitLength.kilometers).converted(to: appSettings.metric ? .kilometers : .miles) },
                   )
                 )

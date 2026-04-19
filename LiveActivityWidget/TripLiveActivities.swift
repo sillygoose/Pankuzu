@@ -14,6 +14,7 @@ extension TripLiveActivityFonts {
   var laUnit: Font   { activityFamily == .small ? DesignTokens.Font.slaUnit   : DesignTokens.Font.mlaUnit   }
   var laTitle: Font  { activityFamily == .small ? DesignTokens.Font.slaTitle  : DesignTokens.Font.mlaTitle  }
   var laLabel: Font  { activityFamily == .small ? DesignTokens.Font.slaLabel  : DesignTokens.Font.mlaLabel  }
+  var laIconFrame: Double  { activityFamily == .small ? 36 : 60 }
   var laArrowFrame: Double  { activityFamily == .small ? 36 : 60 }
 }
 
@@ -38,7 +39,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
 
     var body: some View {
       HStack(alignment: .center) {
-        DokoWidgetIcon()
+        DokoWidgetIcon(height: laIconFrame)
         Spacer()
         Text("Trip Starting")
           .foregroundStyle(DesignTokens.Color.primary)
@@ -60,7 +61,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
       let windSock = context.state.windSock
 
       HStack(alignment: .center) {
-        DokoWidgetIcon()
+        DokoWidgetIcon(height: laIconFrame)
         Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
           GridRow(alignment: .lastTextBaseline) {
             Image(systemName: "clock")
@@ -129,11 +130,12 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
       let duration = context.state.duration
       let distance = context.state.distance
       let energy = context.state.energy
+      let efficiency = context.state.efficiency
 
       HStack(alignment: .center) {
         VStack {
           HStack {
-            DokoWidgetIcon()
+            DokoWidgetIcon(height: laIconFrame)
             Spacer()
             Text("Trip Ended")
               .font(laValue)
@@ -168,11 +170,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
             Spacer()
             Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
               if let energy {
-//                let efficiency = energy.value > 0.0 ? distance.value / energy.value : 0.0
                 GridRow(alignment: .lastTextBaseline) {
-//                  Image(systemName: "bolt.circle.fill")
-//                    .font(laSymbol)
-//                    .gridColumnAlignment(.leading)
                   Text(String(format: "%.1f", energy.value))
                     .font(laValue.monospacedDigit())
                     .gridColumnAlignment(.trailing)
@@ -181,19 +179,18 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
                     .gridColumnAlignment(.leading)
                 }
                 .foregroundStyle(DesignTokens.Color.energy)
-
-//                GridRow(alignment: .lastTextBaseline) {
-////                  Image(systemName: "ev.charger")
-////                    .font(laSymbol)
-////                    .gridColumnAlignment(.leading)
-//                  Text(String(format: "%.1f", efficiency))
-//                    .font(laValue.monospacedDigit())
-//                    .gridColumnAlignment(.trailing)
-//                  Text("km/kWh") //Text(efficiency.unit.symbol)
-//                    .font(laUnit)
-//                    .gridColumnAlignment(.leading)
-//                }
-//                .foregroundStyle(DesignTokens.Color.efficiency)
+              }
+              
+              if let efficiency {
+                GridRow(alignment: .lastTextBaseline) {
+                  Text(String(format: "%.1f", efficiency.value))
+                    .font(laValue.monospacedDigit())
+                    .gridColumnAlignment(.trailing)
+                  Text(efficiency.unit.symbol)
+                    .font(laUnit)
+                    .gridColumnAlignment(.leading)
+                }
+                .foregroundStyle(DesignTokens.Color.efficiency)
               }
             }
 
@@ -329,6 +326,7 @@ extension TripActivityAttributes.ContentState {
       duration: .seconds(1000),
       distance: .init(value: 22.0, unit: .kilometers),
       energy: .init(value: 7.5, unit: .kilowattHours),
+      efficiency: .init(value: 2.93, unit: .kilometersPerKilowattHour),
       rangeConsumed: .init(value: 20.4, unit: .kilometers),
     )
   }
