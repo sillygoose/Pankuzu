@@ -83,7 +83,7 @@ extension Trip {
   public static func postTripEndRecord(
     tripDraft: Trip.Draft,
     tripEndResponse: DokoResponsePacket
-  ) throws {
+  ) throws  -> Trip.Draft {
     guard
       let position = tripEndResponse.position,
       let odometer = tripEndResponse.odometer
@@ -132,10 +132,13 @@ extension Trip {
         try Trip.upsert { tripDraft }.fetchOne(db)
       }
     }
-    guard let tripID = tripDraft.id else { return }
+    guard let tripID = tripDraft.id else {
+      return tripDraft
+    }
     try? postTripDataRecord(tripID: tripID, tripDataPacket: tripEndResponse)
     try? postTripWeatherRecord(tripID: tripID, tripWeatherPacket: tripEndResponse)
     try? postTripPositionRecord(tripID: tripID, tripPositionPacket: tripEndResponse)
+    return tripDraft
   }
 
   public static func postTripUpdateRecord(

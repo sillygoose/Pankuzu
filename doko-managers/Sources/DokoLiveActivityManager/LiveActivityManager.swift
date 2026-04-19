@@ -139,17 +139,19 @@ public final class LiveActivityManager {
     DokoLogging.shared.postLoggingResponse(.liveActivity(".updateTrip"))
   }
   
-  public func endTrip(removeAfter seconds: TimeInterval = 15) async {
+  public func endTrip(state: TripActivityAttributes.ContentState, removeAfter seconds: TimeInterval = 15) async {
     @Dependency(\.date.now) var now
     if pendingActivity == .trip { pendingActivity = nil; return }
     guard case .trip(let activity)? = managedActivity else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.endTrip: no activity"))
       return
     }
-    let endedState = TripActivityAttributes.ContentState(tripState: .ended)
-    await activity.update(ActivityContent(state: endedState, staleDate: nil))
+    let content = ActivityContent(state: state, staleDate: now.addingTimeInterval(seconds))
+    await activity.update(content)
+    DokoLogging.shared.postLoggingResponse(.liveActivity(".updateTrip"))
+//    await activity.update(ActivityContent(state: endedState, staleDate: nil))
     try? await Task.sleep(for: .seconds(30))
-    await activity.end(ActivityContent(state: endedState, staleDate: nil), dismissalPolicy: .after(now.addingTimeInterval(seconds)))
+    await activity.end(ActivityContent(state: state, staleDate: nil), dismissalPolicy: .after(now.addingTimeInterval(seconds)))
     self.managedActivity = nil
     self.pendingActivity = nil
     DokoLogging.shared.postLoggingResponse(.liveActivity(".endTrip"))

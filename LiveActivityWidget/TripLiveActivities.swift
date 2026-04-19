@@ -126,13 +126,80 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
     @Environment(\.activityFamily) var activityFamily
 
     var body: some View {
+      let duration = context.state.duration
+      let distance = context.state.distance
+      let energy = context.state.energy
+
       HStack(alignment: .center) {
-        DokoWidgetIcon()
-        Spacer()
-        Text("Trip Ending")
-          .foregroundStyle(DesignTokens.Color.primary)
+        VStack {
+          HStack {
+            DokoWidgetIcon()
+            Spacer()
+            Text("Trip Ended")
+              .font(laValue)
+              .foregroundStyle(DesignTokens.Color.primary)
+          }
+          
+          HStack {
+            Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
+              GridRow(alignment: .lastTextBaseline) {
+                Image(systemName: "clock")
+                  .font(laSymbol)
+                  .gridColumnAlignment(.leading)
+                Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
+                  .font(laValue.monospacedDigit())
+                  .gridColumnAlignment(.trailing)
+              }
+              .foregroundStyle(DesignTokens.Color.duration)
+
+              GridRow(alignment: .lastTextBaseline) {
+                Image(systemName: "road.lanes")
+                  .font(laSymbol)
+                  .gridColumnAlignment(.leading)
+                Text(String(format: "%5.1f", distance.value))
+                  .font(laValue.monospacedDigit())
+                  .gridColumnAlignment(.trailing)
+                Text(distance.unit.symbol)
+                  .font(laUnit)
+                  .gridColumnAlignment(.leading)
+              }
+              .foregroundStyle(DesignTokens.Color.distance)
+            }
+            Spacer()
+            Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
+              if let energy {
+//                let efficiency = energy.value > 0.0 ? distance.value / energy.value : 0.0
+                GridRow(alignment: .lastTextBaseline) {
+//                  Image(systemName: "bolt.circle.fill")
+//                    .font(laSymbol)
+//                    .gridColumnAlignment(.leading)
+                  Text(String(format: "%.1f", energy.value))
+                    .font(laValue.monospacedDigit())
+                    .gridColumnAlignment(.trailing)
+                  Text(energy.unit.symbol)
+                    .font(laUnit)
+                    .gridColumnAlignment(.leading)
+                }
+                .foregroundStyle(DesignTokens.Color.energy)
+
+//                GridRow(alignment: .lastTextBaseline) {
+////                  Image(systemName: "ev.charger")
+////                    .font(laSymbol)
+////                    .gridColumnAlignment(.leading)
+//                  Text(String(format: "%.1f", efficiency))
+//                    .font(laValue.monospacedDigit())
+//                    .gridColumnAlignment(.trailing)
+//                  Text("km/kWh") //Text(efficiency.unit.symbol)
+//                    .font(laUnit)
+//                    .gridColumnAlignment(.leading)
+//                }
+//                .foregroundStyle(DesignTokens.Color.efficiency)
+              }
+            }
+
+          }
+        }
       }
-      .font(laTitle)
       .padding()
     }
   }
@@ -257,7 +324,13 @@ extension TripActivityAttributes.ContentState {
   }
 
   fileprivate static var ended: TripActivityAttributes.ContentState {
-    TripActivityAttributes.ContentState(tripState: .ended)
+    TripActivityAttributes.ContentState(
+      tripState: .ended,
+      duration: .seconds(1000),
+      distance: .init(value: 22.0, unit: .kilometers),
+      energy: .init(value: 7.5, unit: .kilowattHours),
+      rangeConsumed: .init(value: 20.4, unit: .kilometers),
+    )
   }
 }
 

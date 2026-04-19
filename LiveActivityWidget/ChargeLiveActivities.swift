@@ -65,7 +65,6 @@ struct ChargeLiveActivities: View, ChargeLiveActivityFonts {
 
       HStack(alignment: .center) {
         DokoWidgetIcon()
-        //Spacer()
         HStack {
           Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
             GridRow(alignment: .lastTextBaseline) {

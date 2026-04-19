@@ -19,6 +19,8 @@ public enum DesignTokens {
     public static let rangeOver = SwiftUI.Color.red
     public static let charging = SwiftUI.Color.green
     public static let power = SwiftUI.Color.orange
+    public static let energy = SwiftUI.Color.red
+    public static let efficiency = SwiftUI.Color.green
     public static let voltage = SwiftUI.Color.purple
     public static let current = SwiftUI.Color.cyan
     public static let weather = SwiftUI.Color.white

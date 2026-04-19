@@ -225,9 +225,17 @@ public final class DokoStateEngine {
             var nextState = dokoResponsePacket.nextState ?? .tripEnding
             if nextState == .idle {
               do {
-                try Trip.postTripEndRecord(tripDraft: tripDraft, tripEndResponse: dokoResponsePacket)
+                let finalizedTrip = try Trip.postTripEndRecord(tripDraft: tripDraft, tripEndResponse: dokoResponsePacket)
                 await CoreLocationManager.shared.stopLocationUpdates()
-                await LiveActivityManager.shared.endTrip()
+                await LiveActivityManager.shared.endTrip(
+                  state: TripActivityAttributes.ContentState(
+                    tripState: .ended,
+                    duration: .seconds(finalizedTrip.duration),
+                    distance: Measurement(value: finalizedTrip.distance, unit: UnitLength.kilometers).converted(to: appSettings.metric ? .kilometers : .miles),
+                    energy: finalizedTrip.energy.map { Measurement(value: $0, unit: UnitEnergy.kilowattHours) },
+                    rangeConsumed: finalizedTrip.range.map { Measurement(value: $0, unit: UnitLength.kilometers).converted(to: appSettings.metric ? .kilometers : .miles) },
+                  )
+                )
                 self.tripInProgress = nil
                 $activeSession.withLock { $0 = nil }
               } catch {
