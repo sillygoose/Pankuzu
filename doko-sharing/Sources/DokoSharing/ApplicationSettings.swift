@@ -2,6 +2,12 @@ import Foundation
 import SwiftUI
 import MapKit
 
+public let pankuzuAppGroup = "group.com.unchan.pankuzu.Pankuzu"
+
+extension UserDefaults {
+  nonisolated(unsafe) public static let pankuzu = UserDefaults(suiteName: pankuzuAppGroup)!
+}
+
 public struct AppSettings: Codable, Equatable, Sendable {
   public var backgroundMode: Bool = false
   public var accessorySerialNumber: String? = nil
@@ -116,7 +122,7 @@ extension AppSettings: RawRepresentable {
 
 extension SharedKey where Self == AppStorageKey<AppSettings>.Default {
   public static var appSettings: Self {
-    Self[.appStorage("AppSettings"), default: AppSettings()]
+    Self[.appStorage("AppSettings", store: .pankuzu), default: AppSettings()]
   }
 }
 
@@ -124,29 +130,30 @@ extension AppSettings {
   /// One-time migration from individual UserDefaults keys to the unified AppSettings key.
   /// Call once during app bootstrap before any @Shared(.appSettings) accesses.
   public static func migrateIfNeeded() {
-    let defaults = UserDefaults.standard
+    let defaults = UserDefaults.pankuzu
     guard defaults.object(forKey: "AppSettings") == nil else { return }
 
+    let standard = UserDefaults.standard
     var s = AppSettings()
-    if let v = defaults.object(forKey: "ObdLinkManager-BackgroundMode") as? Bool { s.backgroundMode = v }
-    if let v = defaults.string(forKey: "ObdLinkManager-AccessorySerialNumber") { s.accessorySerialNumber = v }
-    if let v = defaults.object(forKey: "ApplicationSettings-metric") as? Bool { s.metric = v }
-    if let v = defaults.object(forKey: "ApplicationSettings-kWhPer100km") as? Bool { s.kWhPer100km = v }
-    if let v = defaults.object(forKey: "ApplicationSettings-iCloudSync") as? Bool { s.iCloudSync = v }
-    if let v = defaults.object(forKey: "ApplicationSettings-poiThreshold") as? Double { s.poiThreshold = v }
-    if let v = defaults.object(forKey: "ApplicationSettings-duplicateLocationThreshold") as? Double { s.duplicateLocationThreshold = v }
-    if let v = defaults.string(forKey: "ApplicationSettings-tripMapStyle").flatMap(DisplayMapStyle.init) { s.tripMapStyle = v }
-    if let v = defaults.string(forKey: "ApplicationSettings-chargeMapStyle").flatMap(DisplayMapStyle.init) { s.chargeMapStyle = v }
-    if let v = defaults.object(forKey: "ApplicationSettings-tripMapPolyline") as? Bool { s.tripMapPolyline = v }
-    if let v = defaults.object(forKey: "ApplicationSettings-showElevationOnPath") as? Bool { s.showElevationOnPath = v }
-    if let v = defaults.object(forKey: "ApplicationSettings-identicalTripPositionDistance") as? Double { s.identicalTripPositionDistance = v }
-    if let v = defaults.object(forKey: "ApplicationSettings-positionCourseDeviation") as? Double { s.tripPositionCourseDeviation = v }
-    if let v = defaults.object(forKey: "ApplicationSettings-maximumTripPositionDistance") as? Double { s.maximumTripPositionDistance = v }
-    if let v = defaults.object(forKey: "ApplicationSettings-maximumTripElevationDistance") as? Double { s.maximumTripElevationDistance = v }
-    if let v = defaults.object(forKey: "ApplicationSettings-minimumTripElevationChange") as? Double { s.minimumTripElevationChange = v }
-    if let v = defaults.object(forKey: "ApplicationSettings-deletedRecordRetentionDays") as? Int { s.deletedRecordRetentionDays = v }
-    if let v = defaults.object(forKey: "ABRP-enabled") as? Bool { s.abrpEnabled = v }
-    if let v = defaults.string(forKey: "ABRP-userToken") { s.abrpUserToken = v }
+    if let v = standard.object(forKey: "ObdLinkManager-BackgroundMode") as? Bool { s.backgroundMode = v }
+    if let v = standard.string(forKey: "ObdLinkManager-AccessorySerialNumber") { s.accessorySerialNumber = v }
+    if let v = standard.object(forKey: "ApplicationSettings-metric") as? Bool { s.metric = v }
+    if let v = standard.object(forKey: "ApplicationSettings-kWhPer100km") as? Bool { s.kWhPer100km = v }
+    if let v = standard.object(forKey: "ApplicationSettings-iCloudSync") as? Bool { s.iCloudSync = v }
+    if let v = standard.object(forKey: "ApplicationSettings-poiThreshold") as? Double { s.poiThreshold = v }
+    if let v = standard.object(forKey: "ApplicationSettings-duplicateLocationThreshold") as? Double { s.duplicateLocationThreshold = v }
+    if let v = standard.string(forKey: "ApplicationSettings-tripMapStyle").flatMap(DisplayMapStyle.init) { s.tripMapStyle = v }
+    if let v = standard.string(forKey: "ApplicationSettings-chargeMapStyle").flatMap(DisplayMapStyle.init) { s.chargeMapStyle = v }
+    if let v = standard.object(forKey: "ApplicationSettings-tripMapPolyline") as? Bool { s.tripMapPolyline = v }
+    if let v = standard.object(forKey: "ApplicationSettings-showElevationOnPath") as? Bool { s.showElevationOnPath = v }
+    if let v = standard.object(forKey: "ApplicationSettings-identicalTripPositionDistance") as? Double { s.identicalTripPositionDistance = v }
+    if let v = standard.object(forKey: "ApplicationSettings-positionCourseDeviation") as? Double { s.tripPositionCourseDeviation = v }
+    if let v = standard.object(forKey: "ApplicationSettings-maximumTripPositionDistance") as? Double { s.maximumTripPositionDistance = v }
+    if let v = standard.object(forKey: "ApplicationSettings-maximumTripElevationDistance") as? Double { s.maximumTripElevationDistance = v }
+    if let v = standard.object(forKey: "ApplicationSettings-minimumTripElevationChange") as? Double { s.minimumTripElevationChange = v }
+    if let v = standard.object(forKey: "ApplicationSettings-deletedRecordRetentionDays") as? Int { s.deletedRecordRetentionDays = v }
+    if let v = standard.object(forKey: "ABRP-enabled") as? Bool { s.abrpEnabled = v }
+    if let v = standard.string(forKey: "ABRP-userToken") { s.abrpUserToken = v }
 
     defaults.set(s.rawValue, forKey: "AppSettings")
   }

@@ -44,8 +44,8 @@ extension TripActivityAttributes.ContentState {
     TripActivityAttributes.ContentState(
       tripState: .starting,
       duration: .seconds(0),
-      distance: .init(value: 0, unit: .kilometers),
-      rangeConsumed: .init(value: 0, unit: .kilometers),
+      distance: 0,
+      rangeConsumed: 0,
       windSock: WindSock(
         course: .init(value: 90, unit: .degrees),
         temperature: .init(value: 15, unit: .celsius),
@@ -61,8 +61,8 @@ extension TripActivityAttributes.ContentState {
     TripActivityAttributes.ContentState(
       tripState: .active,
       duration: .seconds(3661),
-      distance: .init(value: 42.5, unit: .kilometers),
-      rangeConsumed: .init(value: 48.2, unit: .kilometers),
+      distance: 42.5,
+      rangeConsumed: 48.2,
       windSock: WindSock(
         course: .init(value: 180, unit: .degrees),
         temperature: .init(value: 15, unit: .celsius),
@@ -78,8 +78,8 @@ extension TripActivityAttributes.ContentState {
     TripActivityAttributes.ContentState(
       tripState: .ended,
       duration: .seconds(7200),
-      distance: .init(value: 85.0, unit: .kilometers),
-      rangeConsumed: .init(value: 92.0, unit: .kilometers)
+      distance: 85.0,
+      rangeConsumed: 92.0,
     )
   }
 }

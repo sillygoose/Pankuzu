@@ -2,6 +2,7 @@
 import SwiftUI
 import WidgetKit
 
+import DokoSharing
 import DokoLiveActivityManager
 
 private protocol TripLiveActivityFonts: View {
@@ -52,6 +53,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
   private struct ActiveView: View, TripLiveActivityFonts {
     let context: ActivityViewContext<TripActivityAttributes>
     @Environment(\.activityFamily) var activityFamily
+    @Shared(.appSettings) var appSettings
 
     var body: some View {
       let duration = context.state.duration
@@ -73,9 +75,10 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
               .font(laValue.monospacedDigit())
               .foregroundStyle(DesignTokens.Color.duration)
               .gridColumnAlignment(.trailing)
-//            Color.clear.frame(width: 0)
           }
           GridRow(alignment: .lastTextBaseline) {
+            let distance = Measurement(value: distance, unit: UnitLength.kilometers)
+              .converted(to: appSettings.metric ? .kilometers : .miles)
             Image(systemName: "road.lanes")
               .font(laSymbol)
               .foregroundStyle(DesignTokens.Color.distance)
@@ -90,6 +93,8 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
               .gridColumnAlignment(.leading)
           }
           if let elevation {
+            let elevation = Measurement(value: elevation, unit: UnitLength.meters)
+              .converted(to: appSettings.metric ? .meters : .feet)
             GridRow(alignment: .lastTextBaseline) {
               Image(systemName: "mountain.2")
                 .font(laSymbol)
@@ -107,8 +112,8 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
           }
         }
 
+        Spacer()
         if let windSock {
-          Spacer()
           WindIndicator(
             temperature: windSock.temperature,
             conditions: windSock.conditions,
@@ -123,15 +128,15 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
     }
   }
 
-  private struct EndedView: View, TripLiveActivityFonts {
+  private struct  : View, TripLiveActivityFonts {
     let context: ActivityViewContext<TripActivityAttributes>
     @Environment(\.activityFamily) var activityFamily
+    @Shared(.appSettings) var appSettings
 
     var body: some View {
       let duration = context.state.duration
       let distance = context.state.distance
       let energy = context.state.energy
-      let efficiency = context.state.efficiency
 
       HStack(alignment: .center) {
         VStack {
@@ -156,6 +161,8 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
               .foregroundStyle(DesignTokens.Color.duration)
 
               GridRow(alignment: .lastTextBaseline) {
+                let distance = Measurement(value: distance, unit: UnitLength.kilometers)
+                  .converted(to: appSettings.metric ? .kilometers : .miles)
                 Image(systemName: "road.lanes")
                   .font(laSymbol)
                   .gridColumnAlignment(.leading)
@@ -171,6 +178,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
             Spacer()
             Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
               if let energy {
+                let energy = Measurement(value: energy, unit: UnitEnergy.kilowattHours)
                 GridRow(alignment: .lastTextBaseline) {
                   Text(String(format: "%.1f", energy.value))
                     .font(laValue.monospacedDigit())
@@ -182,7 +190,10 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
                 .foregroundStyle(DesignTokens.Color.energy)
               }
               
-              if let efficiency {
+              if let energy {
+                let kmPerkWh = distance / energy
+                let efficiency = Measurement(value: kmPerkWh, unit: UnitEnergyEfficiency.kilowattHoursPer100Kilometers)
+                  .converted(to: appSettings.metric ? appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour)
                 GridRow(alignment: .lastTextBaseline) {
                   Text(String(format: "%.1f", efficiency.value))
                     .font(laValue.monospacedDigit())
@@ -194,7 +205,6 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
                 .foregroundStyle(DesignTokens.Color.efficiency)
               }
             }
-
           }
         }
       }
@@ -263,9 +273,9 @@ extension TripActivityAttributes.ContentState {
     TripActivityAttributes.ContentState(
       tripState: .active,
       duration: .seconds(1000),
-      distance: .init(value: 22.0, unit: .kilometers),
-      elevation: .init(value: 322.5, unit: .meters),
-      rangeConsumed: .init(value: 26.4, unit: .kilometers),
+      distance: 22.0,
+      elevation: 322.5,
+      rangeConsumed: 26.4,
       windSock: WindSock(
         course: .init(value: 90, unit: .degrees),
         temperature: .init(value: 15, unit: .celsius),
@@ -281,9 +291,9 @@ extension TripActivityAttributes.ContentState {
     TripActivityAttributes.ContentState(
       tripState: .active,
       duration: .seconds(1000),
-      distance: .init(value: 22.0, unit: .kilometers),
-      elevation: .init(value: 322.5, unit: .meters),
-      rangeConsumed: .init(value: 20.4, unit: .kilometers),
+      distance: 22.0,
+      elevation: 322.5,
+      rangeConsumed: 20.4,
       windSock: WindSock(
         course: .init(value: 180, unit: .degrees),
         temperature: .init(value: 15.678, unit: .celsius),
@@ -295,40 +305,13 @@ extension TripActivityAttributes.ContentState {
     )
   }
 
-  fileprivate static var noRange: TripActivityAttributes.ContentState {
-    TripActivityAttributes.ContentState(
-      tripState: .active,
-      duration: .seconds(600),
-      distance: .init(value: 22.0, unit: .kilometers),
-      rangeConsumed: nil,
-      windSock: WindSock(
-        course: .init(value: 0, unit: .degrees),
-        temperature: .init(value: 15.456, unit: .celsius),
-        conditions: "cloud.rain.fill",
-        windSpeed: .init(value: 20.56789, unit: .metersPerSecond),
-        windDirection: .init(value: 0.2345, unit: .degrees),
-        windCompassDirection: "N"
-      )
-    )
-  }
-
-  fileprivate static var noWind: TripActivityAttributes.ContentState {
-    TripActivityAttributes.ContentState(
-      tripState: .active,
-      duration: .seconds(1000),
-      distance: .init(value: 22.0, unit: .kilometers),
-      rangeConsumed: nil
-    )
-  }
-
   fileprivate static var ended: TripActivityAttributes.ContentState {
     TripActivityAttributes.ContentState(
       tripState: .ended,
       duration: .seconds(1000),
-      distance: .init(value: 22.0, unit: .kilometers),
-      energy: .init(value: 7.5, unit: .kilowattHours),
-      efficiency: .init(value: 2.93, unit: .kilometersPerKilowattHour),
-      rangeConsumed: .init(value: 20.4, unit: .kilometers),
+      distance: 22.0,
+      energy: 7.5,
+      rangeConsumed: 20.4,
     )
   }
 }
@@ -339,8 +322,6 @@ extension TripActivityAttributes.ContentState {
   TripActivityAttributes.ContentState.starting
   TripActivityAttributes.ContentState.tailWind
   TripActivityAttributes.ContentState.headWind
-  //  TripActivityAttributes.ContentState.noRange
-  //  TripActivityAttributes.ContentState.noWind
   TripActivityAttributes.ContentState.ended
 }
 
