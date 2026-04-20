@@ -192,7 +192,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
               
               if let energy {
                 let kmPerkWh = distance / energy
-                let efficiency = Measurement(value: kmPerkWh, unit: UnitEnergyEfficiency.kilowattHoursPer100Kilometers)
+                let efficiency = Measurement(value: kmPerkWh, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
                   .converted(to: appSettings.metric ? appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour)
                 GridRow(alignment: .lastTextBaseline) {
                   Text(String(format: "%.1f", efficiency.value))
