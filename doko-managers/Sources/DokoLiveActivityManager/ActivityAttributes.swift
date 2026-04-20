@@ -97,28 +97,31 @@ public struct ChargeActivityAttributes: ActivityAttributes, Sendable {
 
     public let chargeState: ChargeState
     public let duration: Duration
-    public let stateOfCharge: Measurement<UnitPercent>
-    public let rangeAdded: Measurement<UnitLength>?
-    public let measuredPower: Measurement<UnitPower>?
-    public let batteryVoltage: Measurement<UnitElectricPotentialDifference>?
-    public let batteryCurrent: Measurement<UnitElectricCurrent>?
-    public let batteryTemperature: Measurement<UnitTemperature>?
-    public let couplerTemperature: Measurement<UnitTemperature>?
+    public let stateOfCharge: Double?
+    public let energy: Double?
+    public let rangeAdded: Double?
+    public let measuredPower: Double?
+    public let batteryVoltage: Double?
+    public let batteryCurrent: Double?
+    public let batteryTemperature: Double?
+    public let couplerTemperature: Double?
 
     public init(
       chargeState: ChargeState,
       duration: Duration = .seconds(0),
-      stateOfCharge: Measurement<UnitPercent> = .init(value: 0.0, unit: .percent),
-      rangeAdded: Measurement<UnitLength>? = nil,
-      measuredPower: Measurement<UnitPower>? = nil,
-      batteryVoltage: Measurement<UnitElectricPotentialDifference>? = nil,
-      batteryCurrent: Measurement<UnitElectricCurrent>? = nil,
-      batteryTemperature: Measurement<UnitTemperature>? = nil,
-      couplerTemperature: Measurement<UnitTemperature>? = nil,
+      stateOfCharge: Double? = nil,
+      energy: Double? = nil,
+      rangeAdded: Double? = nil,
+      measuredPower: Double? = nil,
+      batteryVoltage: Double? = nil,
+      batteryCurrent: Double? = nil,
+      batteryTemperature: Double? = nil,
+      couplerTemperature: Double? = nil,
     ) {
       self.chargeState = chargeState
       self.duration = duration
       self.stateOfCharge = stateOfCharge
+      self.energy = energy
       self.rangeAdded = rangeAdded
       self.measuredPower = measuredPower
       self.batteryVoltage = batteryVoltage

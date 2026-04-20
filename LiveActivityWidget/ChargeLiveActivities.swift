@@ -2,6 +2,7 @@
 import SwiftUI
 import WidgetKit
 
+import DokoSharing
 import DokoLiveActivityManager
 
 private protocol ChargeLiveActivityFonts: View {
@@ -19,9 +20,9 @@ extension ChargeLiveActivityFonts {
 
 struct ChargeLiveActivities: View, ChargeLiveActivityFonts {
   let context: ActivityViewContext<ChargeActivityAttributes>
-
+  
   @Environment(\.activityFamily) var activityFamily
-
+  
   var body: some View {
     switch context.state.chargeState {
     case .starting:
@@ -32,14 +33,14 @@ struct ChargeLiveActivities: View, ChargeLiveActivityFonts {
       EndedView(context: context)
     }
   }
-
+  
   private struct StartingView: View, ChargeLiveActivityFonts {
     let context: ActivityViewContext<ChargeActivityAttributes>
     @Environment(\.activityFamily) var activityFamily
-
+    
     var body: some View {
       HStack(alignment: .center) {
-        DokoWidgetIcon()
+        DokoWidgetIcon(height: laIconFrame)
         Spacer()
         Text("Charge Starting")
           .foregroundStyle(DesignTokens.Color.primary)
@@ -48,23 +49,138 @@ struct ChargeLiveActivities: View, ChargeLiveActivityFonts {
       .padding()
     }
   }
-
+  
   private struct ActiveView: View, ChargeLiveActivityFonts {
     let context: ActivityViewContext<ChargeActivityAttributes>
+    
     @Environment(\.activityFamily) var activityFamily
-
+    
+    @Shared(.appSettings) var appSettings
+    
     var body: some View {
       let duration = context.state.duration
-      //      let stateOfCharge = context.state.stateOfCharge
-      //      let rangeAdded = context.state.rangeAdded
       let measuredPower = context.state.measuredPower
       let batteryVoltage = context.state.batteryVoltage
       let batteryCurrent = context.state.batteryCurrent
       let batteryTemperature = context.state.batteryTemperature
       let couplerTemperature = context.state.couplerTemperature
-
+      
       HStack(alignment: .center) {
-        DokoWidgetIcon()
+        DokoWidgetIcon(height: laIconFrame)
+        HStack {
+          Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
+            GridRow(alignment: .lastTextBaseline) {
+              Image(systemName: "clock")
+                .font(laSymbol)
+                .gridColumnAlignment(.leading)
+              Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
+                .font(laValue.monospacedDigit())
+                .gridColumnAlignment(.trailing)
+            }
+            .foregroundStyle(DesignTokens.Color.duration)
+            
+            if let batteryTemperature {
+              let batteryTemperature = Measurement(value: batteryTemperature, unit: UnitTemperature.celsius)
+                .converted(to: appSettings.metric ? .celsius : .fahrenheit)
+              GridRow(alignment: .lastTextBaseline) {
+                Image(systemName: "batteryblock.stack")
+                  .font(laSymbol)
+                  .gridColumnAlignment(.leading)
+                Text(String(format: "%.0f", batteryTemperature.value))
+                  .font(laValue.monospacedDigit())
+                  .gridColumnAlignment(.trailing)
+                Text(batteryTemperature.unit.symbol)
+                  .font(laUnit)
+                  .gridColumnAlignment(.leading)
+              }
+              .foregroundStyle(DesignTokens.Color.batteryTemperature)
+            }
+            if let couplerTemperature {
+              let couplerTemperature = Measurement(value: couplerTemperature, unit: UnitTemperature.celsius)
+                .converted(to: appSettings.metric ? .celsius : .fahrenheit)
+              GridRow(alignment: .lastTextBaseline) {
+                Image(systemName: "ev.plug.dc.ccs1")
+                  .font(laSymbol)
+                  .gridColumnAlignment(.leading)
+                Text(String(format: "%.0f", couplerTemperature.value))
+                  .font(laValue.monospacedDigit())
+                  .gridColumnAlignment(.trailing)
+                Text(couplerTemperature.unit.symbol)
+                  .font(laUnit)
+                  .gridColumnAlignment(.leading)
+              }
+              .foregroundStyle(DesignTokens.Color.couplerTemperature)
+            }
+          }
+          
+          Spacer()
+          
+          Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
+            if let batteryVoltage {
+              let batteryVoltage = Measurement(value: batteryVoltage, unit: UnitElectricPotentialDifference.volts)
+              GridRow(alignment: .lastTextBaseline) {
+                Text(String(format: "%5.1f", batteryVoltage.value))
+                  .font(laValue.monospacedDigit())
+                  .gridColumnAlignment(.trailing)
+                Text(batteryVoltage.unit.symbol)
+                  .font(laUnit)
+                  .gridColumnAlignment(.leading)
+              }
+              .foregroundStyle(DesignTokens.Color.voltage)
+            }
+            if let batteryCurrent {
+              let batteryCurrent = Measurement(value: batteryCurrent, unit: UnitElectricCurrent.amperes)
+              GridRow(alignment: .lastTextBaseline) {
+                Text(String(format: "%5.1f", batteryCurrent.value))
+                  .font(laValue.monospacedDigit())
+                  .gridColumnAlignment(.trailing)
+                Text(batteryCurrent.unit.symbol)
+                  .font(laUnit)
+                  .gridColumnAlignment(.leading)
+              }
+              .foregroundStyle(DesignTokens.Color.current)
+            }
+            if let measuredPower {
+              let measuredPower = Measurement(value: measuredPower, unit: UnitPower.kilowatts)
+              GridRow(alignment: .lastTextBaseline) {
+                Text(String(format: "%5.1f", measuredPower.value))
+                  .font(laValue.monospacedDigit())
+                  .gridColumnAlignment(.trailing)
+                Text(measuredPower.unit.symbol)
+                  .font(laUnit)
+                  .gridColumnAlignment(.leading)
+              }
+              .foregroundStyle(DesignTokens.Color.power)
+            }
+          }
+        }
+      }
+      .padding()
+    }
+  }
+  
+  private struct EndedView: View, ChargeLiveActivityFonts {
+    let context: ActivityViewContext<ChargeActivityAttributes>
+    
+    @Environment(\.activityFamily) var activityFamily
+    
+    @Shared(.appSettings) var appSettings
+    
+    var body: some View {
+      let duration = context.state.duration
+      let energyAdded = context.state.energy
+      let stateOfChargeAdded = context.state.stateOfCharge
+      let rangeAdded = context.state.rangeAdded
+      
+      VStack {
+        HStack {
+          DokoWidgetIcon(height: laIconFrame)
+          Spacer()
+          Text("Charge Ended")
+            .font(laValue)
+            .foregroundStyle(DesignTokens.Color.primary)
+        }
+        
         HStack {
           Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
             GridRow(alignment: .lastTextBaseline) {
@@ -77,96 +193,62 @@ struct ChargeLiveActivities: View, ChargeLiveActivityFonts {
                 .foregroundStyle(DesignTokens.Color.duration)
                 .gridColumnAlignment(.trailing)
             }
-            if let batteryTemperature {
+            
+            if let rangeAdded {
+              let rangeAdded = Measurement(value: rangeAdded, unit: UnitLength.kilometers)
+                .converted(to: appSettings.metric ? .kilometers : .miles)
               GridRow(alignment: .lastTextBaseline) {
-                Image(systemName: "batteryblock.stack")
+                Image(systemName: "road.lanes")
                   .font(laSymbol)
-                  .foregroundStyle(DesignTokens.Color.distance)
                   .gridColumnAlignment(.leading)
-                Text(String(format: "%.0f", batteryTemperature.value))
+                Text(String(format: "%+5.1f", rangeAdded.value))
                   .font(laValue.monospacedDigit())
-                  .foregroundStyle(DesignTokens.Color.vbatteryTemperature)
                   .gridColumnAlignment(.trailing)
-                Text(batteryTemperature.unit.symbol)
+                Text(rangeAdded.unit.symbol)
                   .font(laUnit)
-                  .foregroundStyle(.secondary)
                   .gridColumnAlignment(.leading)
               }
-            }
-            if let couplerTemperature {
-              GridRow(alignment: .lastTextBaseline) {
-                Image(systemName: "ev.plug.dc.ccs1")
-                  .font(laSymbol)
-                  .foregroundStyle(DesignTokens.Color.elevation)
-                  .gridColumnAlignment(.leading)
-                Text(String(format: "%.0f", couplerTemperature.value))
-                  .font(laValue.monospacedDigit())
-                  .foregroundStyle(DesignTokens.Color.couplerTemperature)
-                  .gridColumnAlignment(.trailing)
-                Text(couplerTemperature.unit.symbol)
-                  .font(laUnit)
-                  .foregroundStyle(.secondary)
-                  .gridColumnAlignment(.leading)
-              }
+              .foregroundStyle(DesignTokens.Color.rangeAdded)
             }
           }
+          
           Spacer()
+          
           Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
-            if let batteryVoltage {
+            if let stateOfChargeAdded {
+              let stateOfChargeAdded = Measurement(value: stateOfChargeAdded, unit: UnitPercent.percent)
               GridRow(alignment: .lastTextBaseline) {
-                Text(String(format: "%5.1f", batteryVoltage.value))
+                Image(systemName: "battery.75percent")
+                  .font(laSymbol)
+                  .gridColumnAlignment(.leading)
+                Text(String(format: "%+5.1f", stateOfChargeAdded.value))
                   .font(laValue.monospacedDigit())
-                  .foregroundStyle(DesignTokens.Color.voltage)
                   .gridColumnAlignment(.trailing)
-                Text(batteryVoltage.unit.symbol)
+                Text(stateOfChargeAdded.unit.symbol)
                   .font(laUnit)
-                  .foregroundStyle(.secondary)
                   .gridColumnAlignment(.leading)
               }
+              .foregroundStyle(DesignTokens.Color.stateOfCharge)
             }
-            if let batteryCurrent {
+
+            if let energyAdded {
+              let energy = Measurement(value: energyAdded, unit: UnitEnergy.kilowattHours)
               GridRow(alignment: .lastTextBaseline) {
-                Text(String(format: "%5.1f", batteryCurrent.value))
+                Image(systemName: "bolt")
+                  .font(laSymbol)
+                  .gridColumnAlignment(.leading)
+                Text(String(format: "%+5.1f", energy.value))
                   .font(laValue.monospacedDigit())
-                  .foregroundStyle(DesignTokens.Color.current)
                   .gridColumnAlignment(.trailing)
-                Text(batteryCurrent.unit.symbol)
+                Text(energy.unit.symbol)
                   .font(laUnit)
-                  .foregroundStyle(.secondary)
                   .gridColumnAlignment(.leading)
               }
-            }
-            if let measuredPower {
-              GridRow(alignment: .lastTextBaseline) {
-                Text(String(format: "%5.1f", measuredPower.value))
-                  .font(laValue.monospacedDigit())
-                  .foregroundStyle(DesignTokens.Color.power)
-                  .gridColumnAlignment(.trailing)
-                Text(measuredPower.unit.symbol)
-                  .font(laUnit)
-                  .foregroundStyle(.secondary)
-                  .gridColumnAlignment(.leading)
-              }
+              .foregroundStyle(DesignTokens.Color.energy)
             }
           }
         }
       }
-      .padding()
-    }
-  }
-
-  private struct EndedView: View, ChargeLiveActivityFonts {
-    let context: ActivityViewContext<ChargeActivityAttributes>
-    @Environment(\.activityFamily) var activityFamily
-
-    var body: some View {
-      HStack(alignment: .center) {
-        DokoWidgetIcon()
-        Spacer()
-        Text("Charge Ending")
-          .foregroundStyle(DesignTokens.Color.primary)
-      }
-      .font(laTitle)
       .padding()
     }
   }
@@ -182,23 +264,27 @@ extension ChargeActivityAttributes.ContentState {
   fileprivate static var starting: ChargeActivityAttributes.ContentState {
     ChargeActivityAttributes.ContentState(chargeState: .starting)
   }
-
-  fileprivate static var full: ChargeActivityAttributes.ContentState {
+  
+  fileprivate static var active: ChargeActivityAttributes.ContentState {
     ChargeActivityAttributes.ContentState(
       chargeState: .active,
       duration: .seconds(1200),
-      stateOfCharge: .init(value: 71.5, unit: .percent),
-      rangeAdded: .init(value: 5.0, unit: .kilometers),
-      measuredPower: .init(value: 10.0, unit: .kilowatts),
-      batteryVoltage: .init(value: 370.3, unit: .volts),
-      batteryCurrent: .init(value: 40.3, unit: .amperes),
-      batteryTemperature: .init(value: 40.3, unit: .celsius),
-      couplerTemperature: .init(value: 60.3, unit: .celsius),
+      measuredPower: 10.4,
+      batteryVoltage: 370.3,
+      batteryCurrent:  40.3,
+      batteryTemperature: 40.3,
+      couplerTemperature:  60.3,
     )
   }
-
+  
   fileprivate static var ended: ChargeActivityAttributes.ContentState {
-    ChargeActivityAttributes.ContentState(chargeState: .ended)
+    ChargeActivityAttributes.ContentState(
+      chargeState: .ended,
+      duration: .seconds(1200),
+      stateOfCharge: 47.5,
+      energy: 65.3,
+      rangeAdded: 5.0,
+    )
   }
 }
 
@@ -206,7 +292,7 @@ extension ChargeActivityAttributes.ContentState {
   ChargeLiveActivityWidget()
 } contentStates: {
   ChargeActivityAttributes.ContentState.starting
-  ChargeActivityAttributes.ContentState.full
+  ChargeActivityAttributes.ContentState.active
   ChargeActivityAttributes.ContentState.ended
 }
 

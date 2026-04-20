@@ -72,7 +72,7 @@ extension Charge {
   public static func postChargeEndRecord(
     chargeDraft: Charge.Draft,
     chargeEndResponse: DokoResponsePacket
-  ) throws {
+  ) throws -> Charge.Draft {
     var chargeDraft = chargeDraft
 
     chargeDraft.timeEnd = chargeEndResponse.completedAt
@@ -98,6 +98,7 @@ extension Charge {
     }
     guard let chargeID = chargeDraft.id else { throw ChargeError.chargeWriteError }
     try? postChargeHistoryRecord(chargeID: chargeID, chargeHistoryPacket: chargeEndResponse)
+    return chargeDraft
   }
 
   public static func postChargeUpdateRecord(

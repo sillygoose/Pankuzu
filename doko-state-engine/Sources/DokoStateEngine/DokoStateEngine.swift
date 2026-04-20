@@ -333,9 +333,18 @@ public final class DokoStateEngine {
             var nextState = dokoResponsePacket.nextState ?? .acChargeEnding
             if nextState == .idle {
               do {
-                try Charge.postChargeEndRecord(chargeDraft: chargeDraft, chargeEndResponse: dokoResponsePacket)
+                let finalizedCharge = try Charge.postChargeEndRecord(chargeDraft: chargeDraft, chargeEndResponse: dokoResponsePacket)
                 self.chargeInProgress = nil
-                await LiveActivityManager.shared.endCharge()
+                await LiveActivityManager.shared.endCharge(
+                  state: ChargeActivityAttributes.ContentState(
+                    chargeState: .ended,
+                    duration: .seconds(finalizedCharge.duration),
+                    energy: finalizedCharge.energy.map { $0 },
+                    rangeAdded: finalizedCharge.range.map { $0 },
+                    batteryTemperature: finalizedCharge.batteryTempStart.flatMap { start in finalizedCharge.batteryTempEnd.map { end in end - start } },
+                    couplerTemperature: finalizedCharge.couplerTempStart.flatMap { start in finalizedCharge.couplerTempEnd.map { end in end - start } },
+                  )
+                )
                 $activeSession.withLock { $0 = nil }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".acChargeEnding: \(String(describing: error))"))
@@ -384,9 +393,18 @@ public final class DokoStateEngine {
             var nextState = dokoResponsePacket.nextState ?? .dcChargeEnding
             if nextState == .idle {
               do {
-                try Charge.postChargeEndRecord(chargeDraft: chargeDraft, chargeEndResponse: dokoResponsePacket)
+                let finalizedCharge = try Charge.postChargeEndRecord(chargeDraft: chargeDraft, chargeEndResponse: dokoResponsePacket)
                 self.chargeInProgress = nil
-                await LiveActivityManager.shared.endCharge()
+                await LiveActivityManager.shared.endCharge(
+                  state: ChargeActivityAttributes.ContentState(
+                    chargeState: .ended,
+                    duration: .seconds(finalizedCharge.duration),
+                    energy: finalizedCharge.energy.map { $0 },
+                    rangeAdded: finalizedCharge.range.map { $0 },
+                    batteryTemperature: finalizedCharge.batteryTempStart.flatMap { start in finalizedCharge.batteryTempEnd.map { end in end - start } },
+                    couplerTemperature: finalizedCharge.couplerTempStart.flatMap { start in finalizedCharge.couplerTempEnd.map { end in end - start } },
+                  )
+                )
                 $activeSession.withLock { $0 = nil }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".dcChargeEnding: \(String(describing: error))"))
@@ -413,13 +431,13 @@ public final class DokoStateEngine {
                   state: ChargeActivityAttributes.ContentState(
                     chargeState: .active,
                     duration: .seconds(chargeDraft.duration),
-                    stateOfCharge: .init(value: stateOfCharge, unit: .percent),
+                    stateOfCharge: stateOfCharge,
                     rangeAdded: nil,
-                    measuredPower: dokoResponsePacket.batteryPower.map { .init(value: $0, unit: .kilowatts) },
-                    batteryVoltage: dokoResponsePacket.batteryVoltage.map { .init(value: $0, unit: .volts) },
-                    batteryCurrent: dokoResponsePacket.batteryCurrent.map { .init(value: $0, unit: .amperes) },
-                    batteryTemperature: dokoResponsePacket.batteryTemperature.map { .init(value: $0, unit: .celsius).converted(to: appSettings.metric ? .celsius : .fahrenheit) },
-                    couplerTemperature: dokoResponsePacket.couplerTemperature.map { .init(value: $0, unit: .celsius).converted(to: appSettings.metric ? .celsius : .fahrenheit) },
+                    measuredPower: dokoResponsePacket.batteryPower.map { $0 },
+                    batteryVoltage: dokoResponsePacket.batteryVoltage.map { $0 },
+                    batteryCurrent: dokoResponsePacket.batteryCurrent.map { $0 },
+                    batteryTemperature: dokoResponsePacket.batteryTemperature.map { $0 },
+                    couplerTemperature: dokoResponsePacket.couplerTemperature.map { $0 },
                   )
                 )
               }

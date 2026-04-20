@@ -194,7 +194,7 @@ public final class LiveActivityManager {
     DokoLogging.shared.postLoggingResponse(.liveActivity(".updateCharge"))
   }
 
-  public func endCharge(removeAfter seconds: TimeInterval = 15) async {
+  public func endCharge(state: ChargeActivityAttributes.ContentState, removeAfter seconds: TimeInterval = 15) async {
     if pendingActivity == .charge { pendingActivity = nil; return }
     guard case .charge(let activity)? = managedActivity else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.endCharge: no activity"))
@@ -204,7 +204,7 @@ public final class LiveActivityManager {
     self.managedActivity = nil
     self.pendingActivity = nil
     let endedState = ChargeActivityAttributes.ContentState(chargeState: .ended)
-    await activity.update(ActivityContent(state: endedState, staleDate: nil))
+    await activity.update(ActivityContent(state: state, staleDate: now.addingTimeInterval(seconds)))
     DokoLogging.shared.postLoggingResponse(.liveActivity(".endCharge"))
     Task {
       try? await Task.sleep(for: .seconds(30))

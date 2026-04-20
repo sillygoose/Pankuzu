@@ -59,7 +59,6 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
       let duration = context.state.duration
       let distance = context.state.distance
       let elevation = context.state.elevation
-      //let rangeConsumed = context.state.rangeConsumed
       let windSock = context.state.windSock
 
       HStack(alignment: .center) {
@@ -81,38 +80,36 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
               .converted(to: appSettings.metric ? .kilometers : .miles)
             Image(systemName: "road.lanes")
               .font(laSymbol)
-              .foregroundStyle(DesignTokens.Color.distance)
               .gridColumnAlignment(.leading)
             Text(String(format: "%5.1f", distance.value))
               .font(laValue.monospacedDigit())
-              .foregroundStyle(DesignTokens.Color.distance)
               .gridColumnAlignment(.trailing)
             Text(distance.unit.symbol)
               .font(laUnit)
-              .foregroundStyle(.secondary)
               .gridColumnAlignment(.leading)
           }
+          .foregroundStyle(DesignTokens.Color.distance)
+
           if let elevation {
             let elevation = Measurement(value: elevation, unit: UnitLength.meters)
               .converted(to: appSettings.metric ? .meters : .feet)
             GridRow(alignment: .lastTextBaseline) {
               Image(systemName: "mountain.2")
                 .font(laSymbol)
-                .foregroundStyle(DesignTokens.Color.elevation)
                 .gridColumnAlignment(.leading)
               Text(String(format: "%5.0f", elevation.value))
                 .font(laValue.monospacedDigit())
-                .foregroundStyle(DesignTokens.Color.elevation)
                 .gridColumnAlignment(.trailing)
               Text(elevation.unit.symbol)
                 .font(laUnit)
-                .foregroundStyle(.secondary)
                 .gridColumnAlignment(.leading)
             }
+            .foregroundStyle(DesignTokens.Color.elevation)
           }
         }
 
         Spacer()
+        
         if let windSock {
           WindIndicator(
             temperature: windSock.temperature,
@@ -130,7 +127,9 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
 
   private struct EndedView : View, TripLiveActivityFonts {
     let context: ActivityViewContext<TripActivityAttributes>
+    
     @Environment(\.activityFamily) var activityFamily
+    
     @Shared(.appSettings) var appSettings
 
     var body: some View {
