@@ -82,7 +82,7 @@ extension VwElectrics {
       packetType: .tripData
     ),
     StateEngineDokoCommandPacket(
-      schedulerType: .delaysThenFires(300),
+      schedulerType: .firesThenDelays(300),
       packetType: .tripWeather
     ),
   ]

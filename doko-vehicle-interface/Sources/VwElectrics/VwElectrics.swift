@@ -152,7 +152,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .batteryStateOfCharge, //.batteryStateOfHealth,
         .batteryTemperature,
         //.batteryDistanceToEmpty,
-        .position, .weather,
+        .position,
       ])
     case .tripInProgress:
       return ObdCommandPacket(type: .tripInProgress, commands: [
@@ -202,7 +202,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
       ])
     case .acChargeEnding:
       return ObdCommandPacket(type: .acChargeEnding, commands: [
-        .batteryStateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryTemperature, //.batteryStateOfHealth,
         //.batteryDistanceToEmpty,
       ])
 
@@ -224,7 +224,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
       ])
     case .dcChargeEnding:
       return ObdCommandPacket(type: .dcChargeEnding, commands: [
-        .batteryStateOfCharge, .batteryTemperature,
+        .batteryStateOfCharge, .batteryTemperature, //.batteryStateOfHealth,
         //.batteryDistanceToEmpty,
       ])
 

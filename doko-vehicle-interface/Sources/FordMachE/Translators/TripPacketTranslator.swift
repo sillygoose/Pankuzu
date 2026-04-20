@@ -12,8 +12,7 @@ extension FordMachE {
       let odometer = responsePacket.odometer,
       let energyToEmpty = responsePacket.batteryEnergyToEmpty,
       let stateOfCharge = responsePacket.batteryStateOfCharge,
-      let batteryTemperature = responsePacket.batteryTemperature,
-      let stateOfHealth = responsePacket.batteryStateOfHealth
+      let batteryTemperature = responsePacket.batteryTemperature
     else {
       dokoResponses[.error] = DokoCommandResponse(command: .tripStarting, response: .error("arguments"))
       return DokoResponsePacket(type: .tripStarting, responses: dokoResponses)
@@ -33,11 +32,8 @@ extension FordMachE {
     dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: .tripStarting, response: .batteryEnergyToEmpty(energyToEmpty))
     dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .tripStarting, response: .batteryStateOfCharge(stateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripStarting, response: .batteryTemperature(batteryTemperature))
-    dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .tripStarting, response: .batteryStateOfHealth(stateOfHealth))
-    if let weather = responsePacket.weather {
-      meanTemperatureSum += weather.temperature
-      meanTemperatureCount += 1
-      dokoResponses[.weather] = DokoCommandResponse(command: .tripStarting, response: .weather(weather))
+    if let batteryStateOfHealth = responsePacket.batteryStateOfHealth {
+      dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .tripStarting, response: .batteryStateOfHealth(batteryStateOfHealth))
     }
     return DokoResponsePacket(type: .tripStarting, responses: dokoResponses)
   }
@@ -62,8 +58,7 @@ extension FordMachE {
       let odometer = responsePacket.odometer,
       let energyToEmpty = responsePacket.batteryEnergyToEmpty,
       let stateOfCharge = responsePacket.batteryStateOfCharge,
-      let batteryTemperature = responsePacket.batteryTemperature,
-      let stateOfHealth = responsePacket.batteryStateOfHealth
+      let batteryTemperature = responsePacket.batteryTemperature
     else {
       dokoResponses[.error] = DokoCommandResponse(command: .tripEnding, response: .error("arguments"))
       return DokoResponsePacket(type: .tripEnding, responses: dokoResponses)
@@ -77,7 +72,9 @@ extension FordMachE {
     dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: .tripEnding, response: .batteryEnergyToEmpty(energyToEmpty))
     dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .tripEnding, response: .batteryStateOfCharge(stateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripEnding, response: .batteryTemperature(batteryTemperature))
-    dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .tripEnding, response: .batteryStateOfHealth(stateOfHealth))
+    if let batteryStateOfHealth = responsePacket.batteryTemperature {
+      dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .tripEnding, response: .batteryStateOfHealth(batteryStateOfHealth))
+    }
     if let weather = responsePacket.weather {
       meanTemperatureSum += weather.temperature
       meanTemperatureCount += 1

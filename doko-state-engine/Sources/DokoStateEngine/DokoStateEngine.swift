@@ -287,7 +287,19 @@ public final class DokoStateEngine {
               throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
             }
             guard let tripID = self.tripInProgress?.id else { throw StateEngineError.missingTripID }
+            guard var tripDraft = self.tripInProgress else {
+              throw StateEngineError.tripDraftError
+            }
             do {
+              if tripDraft.weatherTempStart == nil {
+                tripDraft.weatherTempStart = dokoResponsePacket.weather?.temperature
+                tripDraft.weatherTempEnd = dokoResponsePacket.weather?.temperature
+                tripDraft.weatherTempMeanWeighted = dokoResponsePacket.weather?.temperature
+                tripDraft.weatherConditionsStart = dokoResponsePacket.weather?.conditionSymbol
+                tripDraft.weatherConditionsEnd = dokoResponsePacket.weather?.conditionSymbol
+                DokoLogging.shared.postLoggingResponse(.info(".tripWeather updated tripDraft"))
+
+              }
               try Trip.postTripWeatherRecord(tripID: tripID, tripWeatherPacket: dokoResponsePacket)
             } catch {
               DokoLogging.shared.postLoggingResponse(.error(".tripWeather: \(String(describing: error))"))
