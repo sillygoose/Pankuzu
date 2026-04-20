@@ -96,7 +96,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .atcra("17FE007X"),
         //.atfcsh("17FC007B"),
         .atfcsd("300000"),
-        .atfcsm(2),
+        .atfcsm(2), //.atfcsm(1),
 
         .atcaf(false),
         .stcsegr(false),

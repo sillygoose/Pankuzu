@@ -12,8 +12,9 @@ import DokoDebug
 
 private struct stpxParser: Parser {
   var body: some Parser<Substring.UTF8View, Double> {
-    "621E3D00".utf8
+    "621E3D".utf8
     Int32ToDouble()
+    "32".utf8
   }
 }
 
