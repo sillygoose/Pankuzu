@@ -94,10 +94,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .atsh("FC007B"),
         .atcp("17"),
         .atcra("17FE007X"),
-        .atfcsh("17FC007B"),
+        //.atfcsh("17FC007B"),
         .atfcsd("300000"),
-        .atfcsm(1),
-        
+        .atfcsm(2),
+
         .atcaf(false),
         .stcsegr(false),
         .batteryCurrent4,
@@ -136,7 +136,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .acChargerStatus, .dcChargerStatus,
         .gearSelected, .odometer, .speed,
         .batteryStateOfCharge, .batteryTemperature,
-        .batteryVoltage, //.batteryCurrent,
+        .batteryVoltage, .batteryCurrent,
         //.batteryStateOfHealth, .batteryDistanceToEmpty,
       ])
 
