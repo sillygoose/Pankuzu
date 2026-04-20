@@ -12,7 +12,7 @@ import DokoDebug
 
 private struct stpxParser: Parser {
   var body: some Parser<Substring.UTF8View, Double> {
-    "621E3D".utf8
+    "621E3D00".utf8
     Int32ToDouble()
   }
 }
@@ -32,5 +32,5 @@ func parseHvbCurrent(_ input: String) throws -> Double {
 #endif
   var input = input[...].utf8
   let current = try stpxParser().parse(&input)
-  return current * -0.1
+  return (current - 150000) * 0.01
 }
