@@ -16,6 +16,22 @@ public struct WelcomeTip: Tip {
   }
 }
 
+public struct CarPlayTip: Tip {
+  public init() {}
+
+  public var title: Text {
+    Text("CarPlay Support")
+  }
+
+  public var message: Text? {
+    Text("Enable Live Activities in CarPlay Settings and you can monitor your trip or charge in the CarPlay Home screen.\n\nBut because Live Activities can't be started from the background, you must bring Pankuzu briefly to the foreground to start Live Activities.😩")
+  }
+
+  public var image: Image? {
+    Image(systemName: "car.front.waves.up")
+  }
+}
+
 public struct TripDetailsTip: Tip {
   public init() {}
 

@@ -180,6 +180,7 @@ public struct TripsView: View {
     NavigationStack(path: $path) {
       VStack(spacing: 0) {
         TipView(WelcomeTip())
+        TipView(CarPlayTip())
         VStack(spacing: 8) {
           DisplayPeriodPicker(
             datePicker: Binding(
