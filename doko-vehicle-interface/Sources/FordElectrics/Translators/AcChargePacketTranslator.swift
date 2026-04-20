@@ -67,9 +67,6 @@ extension FordElectrics {
     if let stateOfCharge = responsePacket.batteryStateOfCharge {
       dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .acChargeUpdate, response: .batteryStateOfCharge(stateOfCharge))
     }
-//    if let stateOfHealth = responsePacket.batteryStateOfHealth {
-//      dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .acChargeUpdate, response: .batteryStateOfHealth(stateOfHealth))
-//    }
     if let batteryTemperature = responsePacket.batteryTemperature {
       dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .acChargeUpdate, response: .batteryTemperature(batteryTemperature))
     }

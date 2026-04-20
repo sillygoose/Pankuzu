@@ -60,9 +60,6 @@ extension VwElectrics {
 
   private func vehicleCustomizationResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
-//    guard let odometer = responsePacket.odometer else {
-//      return DokoResponsePacket(type: .vehicleCustomization, responses: dokoResponses)
-//    }
     dokoResponses[.nextState] = DokoCommandResponse(command: .vehicleCustomization, response: .nextState(.idle))
     if let odometer = responsePacket.odometer {
       dokoResponses[.odometer] = DokoCommandResponse(command: .vehicleCustomization, response: .odometer(odometer))

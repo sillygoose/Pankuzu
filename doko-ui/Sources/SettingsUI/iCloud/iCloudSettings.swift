@@ -51,8 +51,9 @@ struct iCloudSettingsView: View {
             }
           )
         )
-//      } header: {
-//        Text("iCloud Sync")
+        #if !DEBUG
+        .disabled(true)
+        #endif
       } footer: {
         Text("iCloud Sync will share your trips, charges, and settings across all your devices signed into the same iCloud account. This feature is currently in early beta so keep current backups of your data in case you need to restore from a backup.")
       }

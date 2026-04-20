@@ -118,8 +118,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
       return ObdCommandPacket(type: .acChargeUpdate, commands: [
         .batteryVoltage, .batteryCurrent,
         .batteryStateOfCharge,
-        .batteryTemperature,
-        .acChargerCouplerTemperature
+        .batteryTemperature, .acChargerCouplerTemperature
       ])
     case .acChargeEnding:
       return ObdCommandPacket(type: .acChargeEnding, commands: [
@@ -141,8 +140,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
       return ObdCommandPacket(type: .dcChargeUpdate, commands: [
         .batteryVoltage, .batteryCurrent,
         .batteryStateOfCharge,
-        .batteryTemperature,
-        .acChargerCouplerTemperature
+        .batteryTemperature, .dcChargerCouplerTemperature
       ])
     case .dcChargeEnding:
       return ObdCommandPacket(type: .dcChargeEnding, commands: [

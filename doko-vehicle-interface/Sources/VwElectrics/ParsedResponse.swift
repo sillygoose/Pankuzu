@@ -12,10 +12,6 @@ extension VwElectrics {
     do {
       var commandResponse: ObdResponse
       switch command {
-//      case .ath(let enabled):
-//        commandResponse = .ath(enabled)
-//      case .stpx(_, _):
-//        commandResponse = .stpx(response)
       case .atz:
         commandResponse = .atz(response)
       case .ate(let enabled):
