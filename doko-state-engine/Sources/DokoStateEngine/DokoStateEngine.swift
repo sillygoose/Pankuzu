@@ -195,11 +195,11 @@ public final class DokoStateEngine {
               self.tripInProgress = tripDraft
               let windSock: WindSock? = if let course = dokoResponsePacket.position?.course, let weather = dokoResponsePacket.weather {
                 WindSock(
-                  course: .init(value: course, unit: .degrees),
-                  temperature: .init(value: weather.temperature, unit: .celsius).converted(to: appSettings.metric ? .celsius : .fahrenheit),
+                  course: course,
+                  temperature: weather.temperature,
                   conditions: weather.conditionSymbol,
-                  windSpeed: .init(value: weather.windSpeed, unit: .metersPerSecond).converted(to: appSettings.metric ? .metersPerSecond : .milesPerHour),
-                  windDirection: .init(value: weather.windDirection, unit: .degrees),
+                  windSpeed: weather.windSpeed,
+                  windDirection: weather.windDirection,
                   windCompassDirection: weather.windCompassDirection
                 )
               } else { nil }
@@ -339,10 +339,9 @@ public final class DokoStateEngine {
                   state: ChargeActivityAttributes.ContentState(
                     chargeState: .ended,
                     duration: .seconds(finalizedCharge.duration),
+                    stateOfCharge: finalizedCharge.stateOfChargeStart.flatMap { start in finalizedCharge.stateOfChargeEnd.map { end in end - start } },
                     energy: finalizedCharge.energy.map { $0 },
                     rangeAdded: finalizedCharge.range.map { $0 },
-                    batteryTemperature: finalizedCharge.batteryTempStart.flatMap { start in finalizedCharge.batteryTempEnd.map { end in end - start } },
-                    couplerTemperature: finalizedCharge.couplerTempStart.flatMap { start in finalizedCharge.couplerTempEnd.map { end in end - start } },
                   )
                 )
                 $activeSession.withLock { $0 = nil }
@@ -399,10 +398,9 @@ public final class DokoStateEngine {
                   state: ChargeActivityAttributes.ContentState(
                     chargeState: .ended,
                     duration: .seconds(finalizedCharge.duration),
+                    stateOfCharge: finalizedCharge.stateOfChargeStart.flatMap { start in finalizedCharge.stateOfChargeEnd.map { end in end - start } },
                     energy: finalizedCharge.energy.map { $0 },
                     rangeAdded: finalizedCharge.range.map { $0 },
-                    batteryTemperature: finalizedCharge.batteryTempStart.flatMap { start in finalizedCharge.batteryTempEnd.map { end in end - start } },
-                    couplerTemperature: finalizedCharge.couplerTempStart.flatMap { start in finalizedCharge.couplerTempEnd.map { end in end - start } },
                   )
                 )
                 $activeSession.withLock { $0 = nil }

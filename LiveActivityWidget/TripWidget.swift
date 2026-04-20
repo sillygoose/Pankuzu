@@ -47,11 +47,11 @@ extension TripActivityAttributes.ContentState {
       distance: 0,
       rangeConsumed: 0,
       windSock: WindSock(
-        course: .init(value: 90, unit: .degrees),
-        temperature: .init(value: 15, unit: .celsius),
+        course: 90,
+        temperature: 15,
         conditions: "cloud.fill",
-        windSpeed: .init(value: 20, unit: .metersPerSecond),
-        windDirection: .init(value: 180, unit: .degrees),
+        windSpeed: 20,
+        windDirection: 180,
         windCompassDirection: "S"
       )
     )
@@ -64,11 +64,11 @@ extension TripActivityAttributes.ContentState {
       distance: 42.5,
       rangeConsumed: 48.2,
       windSock: WindSock(
-        course: .init(value: 180, unit: .degrees),
-        temperature: .init(value: 15, unit: .celsius),
+        course: 180,
+        temperature: 15,
         conditions: "cloud.fill",
-        windSpeed: .init(value: 16, unit: .metersPerSecond),
-        windDirection: .init(value: 180, unit: .degrees),
+        windSpeed: 16,
+        windDirection: 180,
         windCompassDirection: "S"
       )
     )

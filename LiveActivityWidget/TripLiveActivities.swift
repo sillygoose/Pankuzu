@@ -36,6 +36,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
 
   private struct StartingView: View, TripLiveActivityFonts {
     let context: ActivityViewContext<TripActivityAttributes>
+    
     @Environment(\.activityFamily) var activityFamily
 
     var body: some View {
@@ -52,7 +53,9 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
 
   private struct ActiveView: View, TripLiveActivityFonts {
     let context: ActivityViewContext<TripActivityAttributes>
+    
     @Environment(\.activityFamily) var activityFamily
+    
     @Shared(.appSettings) var appSettings
 
     var body: some View {
@@ -212,21 +215,29 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
   }
 
   private struct WindIndicator: View, TripLiveActivityFonts {
-    var temperature: Measurement<UnitTemperature>
+    var temperature: Double
     var conditions: String
-    var course: Measurement<UnitAngle>
-    var windSpeed: Measurement<UnitSpeed>
-    var windDirection: Measurement<UnitAngle>
+    var course: Double
+    var windSpeed: Double
+    var windDirection: Double
     var windCompassDirection: String
 
     @Environment(\.activityFamily) var activityFamily
 
+    @Shared(.appSettings) var appSettings
+
     var relativeDirection: Double {
-      windDirection.value - course.value
+      windDirection - course
     }
 
     var body: some View {
-      let headWindScale: Double = windSpeed.value < 10 ? DesignTokens.WindScale.light : windSpeed.value < 20 ? DesignTokens.WindScale.moderate : DesignTokens.WindScale.strong
+      let headWindScale: Double = windSpeed < 10 ? DesignTokens.WindScale.light : windSpeed < 20 ? DesignTokens.WindScale.moderate : DesignTokens.WindScale.strong
+
+      let temperature = Measurement(value: temperature, unit: UnitTemperature.celsius)
+        .converted(to: appSettings.metric ? .celsius : .fahrenheit)
+      let windSpeed = Measurement(value: windSpeed, unit: UnitSpeed.kilometersPerHour)
+        .converted(to: appSettings.metric ? .kilometersPerHour : .milesPerHour)
+
 
       VStack(spacing: 2) {
         HStack(spacing: 4) {
@@ -276,11 +287,11 @@ extension TripActivityAttributes.ContentState {
       elevation: 322.5,
       rangeConsumed: 26.4,
       windSock: WindSock(
-        course: .init(value: 90, unit: .degrees),
-        temperature: .init(value: 15, unit: .celsius),
+        course: 90,
+        temperature: 15,
         conditions: "sun.snow",
-        windSpeed: .init(value: 125, unit: .metersPerSecond),
-        windDirection: .init(value: 90, unit: .degrees),
+        windSpeed: 125,
+        windDirection: 90,
         windCompassDirection: "S"
       )
     )
@@ -294,11 +305,11 @@ extension TripActivityAttributes.ContentState {
       elevation: 322.5,
       rangeConsumed: 20.4,
       windSock: WindSock(
-        course: .init(value: 180, unit: .degrees),
-        temperature: .init(value: 15.678, unit: .celsius),
+        course: 180,
+        temperature: 15.678,
         conditions: "cloud.drizzle.fill",
-        windSpeed: .init(value: 20.12345, unit: .metersPerSecond),
-        windDirection: .init(value: 0.4567, unit: .degrees),
+        windSpeed: 20.12345,
+        windDirection:  0.4567,
         windCompassDirection: "N"
       )
     )

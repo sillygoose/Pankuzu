@@ -3,19 +3,19 @@ import WeatherKit
 import Foundation
 
 public struct WindSock: Codable, Hashable, Sendable {
-  public let course: Measurement<UnitAngle>
-  public let temperature: Measurement<UnitTemperature>
+  public let course: Double
+  public let temperature: Double
   public let conditions: String
-  public let windSpeed: Measurement<UnitSpeed>
-  public let windDirection: Measurement<UnitAngle>
+  public let windSpeed: Double
+  public let windDirection: Double
   public let windCompassDirection: String
 
   public init(
-    course: Measurement<UnitAngle>,
-    temperature: Measurement<UnitTemperature>,
+    course: Double,
+    temperature: Double,
     conditions: String,
-    windSpeed: Measurement<UnitSpeed>,
-    windDirection: Measurement<UnitAngle>,
+    windSpeed: Double,
+    windDirection: Double,
     windCompassDirection: String
   ) {
     self.course = course
