@@ -176,7 +176,7 @@ public struct TripDetailView: View {
         GridRow {
           DokoGridCount(
             color: .yellow,
-            value: String(format: "%.1f", odometer.value as CVarArg),
+            value: String(format: "%.1f", odometer.value),
             units: odometer.unit.symbol,
             symbolName: "gauge.open.with.lines.needle.33percent",
             title: "Odometer"
@@ -196,14 +196,14 @@ public struct TripDetailView: View {
         GridRow {
           DokoGridCount(
             color: .blue,
-            value: String(format: "%.1f", distance.value as CVarArg),
+            value: String(format: "%.1f", distance.value),
             units: distance.unit.symbol,
             symbolName: "road.lanes",
             title: "Distance"
           )
           DokoGridCount(
             color: .orange,
-            value: String(format: "%.0f", averageSpeed.value as CVarArg),
+            value: String(format: "%.0f", averageSpeed.value),
             units: averageSpeed.unit.symbol,
             symbolName: "powermeter",
             title: "Speed"
@@ -225,7 +225,7 @@ public struct TripDetailView: View {
           GridRow {
             DokoGridValueButton(
               color: .red,
-              value: String(format: "%.1f", energyUsed.value as CVarArg),
+              value: String(format: "%.1f", energyUsed.value),
               units: energyUsed.unit.symbol,
               symbolName: "bolt.circle.fill",
               title: "Energy Used"
@@ -234,7 +234,7 @@ public struct TripDetailView: View {
             }
             DokoGridCount(
               color: .green,
-              value: String(format: "%.1f", efficiency.value as CVarArg),
+              value: String(format: "%.1f", efficiency.value),
               units: efficiency.unit.symbol,
               symbolName: "ev.charger",
               title: "Efficiency"
@@ -250,14 +250,14 @@ public struct TripDetailView: View {
               .converted(to: model.appSettings.metric ? .kilometers : .miles)
             DokoGridCount(
               color: .blue,
-              value: String(format: "%.0f", distanceToEmptyStart.value as CVarArg),
+              value: String(format: "%.0f", distanceToEmptyStart.value),
               units: distanceToEmptyStart.unit.symbol,
               symbolName: "road.lanes.curved.left",
               title: "Start Range"
             )
             DokoGridCount(
               color: .blue,
-              value: String(format: "%.0f", distanceToEmptyEnd.value as CVarArg),
+              value: String(format: "%.0f", distanceToEmptyEnd.value),
               units: distanceToEmptyEnd.unit.symbol,
               symbolName: "road.lanes.curved.right",
               title: "End Range"

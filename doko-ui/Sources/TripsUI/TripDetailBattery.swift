@@ -107,7 +107,7 @@ public struct TripDetailBatteryView: View {
               .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
             DokoGridCount(
               color: batteryTempStartColor,
-              value: String(format: "%.0f", batteryTempStart.value as CVarArg),
+              value: String(format: "%.0f", batteryTempStart.value),
               units: batteryTempStart.unit.symbol,
               symbolName: batteryTempStartIcon,
               title: "Start Temp"
@@ -122,7 +122,7 @@ public struct TripDetailBatteryView: View {
               .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
             DokoGridCount(
               color: batteryTempEndColor,
-              value: String(format: "%.0f", batteryTempEnd.value as CVarArg),
+              value: String(format: "%.0f", batteryTempEnd.value),
               units: batteryTempEnd.unit.symbol,
               symbolName: batteryTempEndIcon,
               title: "End Temp"

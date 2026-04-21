@@ -69,7 +69,7 @@ public struct DokoGridCount: View {
         GridRow {
           DokoGridCount(
             color: .yellow,
-            value: String(format: "%.1f", odometer.value as CVarArg),
+            value: String(format: "%.1f", odometer.value),
             units: odometer.unit.symbol,
             symbolName: "gauge.open.with.lines.needle.33percent",
             title: "Odometer"
@@ -91,7 +91,7 @@ public struct DokoGridCount: View {
         GridRow {
           DokoGridCount(
             color: .blue,
-            value: String(format: "%.1f", distance.value as CVarArg),
+            value: String(format: "%.1f", distance.value),
             units: distance.unit.symbol,
             symbolName: "road.lanes",
             pulseSymbol: true,
@@ -99,7 +99,7 @@ public struct DokoGridCount: View {
           )
           DokoGridCount(
             color: .orange,
-            value: String(format: "%.0f", averageSpeed.value as CVarArg),
+            value: String(format: "%.0f", averageSpeed.value),
             units: averageSpeed.unit.symbol,
             symbolName: "powermeter",
             title: "Avg. Speed"

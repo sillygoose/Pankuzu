@@ -69,7 +69,7 @@ public struct ChargeDetailBatteryView: View {
           let dteStart = dteStartMetric.converted(to: model.appSettings.metric ? .kilometers : .miles)
           DokoGridCount(
             color: .blue,
-            value: String(format: "%.0f", dteStart.value as CVarArg),
+            value: String(format: "%.0f", dteStart.value),
             units: dteStart.unit.symbol,
             symbolName: "road.lanes.curved.left",
             title: "Start Range"
@@ -79,7 +79,7 @@ public struct ChargeDetailBatteryView: View {
           let dteEnd = dteEndMetric.converted(to: model.appSettings.metric ? .kilometers : .miles)
           DokoGridCount(
             color: .blue,
-            value: String(format: "%.0f", dteEnd.value as CVarArg),
+            value: String(format: "%.0f", dteEnd.value),
             units: dteEnd.unit.symbol,
             symbolName: "road.lanes.curved.right",
             title: "End Range"
@@ -129,7 +129,7 @@ public struct ChargeDetailBatteryView: View {
               .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
             DokoGridCount(
               color: batteryTempStartColor,
-              value: String(format: "%.0f", batteryTempStart.value as CVarArg),
+              value: String(format: "%.0f", batteryTempStart.value),
               units: batteryTempStart.unit.symbol,
               symbolName: batteryTempStartIcon,
               title: "Start Temp"
@@ -144,7 +144,7 @@ public struct ChargeDetailBatteryView: View {
               .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
             DokoGridCount(
               color: batteryTempEndColor,
-              value: String(format: "%.0f", batteryTempEnd.value as CVarArg),
+              value: String(format: "%.0f", batteryTempEnd.value),
               units: batteryTempEnd.unit.symbol,
               symbolName: batteryTempEndIcon,
               title: "End Temp"
@@ -164,7 +164,7 @@ public struct ChargeDetailBatteryView: View {
                 .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
               DokoGridValueButton(
                 color: couplerTempStartColor,
-                value: String(format: "%.0f", couplerTempStart.value as CVarArg),
+                value: String(format: "%.0f", couplerTempStart.value),
                 units: couplerTempStart.unit.symbol,
                 symbolName: couplerTempStartIcon,
                 title: "Coupler Start"
@@ -180,7 +180,7 @@ public struct ChargeDetailBatteryView: View {
                 .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
               DokoGridValueButton(
                 color: couplerTempEndColor,
-                value: String(format: "%.0f", couplerTempEnd.value as CVarArg),
+                value: String(format: "%.0f", couplerTempEnd.value),
                 units: couplerTempEnd.unit.symbol,
                 symbolName: couplerTempEndIcon,
                 title: "Coupler End"

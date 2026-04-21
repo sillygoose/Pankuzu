@@ -322,7 +322,7 @@ public struct ChargesView: View {
             GridRow {
               DokoGridCount(
                 color: .orange,
-                value: String(format: "%.0f", acEnergy.value as CVarArg),
+                value: String(format: "%.0f", acEnergy.value),
                 units: acEnergy.unit.symbol,
                 symbolName: "bolt.batteryblock",
                 title: "Energy"
@@ -331,7 +331,7 @@ public struct ChargesView: View {
 
               DokoGridCount(
                 color: .green,
-                value: String(format: "%.0f", dcEnergy.value as CVarArg),
+                value: String(format: "%.0f", dcEnergy.value),
                 units: dcEnergy.unit.symbol,
                 symbolName: "bolt.batteryblock",
                 title: "Energy"

@@ -134,7 +134,7 @@ public struct ChargeDetailView: View {
         GridRow {
           DokoGridCount(
             color: .yellow,
-            value: String(format: "%.1f", odometer.value as CVarArg),
+            value: String(format: "%.1f", odometer.value),
             units: odometer.unit.symbol,
             symbolName: "gauge.open.with.lines.needle.33percent",
             title: "Odometer"
@@ -157,7 +157,7 @@ public struct ChargeDetailView: View {
           GridRow {
             DokoGridValueButton(
               color: .blue,
-              value: String(format: "%.1f", displayEnergy as CVarArg),
+              value: String(format: "%.1f", displayEnergy),
               units: energyAdded.unit.symbol,
               symbolName: "bolt.circle.fill",
               title: "Energy Added"
@@ -167,7 +167,7 @@ public struct ChargeDetailView: View {
             
             DokoGridCount(
               color: .red,
-              value: String(format: "%.1f", peakPower.value as CVarArg),
+              value: String(format: "%.1f", peakPower.value),
               units: peakPower.unit.symbol,
               symbolName: "bolt",
               title: "Peak Power"
@@ -211,7 +211,7 @@ public struct ChargeDetailView: View {
             let dteStart = dteStartMetric.converted(to: model.appSettings.metric ? .kilometers : .miles)
             DokoGridCount(
               color: .blue,
-              value: String(format: "%.0f", dteStart.value as CVarArg),
+              value: String(format: "%.0f", dteStart.value),
               units: dteStart.unit.symbol,
               symbolName: "road.lanes.curved.left",
               title: "Start Range"
@@ -221,7 +221,7 @@ public struct ChargeDetailView: View {
             let dteEnd = dteEndMetric.converted(to: model.appSettings.metric ? .kilometers : .miles)
             DokoGridCount(
               color: .blue,
-              value: String(format: "%.0f", dteEnd.value as CVarArg),
+              value: String(format: "%.0f", dteEnd.value),
               units: dteEnd.unit.symbol,
               symbolName: "road.lanes.curved.right",
               title: "End Range"

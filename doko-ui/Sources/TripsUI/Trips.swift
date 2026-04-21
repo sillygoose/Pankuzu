@@ -255,7 +255,7 @@ public struct TripsView: View {
             GridRow {
               DokoGridCount(
                 color: .yellow,
-                value: String(format: "%.1f", distance.value as CVarArg),
+                value: String(format: "%.1f", distance.value),
                 units: distance.unit.symbol,
                 symbolName: "road.lanes",
                 title: "Distance"
@@ -271,7 +271,7 @@ public struct TripsView: View {
                 }()
                 DokoGridCount(
                   color: meanTemperaturePeriodColor,
-                  value: String(format: "%.0f", meanTemperaturePeriod.value as CVarArg),
+                  value: String(format: "%.0f", meanTemperaturePeriod.value),
                   units: meanTemperaturePeriod.unit.symbol,
                   symbolName: meanTemperaturePeriodIcon,
                   title: "Mean Temp"
@@ -302,7 +302,7 @@ public struct TripsView: View {
               GridRow {
                 DokoGridCount(
                   color: .red,
-                  value: String(format: "%.1f", energyKWh.value as CVarArg),
+                  value: String(format: "%.1f", energyKWh.value),
                   units: energyKWh.unit.symbol,
                   symbolName: "bolt.circle.fill",
                   title: "Energy Used"
@@ -310,7 +310,7 @@ public struct TripsView: View {
 
                 DokoGridCount(
                   color: .green,
-                  value: String(format: "%.1f", energyEfficiency.value as CVarArg),
+                  value: String(format: "%.1f", energyEfficiency.value),
                   units: energyEfficiency.unit.symbol,
                   symbolName: "powermeter",
                   title: "Efficiency"
