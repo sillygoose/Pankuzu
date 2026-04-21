@@ -94,9 +94,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .atsh("FC007B"),
         .atcp("17"),
         .atcra("17FE007X"),
-        //.atfcsh("17FC007B"),
+        .atfcsh("17FC007B"),
         .atfcsd("300000"),
-        .atfcsm(2), //.atfcsm(1),
+        .atfcsm(1),
 
         .atcaf(false),
         .stcsegr(false),
@@ -149,9 +149,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .tripStarting:
       return ObdCommandPacket(type: .tripStarting, commands: [
         .odometer,
-        .batteryStateOfCharge, //.batteryStateOfHealth,
+        .batteryStateOfCharge,
         .batteryTemperature,
-        //.batteryDistanceToEmpty,
+        //.batteryDistanceToEmpty, //.batteryStateOfHealth,
         .position,
       ])
     case .tripInProgress:
@@ -169,15 +169,16 @@ public actor VwElectrics: ConnectedVehicleInterface {
       return ObdCommandPacket(type: .tripEnding, commands: [
         .weather,
         .odometer,
-        .batteryStateOfCharge, //.batteryStateOfHealth,
+        .batteryStateOfCharge,
         .batteryTemperature,
-        //.batteryDistanceToEmpty,
+        //.batteryDistanceToEmpty, //.batteryStateOfHealth,
         .position,
       ])
     case .tripData:
       return ObdCommandPacket(type: .tripData, commands: [
         .odometer,
-        .batteryStateOfCharge, .batteryTemperature
+        .batteryStateOfCharge, .batteryTemperature,
+        //.batteryDistanceToEmpty,
       ])
     case .tripWeather:
       return ObdCommandPacket(type: .tripWeather, commands: [
@@ -187,9 +188,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .acChargeStarting:
       return ObdCommandPacket(type: .acChargeStarting, commands: [
         .odometer,
-        .batteryStateOfCharge, //.batteryStateOfHealth,
+        .batteryStateOfCharge,
         .batteryTemperature,
-        //.batteryDistanceToEmpty,
+        //.batteryDistanceToEmpty, //.batteryStateOfHealth,
         .position, .weather,
       ])
     case .acChargeInProgress:
@@ -202,16 +203,16 @@ public actor VwElectrics: ConnectedVehicleInterface {
       ])
     case .acChargeEnding:
       return ObdCommandPacket(type: .acChargeEnding, commands: [
-        .batteryStateOfCharge, .batteryTemperature, //.batteryStateOfHealth,
-        //.batteryDistanceToEmpty,
+        .batteryStateOfCharge, .batteryTemperature,
+        //.batteryDistanceToEmpty, //.batteryStateOfHealth,
       ])
 
     case .dcChargeStarting:
       return ObdCommandPacket(type: .dcChargeStarting, commands: [
         .odometer,
-        .batteryStateOfCharge,//.batteryStateOfHealth,
+        .batteryStateOfCharge,
         .batteryTemperature,
-        //.batteryDistanceToEmpty,
+        //.batteryDistanceToEmpty, //.batteryStateOfHealth,
         .position, .weather,
       ])
     case .dcChargeInProgress:
@@ -224,8 +225,8 @@ public actor VwElectrics: ConnectedVehicleInterface {
       ])
     case .dcChargeEnding:
       return ObdCommandPacket(type: .dcChargeEnding, commands: [
-        .batteryStateOfCharge, .batteryTemperature, //.batteryStateOfHealth,
-        //.batteryDistanceToEmpty,
+        .batteryStateOfCharge, .batteryTemperature,
+        //.batteryDistanceToEmpty, //.batteryStateOfHealth,
       ])
 
     case .acChargeHistory:
@@ -237,21 +238,21 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .batteryStateOfCharge, .batteryTemperature,
       ])
 
-//    case .tripEnergy:
-//      return ObdCommandPacket(type: .tripEnergy, commands: [
-//        .batteryVoltage, .batteryCurrent
-//      ])
-//    case .acChargeEnergy:
-//      return ObdCommandPacket(type: .acChargeEnergy, commands: [
-//        .batteryVoltage, .batteryCurrent
-//      ])
-//    case .dcChargeEnergy:
-//      return ObdCommandPacket(type: .dcChargeEnergy, commands: [
-//        .batteryVoltage, .batteryCurrent
-//      ])
+    case .tripEnergy:
+      return ObdCommandPacket(type: .tripEnergy, commands: [
+        .batteryVoltage, .batteryCurrent
+      ])
+    case .acChargeEnergy:
+      return ObdCommandPacket(type: .acChargeEnergy, commands: [
+        .batteryVoltage, .batteryCurrent
+      ])
+    case .dcChargeEnergy:
+      return ObdCommandPacket(type: .dcChargeEnergy, commands: [
+        .batteryVoltage, .batteryCurrent
+      ])
 
     default:
-//      DokoLogging.shared.postLoggingResponse(.error("VWE.translateDokoCommandPacket: no packet translation for '\(packetType.description)'"))
+      DokoLogging.shared.postLoggingResponse(.error("VWE.translateDokoCommandPacket: no packet translation for '\(packetType.description)'"))
       return nil
     }
   }
