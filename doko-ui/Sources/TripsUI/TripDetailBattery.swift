@@ -33,29 +33,31 @@ public struct TripDetailBatteryView: View {
   public var body: some View {
     VStack {
       if let stateOfChargeStart = model.trip.stateOfChargeStart, let stateOfChargeEnd = model.trip.stateOfChargeEnd {
+        let stateOfChargeStart = Measurement(value: stateOfChargeStart, unit: UnitPercent.percent)
+        let stateOfChargeEnd = Measurement(value: stateOfChargeEnd, unit: UnitPercent.percent)
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
           GridRow {
             let (stateOfChargeStartColor, stateOfChargeStartIcon) = {
-              if stateOfChargeStart < 25 { return (Color.red, "battery.25percent") }
-              if stateOfChargeStart < 50 { return (Color.yellow,"battery.50percent") }
+              if stateOfChargeStart.value < 25 { return (Color.red, "battery.25percent") }
+              if stateOfChargeStart.value < 50 { return (Color.yellow,"battery.50percent") }
               return (Color.green, "battery.75percent")
             }()
             DokoGridCount(
               color: stateOfChargeStartColor,
-              value: String(format: "%.0f", stateOfChargeStart),
-              units: "%",
+              value: String(format: "%.0f", stateOfChargeStart.value),
+              units: stateOfChargeStart.unit.symbol,
               symbolName: stateOfChargeStartIcon,
               title: "Start SoC"
             )
             let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
-              if stateOfChargeEnd < 25 { return (Color.red, "battery.25percent") }
-              if stateOfChargeEnd < 50 { return (Color.yellow,"battery.50percent") }
+              if stateOfChargeEnd.value < 25 { return (Color.red, "battery.25percent") }
+              if stateOfChargeEnd.value < 50 { return (Color.yellow,"battery.50percent") }
               return (Color.green, "battery.75percent")
             }()
             DokoGridCount(
               color: stateOfChargeEndColor,
-              value: String(format: "%.0f", stateOfChargeEnd),
-              units: "%",
+              value: String(format: "%.0f", stateOfChargeEnd.value),
+              units: stateOfChargeEnd.unit.symbol,
               symbolName: stateOfChargeEndIcon,
               title: "End SoC"
             )
@@ -64,30 +66,32 @@ public struct TripDetailBatteryView: View {
       }
  
       if let energyToEmptyStart = model.trip.energyToEmptyStart, let energyToEmptyEnd = model.trip.energy {
+        let energyToEmptyStart = Measurement(value: energyToEmptyStart, unit: UnitEnergy.kilowattHours)
+        let energyToEmptyEnd = Measurement(value: energyToEmptyEnd, unit: UnitEnergy.kilowattHours)
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
           GridRow {
             let (energyToEmptyStartColor, energyToEmptyStartIcon) = {
-              if energyToEmptyStart < 25 { return (Color.red, "bolt") }
-              if energyToEmptyStart < 50 { return (Color.yellow,"bolt") }
+              if energyToEmptyStart.value < 25 { return (Color.red, "bolt") }
+              if energyToEmptyStart.value < 50 { return (Color.yellow,"bolt") }
               return (Color.green, "bolt")
             }()
             DokoGridCount(
               color: energyToEmptyStartColor,
-              value: String(format: "%.1f", energyToEmptyStart),
-              units: "kWh",
+              value: String(format: "%.1f", energyToEmptyStart.value),
+              units: energyToEmptyStart.unit.symbol,
               symbolName: energyToEmptyStartIcon,
               title: "Start Energy"
             )
 
             let (energyToEmptyEndColor, energyToEmptyEndIcon) = {
-              if energyToEmptyEnd < 25 { return (Color.red, "bolt") }
-              if energyToEmptyEnd < 50 { return (Color.yellow,"bolt") }
+              if energyToEmptyEnd.value < 25 { return (Color.red, "bolt") }
+              if energyToEmptyEnd.value < 50 { return (Color.yellow,"bolt") }
               return (Color.green, "bolt")
             }()
             DokoGridCount(
               color: energyToEmptyEndColor,
-              value: String(format: "%.1f", energyToEmptyStart - energyToEmptyEnd),
-              units: "kWh",
+              value: String(format: "%.1f", energyToEmptyStart.value - energyToEmptyEnd.value),
+              units: energyToEmptyEnd.unit.symbol,
               symbolName: energyToEmptyEndIcon,
               title: "End Energy"
             )

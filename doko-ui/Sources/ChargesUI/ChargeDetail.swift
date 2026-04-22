@@ -7,6 +7,7 @@ import DokoLocationManager
 import DokoVehicleManager
 import DokoSchema
 import DokoTypes
+import DokoExtensions
 import VehiclesUI
 import LocationsUI
 import CommonUI
@@ -178,27 +179,29 @@ public struct ChargeDetailView: View {
 
         if let stateOfChargeStart = charge.stateOfChargeStart, let stateOfChargeEnd = charge.stateOfChargeEnd {
           GridRow {
+            let stateOfChargeStart = Measurement(value: stateOfChargeStart, unit: UnitPercent.percent)
+            let stateOfChargeEnd = Measurement(value: stateOfChargeEnd, unit: UnitPercent.percent)
             let (stateOfChargeStartColor, stateOfChargeStartIcon) = {
-              if stateOfChargeStart < 25 { return (Color.red, "battery.25percent") }
-              if stateOfChargeStart < 50 { return (Color.yellow,"battery.50percent") }
+              if stateOfChargeStart.value < 25 { return (Color.red, "battery.25percent") }
+              if stateOfChargeStart.value < 50 { return (Color.yellow,"battery.50percent") }
               return (Color.green, "battery.75percent")
             }()
             DokoGridCount(
               color: stateOfChargeStartColor,
-              value: String(format: "%.0f", stateOfChargeStart),
-              units: "%",
+              value: String(format: "%.0f", stateOfChargeStart.value),
+              units: stateOfChargeStart.unit.symbol,
               symbolName: stateOfChargeStartIcon,
               title: "Start SoC"
             )
             let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
-              if stateOfChargeEnd < 25 { return (Color.red, "battery.25percent") }
-              if stateOfChargeEnd < 50 { return (Color.yellow,"battery.50percent") }
+              if stateOfChargeEnd.value < 25 { return (Color.red, "battery.25percent") }
+              if stateOfChargeEnd.value < 50 { return (Color.yellow,"battery.50percent") }
               return (Color.green, "battery.75percent")
             }()
             DokoGridCount(
               color: stateOfChargeEndColor,
-              value: String(format: "%.0f", stateOfChargeEnd),
-              units: "%",
+              value: String(format: "%.0f", stateOfChargeEnd.value),
+              units: stateOfChargeEnd.unit.symbol,
               symbolName: stateOfChargeEndIcon,
               title: "End SoC"
             )
@@ -231,12 +234,13 @@ public struct ChargeDetailView: View {
 
         if let batteryStateOfHealth = charge.batteryStateOfHealth {
           GridRow {
+            let batteryStateOfHealth = Measurement(value: batteryStateOfHealth, unit: UnitPercent.percent)
             let batteryStateOfHealthColor =
-            batteryStateOfHealth < 80 ? Color.red : batteryStateOfHealth < 90 ? .yellow : .green
+            batteryStateOfHealth.value < 80 ? Color.red : batteryStateOfHealth.value < 90 ? .yellow : .green
             DokoGridValueButton(
               color: batteryStateOfHealthColor,
-              value: String(format: "%.0f", batteryStateOfHealth),
-              units: "%",
+              value: String(format: "%.0f", batteryStateOfHealth.value),
+              units: batteryStateOfHealth.unit.symbol,
               symbolName: "minus.plus.batteryblock.stack",
               title: "State of Health"
             ) {

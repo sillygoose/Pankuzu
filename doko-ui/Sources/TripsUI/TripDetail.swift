@@ -9,6 +9,7 @@ import DokoLocationManager
 import DokoVehicleManager
 import DokoSchema
 import DokoTypes
+import DokoExtensions
 import VehiclesUI
 import LocationsUI
 import CommonUI
@@ -266,16 +267,17 @@ public struct TripDetailView: View {
         }
         
         if let batteryStateOfHealth = trip.batteryStateOfHealth {
+          let batteryStateOfHealth = Measurement(value: batteryStateOfHealth, unit: UnitPercent.percent)
           let batteryStateOfHealthColor = {
-            if batteryStateOfHealth < 80 { return Color.red }
-            if batteryStateOfHealth < 90 { return Color.yellow }
+            if batteryStateOfHealth.value < 80 { return Color.red }
+            if batteryStateOfHealth.value < 90 { return Color.yellow }
             return Color.green
           }()
           GridRow {
             DokoGridValueButton(
               color: batteryStateOfHealthColor,
-              value: String(format: "%.0f", batteryStateOfHealth),
-              units: "%",
+              value: String(format: "%.0f", batteryStateOfHealth.value),
+              units: batteryStateOfHealth.unit.symbol,
               symbolName: "minus.plus.batteryblock.stack",
               title: "State of Health"
             ) {

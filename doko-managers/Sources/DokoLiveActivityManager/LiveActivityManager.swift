@@ -2,6 +2,8 @@ import Foundation
 @preconcurrency import ActivityKit
 
 import Dependencies
+@_exported import DokoDesignTokens
+@_exported import DokoExtensions
 
 import DokoLogging
 import DokoSharing

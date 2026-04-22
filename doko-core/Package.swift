@@ -9,6 +9,8 @@ let package = Package(
   ],
   products: [
     .library(name: "DokoTypes", targets: ["DokoTypes"]),
+    .library(name: "DokoDesignTokens", targets: ["DokoDesignTokens"]),
+    .library(name: "DokoExtensions", targets: ["DokoExtensions"]),
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-collections", from: "1.3.0"),
@@ -19,6 +21,14 @@ let package = Package(
       dependencies: [
         .product(name: "OrderedCollections", package: "swift-collections"),
       ]
+    ),
+    .target(
+      name: "DokoDesignTokens",
+      dependencies: []
+    ),
+    .target(
+      name: "DokoExtensions",
+      dependencies: []
     ),
   ],
   swiftLanguageModes: [.v6]

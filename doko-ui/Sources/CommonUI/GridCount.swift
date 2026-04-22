@@ -42,7 +42,7 @@ public struct DokoGridCount: View {
           .font(DesignTokens.Font.title)
           .fontDesign(.rounded)
           .bold()
-          .foregroundStyle(DesignTokens.Color.label)
+          .foregroundStyle(DesignTokens.Color.value)
       }
       HStack {
         Text(title)

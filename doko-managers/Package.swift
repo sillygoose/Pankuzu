@@ -87,6 +87,8 @@ let package = Package(
     .target(
       name: "DokoLiveActivityManager",
       dependencies: [
+        .product(name: "DokoDesignTokens", package: "doko-core"),
+        .product(name: "DokoExtensions", package: "doko-core"),
         .product(name: "DokoSharing", package: "doko-sharing"),
         .product(name: "DokoLogging", package: "doko-logging"),
         .product(name: "Dependencies", package: "swift-dependencies"),

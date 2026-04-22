@@ -41,6 +41,7 @@ let package = Package(
         "VehiclesUI",
         "LocationsUI",
         .product(name: "DokoTypes", package: "doko-core"),
+        .product(name: "DokoExtensions", package: "doko-core"),
         .product(name: "DokoSharing", package: "doko-sharing"),
         .product(name: "DokoVehicleManager", package: "doko-managers"),
         .product(name: "DokoLocationManager", package: "doko-managers"),
@@ -55,6 +56,7 @@ let package = Package(
         "VehiclesUI",
         "LocationsUI",
         .product(name: "DokoTypes", package: "doko-core"),
+        .product(name: "DokoExtensions", package: "doko-core"),
         .product(name: "DokoSharing", package: "doko-sharing"),
         .product(name: "DokoVehicleManager", package: "doko-managers"),
         .product(name: "DokoLocationManager", package: "doko-managers"),
@@ -108,6 +110,8 @@ let package = Package(
     .target(
       name: "CommonUI",
       dependencies: [
+        .product(name: "DokoDesignTokens", package: "doko-core"),
+        .product(name: "DokoExtensions", package: "doko-core"),
         .product(name: "DokoSharing", package: "doko-sharing"),
         .product(name: "DokoSchema", package: "doko-schema"),
       ]

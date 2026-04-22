@@ -68,7 +68,7 @@ public struct DokoGridValueButton: View {
               .font(DesignTokens.Font.title)
               .fontDesign(.rounded)
               .bold()
-              .foregroundStyle(DesignTokens.Color.label)
+              .foregroundStyle(DesignTokens.Color.value)
           }
         }
         HStack {

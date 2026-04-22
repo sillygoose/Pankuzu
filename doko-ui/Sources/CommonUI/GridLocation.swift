@@ -36,7 +36,7 @@ public struct DokoGridLocation: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .fontDesign(.rounded)
-        .foregroundStyle(DesignTokens.Color.label)
+        .foregroundStyle(DesignTokens.Color.value)
       }
     }
     .buttonStyle(.borderless)
