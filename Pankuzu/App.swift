@@ -56,6 +56,9 @@ struct AppView: View {
     .onReceive(NotificationCenter.default.publisher(for: .pankuzuOpenCharges)) { _ in
       model.selectedTab = .charges
     }
+    .onReceive(NotificationCenter.default.publisher(for: .pankuzuOpenTools)) { _ in
+      model.selectedTab = .tools
+    }
     .onReceive(NotificationCenter.default.publisher(for: .pankuzuOpenSettings)) { _ in
       model.selectedTab = .settings
     }

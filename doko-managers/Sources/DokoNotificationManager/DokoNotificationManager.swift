@@ -7,6 +7,7 @@ import DokoLogging
 public extension Notification.Name {
   static let pankuzuOpenTrips    = Notification.Name("com.unchan.pankuzu.openTrips")
   static let pankuzuOpenCharges  = Notification.Name("com.unchan.pankuzu.openCharges")
+  static let pankuzuOpenTools    = Notification.Name("com.unchan.pankuzu.openTools")
   static let pankuzuOpenSettings = Notification.Name("com.unchan.pankuzu.openSettings")
 }
 

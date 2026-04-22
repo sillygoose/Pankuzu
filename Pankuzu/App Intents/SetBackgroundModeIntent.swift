@@ -28,6 +28,42 @@ struct DisableBackgroundModeIntent: AppIntent {
 struct PankuzuShortcuts: AppShortcutsProvider {
   static var appShortcuts: [AppShortcut] {
     AppShortcut(
+      intent: OpenTripsIntent(),
+      phrases: [
+        "Open \(.applicationName) trips",
+        "Show \(.applicationName) trips"
+      ],
+      shortTitle: "Open Trips",
+      systemImageName: "car"
+    )
+    AppShortcut(
+      intent: OpenChargesIntent(),
+      phrases: [
+        "Open \(.applicationName) charges",
+        "Show \(.applicationName) charges"
+      ],
+      shortTitle: "Open Charges",
+      systemImageName: "bolt.fill"
+    )
+    AppShortcut(
+      intent: OpenToolsIntent(),
+      phrases: [
+        "Open \(.applicationName) tools",
+        "Show \(.applicationName) tools"
+      ],
+      shortTitle: "Open Tools",
+      systemImageName: "hammer.circle"
+    )
+    AppShortcut(
+      intent: OpenSettingsIntent(),
+      phrases: [
+        "Open \(.applicationName) settings",
+        "Show \(.applicationName) settings"
+      ],
+      shortTitle: "Open Settings",
+      systemImageName: "gear"
+    )
+    AppShortcut(
       intent: EnableBackgroundModeIntent(),
       phrases: [
         "Enable \(.applicationName) background mode"
