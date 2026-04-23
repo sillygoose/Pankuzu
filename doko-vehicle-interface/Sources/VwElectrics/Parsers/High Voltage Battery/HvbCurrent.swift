@@ -1,20 +1,11 @@
 import ParsingHelpers
 import DokoDebug
 
-/*
- Ready  Battery  HV Battery current  A  UDS SID
- 0x17fc007b 03 22 1e 3d 55 55 55 55  17
- 17fc007b  03 22 1e 3d 55 55 55 55
- 0x17fe007b 07 62 1e 3d WW XX YY ZZ
- 17fe007b  07 62 1e 3d WW XX YY ZZ  (WW*2^32+XX*2^16+YY*2^8+ZZ-150000)/100 = HV current in decimal value
- Negative value is out from battery (consumption) and positive value is into battery (charging or regen)
- */
-
 private struct stpxParser: Parser {
-  var body: some Parser<Substring.UTF8View, Double> {
+  var body: some Parser<Substring.UTF8View, (Double, Double)> {
     "621E3D".utf8
     Int32ToDouble()
-    "32".utf8
+    UInt8ToDouble()
   }
 }
 
@@ -32,6 +23,6 @@ func parseHvbCurrent(_ input: String) throws -> Double {
   }
 #endif
   var input = input[...].utf8
-  let current = try stpxParser().parse(&input)
+  let (current, _) = try stpxParser().parse(&input)
   return (current - 150000) * 0.01
 }
