@@ -13,15 +13,3 @@ extension SharedKey where Self == InMemoryKey<String?>.Default {
     Self[.inMemory("ObdLinkManager-AccessorySerialNumber"), default: nil]
   }
 }
-
-//extension SharedKey where Self == AppStorageKey<Bool>.Default {
-//  public static var backgroundMode: Self {
-//    Self[.appStorage("ObdLinkManager-BackgroundMode"), default: false]
-//  }
-//}
-//
-//extension SharedKey where Self == AppStorageKey<String?>.Default {
-//  public static var accessorySerialNumber: Self {
-//    Self[.appStorage("ObdLinkManager-AccessorySerialNumber"), default: nil]
-//  }
-//}

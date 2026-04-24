@@ -19,38 +19,36 @@ public struct TripRow: View {
     self.fromLocation = DokoLocationManager.shared.lookup(id: trip.originID)
     self.toLocation = DokoLocationManager.shared.lookup(id: trip.destinationID)
   }
-
+  
   public var body: some View {
-    HStack {
-      VStack(alignment: .leading) {
+    VStack(alignment: .leading, spacing: 5) {
+      HStack {
         Text("\(trip.timeStart.formatted(date: .numeric, time: .shortened))")
         Spacer()
-        Text("\(fromLocation.placeNameCityState)")
-          .multilineTextAlignment(.leading)
-          .fixedSize(horizontal: false, vertical: true)
-        Spacer()
-        Text("\(toLocation.placeNameCityState)")
-          .multilineTextAlignment(.leading)
-          .fixedSize(horizontal: false, vertical: true)
-      }
-      .font(.body)
-      Spacer()
-      VStack(alignment: .trailing)  {
         if let vehicle = vehicle {
           Image(systemName: vehicle.truck ? "truck.pickup.side" : "car.side")
         } else {
           Image(systemName: "truck.pickup.side")
         }
       }
-      .font(.body)
+      
+      Text("\(fromLocation.placeNameCityState)")
+        .multilineTextAlignment(.leading)
+        .fixedSize(horizontal: false, vertical: true)
+      
+      Text("\(toLocation.placeNameCityState)")
+        .multilineTextAlignment(.leading)
+        .fixedSize(horizontal: false, vertical: true)
     }
+    .font(.body)
+    .padding(.horizontal, 2)
   }
 }
 
 #Preview {
   let _ = prepareDependencies {
-    try! $0.bootstrapDatabase()
-    try! $0.defaultDatabase.seedPreviews()
+    try? $0.bootstrapDatabase()
+    try? $0.defaultDatabase.seedPreviews()
   }
   @FetchAll() var trips: [Trip]
   NavigationStack {

@@ -111,8 +111,6 @@ public final class DokoLocationManager: Sendable {
       
       if result.stateProv == nil, let singleLine = addressRepresentations.fullAddress(includingRegion: false, singleLine: true),
          let city = result.city {
-        // Canada: "180 Nichol Rd, Baltimore ON K0K 1C0, Canada" — city and province space-separated
-        // US:     "123 Main St, Springfield, IL 62701"          — city and state comma-separated
         for sep in [" ", ", "] {
           let tail = singleLine.components(separatedBy: city + sep).dropFirst().first ?? ""
           let candidate = tail.components(separatedBy: CharacterSet(charactersIn: " ,")).first ?? ""

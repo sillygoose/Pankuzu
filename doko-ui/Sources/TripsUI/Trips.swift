@@ -319,7 +319,6 @@ public struct TripsView: View {
             }
           }
         }
-        .padding(.horizontal)
         .padding(.bottom, 8)
 
         List {
@@ -343,6 +342,7 @@ public struct TripsView: View {
               Spacer()
             }
             .buttonStyle(.borderless)
+            .listRowInsets(EdgeInsets(top: 10, leading: 5, bottom: 10, trailing: 5))
           }
         }
         .listStyle(.plain)
