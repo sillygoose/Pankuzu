@@ -145,14 +145,14 @@ public struct TripDetailView: View {
         }
       }
       
-      if let weatherTempStartMetric = trip.weatherTempStart, let weatherTempEndMetric = trip.weatherTempEnd,
+      if let weatherTemperatureStart = trip.weatherTempStart, let weatherTemperatureEnd = trip.weatherTempEnd,
          let weatherConditionsStart = trip.weatherConditionsStart, let weatherConditionsEnd = trip.weatherConditionsEnd {
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
           GridRow {
             DokoGridWeatherConditions(
-              startCondition: Measurement(value: weatherTempStartMetric, unit: UnitTemperature.celsius),
+              startTemperature: weatherTemperatureStart,
               startConditionSymbol: weatherConditionsStart,
-              endCondition: Measurement(value: weatherTempEndMetric, unit: UnitTemperature.celsius),
+              endTemperature: weatherTemperatureEnd,
               endConditionSymbol: weatherConditionsEnd,
               title: "Trip Conditions"
             ) {
@@ -224,7 +224,7 @@ public struct TripDetailView: View {
               to:model.appSettings.metric ? model.appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
             )
           GridRow {
-            DokoGridValueButton(
+            GridValueButton(
               color: .red,
               value: String(format: "%.1f", energyUsed.value),
               units: energyUsed.unit.symbol,
@@ -274,7 +274,7 @@ public struct TripDetailView: View {
             return Color.green
           }()
           GridRow {
-            DokoGridValueButton(
+            GridValueButton(
               color: batteryStateOfHealthColor,
               value: String(format: "%.0f", batteryStateOfHealth.value),
               units: batteryStateOfHealth.unit.symbol,
@@ -284,7 +284,7 @@ public struct TripDetailView: View {
               model.destination = .stateOfHealthChart
             }
             
-            DokoGridValueButton(
+            GridValueButton(
               color: .orange,
               value: nil,
               units: nil,

@@ -156,7 +156,7 @@ public struct ChargeDetailView: View {
           let energyAdded = Measurement(value: energy, unit: UnitEnergy.kilowattHours)
           let displayEnergy = abs(energyAdded.value) < 0.05 ? 0.0 : energyAdded.value
           GridRow {
-            DokoGridValueButton(
+            GridValueButton(
               color: .blue,
               value: String(format: "%.1f", displayEnergy),
               units: energyAdded.unit.symbol,
@@ -237,7 +237,7 @@ public struct ChargeDetailView: View {
             let batteryStateOfHealth = Measurement(value: batteryStateOfHealth, unit: UnitPercent.percent)
             let batteryStateOfHealthColor =
             batteryStateOfHealth.value < 80 ? Color.red : batteryStateOfHealth.value < 90 ? .yellow : .green
-            DokoGridValueButton(
+            GridValueButton(
               color: batteryStateOfHealthColor,
               value: String(format: "%.0f", batteryStateOfHealth.value),
               units: batteryStateOfHealth.unit.symbol,
@@ -247,7 +247,7 @@ public struct ChargeDetailView: View {
               model.destination = .stateOfHealthChart
             }
             
-            DokoGridValueButton(
+            GridValueButton(
               color: .orange,
               value: nil,
               units: nil,

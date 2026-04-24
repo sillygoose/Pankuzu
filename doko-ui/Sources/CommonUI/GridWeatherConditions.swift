@@ -3,26 +3,26 @@ import SwiftUI
 import DokoSharing
 
 public struct DokoGridWeatherConditions: View {
-  let startCondition: Measurement<UnitTemperature>
+  let startTemperature: Measurement<UnitTemperature>
   let startConditionSymbol: String
-  let endCondition: Measurement<UnitTemperature>
+  let endTemperature: Measurement<UnitTemperature>
   let endConditionSymbol: String
   let title: String
   let action: () -> Void
 
   public init(
-    startCondition: Measurement<UnitTemperature>,
+    startTemperature: Double,
     startConditionSymbol: String,
-    endCondition: Measurement<UnitTemperature>,
+    endTemperature: Double,
     endConditionSymbol: String,
     title: String = "",
     action: @escaping () -> Void
   ) {
     @Shared(.appSettings) var appSettings
-    self.startCondition = startCondition
+    self.startTemperature = Measurement(value: startTemperature, unit: UnitTemperature.celsius)
       .converted(to: appSettings.metric ? .celsius : .fahrenheit)
     self.startConditionSymbol = startConditionSymbol
-    self.endCondition = endCondition
+    self.endTemperature = Measurement(value: endTemperature, unit: UnitTemperature.celsius)
       .converted(to: appSettings.metric ? .celsius : .fahrenheit)
     self.endConditionSymbol = endConditionSymbol
     self.title = title
@@ -35,8 +35,8 @@ public struct DokoGridWeatherConditions: View {
         HStack {
           HStack(alignment: .bottom) {
             HStack(alignment: .top, spacing: 2) {
-              Text(startCondition.value, format: .number.precision(.fractionLength(0)))
-              Text(startCondition.unit.symbol)
+              Text(startTemperature.value, format: .number.precision(.fractionLength(0)))
+              Text(startTemperature.unit.symbol)
                 .font(DesignTokens.Font.headline)
                 .opacity(DesignTokens.Opacity.muted)
               Image(systemName: startConditionSymbol)
@@ -45,8 +45,8 @@ public struct DokoGridWeatherConditions: View {
 
             HStack(alignment: .top, spacing: 2) {
               Image(systemName: endConditionSymbol)
-              Text(endCondition.value, format: .number.precision(.fractionLength(0)))
-              Text(endCondition.unit.symbol)
+              Text(endTemperature.value, format: .number.precision(.fractionLength(0)))
+              Text(endTemperature.unit.symbol)
                 .font(DesignTokens.Font.headline)
                 .opacity(DesignTokens.Opacity.muted)
             }
@@ -77,9 +77,9 @@ public struct DokoGridWeatherConditions: View {
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
           DokoGridWeatherConditions(
-            startCondition: Measurement(value: 20, unit: .celsius),
+            startTemperature: 20,
             startConditionSymbol: "cloud",
-            endCondition: Measurement(value: 22, unit: .celsius),
+            endTemperature: 22,
             endConditionSymbol: "cloud",
             title: "Trip Conditions"
           ) {

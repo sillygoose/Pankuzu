@@ -162,7 +162,7 @@ public struct ChargeDetailBatteryView: View {
               }()
               let couplerTempStart = Measurement(value: couplerTempStartMetric, unit: UnitTemperature.celsius)
                 .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
-              DokoGridValueButton(
+              GridValueButton(
                 color: couplerTempStartColor,
                 value: String(format: "%.0f", couplerTempStart.value),
                 units: couplerTempStart.unit.symbol,
@@ -178,7 +178,7 @@ public struct ChargeDetailBatteryView: View {
               }()
               let couplerTempEnd = Measurement(value: couplerTempEndMetric, unit: UnitTemperature.celsius)
                 .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
-              DokoGridValueButton(
+              GridValueButton(
                 color: couplerTempEndColor,
                 value: String(format: "%.0f", couplerTempEnd.value),
                 units: couplerTempEnd.unit.symbol,

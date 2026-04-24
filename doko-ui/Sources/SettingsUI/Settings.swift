@@ -82,7 +82,7 @@ public struct SettingsView: View {
           Divider()
 
           GridRow {
-            DokoGridValueButton(
+            GridValueButton(
               color: .cyan,
               value: "\(model.vehicleStats.count)",
               units: nil,
@@ -92,7 +92,7 @@ public struct SettingsView: View {
               path.append(Destination.vehicleSettings)
             }
 
-            DokoGridValueButton(
+            GridValueButton(
               color: .blue,
               value: "\(model.locationStats.count)",
               units: nil,
@@ -104,7 +104,7 @@ public struct SettingsView: View {
           }
 
           GridRow {
-            DokoGridValueButton(
+            GridValueButton(
               color: .green,
               value: nil,
               units: nil,
@@ -114,7 +114,7 @@ public struct SettingsView: View {
               path.append(Destination.databaseSettings)
             }
 
-            DokoGridValueButton(
+            GridValueButton(
               color: .purple,
               value: nil,
               units: nil,
@@ -126,7 +126,7 @@ public struct SettingsView: View {
           }
 
           GridRow {
-            DokoGridValueButton(
+            GridValueButton(
               color: .orange,
               value: nil,
               units: nil,
@@ -136,7 +136,7 @@ public struct SettingsView: View {
               path.append(Destination.unitsSettings)
             }
 
-            DokoGridValueButton(
+            GridValueButton(
               color: .teal,
               value: nil,
               units: nil,
@@ -148,7 +148,7 @@ public struct SettingsView: View {
           }
 
           GridRow {
-            DokoGridValueButton(
+            GridValueButton(
               color: .blue,
               value: nil,
               units: nil,
@@ -158,7 +158,7 @@ public struct SettingsView: View {
               path.append(Destination.iCloudSettings)
             }
 
-            DokoGridValueButton(
+            GridValueButton(
               color: .indigo,
               value: nil,
               units: nil,
@@ -170,7 +170,7 @@ public struct SettingsView: View {
           }
 
           GridRow {
-            DokoGridValueButton(
+            GridValueButton(
               color: .mint,
               value: nil,
               units: nil,
@@ -180,7 +180,7 @@ public struct SettingsView: View {
               path.append(Destination.scanTools)
             }
 
-            DokoGridValueButton(
+            GridValueButton(
               color: .gray,
               value: nil,
               units: nil,
@@ -192,7 +192,7 @@ public struct SettingsView: View {
           }
           
           GridRow {
-            DokoGridValueButton(
+            GridValueButton(
               color: .yellow,
               value: nil,
               units: nil,
@@ -202,7 +202,7 @@ public struct SettingsView: View {
               path.append(Destination.about)
             }
 
-            DokoGridValueButton(
+            GridValueButton(
               color: .red,
               value: nil,
               units: nil,

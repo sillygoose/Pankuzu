@@ -7,7 +7,7 @@ public struct DokoGridCount: View {
   let symbolName: String
   let pulseSymbol: Bool
   let title: String
-
+  
   public init(
     color: Color, value: String, units: String,
     symbolName: String,
@@ -21,7 +21,7 @@ public struct DokoGridCount: View {
     self.pulseSymbol = pulseSymbol
     self.title = title
   }
-
+  
   public var body: some View {
     VStack {
       HStack {
@@ -61,7 +61,7 @@ public struct DokoGridCount: View {
   }
 }
 
-#Preview("DokoGridCount") {
+#Preview("Grid Count") {
   NavigationStack {
     ScrollView {
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
@@ -76,7 +76,7 @@ public struct DokoGridCount: View {
           )
         }
       }
-
+      
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         let duration: Duration = .seconds(600)
         let distance = Measurement(

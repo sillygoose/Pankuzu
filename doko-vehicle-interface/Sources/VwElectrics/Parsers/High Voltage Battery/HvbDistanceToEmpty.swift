@@ -6,11 +6,18 @@ import DokoDebug
  Bytes [2:4]: u16 km → 345 km
 
  DID 2AB6 — Range Displayed:
- Bytes [0:2]: u16 miles → 215 miles */
+ Bytes [0:2]: u16 miles → 215 miles
+
+   .batteryCurrent2(ERROR) [STPX h:710, d:222AB5 → 77A622AB501160000011600000000]
+   .batteryCurrent3(ERROR) [222AB5 → 77A622AB501160000011600000000]
+
+ 77A 62 2AB5 0116 0000 0116 0000 0000
+ 278 km
+ */
 
 private struct stpxParser: Parser {
   var body: some Parser<Substring.UTF8View, Double> {
-    "622AB6".utf8
+    "622AB5".utf8
     UInt16ToDouble()
   }
 }

@@ -7,7 +7,7 @@ public struct DokoGridLocation: View {
   let label: String
   let symbolName: String
   let action: () -> Void
-
+  
   public init(color: Color, placeName: String, cityState: String, label: String, symbolName: String, action: @escaping () -> Void) {
     self.color = color
     self.placeName = placeName
@@ -16,7 +16,7 @@ public struct DokoGridLocation: View {
     self.symbolName = symbolName
     self.action = action
   }
-
+  
   public var body: some View {
     Button(action: action) {
       HStack(spacing: DesignTokens.Grid.horizontalSpacing) {
@@ -61,7 +61,7 @@ public struct DokoGridLocation: View {
           }
         }
       }
-
+      
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
           DokoGridLocation(
