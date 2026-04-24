@@ -47,15 +47,15 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .stp(let canProtocol):         obdLinkCommand = "STP \(canProtocol)"
     case .stpbr(let baudRate):          obdLinkCommand = "STPBR \(baudRate)"
 
-    case .batteryCurrent0:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
-    case .batteryCurrent1:              obdLinkCommand = "221E3D"
-    case .batteryCurrent2:              obdLinkCommand = "STPX h:17FC007B, d:221E3D"
-    case .batteryCurrent3:              obdLinkCommand = "221E3D"
+    case .batteryCurrent0:              obdLinkCommand = "STPX h:710, d:222AB2"
+    case .batteryCurrent1:              obdLinkCommand = "222AB2"
+    case .batteryCurrent2:              obdLinkCommand = "STPX h:710, d:222AB5"
+    case .batteryCurrent3:              obdLinkCommand = "222AB5"
 
-    case .batteryCurrent4:              obdLinkCommand = "STPX h:17FC007B, d:03221E3D"
-    case .batteryCurrent5:              obdLinkCommand = "03221E3D"
-    case .batteryCurrent6:              obdLinkCommand = "STPX h:17FC007B, d:03221E3D"
-    case .batteryCurrent7:              obdLinkCommand = "03221E3D"
+//    case .batteryCurrent4:              obdLinkCommand = "STPX h:17FC007B, d:03221E3D"
+//    case .batteryCurrent5:              obdLinkCommand = "03221E3D"
+//    case .batteryCurrent6:              obdLinkCommand = "STPX h:17FC007B, d:03221E3D"
+//    case .batteryCurrent7:              obdLinkCommand = "03221E3D"
 
     case .gearSelected:                 obdLinkCommand = "STPX h:17FC0076, d:22210E"
     case .odometer:                     obdLinkCommand = "STPX h:17FC0076, d:22295A"
@@ -89,49 +89,29 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
         //.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
-        //.atcfc(true),
+
+        // ATSP6 + ATSH 710 + ATCRA 77A + ATFCSH 710 + ATFCSD 300000 + ATFCSM1         */
         .ath(true),
+        .stp(33), .stpo,
+        .atsh("710"),
+        .atcra("77A"),
+        .atfcsh("710"),
+        .atfcsd("300000"),
+        .atfcsm(1),
+
+        .batteryCurrent0,
+        .batteryCurrent1,
+        .batteryCurrent2,
+        .batteryCurrent3,
+
+        .ath(false),
+        .stp(34), .stpo,
         .atsh("FC007B"),
         .atcp("17"),
         .atcra("17FE007X"),
         .atfcsh("17FC007B"),
         .atfcsd("300000"),
         .atfcsm(1),
-
-        .atcaf(false),
-        .stcsegr(false),
-        .batteryCurrent4,
-        .batteryCurrent5,
-        .atcaf(false),
-        .stcsegr(true),
-        .batteryCurrent6,
-        .batteryCurrent7,
-        .atcaf(true),
-        .stcsegr(false),
-        .batteryCurrent0,
-        .batteryCurrent1,
-        .atcaf(true),
-        .stcsegr(true),
-        .batteryCurrent2,
-        .batteryCurrent3,
-
-        /*
-         ATSH FC007B / ATCP 17 / ATCRA 17FE007B / ATFCSH 17FC007B / ATFCSD 300000 / ATFCSM1
-         ATSH FC0076 / ATCP 17 / ATCRA 17FE0076 / ATFCSH 17FC0076 / ATFCSD 300000 / ATFCSM1
-         */
-        
-        /*
-         .atcra("7XX"),
-         .stp(33), .stpo,
-         .ath(true),
-         .batteryStateOfHealth,
-         .batteryDistanceToEmpty,
-
-         .stp(34), .stpo,
-         .atcra("17FE007X"),
-         */
-
-        .ath(false),
 
         .acChargerStatus, .dcChargerStatus,
         .gearSelected, .odometer, .speed,
