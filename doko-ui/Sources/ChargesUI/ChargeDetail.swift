@@ -180,46 +180,33 @@ public struct ChargeDetailView: View {
 
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         if let stateOfChargeStart = charge.stateOfChargeStart, let stateOfChargeEnd = charge.stateOfChargeEnd {
-//          GridRow {
-            let stateOfChargeStart = Measurement(value: stateOfChargeStart, unit: UnitPercent.percent)
-            let stateOfChargeEnd = Measurement(value: stateOfChargeEnd, unit: UnitPercent.percent)
-//            let (stateOfChargeStartColor, stateOfChargeStartIcon) = {
-//              if stateOfChargeStart.value < 25 { return (Color.red, "battery.25percent") }
-//              if stateOfChargeStart.value < 50 { return (Color.yellow,"battery.50percent") }
-//              return (Color.green, "battery.75percent")
-//            }()
-//            GridValue(
-//              color: stateOfChargeStartColor,
-//              value: String(format: "%.0f", stateOfChargeStart.value),
-//              units: stateOfChargeStart.unit.symbol,
-//              symbolName: stateOfChargeStartIcon,
-//              title: "Start SoC"
-//            )
-//            let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
-//              if stateOfChargeEnd.value < 25 { return (Color.red, "battery.25percent") }
-//              if stateOfChargeEnd.value < 50 { return (Color.yellow,"battery.50percent") }
-//              return (Color.green, "battery.75percent")
-//            }()
-//            GridValue(
-//              color: stateOfChargeEndColor,
-//              value: String(format: "%.0f", stateOfChargeEnd.value),
-//              units: stateOfChargeEnd.unit.symbol,
-//              symbolName: stateOfChargeEndIcon,
-//              title: "End SoC"
-//            )
-            GridRangeButton(
-              rangeName: "State Of Charge",
-              symbolColor: .green,
-              symbolName: "battery.75percent",
-              startValue: String(format: "%.0f", stateOfChargeStart.value),
-              startUnit: stateOfChargeStart.unit.symbol,
-              startColor: .primary,
-              endValue: String(format: "%.0f", stateOfChargeEnd.value),
-              endUnit: stateOfChargeEnd.unit.symbol,
-              endColor: .primary
-            ) {}
-//          }
+          let (stateOfChargeStartColor, stateOfChargeStartIcon) = {
+            if stateOfChargeStart < 25 { return (Color.red, "battery.25percent") }
+            if stateOfChargeStart < 50 { return (Color.yellow,"battery.50percent") }
+            return (Color.green, "battery.75percent")
+          }()
+          let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
+            if stateOfChargeEnd < 25 { return (Color.red, "battery.25percent") }
+            if stateOfChargeEnd < 50 { return (Color.yellow,"battery.50percent") }
+            return (Color.green, "battery.75percent")
+          }()
+          let stateOfChargeStart = Measurement(value: stateOfChargeStart, unit: UnitPercent.percent)
+          let stateOfChargeEnd = Measurement(value: stateOfChargeEnd, unit: UnitPercent.percent)
+          GridRangeButton(
+            rangeName: "State Of Charge",
+            startValue: String(format: "%.0f", stateOfChargeStart.value),
+            startUnit: stateOfChargeStart.unit.symbol,
+            startColor: stateOfChargeStartColor,
+            startSymbol: stateOfChargeStartIcon,
+            endValue: String(format: "%.0f", stateOfChargeEnd.value),
+            endUnit: stateOfChargeEnd.unit.symbol,
+            endColor: stateOfChargeEndColor,
+            endSymbol: stateOfChargeEndIcon,
+          ) {}
+
         }
+//        Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
+//        }
 
         if let distanceToEmptyStart = charge.distanceToEmptyStart, let distanceToEmptyEnd = charge.distanceToEmptyEnd {
           GridRow {

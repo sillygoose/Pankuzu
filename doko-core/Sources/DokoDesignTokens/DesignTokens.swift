@@ -22,6 +22,9 @@ public enum DesignTokens {
     public static let info = SwiftUI.Color.blue
 
     // Domain-specific
+    public static let cool = SwiftUI.Color.blue
+    public static let warm = SwiftUI.Color.yellow
+    public static let hot = SwiftUI.Color.red
     public static let record = SwiftUI.Color.red
     public static let duration = SwiftUI.Color.yellow
     public static let distance = SwiftUI.Color.blue

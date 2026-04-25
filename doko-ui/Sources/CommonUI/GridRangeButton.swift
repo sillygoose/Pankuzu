@@ -2,67 +2,58 @@ import SwiftUI
 
 public struct GridRangeButton: View {
   let rangeName: String
-  let symbolColor: Color
-  let symbolName: String
   let startValue: String
   let startUnit: String
   let startColor: Color
+  let startSymbol: String
   let endValue: String
   let endUnit: String
   let endColor: Color
+  let endSymbol: String
   let action: () -> Void
 
   public init(
     rangeName: String = "",
-    symbolColor: Color,
-    symbolName: String,
-    startValue: String, startUnit: String, startColor: Color = .primary,
-    endValue: String, endUnit: String, endColor: Color = .primary,
+    startValue: String, startUnit: String, startColor: Color, startSymbol: String = "bolt",
+    endValue: String, endUnit: String, endColor: Color, endSymbol: String = "bolt",
     action: @escaping () -> Void
   ) {
     self.rangeName = rangeName
-    self.symbolColor = symbolColor
-    self.symbolName = symbolName
     self.startValue = startValue
     self.startUnit = startUnit
     self.startColor = startColor
+    self.startSymbol = startSymbol
     self.endValue = endValue
     self.endUnit = endUnit
     self.endColor = endColor
+    self.endSymbol = endSymbol
     self.action = action
   }
 
   public var body: some View {
     Button(action: action) {
-      //      HStack(spacing: 12) {
       VStack(alignment: .leading) {
         HStack(alignment: .bottom) {
-          Image(systemName: symbolName)
+          Image(systemName: startSymbol)
             .font(DesignTokens.Font.title)
             .bold()
-            .foregroundStyle(symbolColor)
-            .frame(width: 32, height: 32)
-
-          Spacer()
+            .foregroundStyle(startColor)
+            .frame(width: 48, height: 32)
 
           HStack {
-            VStack(alignment: .trailing) {
-              Text("Start")
-                .font(DesignTokens.Font.headline)
-                .foregroundStyle(.gray)
-
+            VStack(alignment: .leading) {
               HStack(alignment: .bottom, spacing: 2) {
                 Text(startValue)
                   .font(DesignTokens.Font.title)
                   .fontDesign(.rounded)
                   .bold()
-                  .foregroundStyle(startColor)
+                  .foregroundStyle(DesignTokens.Color.value)
 
                 Text(startUnit)
                   .lineLimit(1)
                   .font(DesignTokens.Font.headline)
                   .bold()
-                  .foregroundStyle(startColor)
+                  .foregroundStyle(DesignTokens.Color.value)
               }
             }
           }
@@ -70,32 +61,35 @@ public struct GridRangeButton: View {
           Spacer()
 
           VStack(alignment: .trailing) {
-            Text("End")
-              .font(DesignTokens.Font.headline)
-              .foregroundStyle(.gray)
-
-            HStack(alignment: .bottom, spacing: 0) {
+            HStack(alignment: .bottom, spacing: 2) {
               Text(endValue)
                 .font(DesignTokens.Font.title)
                 .fontDesign(.rounded)
                 .bold()
-                .foregroundStyle(endColor)
+                .foregroundStyle(DesignTokens.Color.value)
 
               Text(endUnit)
                 .lineLimit(1)
                 .font(DesignTokens.Font.headline)
                 .bold()
-                .foregroundStyle(endColor)
+                .foregroundStyle(DesignTokens.Color.value)
+
+                Image(systemName: endSymbol)
+                  .font(DesignTokens.Font.title)
+                  .bold()
+                  .foregroundStyle(endColor)
+                  .frame(width: 48, height: 32)
             }
+
           }
         }
 
         Text(rangeName)
           .font(DesignTokens.Font.headline)
           .bold()
-          .foregroundStyle(symbolColor)
-          .multilineTextAlignment(.leading)
-          .frame(maxWidth: .infinity, alignment: .leading)
+          .foregroundStyle(.gray)
+          .multilineTextAlignment(.center)
+          .frame(maxWidth: .infinity, alignment: .center)
       }
     }
     .buttonStyle(.borderless)
@@ -110,56 +104,88 @@ public struct GridRangeButton: View {
     ScrollView {
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
-          let couplerTempStart = Measurement(value: 12, unit: UnitTemperature.celsius)
-          let couplerTempEnd = Measurement(value: 60, unit: UnitTemperature.celsius)
+          let couplerTempStartMetric: Double = 12
+          let couplerTempEndMetric: Double = 60
+          let (couplerTempStartColor, couplerTempStartIcon) = {
+            if couplerTempStartMetric < 30 { return (DesignTokens.Color.cool, "ev.plug.dc.nacs") }
+            if couplerTempStartMetric < 50 { return (DesignTokens.Color.warm, "ev.plug.dc.nacs") }
+            return (DesignTokens.Color.hot, "ev.plug.dc.nacs")
+          }()
+          let (couplerTempEndColor, couplerTempEndIcon) = {
+            if couplerTempEndMetric < 30 { return (DesignTokens.Color.cool, "ev.plug.dc.nacs") }
+            if couplerTempEndMetric < 50 { return (DesignTokens.Color.warm, "ev.plug.dc.nacs") }
+            return (DesignTokens.Color.hot, "ev.plug.dc.nacs")
+          }()
+          let couplerTempStart = Measurement(value: couplerTempStartMetric, unit: UnitTemperature.celsius)
+          let couplerTempEnd = Measurement(value: couplerTempEndMetric, unit: UnitTemperature.celsius)
+
           GridRangeButton(
             rangeName: "Coupler Temperature",
-            symbolColor: .green,
-            symbolName: "ev.plug.dc.nacs",
             startValue: String(format: "%.0f", couplerTempStart.value),
             startUnit: couplerTempStart.unit.symbol,
-            startColor: .primary,
+            startColor: couplerTempStartColor,
+            startSymbol: couplerTempStartIcon,
             endValue: String(format: "%.0f", couplerTempEnd.value),
             endUnit: couplerTempEnd.unit.symbol,
-            endColor: .primary
+            endColor: couplerTempEndColor,
+            endSymbol: couplerTempEndIcon
           ) {}
         }
 
         GridRow {
-          let batteryTempStart = Measurement(value: 8, unit: UnitTemperature.celsius)
-          let batteryTempEnd = Measurement(value: 4, unit: UnitTemperature.celsius)
-          let batteryTempSymbol = {
-            if batteryTempEnd.value < 10 { return "batteryblock.stack.badge.snowflake" }
-            if batteryTempEnd.value < 50 { return "batteryblock.stack" }
-            return "batteryblock.stack.trianglebadge.exclamationmark"
+          let batteryTempStartMetric: Double = 28
+          let batteryTempEndMetric: Double = 54
+          let (batteryTempStartColor, batteryTempStartIcon) = {
+            if batteryTempStartMetric < 10 { return (DesignTokens.Color.cool, "batteryblock.stack.badge.snowflake") }
+            if batteryTempStartMetric < 40 { return (DesignTokens.Color.warm, "batteryblock.stack") }
+            return (DesignTokens.Color.hot, "batteryblock.stack.trianglebadge.exclamationmark")
           }()
+          let (batteryTempEndColor, batteryTempEndIcon) = {
+            if batteryTempEndMetric < 10 { return (DesignTokens.Color.cool, "batteryblock.stack.badge.snowflake") }
+            if batteryTempEndMetric < 40 { return (DesignTokens.Color.warm, "batteryblock.stack") }
+            return (DesignTokens.Color.hot, "batteryblock.stack.trianglebadge.exclamationmark")
+          }()
+          let batteryTempStart = Measurement(value: batteryTempStartMetric, unit: UnitTemperature.celsius)
+          let batteryTempEnd = Measurement(value: batteryTempEndMetric, unit: UnitTemperature.celsius)
 
           GridRangeButton(
             rangeName: "Battery Temperature",
-            symbolColor: .yellow,
-            symbolName: batteryTempSymbol,
             startValue: String(format: "%.0f", batteryTempStart.value),
             startUnit: batteryTempStart.unit.symbol,
-            startColor: .primary,
+            startColor: batteryTempStartColor,
+            startSymbol: batteryTempStartIcon,
             endValue: String(format: "%.0f", batteryTempEnd.value),
             endUnit: batteryTempEnd.unit.symbol,
-            endColor: .primary
+            endColor: batteryTempEndColor,
+            endSymbol: batteryTempEndIcon
           ) {}
         }
 
         GridRow {
-          let energyStart = Measurement(value: 18.4, unit: UnitEnergy.kilowattHours)
-          let energyEnd = Measurement(value: 42.1, unit: UnitEnergy.kilowattHours)
+          let energyToEmptyStartRaw: Double = 78.3
+          let energyToEmptyEndRaw: Double = 32.6
+          let (energyToEmptyStartColor, energyToEmptyStartIcon) = {
+            if energyToEmptyStartRaw < 25 { return (Color.red, "bolt") }
+            if energyToEmptyStartRaw < 50 { return (Color.yellow,"bolt") }
+            return (Color.green, "bolt")
+          }()
+          let (energyToEmptyEndColor, energyToEmptyEndIcon) = {
+            if energyToEmptyEndRaw < 25 { return (Color.red, "bolt") }
+            if energyToEmptyEndRaw < 50 { return (Color.yellow,"bolt") }
+            return (Color.green, "bolt")
+          }()
+          let energyToEmptyStart = Measurement(value: energyToEmptyStartRaw, unit: UnitEnergy.kilowattHours)
+          let energyToEmptyEnd = Measurement(value: energyToEmptyEndRaw, unit: UnitEnergy.kilowattHours)
           GridRangeButton(
             rangeName: "Energy To Empty",
-            symbolColor: .red,
-            symbolName: "bolt.fill",
-            startValue: String(format: "%.1f", energyStart.value),
-            startUnit: energyStart.unit.symbol,
-            startColor: .primary,
-            endValue: String(format: "%.1f", energyEnd.value),
-            endUnit: energyEnd.unit.symbol,
-            endColor: .primary
+            startValue: String(format: "%.1f", energyToEmptyStart.value),
+            startUnit: energyToEmptyStart.unit.symbol,
+            startColor: energyToEmptyStartColor,
+            startSymbol: energyToEmptyStartIcon,
+            endValue: String(format: "%.1f", energyToEmptyEnd.value),
+            endUnit: energyToEmptyEnd.unit.symbol,
+            endColor: energyToEmptyEndColor,
+            endSymbol: energyToEmptyEndIcon,
           ) {}
         }
       }
