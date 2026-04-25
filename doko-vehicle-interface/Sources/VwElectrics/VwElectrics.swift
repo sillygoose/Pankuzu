@@ -90,33 +90,40 @@ public actor VwElectrics: ConnectedVehicleInterface {
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
         //.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
 
-        // ATSP6 + ATSH 710 + ATCRA 77A + ATFCSH 710 + ATFCSD 300000 + ATFCSM1         */
-        .ath(true),
-        .stp(33), .stpo,
-        .atsh("710"),
-        .atcra("77A"),
-        .atfcsh("710"),
-        .atfcsd("300000"),
-        .atfcsm(1),
-
-        .batteryCurrent0,
-        .batteryCurrent1,
-        .batteryCurrent2,
-        .batteryCurrent3,
-
-        .ath(false),
-        .stp(34), .stpo,
-        .atsh("FC007B"),
-        .atcp("17"),
         .atcra("17FE007X"),
         .atfcsh("17FC007B"),
         .atfcsd("300000"),
         .atfcsm(1),
 
+        //.ath(true), // Test if .atcp("17"), .atsh("FC007B"), are requitred with STPX
+        .batteryVoltage,
+        .batteryTemperature,
+        
+        // ATSP6 + ATSH 710 + ATCRA 77A + ATFCSH 710 + ATFCSD 300000 + ATFCSM1         */
+//        .ath(true),
+        .stp(33), .stpo,
+//        .atsh("710"),
+        .atcra("77A"),
+        .atfcsh("710"),
+//        .atfcsd("300000"),
+//        .atfcsm(1),
+
+        .batteryStateOfHealth,
+        .batteryDistanceToEmpty,
+
+        .ath(false),
+        .stp(34), .stpo,
+        .atcp("17"),
+        .atsh("FC007B"),
+        .atfcsh("17FC007B"),
+        .atcra("17FE007X"),
+        .atfcsd("300000"),
+        .atfcsm(1),
+
         .acChargerStatus, .dcChargerStatus,
         .gearSelected, .odometer, .speed,
-        .batteryStateOfCharge, .batteryTemperature,
-        .batteryVoltage, .batteryCurrent,
+        .batteryStateOfCharge, // .batteryTemperature,
+        //.batteryVoltage, .batteryCurrent,
         //.batteryStateOfHealth, .batteryDistanceToEmpty,
       ])
 
