@@ -22,14 +22,14 @@ private struct stpxParser: Parser {
   }
 }
 
-func parseHvbStateOfHealth(_ input: String) throws -> Double {
+func parseHvbCurrentCapacity(_ input: String) throws -> Double {
 #if DEBUG
   @Shared(.simIdle) var simIdle
   if simIdle {
-    return 97
+    return 74
   }
 #endif
   var input = input[...].utf8
-  let soh = try stpxParser().parse(&input)
-  return (soh * 0.05) / 77.0 //###
+  let currentCapacity = try stpxParser().parse(&input)
+  return currentCapacity * 0.05
 }

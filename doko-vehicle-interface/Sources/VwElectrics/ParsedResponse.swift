@@ -79,9 +79,12 @@ extension VwElectrics {
       case .batteryStateOfCharge:
         let soc = try parseHvbStateOfCharge(response)
         commandResponse = .batteryStateOfCharge(soc)
-      case .batteryStateOfHealth:
-        let soh = try parseHvbStateOfHealth(response)
-        commandResponse = .batteryStateOfHealth(soh)
+      case .batteryCurrentCapacity:
+        let batteryCurrentCapacity = try parseHvbCurrentCapacity(response)
+        commandResponse = .batteryCurrentCapacity(batteryCurrentCapacity)
+      case .batteryOriginalCapacity:
+        let batteryOriginalCapacity = try parseHvbOriginalCapacity(response)
+        commandResponse = .batteryOriginalCapacity(batteryOriginalCapacity)
       case .batteryTemperature:
         let temperature = try parseHvbTemperature(response)
         commandResponse = .batteryTemperature(temperature)

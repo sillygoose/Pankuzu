@@ -61,18 +61,12 @@ extension VwElectrics {
   private func vehicleCustomizationResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
     dokoResponses[.nextState] = DokoCommandResponse(command: .vehicleCustomization, response: .nextState(.idle))
-    if let odometer = responsePacket.odometer {
-      dokoResponses[.odometer] = DokoCommandResponse(command: .vehicleCustomization, response: .odometer(odometer))
-    }
-    if let batteryVoltage = responsePacket.batteryVoltage, let batteryCurrent = responsePacket.batteryCurrent  {
-      let batteryPower = batteryVoltage * batteryCurrent
-      dokoResponses[.batteryPower] = DokoCommandResponse(command: .vehicleCustomization, response: .batteryPower(batteryPower))
-    }
-    if let batteryTemperature = responsePacket.batteryTemperature {
-      dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .vehicleCustomization, response: .batteryTemperature(batteryTemperature))
-    }
-    if let stateOfCharge = responsePacket.batteryStateOfCharge {
-      dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .vehicleCustomization, response: .batteryStateOfCharge(stateOfCharge))
+    if let batteryCurrentCapacity = responsePacket.batteryCurrentCapacity,
+       let batteryOriginalCapacity = responsePacket.batteryOriginalCapacity,
+       batteryOriginalCapacity > 0
+    {
+      let batteryStateOfHealth = 100 * batteryCurrentCapacity / batteryOriginalCapacity
+      dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .vehicleCustomization, response: .batteryStateOfHealth(batteryStateOfHealth))
     }
     return DokoResponsePacket(type: .vehicleCustomization, responses: dokoResponses)
   }

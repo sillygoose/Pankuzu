@@ -20,7 +20,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
   public var meanTemperatureSum: Double = 0.0
   public var meanTemperatureCount: Int = 0
 
-  public init(vehicle: Vehicle?) {
+  public init(
+    vehicle: Vehicle?
+  ) {
     self.vehicle = vehicle
   }
 
@@ -65,8 +67,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .batteryCurrent:               obdLinkCommand = "STPX h:17FC007B, d:221E3D"
     case .batteryStateOfCharge:         obdLinkCommand = "STPX h:17FC007B, d:22028C"
     case .batteryTemperature:           obdLinkCommand = "STPX h:17FC007B, d:222A0B"
+    case .batteryOriginalCapacity:      obdLinkCommand = "STPX h:17FC007B, d:22F1B3"
 
-    case .batteryStateOfHealth:         obdLinkCommand = "STPX h:710, d:222AB2"
+    case .batteryCurrentCapacity:       obdLinkCommand = "STPX h:710, d:222AB2"
     case .batteryDistanceToEmpty:       obdLinkCommand = "STPX h:710, d:222AB6"
 
     case .acChargerStatus:              obdLinkCommand = "STPX h:17FC007B, d:227448"
@@ -98,7 +101,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
         //.ath(true), // Test if .atcp("17"), .atsh("FC007B"), are requitred with STPX
         .batteryVoltage,
         .batteryTemperature,
-        
+
         // ATSP6 + ATSH 710 + ATCRA 77A + ATFCSH 710 + ATFCSD 300000 + ATFCSM1         */
 //        .ath(true),
         .stp(33), .stpo,
@@ -108,7 +111,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
 //        .atfcsd("300000"),
 //        .atfcsm(1),
 
-        .batteryStateOfHealth,
+        .batteryCurrentCapacity,
         .batteryDistanceToEmpty,
 
         .ath(false),
@@ -123,8 +126,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .acChargerStatus, .dcChargerStatus,
         .gearSelected, .odometer, .speed,
         .batteryStateOfCharge, // .batteryTemperature,
+        .batteryOriginalCapacity,
         //.batteryVoltage, .batteryCurrent,
-        //.batteryStateOfHealth, .batteryDistanceToEmpty,
+        //.batteryCurrentCapacity, .batteryDistanceToEmpty,
       ])
 
     case .idle:
@@ -158,7 +162,8 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .odometer,
         .batteryStateOfCharge,
         .batteryTemperature,
-        //.batteryDistanceToEmpty, //.batteryStateOfHealth,
+        .batteryOriginalCapacity,
+//        .batteryDistanceToEmpty, .batteryCurrentCapacity,
         .position,
       ])
     case .tripData:
@@ -191,6 +196,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .acChargeEnding:
       return ObdCommandPacket(type: .acChargeEnding, commands: [
         .batteryStateOfCharge, .batteryTemperature,
+        .batteryOriginalCapacity,
         //.batteryDistanceToEmpty, //.batteryStateOfHealth,
       ])
 
@@ -213,6 +219,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .dcChargeEnding:
       return ObdCommandPacket(type: .dcChargeEnding, commands: [
         .batteryStateOfCharge, .batteryTemperature,
+        .batteryOriginalCapacity,
         //.batteryDistanceToEmpty, //.batteryStateOfHealth,
       ])
 

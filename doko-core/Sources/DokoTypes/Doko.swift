@@ -221,6 +221,8 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case batteryPower
   case batteryEnergy
   case batteryEnergyToEmpty
+  case batteryOriginalCapacity
+  case batteryCurrentCapacity
 
   case couplerTemperature
   
@@ -320,6 +322,10 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".batteryEnergy"
       case .batteryEnergyToEmpty:
         return ".batteryEnergyToEmpty"
+      case .batteryOriginalCapacity:
+        return ".batteryOriginalCapacity"
+      case .batteryCurrentCapacity:
+        return ".batteryCurrentCapacity"
 
       case .couplerTemperature:
         return ".couplerTemperature"
@@ -362,6 +368,8 @@ public enum DokoResponse: Equatable, Sendable {
   case batteryPower(Double)
   case batteryEnergy(Double)
   case batteryEnergyToEmpty(Double)
+  case batteryOriginalCapacity(Double)
+  case batteryCurrentCapacity(Double)
 
   case couplerTemperature(Double)
 
@@ -409,6 +417,10 @@ public enum DokoResponse: Equatable, Sendable {
         return String(format: ".batteryEnergy(%.3f)", energy)
       case .batteryEnergyToEmpty(let ete):
         return String(format: ".batteryEnergyToEmpty(%.1f)", ete)
+      case .batteryOriginalCapacity(let kwh):
+        return String(format: ".batteryOriginalCapacity(%.1f)", kwh)
+      case .batteryCurrentCapacity(let kwh):
+        return String(format: ".batteryCurrentCapacity(%.1f)", kwh)
 
       case .couplerTemperature(let temp):
         return String(format: ".couplerTemperature(%.0f)", temp)
@@ -507,6 +519,16 @@ extension DokoResponsePacket {
 
   public var batteryEnergy: Double? {
     guard case let .batteryEnergy(v)? = responses[.batteryEnergy]?.response else { return nil }
+    return v
+  }
+
+  public var batteryOriginalCapacity: Double? {
+    guard case let .batteryOriginalCapacity(v)? = responses[.batteryOriginalCapacity]?.response else { return nil }
+    return v
+  }
+
+  public var batteryCurrentCapacity: Double? {
+    guard case let .batteryCurrentCapacity(v)? = responses[.batteryCurrentCapacity]?.response else { return nil }
     return v
   }
 
