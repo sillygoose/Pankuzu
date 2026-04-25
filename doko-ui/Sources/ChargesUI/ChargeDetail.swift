@@ -89,11 +89,11 @@ public struct ChargeDetailView: View {
       TipView(EditChargeDetailTip())
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
-          DokoGridButton(color: .blue, symbolName: "map.fill", title: "Map") {
+          GridButton(color: .blue, symbolName: "map.fill", title: "Map") {
             model.destination = .chargeLocationMap
           }
 
-          DokoGridButton(
+          GridButton(
             color: .green,
             symbolName: "chart.xyaxis.line",
             title: "Power"
@@ -101,7 +101,7 @@ public struct ChargeDetailView: View {
             model.destination = .powerChart
           }
 
-          DokoGridButton(
+          GridButton(
             color: .yellow,
             symbolName: "car",
             title: model.vehicle?.name ?? (model.vehicle?.model ?? "Missing Vehicle")
@@ -117,7 +117,7 @@ public struct ChargeDetailView: View {
         Section {
           Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
             GridRow {
-              DokoGridLocation(
+              GridLocation(
                 color: charge.chargerType == .ac ? .purple : .green,
                 placeName: model.chargeLocation.placeName,
                 cityState: model.chargeLocation.cityState,
@@ -133,7 +133,7 @@ public struct ChargeDetailView: View {
       
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
-          DokoGridCount(
+          GridValue(
             color: .yellow,
             value: String(format: "%.1f", odometer.value),
             units: odometer.unit.symbol,
@@ -141,7 +141,7 @@ public struct ChargeDetailView: View {
             title: "Odometer"
           )
 
-          DokoGridCount(
+          GridValue(
             color: .gray,
             value: duration.formatted(
               .time(pattern: .hourMinute(padHourToLength: 2))
@@ -165,8 +165,8 @@ public struct ChargeDetailView: View {
             ) {
               model.destination = .energyUsedChart
             }
-            
-            DokoGridCount(
+
+            GridValue(
               color: .red,
               value: String(format: "%.1f", peakPower.value),
               units: peakPower.unit.symbol,
@@ -176,43 +176,56 @@ public struct ChargeDetailView: View {
 
           }
         }
+      }
 
+      Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         if let stateOfChargeStart = charge.stateOfChargeStart, let stateOfChargeEnd = charge.stateOfChargeEnd {
-          GridRow {
+//          GridRow {
             let stateOfChargeStart = Measurement(value: stateOfChargeStart, unit: UnitPercent.percent)
             let stateOfChargeEnd = Measurement(value: stateOfChargeEnd, unit: UnitPercent.percent)
-            let (stateOfChargeStartColor, stateOfChargeStartIcon) = {
-              if stateOfChargeStart.value < 25 { return (Color.red, "battery.25percent") }
-              if stateOfChargeStart.value < 50 { return (Color.yellow,"battery.50percent") }
-              return (Color.green, "battery.75percent")
-            }()
-            DokoGridCount(
-              color: stateOfChargeStartColor,
-              value: String(format: "%.0f", stateOfChargeStart.value),
-              units: stateOfChargeStart.unit.symbol,
-              symbolName: stateOfChargeStartIcon,
-              title: "Start SoC"
-            )
-            let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
-              if stateOfChargeEnd.value < 25 { return (Color.red, "battery.25percent") }
-              if stateOfChargeEnd.value < 50 { return (Color.yellow,"battery.50percent") }
-              return (Color.green, "battery.75percent")
-            }()
-            DokoGridCount(
-              color: stateOfChargeEndColor,
-              value: String(format: "%.0f", stateOfChargeEnd.value),
-              units: stateOfChargeEnd.unit.symbol,
-              symbolName: stateOfChargeEndIcon,
-              title: "End SoC"
-            )
-          }
+//            let (stateOfChargeStartColor, stateOfChargeStartIcon) = {
+//              if stateOfChargeStart.value < 25 { return (Color.red, "battery.25percent") }
+//              if stateOfChargeStart.value < 50 { return (Color.yellow,"battery.50percent") }
+//              return (Color.green, "battery.75percent")
+//            }()
+//            GridValue(
+//              color: stateOfChargeStartColor,
+//              value: String(format: "%.0f", stateOfChargeStart.value),
+//              units: stateOfChargeStart.unit.symbol,
+//              symbolName: stateOfChargeStartIcon,
+//              title: "Start SoC"
+//            )
+//            let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
+//              if stateOfChargeEnd.value < 25 { return (Color.red, "battery.25percent") }
+//              if stateOfChargeEnd.value < 50 { return (Color.yellow,"battery.50percent") }
+//              return (Color.green, "battery.75percent")
+//            }()
+//            GridValue(
+//              color: stateOfChargeEndColor,
+//              value: String(format: "%.0f", stateOfChargeEnd.value),
+//              units: stateOfChargeEnd.unit.symbol,
+//              symbolName: stateOfChargeEndIcon,
+//              title: "End SoC"
+//            )
+            GridRangeButton(
+              rangeName: "State Of Charge",
+              symbolColor: .green,
+              symbolName: "battery.75percent",
+              startValue: String(format: "%.0f", stateOfChargeStart.value),
+              startUnit: stateOfChargeStart.unit.symbol,
+              startColor: .primary,
+              endValue: String(format: "%.0f", stateOfChargeEnd.value),
+              endUnit: stateOfChargeEnd.unit.symbol,
+              endColor: .primary
+            ) {}
+//          }
         }
 
         if let distanceToEmptyStart = charge.distanceToEmptyStart, let distanceToEmptyEnd = charge.distanceToEmptyEnd {
           GridRow {
             let dteStartMetric = Measurement(value: distanceToEmptyStart, unit: UnitLength.kilometers)
             let dteStart = dteStartMetric.converted(to: model.appSettings.metric ? .kilometers : .miles)
-            DokoGridCount(
+            GridValue(
               color: .blue,
               value: String(format: "%.0f", dteStart.value),
               units: dteStart.unit.symbol,
@@ -222,7 +235,7 @@ public struct ChargeDetailView: View {
             
             let dteEndMetric = Measurement(value: distanceToEmptyEnd, unit: UnitLength.kilometers)
             let dteEnd = dteEndMetric.converted(to: model.appSettings.metric ? .kilometers : .miles)
-            DokoGridCount(
+            GridValue(
               color: .blue,
               value: String(format: "%.0f", dteEnd.value),
               units: dteEnd.unit.symbol,

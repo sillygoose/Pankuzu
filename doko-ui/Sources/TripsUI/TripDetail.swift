@@ -86,7 +86,7 @@ public struct TripDetailView: View {
     ScrollView {
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
-          DokoGridButton(
+          GridButton(
             color: .blue,
             symbolName: "point.bottomleft.forward.to.point.topright.scurvepath.fill",
             title: "Route"
@@ -94,7 +94,7 @@ public struct TripDetailView: View {
             model.destination = .tripMap
           }
           
-          DokoGridButton(
+          GridButton(
             color: .green,
             symbolName: "mountain.2.fill",
             title: "Elevation"
@@ -102,7 +102,7 @@ public struct TripDetailView: View {
             model.destination = .elevationChart
           }
           
-          DokoGridButton(
+          GridButton(
             color: .yellow,
             symbolName: "car",
             title: model.vehicle?.name ?? (model.vehicle?.model ?? "Missing Vehicle")
@@ -118,7 +118,7 @@ public struct TripDetailView: View {
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         Section {
           GridRow {
-            DokoGridLocation(
+            GridLocation(
               color: .purple,
               placeName: model.fromLocation.placeName,
               cityState: model.fromLocation.cityState,
@@ -132,7 +132,7 @@ public struct TripDetailView: View {
         
         Section {
           GridRow {
-            DokoGridLocation(
+            GridLocation(
               color: .cyan,
               placeName: model.toLocation.placeName,
               cityState: model.toLocation.cityState,
@@ -149,7 +149,7 @@ public struct TripDetailView: View {
          let weatherConditionsStart = trip.weatherConditionsStart, let weatherConditionsEnd = trip.weatherConditionsEnd {
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
           GridRow {
-            DokoGridWeatherConditions(
+            GridWeatherConditions(
               startTemperature: weatherTemperatureStart,
               startConditionSymbol: weatherConditionsStart,
               endTemperature: weatherTemperatureEnd,
@@ -175,14 +175,14 @@ public struct TripDetailView: View {
       
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
-          DokoGridCount(
+          GridValue(
             color: .yellow,
             value: String(format: "%.1f", odometer.value),
             units: odometer.unit.symbol,
             symbolName: "gauge.open.with.lines.needle.33percent",
             title: "Odometer"
           )
-          DokoGridCount(
+          GridValue(
             color: .gray,
             value: duration.formatted(
               .time(pattern: .hourMinute(padHourToLength: 2))
@@ -195,14 +195,14 @@ public struct TripDetailView: View {
       }
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
-          DokoGridCount(
+          GridValue(
             color: .blue,
             value: String(format: "%.1f", distance.value),
             units: distance.unit.symbol,
             symbolName: "road.lanes",
             title: "Distance"
           )
-          DokoGridCount(
+          GridValue(
             color: .orange,
             value: String(format: "%.0f", averageSpeed.value),
             units: averageSpeed.unit.symbol,
@@ -233,7 +233,7 @@ public struct TripDetailView: View {
             ) {
               model.destination = .energyUsedChart
             }
-            DokoGridCount(
+            GridValue(
               color: .green,
               value: String(format: "%.1f", efficiency.value),
               units: efficiency.unit.symbol,
@@ -249,14 +249,14 @@ public struct TripDetailView: View {
               .converted(to: model.appSettings.metric ? .kilometers : .miles)
             let distanceToEmptyEnd = Measurement(value: distanceToEmptyEndMetric, unit: UnitLength.kilometers)
               .converted(to: model.appSettings.metric ? .kilometers : .miles)
-            DokoGridCount(
+            GridValue(
               color: .blue,
               value: String(format: "%.0f", distanceToEmptyStart.value),
               units: distanceToEmptyStart.unit.symbol,
               symbolName: "road.lanes.curved.left",
               title: "Start Range"
             )
-            DokoGridCount(
+            GridValue(
               color: .blue,
               value: String(format: "%.0f", distanceToEmptyEnd.value),
               units: distanceToEmptyEnd.unit.symbol,

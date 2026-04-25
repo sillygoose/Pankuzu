@@ -2,7 +2,7 @@ import SwiftUI
 
 import DokoSharing
 
-public struct DokoGridWeatherConditions: View {
+public struct GridWeatherConditions: View {
   let startTemperature: Measurement<UnitTemperature>
   let startConditionSymbol: String
   let endTemperature: Measurement<UnitTemperature>
@@ -76,7 +76,7 @@ public struct DokoGridWeatherConditions: View {
     ScrollView {
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
-          DokoGridWeatherConditions(
+          GridWeatherConditions(
             startTemperature: 20,
             startConditionSymbol: "cloud",
             endTemperature: 22,

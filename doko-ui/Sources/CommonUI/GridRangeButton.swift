@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct DokoGridRangeButton: View {
+public struct GridRangeButton: View {
   let rangeName: String
   let symbolColor: Color
   let symbolName: String
@@ -11,7 +11,7 @@ public struct DokoGridRangeButton: View {
   let endUnit: String
   let endColor: Color
   let action: () -> Void
-  
+
   public init(
     rangeName: String = "",
     symbolColor: Color,
@@ -31,64 +31,71 @@ public struct DokoGridRangeButton: View {
     self.endColor = endColor
     self.action = action
   }
-  
+
   public var body: some View {
     Button(action: action) {
-      HStack(spacing: 12) {
-        VStack(alignment: .leading) {
+      //      HStack(spacing: 12) {
+      VStack(alignment: .leading) {
+        HStack(alignment: .bottom) {
           Image(systemName: symbolName)
             .font(DesignTokens.Font.title)
             .bold()
             .foregroundStyle(symbolColor)
             .frame(width: 32, height: 32)
-          
-          Text(rangeName)
-            .font(DesignTokens.Font.headline)
-            .bold()
-            .foregroundStyle(symbolColor)
-            .multilineTextAlignment(.leading)
-            .frame(maxWidth: 150, alignment: .leading)
-        }
-        
-        VStack(alignment: .trailing) {
-          Text(startValue)
-            .font(DesignTokens.Font.title)
-            .fontDesign(.rounded)
-            .bold()
-            .foregroundStyle(startColor)
+
+          Spacer()
+
           HStack {
-            Text("Start")
-              .font(DesignTokens.Font.headline)
-              .foregroundStyle(.gray)
-            Spacer()
-            Text(startUnit)
-              .lineLimit(1)
-              .font(DesignTokens.Font.headline)
-              .bold()
-              .foregroundStyle(startColor)
+            VStack(alignment: .trailing) {
+              Text("Start")
+                .font(DesignTokens.Font.headline)
+                .foregroundStyle(.gray)
+
+              HStack(alignment: .bottom, spacing: 2) {
+                Text(startValue)
+                  .font(DesignTokens.Font.title)
+                  .fontDesign(.rounded)
+                  .bold()
+                  .foregroundStyle(startColor)
+
+                Text(startUnit)
+                  .lineLimit(1)
+                  .font(DesignTokens.Font.headline)
+                  .bold()
+                  .foregroundStyle(startColor)
+              }
+            }
           }
-        }
-        
-        Spacer()
-        
-        VStack(alignment: .trailing) {
-          Text(endValue)
-            .font(DesignTokens.Font.title)
-            .fontDesign(.rounded)
-            .bold()
-            .foregroundStyle(endColor)
-          HStack {
+
+          Spacer()
+
+          VStack(alignment: .trailing) {
             Text("End")
               .font(DesignTokens.Font.headline)
               .foregroundStyle(.gray)
-            Spacer()
-            Text(endUnit)
-              .lineLimit(1)
-              .font(DesignTokens.Font.headline)
-              .bold()
-              .foregroundStyle(endColor)
+
+            HStack(alignment: .bottom, spacing: 0) {
+              Text(endValue)
+                .font(DesignTokens.Font.title)
+                .fontDesign(.rounded)
+                .bold()
+                .foregroundStyle(endColor)
+
+              Text(endUnit)
+                .lineLimit(1)
+                .font(DesignTokens.Font.headline)
+                .bold()
+                .foregroundStyle(endColor)
+            }
           }
         }
+
+        Text(rangeName)
+          .font(DesignTokens.Font.headline)
+          .bold()
+          .foregroundStyle(symbolColor)
+          .multilineTextAlignment(.leading)
+          .frame(maxWidth: .infinity, alignment: .leading)
       }
     }
     .buttonStyle(.borderless)
@@ -105,7 +112,7 @@ public struct DokoGridRangeButton: View {
         GridRow {
           let couplerTempStart = Measurement(value: 12, unit: UnitTemperature.celsius)
           let couplerTempEnd = Measurement(value: 60, unit: UnitTemperature.celsius)
-          DokoGridRangeButton(
+          GridRangeButton(
             rangeName: "Coupler Temperature",
             symbolColor: .green,
             symbolName: "ev.plug.dc.nacs",
@@ -117,7 +124,7 @@ public struct DokoGridRangeButton: View {
             endColor: .primary
           ) {}
         }
-        
+
         GridRow {
           let batteryTempStart = Measurement(value: 8, unit: UnitTemperature.celsius)
           let batteryTempEnd = Measurement(value: 4, unit: UnitTemperature.celsius)
@@ -126,8 +133,8 @@ public struct DokoGridRangeButton: View {
             if batteryTempEnd.value < 50 { return "batteryblock.stack" }
             return "batteryblock.stack.trianglebadge.exclamationmark"
           }()
-          
-          DokoGridRangeButton(
+
+          GridRangeButton(
             rangeName: "Battery Temperature",
             symbolColor: .yellow,
             symbolName: batteryTempSymbol,
@@ -139,11 +146,11 @@ public struct DokoGridRangeButton: View {
             endColor: .primary
           ) {}
         }
-        
+
         GridRow {
           let energyStart = Measurement(value: 18.4, unit: UnitEnergy.kilowattHours)
           let energyEnd = Measurement(value: 42.1, unit: UnitEnergy.kilowattHours)
-          DokoGridRangeButton(
+          GridRangeButton(
             rangeName: "Energy To Empty",
             symbolColor: .red,
             symbolName: "bolt.fill",

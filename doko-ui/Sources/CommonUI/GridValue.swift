@@ -1,100 +1,125 @@
 import SwiftUI
 
-public struct GridValueButton: View {
+public struct GridValue: View {
   let color: Color
-  let value: String?
-  let units: String?
+  let value: String
+  let units: String
   let symbolName: String
   let title: String
-  let action: () -> Void
-
-  public init(color: Color, value: String?, units: String?, symbolName: String, title: String, action: @escaping () -> Void) {
+  
+  public init(
+    color: Color, value: String, units: String,
+    symbolName: String,
+    title: String
+  ) {
     self.color = color
     self.value = value
     self.units = units
     self.symbolName = symbolName
     self.title = title
-    self.action = action
   }
-
+  
   public var body: some View {
-    Button(action: action) {
-      VStack {
-        HStack {
-          Image(systemName: symbolName)
-            .font(DesignTokens.Font.title)
-            .bold()
-            .foregroundStyle(color)
-            .frame(width: 32, height: 32)
-          Spacer()
-          if let value {
-            Text("\(value)")
-              .font(DesignTokens.Font.title)
-              .fontDesign(.rounded)
-              .bold()
-              .foregroundStyle(DesignTokens.Color.value)
-          }
-        }
-        HStack {
-          Text(title)
-            .lineLimit(1)
-            .font(DesignTokens.Font.headline)
-            .foregroundStyle(.gray)
-          Spacer()
-          if let units {
-            Text("\(units)")
-              .lineLimit(1)
-              .font(DesignTokens.Font.headline)
-              .foregroundStyle(.gray)
-          }
-        }
+    VStack {
+      HStack {
+        Image(systemName: symbolName)
+          .font(DesignTokens.Font.title)
+          .bold()
+          .foregroundStyle(color)
+        Spacer()
+        Text(value)
+          .font(DesignTokens.Font.title)
+          .fontDesign(.rounded)
+          .bold()
+          .foregroundStyle(DesignTokens.Color.value)
+      }
+      HStack {
+        Text(title)
+          .lineLimit(1)
+          .font(DesignTokens.Font.headline)
+          .opacity(DesignTokens.Opacity.subtle)
+        Spacer()
+        Text(units)
+          .lineLimit(1)
+          .font(DesignTokens.Font.callout)
       }
     }
-    .buttonStyle(.borderless)
     .padding(DesignTokens.Padding.cardInsets)
     .background(DesignTokens.Color.cardBackground)
     .cornerRadius(DesignTokens.CornerRadius.medium)
   }
 }
 
-
-#Preview("Grid Button") {
+#Preview("Grid Count") {
   NavigationStack {
     ScrollView {
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
+        let odometer: Measurement<UnitLength> = .init(value: 150324.7, unit: .miles)
         GridRow {
-          GridValueButton(
-            color: .blue,
-            value: "3210",
-            units: "mi",
-            symbolName: "point.topright.arrow.triangle.backward.to.point.bottomleft.scurvepath",
-            title: "Route"
-          ) {
-            print("Route button pressed")
-          }
-          GridValueButton(
+          GridValue(
             color: .yellow,
-            value: "123",
-            units: nil,
-            symbolName: "car",
-            title: "F-150 Lightning"
-          ) {
-            print("F-150 Lightning button pressed")
-          }
+            value: String(format: "%.1f", odometer.value),
+            units: odometer.unit.symbol,
+            symbolName: "gauge.open.with.lines.needle.33percent",
+            title: "Odometer"
+          )
         }
       }
-
-      Spacer(minLength: 70)
-
+      
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
-        GridValueButton(
-          color: .yellow,
-          value: nil,
-          units: nil,
-          symbolName: "info.circle.fill",
-          title: "About"
-        ) {
-          print("About button pressed")
+        let duration: Duration = .seconds(600)
+        let distance = Measurement(
+          value: 10,
+          unit: UnitLength.kilometers
+        )
+        let averageSpeed = Measurement(
+          value: duration == .seconds(0)
+          ? 0 : (distance.value / Double(duration.components.seconds)) * 3600,
+          unit: UnitSpeed.kilometersPerHour
+        )
+        GridRow {
+          GridValue(
+            color: .blue,
+            value: String(format: "%.1f", distance.value),
+            units: distance.unit.symbol,
+            symbolName: "road.lanes",
+            title: "Distance"
+          )
+          GridValue(
+            color: .orange,
+            value: String(format: "%.0f", averageSpeed.value),
+            units: averageSpeed.unit.symbol,
+            symbolName: "powermeter",
+            title: "Avg. Speed"
+          )
+        }
+        GridRow {
+          let socStart = 80.0
+          let (socStartColor, socStartIcon) = {
+            if socStart < 25 { return (Color.red, "battery.25percent") }
+            if socStart < 50 { return (Color.yellow,"battery.50percent") }
+            return (Color.green, "battery.75percent")
+          }()
+          GridValue(
+            color: socStartColor,
+            value: String(format: "%.0f", socStart),
+            units: "%",
+            symbolName: socStartIcon,
+            title: "SoC Start"
+          )
+          let socEnd = 75.0
+          let (socEndColor, socEndIcon) = {
+            if socEnd < 25 { return (Color.red, "battery.25percent") }
+            if socEnd < 50 { return (Color.yellow,"battery.50percent") }
+            return (Color.green, "battery.75percent")
+          }()
+          GridValue(
+            color: socEndColor,
+            value: String(format: "%.0f", socEnd),
+            units: "%",
+            symbolName: socEndIcon,
+            title: "SoC End"
+          )
         }
       }
     }

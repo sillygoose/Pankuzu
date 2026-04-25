@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct DokoGridLocation: View {
+public struct GridLocation: View {
   let color: Color
   let placeName: String
   let cityState: String
@@ -51,7 +51,7 @@ public struct DokoGridLocation: View {
     ScrollView {
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
-          DokoGridLocation(
+          GridLocation(
             color: .purple,
             placeName: "Bob's Barbeque",
             cityState: "Homer, NY",
@@ -64,7 +64,7 @@ public struct DokoGridLocation: View {
       
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
-          DokoGridLocation(
+          GridLocation(
             color: .blue,
             placeName: "Kwik-Fill",
             cityState: "7Skaneatekes, NY",

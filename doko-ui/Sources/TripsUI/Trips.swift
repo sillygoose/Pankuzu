@@ -213,7 +213,7 @@ public struct TripsView: View {
                   }
                 }
               } label: {
-                DokoGridButton(
+                GridButton(
                   color: .mint,
                   symbolName: model.vehicleButtonImage,
                   title: model.vehicleButtonTitle
@@ -232,16 +232,15 @@ public struct TripsView: View {
             let distance = metricDistance.converted(to: model.appSettings.metric ? .kilometers : .miles)
 
             GridRow {
-              DokoGridCount(
+              GridValue(
                 color: .blue,
                 value: "\(tripCount)",
                 units: "",
                 symbolName: "bolt.car",
-                pulseSymbol: model.activeSession == .trip,
                 title: "Trips"
               )
 
-              DokoGridCount(
+              GridValue(
                 color: .gray,
                 value: duration.formatted(
                   .time(pattern: .hourMinute(padHourToLength: 2))
@@ -253,7 +252,7 @@ public struct TripsView: View {
             }
 
             GridRow {
-              DokoGridCount(
+              GridValue(
                 color: .yellow,
                 value: String(format: "%.1f", distance.value),
                 units: distance.unit.symbol,
@@ -269,7 +268,7 @@ public struct TripsView: View {
                   if meanTemperaturePeriodMetric < 30 { return (Color.green,"thermometer.medium") }
                   return (Color.red, "thermometer.high")
                 }()
-                DokoGridCount(
+                GridValue(
                   color: meanTemperaturePeriodColor,
                   value: String(format: "%.0f", meanTemperaturePeriod.value),
                   units: meanTemperaturePeriod.unit.symbol,
@@ -279,7 +278,7 @@ public struct TripsView: View {
               } else {
                 let meanTemperaturePeriod = Measurement(value: 0, unit: UnitTemperature.celsius)
                   .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
-                DokoGridCount(
+                GridValue(
                   color: .green,
                   value: "-",
                   units: meanTemperaturePeriod.unit.symbol,
@@ -300,7 +299,7 @@ public struct TripsView: View {
                   to: model.appSettings.metric ? model.appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
                 )
               GridRow {
-                DokoGridCount(
+                GridValue(
                   color: .red,
                   value: String(format: "%.1f", energyKWh.value),
                   units: energyKWh.unit.symbol,
@@ -308,7 +307,7 @@ public struct TripsView: View {
                   title: "Energy Used"
                 )
 
-                DokoGridCount(
+                GridValue(
                   color: .green,
                   value: String(format: "%.1f", energyEfficiency.value),
                   units: energyEfficiency.unit.symbol,

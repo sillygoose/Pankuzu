@@ -24,7 +24,7 @@ public struct ToolsView: View {
       List {
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
           GridRow {
-            DokoGridButton(
+            GridButton(
               color: .green,
               symbolName: "ev.charger",
               title: "Add Charge"

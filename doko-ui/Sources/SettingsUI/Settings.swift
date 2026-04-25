@@ -65,7 +65,7 @@ public struct SettingsView: View {
       TipView(ScanToolTip())
       List {
         Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
-          DokoGridStatusButton(
+          GridStatusButton(
             leftSymbol: model.bluetoothEnableSymbol,
             leftSymbolColor: model.bluetoothEnableSymbolColor,
             leftSymbolTitle: "Emable",

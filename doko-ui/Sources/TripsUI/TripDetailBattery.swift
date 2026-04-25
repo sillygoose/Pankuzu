@@ -42,7 +42,7 @@ public struct TripDetailBatteryView: View {
               if stateOfChargeStart.value < 50 { return (Color.yellow,"battery.50percent") }
               return (Color.green, "battery.75percent")
             }()
-            DokoGridCount(
+            GridValue(
               color: stateOfChargeStartColor,
               value: String(format: "%.0f", stateOfChargeStart.value),
               units: stateOfChargeStart.unit.symbol,
@@ -54,7 +54,7 @@ public struct TripDetailBatteryView: View {
               if stateOfChargeEnd.value < 50 { return (Color.yellow,"battery.50percent") }
               return (Color.green, "battery.75percent")
             }()
-            DokoGridCount(
+            GridValue(
               color: stateOfChargeEndColor,
               value: String(format: "%.0f", stateOfChargeEnd.value),
               units: stateOfChargeEnd.unit.symbol,
@@ -75,7 +75,7 @@ public struct TripDetailBatteryView: View {
               if energyToEmptyStart.value < 50 { return (Color.yellow,"bolt") }
               return (Color.green, "bolt")
             }()
-            DokoGridCount(
+            GridValue(
               color: energyToEmptyStartColor,
               value: String(format: "%.1f", energyToEmptyStart.value),
               units: energyToEmptyStart.unit.symbol,
@@ -88,7 +88,7 @@ public struct TripDetailBatteryView: View {
               if energyToEmptyEnd.value < 50 { return (Color.yellow,"bolt") }
               return (Color.green, "bolt")
             }()
-            DokoGridCount(
+            GridValue(
               color: energyToEmptyEndColor,
               value: String(format: "%.1f", energyToEmptyStart.value - energyToEmptyEnd.value),
               units: energyToEmptyEnd.unit.symbol,
@@ -109,7 +109,7 @@ public struct TripDetailBatteryView: View {
             }()
             let batteryTempStart = Measurement(value: batteryTempStartMetric, unit: UnitTemperature.celsius)
               .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
-            DokoGridCount(
+            GridValue(
               color: batteryTempStartColor,
               value: String(format: "%.0f", batteryTempStart.value),
               units: batteryTempStart.unit.symbol,
@@ -124,7 +124,7 @@ public struct TripDetailBatteryView: View {
             }()
             let batteryTempEnd = Measurement(value: batteryTempEndMetric, unit: UnitTemperature.celsius)
               .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
-            DokoGridCount(
+            GridValue(
               color: batteryTempEndColor,
               value: String(format: "%.0f", batteryTempEnd.value),
               units: batteryTempEnd.unit.symbol,

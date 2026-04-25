@@ -230,7 +230,7 @@ public struct ChargesView: View {
                   }
                 }
               } label: {
-                DokoGridButton(
+                GridButton(
                   color: .mint,
                   symbolName: model.vehicleButtonImage,
                   title: model.vehicleButtonTitle
@@ -254,7 +254,7 @@ public struct ChargesView: View {
             )
 
             GridRow {
-              DokoGridButton(
+              GridButton(
                 color: .orange,
                 symbolName: "powerplug",
                 title: "AC"
@@ -263,7 +263,7 @@ public struct ChargesView: View {
               }
               .opacity(model.showAcCharges ? DesignTokens.Opacity.full : DesignTokens.Opacity.subtle)
 
-              DokoGridButton(
+              GridButton(
                 color: .green,
                 symbolName: "ev.charger",
                 title: "DC"
@@ -274,29 +274,27 @@ public struct ChargesView: View {
             }
 
             GridRow {
-              DokoGridCount(
+              GridValue(
                 color: .orange,
                 value: "\(acChargeCount)",
                 units: "",
                 symbolName: "bolt.car",
-                pulseSymbol: model.activeSession == .acCharge,
                 title: "Charges"
               )
               .opacity(model.showAcCharges ? DesignTokens.Opacity.full : DesignTokens.Opacity.subtle)
 
-              DokoGridCount(
+              GridValue(
                 color: .green,
                 value: "\(dcChargeCount)",
                 units: "",
                 symbolName: "bolt.car",
-                pulseSymbol: model.activeSession == .dcCharge,
                 title: "Charges"
               )
               .opacity(model.showDcCharges ? DesignTokens.Opacity.full : DesignTokens.Opacity.subtle)
             }
 
             GridRow {
-              DokoGridCount(
+              GridValue(
                 color: .orange,
                 value: acDuration.formatted(
                   .time(pattern: .hourMinute(padHourToLength: 2))
@@ -307,7 +305,7 @@ public struct ChargesView: View {
               )
               .opacity(model.showAcCharges ? DesignTokens.Opacity.full : DesignTokens.Opacity.subtle)
 
-              DokoGridCount(
+              GridValue(
                 color: .green,
                 value: dcDuration.formatted(
                   .time(pattern: .hourMinute(padHourToLength: 2))
@@ -320,7 +318,7 @@ public struct ChargesView: View {
             }
 
             GridRow {
-              DokoGridCount(
+              GridValue(
                 color: .orange,
                 value: String(format: "%.0f", acEnergy.value),
                 units: acEnergy.unit.symbol,
@@ -329,7 +327,7 @@ public struct ChargesView: View {
               )
               .opacity(model.showAcCharges ? DesignTokens.Opacity.full : DesignTokens.Opacity.subtle)
 
-              DokoGridCount(
+              GridValue(
                 color: .green,
                 value: String(format: "%.0f", dcEnergy.value),
                 units: dcEnergy.unit.symbol,

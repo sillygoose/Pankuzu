@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct DokoGridStatusButton: View {
+public struct GridStatusButton: View {
   let leftSymbolTitle: String
   let leftSymbol: String
   let leftSymbolColor: Color
@@ -98,7 +98,7 @@ public struct DokoGridStatusButton: View {
   NavigationStack {
     ScrollView {
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
-        DokoGridStatusButton(
+        GridStatusButton(
           leftSymbol: "togglepower",
           leftSymbolColor: .green,
           leftSymbolTitle: "Emable",
@@ -111,7 +111,7 @@ public struct DokoGridStatusButton: View {
         ) {
           print("Bluetooth button pressed")
         }
-        DokoGridStatusButton(
+        GridStatusButton(
           leftSymbol: "togglepower",
           leftSymbolColor: .green,
           leftSymbolTitle: "Emable",

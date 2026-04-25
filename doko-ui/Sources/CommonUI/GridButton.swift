@@ -1,12 +1,17 @@
 import SwiftUI
 
-public struct DokoGridButton: View {
+public struct GridButton: View {
   let title: String
   let color: Color
   let symbolName: String
   let action: () -> Void
   
-  public init(color: Color, symbolName: String, title: String, action: @escaping () -> Void) {
+  public init(
+    color: Color,
+    symbolName: String,
+    title: String,
+    action: @escaping () -> Void
+  ) {
     self.color = color
     self.symbolName = symbolName
     self.title = title
@@ -41,14 +46,14 @@ public struct DokoGridButton: View {
     ScrollView {
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
-          DokoGridButton(
+          GridButton(
             color: .blue,
             symbolName: "map",
             title: "Map"
           ) {
             print("Map button pressed")
           }
-          DokoGridButton(
+          GridButton(
             color: .green,
             symbolName: "chart.bar.fill",
             title: "Elevation"
@@ -60,21 +65,21 @@ public struct DokoGridButton: View {
       
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
-          DokoGridButton(
+          GridButton(
             color: .red,
             symbolName: "bolt",
             title: "Energy"
           ) {
             print("Energy button pressed")
           }
-          DokoGridButton(
+          GridButton(
             color: .purple,
             symbolName: "chart.bar.fill",
             title: "Power"
           ) {
             print("Power button pressed")
           }
-          DokoGridButton(
+          GridButton(
             color: .gray,
             symbolName: "truck.pickup.side",
             title: "F-150 Lightning"
