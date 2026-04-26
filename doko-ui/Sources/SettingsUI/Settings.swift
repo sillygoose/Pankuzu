@@ -68,7 +68,7 @@ public struct SettingsView: View {
           GridStatusButton(
             leftSymbol: model.bluetoothEnableSymbol,
             leftSymbolColor: model.bluetoothEnableSymbolColor,
-            leftSymbolTitle: "Emable",
+            leftSymbolTitle: "Enable",
             centerSymbol: model.bluetoothConnectedSymbol,
             centerSymbolColor: model.bluetoothConnectedSymbolColor,
             centerSymbolTitle: "Bluetooth",

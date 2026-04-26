@@ -101,7 +101,7 @@ public struct GridStatusButton: View {
         GridStatusButton(
           leftSymbol: "togglepower",
           leftSymbolColor: .green,
-          leftSymbolTitle: "Emable",
+          leftSymbolTitle: "Enable",
           centerSymbol: "antenna.radiowaves.left.and.right",
           centerSymbolColor: .blue,
           centerSymbolTitle: "Bluetooth",
@@ -114,7 +114,7 @@ public struct GridStatusButton: View {
         GridStatusButton(
           leftSymbol: "togglepower",
           leftSymbolColor: .green,
-          leftSymbolTitle: "Emable",
+          leftSymbolTitle: "Enable",
           centerSymbol: "antenna.radiowaves.left.and.right",
           centerSymbolColor: .blue,
           centerSymbolTitle: "Bluetooth",
