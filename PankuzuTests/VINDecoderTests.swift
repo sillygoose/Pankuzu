@@ -193,18 +193,42 @@ struct VINDecoderTests {
 
   // MARK: - VW ID.4 (WMI: WVG or 1V2)
 
-  @Test func vwGermany() {
+  @Test func vwGermanyE1() {
+    // WVG + pos7-8 = E1 → ID.4
     let v = Vehicle(decoding: "WVGZZZE1ZNB000001")
     #expect(v.vehicleType == .vwElectric)
     #expect(v.model == "ID.4")
     #expect(v.make == "VW")
   }
 
-  @Test func vwUSA() {
-    let v = Vehicle(decoding: "1V2ZZZE1ZNB000001")
+  @Test func vwGermanyE2() {
+    // WVG + pos7-8 = E2 → ID.4
+    let v = Vehicle(decoding: "WVGZZZE2ZNB000001")
     #expect(v.vehicleType == .vwElectric)
     #expect(v.model == "ID.4")
     #expect(v.make == "VW")
+  }
+
+  @Test func vwGermanyInvalidPositions() {
+    // WVG + pos7-8 = E8 → undetermined
+    let v = Vehicle(decoding: "WVGZZZE8ZNB000001")
+    #expect(v.vehicleType == .undetermined)
+    #expect(v.model == "Unknown")
+  }
+
+  @Test func vwUSA() {
+    // 1V2 + pos7-8 = E8 → ID.4
+    let v = Vehicle(decoding: "1V2ZZZE8ZNB000001")
+    #expect(v.vehicleType == .vwElectric)
+    #expect(v.model == "ID.4")
+    #expect(v.make == "VW")
+  }
+
+  @Test func vwUSAInvalidPositions() {
+    // 1V2 + pos7-8 = E1 → undetermined (E1/E2 are German-only)
+    let v = Vehicle(decoding: "1V2ZZZE1ZNB000001")
+    #expect(v.vehicleType == .undetermined)
+    #expect(v.model == "Unknown")
   }
 
   // MARK: - Edge cases

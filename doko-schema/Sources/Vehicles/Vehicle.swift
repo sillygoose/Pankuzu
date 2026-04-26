@@ -106,8 +106,12 @@ extension VehicleProtocol {
       case "W7L": return "F-150 Lightning Platinum"
       default:    return "F-150 Lightning"
       }
-    case "WVG", "1V2":
-      return "ID.4"
+    case "WVG":
+      let pos78 = String(vin[vin.index(vin.startIndex, offsetBy: 6)...vin.index(vin.startIndex, offsetBy: 7)])
+      return (pos78 == "E1" || pos78 == "E2") ? "ID.4" : "Unknown"
+    case "1V2":
+      let pos78 = String(vin[vin.index(vin.startIndex, offsetBy: 6)...vin.index(vin.startIndex, offsetBy: 7)])
+      return pos78 == "E8" ? "ID.4" : "Unknown"
     default:
       return "Unknown"
     }
@@ -138,8 +142,12 @@ extension VehicleProtocol {
       let validGVWR = pos4 == "V" || pos4 == "6"
       let validEngine = "SK7MLV".contains(pos8)
       return validGVWR && validEngine ? .fordElectric : .undetermined
-    case "WVG", "1V2":
-      return .vwElectric
+    case "WVG":
+      let pos78 = String(vin[vin.index(vin.startIndex, offsetBy: 6)...vin.index(vin.startIndex, offsetBy: 7)])
+      return (pos78 == "E1" || pos78 == "E2") ? .vwElectric : .undetermined
+    case "1V2":
+      let pos78 = String(vin[vin.index(vin.startIndex, offsetBy: 6)...vin.index(vin.startIndex, offsetBy: 7)])
+      return pos78 == "E8" ? .vwElectric : .undetermined
     default:
       return .undetermined
     }
