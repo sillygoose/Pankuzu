@@ -70,7 +70,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .batteryOriginalCapacity:      obdLinkCommand = "STPX h:17FC007B, d:22F1B3"
 
     case .batteryCurrentCapacity:       obdLinkCommand = "STPX h:710, d:222AB2"
-    case .batteryDistanceToEmpty:       obdLinkCommand = "STPX h:710, d:222AB6"
+    case .batteryDistanceToEmpty:       obdLinkCommand = "STPX h:710, d:222AB5"
 
     case .acChargerStatus:              obdLinkCommand = "STPX h:17FC007B, d:227448"
     case .dcChargerStatus:              obdLinkCommand = "STPX h:17FC007B, d:227448"
@@ -99,8 +99,8 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .atfcsm(1),
 
         //.ath(true), // Test if .atcp("17"), .atsh("FC007B"), are requitred with STPX
-        .batteryVoltage,
-        .batteryTemperature,
+//        .batteryVoltage,
+//        .batteryTemperature,
 
         // ATSP6 + ATSH 710 + ATCRA 77A + ATFCSH 710 + ATFCSD 300000 + ATFCSM1         */
 //        .ath(true),
@@ -116,18 +116,20 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
         .ath(false),
         .stp(34), .stpo,
-        .atcp("17"),
-        .atsh("FC007B"),
+
+//        .atcp("17"),
+//        .atsh("FC007B"),
         .atfcsh("17FC007B"),
         .atcra("17FE007X"),
-        .atfcsd("300000"),
-        .atfcsm(1),
+//        .atfcsd("300000"),
+//        .atfcsm(1),
 
         .acChargerStatus, .dcChargerStatus,
         .gearSelected, .odometer, .speed,
-        .batteryStateOfCharge, // .batteryTemperature,
+        .batteryStateOfCharge, .batteryTemperature,
         .batteryOriginalCapacity,
-        //.batteryVoltage, .batteryCurrent,
+        .batteryVoltage, .batteryCurrent,
+
         //.batteryCurrentCapacity, .batteryDistanceToEmpty,
       ])
 
@@ -163,7 +165,12 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .batteryStateOfCharge,
         .batteryTemperature,
         .batteryOriginalCapacity,
-//        .batteryDistanceToEmpty, .batteryCurrentCapacity,
+
+        // 11-but can commands
+        //.batteryDistanceToEmpty,
+        //.batteryCurrentCapacity,
+        // 29-bit can commands
+
         .position,
       ])
     case .tripData:
@@ -182,7 +189,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .odometer,
         .batteryStateOfCharge,
         .batteryTemperature,
-        //.batteryDistanceToEmpty, //.batteryStateOfHealth,
+        // 11-but can commands
+        //.batteryDistanceToEmpty,
+        //.batteryCurrentCapacity,
+        // 29-bit can commands
         .position, .weather,
       ])
     case .acChargeInProgress:
@@ -197,7 +207,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
       return ObdCommandPacket(type: .acChargeEnding, commands: [
         .batteryStateOfCharge, .batteryTemperature,
         .batteryOriginalCapacity,
-        //.batteryDistanceToEmpty, //.batteryStateOfHealth,
+        // 11-but can commands
+        //.batteryDistanceToEmpty,
+        //.batteryCurrentCapacity,
+        // 29-bit can commands
       ])
 
     case .dcChargeStarting:
@@ -205,7 +218,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .odometer,
         .batteryStateOfCharge,
         .batteryTemperature,
-        //.batteryDistanceToEmpty, //.batteryStateOfHealth,
+        // 11-but can commands
+        //.batteryDistanceToEmpty,
+        //.batteryCurrentCapacity,
+        // 29-bit can commands
         .position, .weather,
       ])
     case .dcChargeInProgress:
@@ -220,7 +236,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
       return ObdCommandPacket(type: .dcChargeEnding, commands: [
         .batteryStateOfCharge, .batteryTemperature,
         .batteryOriginalCapacity,
-        //.batteryDistanceToEmpty, //.batteryStateOfHealth,
+        // 11-but can commands
+        //.batteryDistanceToEmpty,
+        //.batteryCurrentCapacity,
+        // 29-bit can commands
       ])
 
     case .acChargeHistory:
