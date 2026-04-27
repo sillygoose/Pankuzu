@@ -48,9 +48,9 @@ extension Trip {
     trip.energyToEmptyStart = tripStartResponse.batteryEnergyToEmpty
     trip.energyToEmptyEnd = tripStartResponse.batteryEnergyToEmpty
 
-    trip.distanceToEmptyStart = tripStartResponse.distanceToEmpty
-    trip.distanceToEmptyEnd = tripStartResponse.distanceToEmpty
-    if let _ = tripStartResponse.distanceToEmpty {
+    trip.distanceToEmptyStart = tripStartResponse.batteryDistanceToEmpty
+    trip.distanceToEmptyEnd = tripStartResponse.batteryDistanceToEmpty
+    if let _ = tripStartResponse.batteryDistanceToEmpty {
       trip.range = 0.0
     }
     trip.stateOfChargeStart = tripStartResponse.batteryStateOfCharge
@@ -111,8 +111,8 @@ extension Trip {
     tripDraft.energy = tripEndResponse.batteryEnergy.map { -$0 }
     tripDraft.energyToEmptyEnd = tripEndResponse.batteryEnergyToEmpty
 
-    tripDraft.distanceToEmptyEnd = tripEndResponse.distanceToEmpty
-    if let dteStart = tripDraft.distanceToEmptyStart, let dteEnd = tripEndResponse.distanceToEmpty {
+    tripDraft.distanceToEmptyEnd = tripEndResponse.batteryDistanceToEmpty
+    if let dteStart = tripDraft.distanceToEmptyStart, let dteEnd = tripEndResponse.batteryDistanceToEmpty {
       tripDraft.range = dteStart - dteEnd
     }
 
@@ -172,8 +172,8 @@ extension Trip {
     tripDraft.energy = tripUpdateResponse.batteryEnergy.map { -$0 }
     tripDraft.energyToEmptyEnd = tripUpdateResponse.batteryEnergyToEmpty
 
-    tripDraft.distanceToEmptyEnd = tripUpdateResponse.distanceToEmpty
-    if let dteStart = tripDraft.distanceToEmptyStart, let dteEnd = tripUpdateResponse.distanceToEmpty {
+    tripDraft.distanceToEmptyEnd = tripUpdateResponse.batteryDistanceToEmpty
+    if let dteStart = tripDraft.distanceToEmptyStart, let dteEnd = tripUpdateResponse.batteryDistanceToEmpty {
       tripDraft.range = dteStart - dteEnd
     }
 

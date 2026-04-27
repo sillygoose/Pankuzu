@@ -103,27 +103,15 @@ public actor VwElectrics: ConnectedVehicleInterface {
 //        .batteryTemperature,
 
         // ATSP6 + ATSH 710 + ATCRA 77A + ATFCSH 710 + ATFCSD 300000 + ATFCSM1         */
-//        .ath(true),
         .stp(33), .stpo,
-//        .atsh("710"),
         .atcra("77A"),
         .atfcsh("710"),
-//        .atfcsd("300000"),
-//        .atfcsm(1),
-
         .batteryCurrentCapacity,
         .batteryDistanceToEmpty,
 
-        .ath(false),
         .stp(34), .stpo,
-
-//        .atcp("17"),
-//        .atsh("FC007B"),
         .atfcsh("17FC007B"),
         .atcra("17FE007X"),
-//        .atfcsd("300000"),
-//        .atfcsm(1),
-
         .acChargerStatus, .dcChargerStatus,
         .gearSelected, .odometer, .speed,
         .batteryStateOfCharge, .batteryTemperature,
@@ -144,7 +132,13 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .odometer,
         .batteryStateOfCharge,
         .batteryTemperature,
-        //.batteryDistanceToEmpty, //.batteryStateOfHealth,
+        .stp(33), .stpo,
+        .atcra("77A"),
+        .atfcsh("710"),
+        .batteryDistanceToEmpty,
+        .stp(34), .stpo,
+        .atfcsh("17FC007B"),
+        .atcra("17FE007X"),
         .position,
       ])
     case .tripInProgress:
@@ -165,12 +159,14 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .batteryStateOfCharge,
         .batteryTemperature,
         .batteryOriginalCapacity,
-
-        // 11-but can commands
-        //.batteryDistanceToEmpty,
-        //.batteryCurrentCapacity,
-        // 29-bit can commands
-
+        .stp(33), .stpo,
+        .atcra("77A"),
+        .atfcsh("710"),
+        .batteryCurrentCapacity,
+        .batteryDistanceToEmpty,
+        .stp(34), .stpo,
+        .atfcsh("17FC007B"),
+        .atcra("17FE007X"),
         .position,
       ])
     case .tripData:

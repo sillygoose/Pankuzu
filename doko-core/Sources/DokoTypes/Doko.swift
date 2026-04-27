@@ -221,6 +221,7 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case batteryPower
   case batteryEnergy
   case batteryEnergyToEmpty
+  case batteryDistanceToEmpty
   case batteryOriginalCapacity
   case batteryCurrentCapacity
 
@@ -322,6 +323,8 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".batteryEnergy"
       case .batteryEnergyToEmpty:
         return ".batteryEnergyToEmpty"
+      case .batteryDistanceToEmpty:
+        return ".batteryDistanceToEmpty"
       case .batteryOriginalCapacity:
         return ".batteryOriginalCapacity"
       case .batteryCurrentCapacity:
@@ -368,6 +371,7 @@ public enum DokoResponse: Equatable, Sendable {
   case batteryPower(Double)
   case batteryEnergy(Double)
   case batteryEnergyToEmpty(Double)
+  case batteryDistanceToEmpty(Double)
   case batteryOriginalCapacity(Double)
   case batteryCurrentCapacity(Double)
 
@@ -417,6 +421,8 @@ public enum DokoResponse: Equatable, Sendable {
         return String(format: ".batteryEnergy(%.3f)", energy)
       case .batteryEnergyToEmpty(let ete):
         return String(format: ".batteryEnergyToEmpty(%.1f)", ete)
+      case .batteryDistanceToEmpty(let dte):
+        return String(format: ".batteryDistanceToEmpty(%.1f)", dte)
       case .batteryOriginalCapacity(let kwh):
         return String(format: ".batteryOriginalCapacity(%.1f)", kwh)
       case .batteryCurrentCapacity(let kwh):
@@ -477,7 +483,7 @@ extension DokoResponsePacket {
     return v
   }
   
-  public var distanceToEmpty: Double? {
+  public var batteryDistanceToEmpty: Double? {
     guard case let .distanceToEmpty(v)? = responses[.distanceToEmpty]?.response else { return nil }
     return v
   }

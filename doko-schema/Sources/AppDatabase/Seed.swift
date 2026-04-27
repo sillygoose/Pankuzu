@@ -467,6 +467,8 @@ extension DatabaseWriter {
           energy: 55,
           energyToEmptyStart: 18,
           energyToEmptyEnd: 73,
+          distanceToEmptyStart: 100,
+          distanceToEmptyEnd: 73,
           stateOfChargeStart: 23,
           stateOfChargeEnd: 80,
           batteryStateOfHealth: 99.5,

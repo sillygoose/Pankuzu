@@ -39,9 +39,9 @@ extension Charge {
     charge.energyToEmptyEnd = chargeStartResponse.batteryEnergyToEmpty
     charge.energy = chargeStartResponse.batteryEnergy
 
-    charge.distanceToEmptyStart = chargeStartResponse.distanceToEmpty
-    charge.distanceToEmptyEnd = chargeStartResponse.distanceToEmpty
-    if let _ = chargeStartResponse.distanceToEmpty {
+    charge.distanceToEmptyStart = chargeStartResponse.batteryDistanceToEmpty
+    charge.distanceToEmptyEnd = chargeStartResponse.batteryDistanceToEmpty
+    if let _ = chargeStartResponse.batteryDistanceToEmpty {
       charge.range = 0.0
     }
     charge.stateOfChargeStart = chargeStartResponse.batteryStateOfCharge
@@ -81,8 +81,8 @@ extension Charge {
     chargeDraft.energyToEmptyEnd = chargeEndResponse.batteryEnergyToEmpty
     chargeDraft.energy = chargeEndResponse.batteryEnergy
 
-    chargeDraft.distanceToEmptyEnd = chargeEndResponse.distanceToEmpty
-    if let dteStart = chargeDraft.distanceToEmptyStart, let dteEnd = chargeEndResponse.distanceToEmpty {
+    chargeDraft.distanceToEmptyEnd = chargeEndResponse.batteryDistanceToEmpty
+    if let dteStart = chargeDraft.distanceToEmptyStart, let dteEnd = chargeEndResponse.batteryDistanceToEmpty {
       chargeDraft.range = dteStart - dteEnd
     }
 
@@ -112,8 +112,8 @@ extension Charge {
     chargeDraft.energy = chargeUpdateResponse.batteryEnergy
     chargeDraft.energyToEmptyEnd = chargeUpdateResponse.batteryEnergyToEmpty
 
-    chargeDraft.distanceToEmptyEnd = chargeUpdateResponse.distanceToEmpty
-    if let dteStart = chargeDraft.energyToEmptyStart, let dteEnd = chargeUpdateResponse.distanceToEmpty {
+    chargeDraft.distanceToEmptyEnd = chargeUpdateResponse.batteryDistanceToEmpty
+    if let dteStart = chargeDraft.energyToEmptyStart, let dteEnd = chargeUpdateResponse.batteryDistanceToEmpty {
       chargeDraft.range = dteStart - dteEnd
     }
 

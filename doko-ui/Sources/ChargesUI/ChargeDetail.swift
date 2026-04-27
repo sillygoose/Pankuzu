@@ -203,40 +203,69 @@ public struct ChargeDetailView: View {
             endColor: stateOfChargeEndColor,
             endSymbol: stateOfChargeEndIcon,
           ) {}
-
         }
-//        Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
-//        }
 
-        if let distanceToEmptyStart = charge.distanceToEmptyStart, let distanceToEmptyEnd = charge.distanceToEmptyEnd {
-          GridRow {
-            let dteStartMetric = Measurement(value: distanceToEmptyStart, unit: UnitLength.kilometers)
-            let dteStart = dteStartMetric.converted(to: model.appSettings.metric ? .kilometers : .miles)
-            GridValue(
-              color: .blue,
-              value: String(format: "%.0f", dteStart.value),
-              units: dteStart.unit.symbol,
-              symbolName: "road.lanes.curved.left",
-              title: "Start Range"
-            )
-            
-            let dteEndMetric = Measurement(value: distanceToEmptyEnd, unit: UnitLength.kilometers)
-            let dteEnd = dteEndMetric.converted(to: model.appSettings.metric ? .kilometers : .miles)
-            GridValue(
-              color: .blue,
-              value: String(format: "%.0f", dteEnd.value),
-              units: dteEnd.unit.symbol,
-              symbolName: "road.lanes.curved.right",
-              title: "End Range"
-            )
-          }
+        if let distanceToEmptyStartMetric = charge.distanceToEmptyStart, let distanceToEmptyEndMetric = charge.distanceToEmptyEnd {
+          let (distanceToEmptyStartColor, distanceToEmptyStartStartIcon) = {
+            if distanceToEmptyStartMetric < 35 { return (Color.red, "road.lanes.curved.left") }
+            if distanceToEmptyStartMetric < 70 { return (Color.yellow,"road.lanes.curved.left") }
+            return (Color.green, "road.lanes.curved.left")
+          }()
+          let (distanceToEmptyEndColor, distanceToEmptyEndIcon) = {
+            if distanceToEmptyEndMetric < 35 { return (Color.red, "road.lanes.curved.right") }
+            if distanceToEmptyEndMetric < 70 { return (Color.yellow,"road.lanes.curved.right") }
+            return (Color.green, "road.lanes.curved.right")
+          }()
+          let distanceToEmptyStart = Measurement(value: distanceToEmptyStartMetric, unit: UnitLength.kilometers)
+            .converted(to: model.appSettings.metric ? .kilometers : .miles)
+          let distanceToEmptyEnd = Measurement(value: distanceToEmptyEndMetric, unit: UnitLength.kilometers)
+            .converted(to: model.appSettings.metric ? .kilometers : .miles)
+          GridRangeButton(
+            rangeName: "Distance To Empty",
+            startValue: String(format: "%.0f", distanceToEmptyStart.value),
+            startUnit: distanceToEmptyStart.unit.symbol,
+            startColor: distanceToEmptyStartColor,
+            startSymbol: distanceToEmptyStartStartIcon,
+            endValue: String(format: "%.0f", distanceToEmptyEnd.value),
+            endUnit: distanceToEmptyEnd.unit.symbol,
+            endColor: distanceToEmptyEndColor,
+            endSymbol: distanceToEmptyEndIcon,
+          ) {}
+        }
+
+        if let batteryTempStartMetric = charge.batteryTempStart, let batteryTempEndMetric = charge.batteryTempEnd {
+          let (batteryTempStartColor, batteryTempStartIcon) = {
+            if batteryTempStartMetric < 10 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
+            if batteryTempStartMetric < 50 { return (Color.green, "batteryblock.stack") }
+            return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
+          }()
+          let (batteryTempEndColor, batteryTempEndIcon) = {
+            if batteryTempEndMetric < 10 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
+            if batteryTempEndMetric < 50 { return (Color.green,"batteryblock.stack") }
+            return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
+          }()
+          let batteryTempStart = Measurement(value: batteryTempStartMetric, unit: UnitTemperature.celsius)
+            .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
+          let batteryTempEnd = Measurement(value: batteryTempEndMetric, unit: UnitTemperature.celsius)
+            .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
+          GridRangeButton(
+            rangeName: "Battery Temperature",
+            startValue: String(format: "%.0f", batteryTempStart.value),
+            startUnit: batteryTempStart.unit.symbol,
+            startColor: batteryTempStartColor,
+            startSymbol: batteryTempStartIcon,
+            endValue: String(format: "%.0f", batteryTempEnd.value),
+            endUnit: batteryTempEnd.unit.symbol,
+            endColor: batteryTempEndColor,
+            endSymbol: batteryTempEndIcon,
+          ) {}
         }
 
         if let batteryStateOfHealth = charge.batteryStateOfHealth {
+          let batteryStateOfHealth = Measurement(value: batteryStateOfHealth, unit: UnitPercent.percent)
+          let batteryStateOfHealthColor =
+          batteryStateOfHealth.value < 80 ? Color.red : batteryStateOfHealth.value < 90 ? .yellow : .green
           GridRow {
-            let batteryStateOfHealth = Measurement(value: batteryStateOfHealth, unit: UnitPercent.percent)
-            let batteryStateOfHealthColor =
-            batteryStateOfHealth.value < 80 ? Color.red : batteryStateOfHealth.value < 90 ? .yellow : .green
             GridValueButton(
               color: batteryStateOfHealthColor,
               value: String(format: "%.0f", batteryStateOfHealth.value),
@@ -245,16 +274,6 @@ public struct ChargeDetailView: View {
               title: "State of Health"
             ) {
               model.destination = .stateOfHealthChart
-            }
-            
-            GridValueButton(
-              color: .orange,
-              value: nil,
-              units: nil,
-              symbolName: "batteryblock.stack",
-              title: "Battery Details"
-            ) {
-              model.destination = .batteryChart
             }
           }
         }
