@@ -44,15 +44,14 @@ extension Trip {
       odometerStart: odometer,
       odometerEnd: odometer,
     )
-    trip.energy = tripStartResponse.batteryEnergy.map { -$0 }
     trip.energyToEmptyStart = tripStartResponse.batteryEnergyToEmpty
     trip.energyToEmptyEnd = tripStartResponse.batteryEnergyToEmpty
+    trip.energy = tripStartResponse.batteryEnergy.map { -$0 }
 
     trip.distanceToEmptyStart = tripStartResponse.batteryDistanceToEmpty
     trip.distanceToEmptyEnd = tripStartResponse.batteryDistanceToEmpty
-    if let _ = tripStartResponse.batteryDistanceToEmpty {
-      trip.range = 0.0
-    }
+    trip.range = trip.distanceToEmptyStart.flatMap { start in trip.distanceToEmptyEnd.map { end in start - end } }
+
     trip.stateOfChargeStart = tripStartResponse.batteryStateOfCharge
     trip.stateOfChargeEnd = tripStartResponse.batteryStateOfCharge
     trip.batteryStateOfHealth = tripStartResponse.batteryStateOfHealth
@@ -108,13 +107,11 @@ extension Trip {
     tripDraft.odometerEnd = odometer
     tripDraft.distance = odometer - tripDraft.odometerStart
 
-    tripDraft.energy = tripEndResponse.batteryEnergy.map { -$0 }
     tripDraft.energyToEmptyEnd = tripEndResponse.batteryEnergyToEmpty
+    tripDraft.energy = tripEndResponse.batteryEnergy.map { -$0 }
 
     tripDraft.distanceToEmptyEnd = tripEndResponse.batteryDistanceToEmpty
-    if let dteStart = tripDraft.distanceToEmptyStart, let dteEnd = tripEndResponse.batteryDistanceToEmpty {
-      tripDraft.range = dteStart - dteEnd
-    }
+    tripDraft.range = tripDraft.distanceToEmptyStart.flatMap { start in tripEndResponse.batteryDistanceToEmpty.map { end in start - end } }
 
     tripDraft.stateOfChargeEnd = tripEndResponse.batteryStateOfCharge
     tripDraft.batteryTempEnd = tripEndResponse.batteryTemperature
@@ -169,13 +166,11 @@ extension Trip {
     tripDraft.odometerEnd = odometer
     tripDraft.distance = odometer - tripDraft.odometerStart
 
-    tripDraft.energy = tripUpdateResponse.batteryEnergy.map { -$0 }
     tripDraft.energyToEmptyEnd = tripUpdateResponse.batteryEnergyToEmpty
+    tripDraft.energy = tripUpdateResponse.batteryEnergy.map { -$0 }
 
-    tripDraft.distanceToEmptyEnd = tripUpdateResponse.batteryDistanceToEmpty
-    if let dteStart = tripDraft.distanceToEmptyStart, let dteEnd = tripUpdateResponse.batteryDistanceToEmpty {
-      tripDraft.range = dteStart - dteEnd
-    }
+//###    tripDraft.distanceToEmptyEnd = tripUpdateResponse.batteryDistanceToEmpty
+//    tripDraft.range = tripDraft.distanceToEmptyStart.flatMap { start in tripUpdateResponse.batteryDistanceToEmpty.map { end in start - end } }
 
     tripDraft.stateOfChargeEnd = tripUpdateResponse.batteryStateOfCharge
     tripDraft.batteryTempEnd = tripUpdateResponse.batteryTemperature

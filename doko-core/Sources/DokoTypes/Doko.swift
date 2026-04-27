@@ -211,8 +211,7 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case weather, meanTemperature
   case odometer
   case speed
-  case distanceToEmpty
-  
+
   case batteryStateOfCharge
   case batteryStateOfHealth
   case batteryTemperature
@@ -304,9 +303,7 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".odometer"
       case .speed:
         return ".speed"
-      case .distanceToEmpty:
-        return ".distanceToEmpty"
-        
+
       case .batteryStateOfCharge:
         return ".batteryStateOfCharge"
       case .batteryStateOfHealth:
@@ -361,8 +358,6 @@ public enum DokoResponse: Equatable, Sendable {
   case odometer(Double)
   case speed(Double)
 
-  case distanceToEmpty(Double)
-  
   case batteryStateOfCharge(Double)
   case batteryStateOfHealth(Double)
   case batteryTemperature(Double)
@@ -402,8 +397,6 @@ public enum DokoResponse: Equatable, Sendable {
         return String(format: ".odometer(%.1f)", odometer)
       case .speed(let speed):
         return String(format: ".speed(%.1f)", speed)
-      case .distanceToEmpty(let dte):
-        return String(format: ".distanceToEmpty(%.1f)", dte)
         
       case .batteryStateOfCharge(let soc):
         return String(format: ".batteryStateOfCharge(%.1f)", soc)
@@ -422,7 +415,7 @@ public enum DokoResponse: Equatable, Sendable {
       case .batteryEnergyToEmpty(let ete):
         return String(format: ".batteryEnergyToEmpty(%.1f)", ete)
       case .batteryDistanceToEmpty(let dte):
-        return String(format: ".batteryDistanceToEmpty(%.1f)", dte)
+        return String(format: ".batteryDistanceToEmpty(%.0f)", dte)
       case .batteryOriginalCapacity(let kwh):
         return String(format: ".batteryOriginalCapacity(%.1f)", kwh)
       case .batteryCurrentCapacity(let kwh):
@@ -484,7 +477,7 @@ extension DokoResponsePacket {
   }
   
   public var batteryDistanceToEmpty: Double? {
-    guard case let .distanceToEmpty(v)? = responses[.distanceToEmpty]?.response else { return nil }
+    guard case let .batteryDistanceToEmpty(v)? = responses[.batteryDistanceToEmpty]?.response else { return nil }
     return v
   }
 

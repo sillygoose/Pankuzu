@@ -72,6 +72,7 @@ public struct Trip: Equatable, Identifiable, Hashable, Codable, Sendable {
     energy: Double? = nil,
     energyToEmptyStart: Double? = nil,
     energyToEmptyEnd: Double? = nil,
+    range: Double? = nil,
     distanceToEmptyStart: Double? = nil,
     distanceToEmptyEnd: Double? = nil,
     stateOfChargeStart: Double? = nil,
@@ -110,10 +111,8 @@ public struct Trip: Equatable, Identifiable, Hashable, Codable, Sendable {
 
     self.distanceToEmptyStart = distanceToEmptyStart
     self.distanceToEmptyEnd = distanceToEmptyEnd
-    self.range = nil
-    if let distanceToEmptyStart, let distanceToEmptyEnd {
-      self.range = distanceToEmptyStart - distanceToEmptyEnd
-    }
+    self.range = range
+
     self.stateOfChargeStart = stateOfChargeStart
     self.stateOfChargeEnd = stateOfChargeEnd
     

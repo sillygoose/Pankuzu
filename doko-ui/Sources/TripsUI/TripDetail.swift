@@ -24,7 +24,8 @@ public final class TripDetailModel {
     case elevationChart
     case weatherChart
     case energyUsedChart
-    case batteryChart
+    case stateOfChargeChart
+    case batteryTemperatureChart
     case stateOfHealthChart
 
     public var id: String {
@@ -41,8 +42,10 @@ public final class TripDetailModel {
         return "weatherChart"
       case .energyUsedChart:
         return "energyUsedChart"
-      case .batteryChart:
-        return "batteryChart"
+      case .stateOfChargeChart:
+        return "stateOfChargeChart"
+      case .batteryTemperatureChart:
+        return "batteryTemperatureChart"
       case .stateOfHealthChart:
         return "stateOfHealthChart"
       }
@@ -267,23 +270,25 @@ public struct TripDetailView: View {
             endUnit: stateOfChargeEnd.unit.symbol,
             endColor: stateOfChargeEndColor,
             endSymbol: stateOfChargeEndIcon,
-          ) {}
+          ) {
+            model.destination = .stateOfChargeChart
+          }
         }
 
-        if let distanceToEmptyStartMetric = trip.distanceToEmptyStart, let distanceToEmptyEndMetric = trip.distanceToEmptyEnd {
+        if let distanceToEmptyStartRaw = trip.distanceToEmptyStart, let distanceToEmptyEndRaw = trip.distanceToEmptyEnd {
           let (distanceToEmptyStartColor, distanceToEmptyStartStartIcon) = {
-            if distanceToEmptyStartMetric < 35 { return (Color.red, "road.lanes.curved.left") }
-            if distanceToEmptyStartMetric < 70 { return (Color.yellow,"road.lanes.curved.left") }
+            if distanceToEmptyStartRaw < 35 { return (Color.red, "road.lanes.curved.left") }
+            if distanceToEmptyStartRaw < 70 { return (Color.yellow,"road.lanes.curved.left") }
             return (Color.green, "road.lanes.curved.left")
           }()
           let (distanceToEmptyEndColor, distanceToEmptyEndIcon) = {
-            if distanceToEmptyEndMetric < 35 { return (Color.red, "road.lanes.curved.right") }
-            if distanceToEmptyEndMetric < 70 { return (Color.yellow,"road.lanes.curved.right") }
+            if distanceToEmptyEndRaw < 35 { return (Color.red, "road.lanes.curved.right") }
+            if distanceToEmptyEndRaw < 70 { return (Color.yellow,"road.lanes.curved.right") }
             return (Color.green, "road.lanes.curved.right")
           }()
-          let distanceToEmptyStart = Measurement(value: distanceToEmptyStartMetric, unit: UnitLength.kilometers)
+          let distanceToEmptyStart = Measurement(value: distanceToEmptyStartRaw, unit: UnitLength.kilometers)
             .converted(to: model.appSettings.metric ? .kilometers : .miles)
-          let distanceToEmptyEnd = Measurement(value: distanceToEmptyEndMetric, unit: UnitLength.kilometers)
+          let distanceToEmptyEnd = Measurement(value: distanceToEmptyEndRaw, unit: UnitLength.kilometers)
             .converted(to: model.appSettings.metric ? .kilometers : .miles)
           GridRangeButton(
             rangeName: "Distance To Empty",
@@ -323,7 +328,9 @@ public struct TripDetailView: View {
             endUnit: batteryTempEnd.unit.symbol,
             endColor: batteryTempEndColor,
             endSymbol: batteryTempEndIcon,
-          ) {}
+          ) {
+            model.destination = .batteryTemperatureChart
+          }
         }
 
         if let batteryStateOfHealth = trip.batteryStateOfHealth {
@@ -407,10 +414,19 @@ public struct TripDetailView: View {
           )
           .presentationDetents([.medium])
         }
-      case .batteryChart:
+      case .stateOfChargeChart:
         NavigationStack {
-          TripDetailBatteryView(
-            model: TripDetailBatteryModel(
+          TripDetailStateOfChargeView(
+            model: TripDetailStateOfChargeModel(
+              trip: trip
+            )
+          )
+          .presentationDetents([.medium])
+        }
+      case .batteryTemperatureChart:
+        NavigationStack {
+          TripDetailBatteryTemperatureView(
+            model: TripDetailBatteryTemperatureModel(
               trip: trip
             )
           )

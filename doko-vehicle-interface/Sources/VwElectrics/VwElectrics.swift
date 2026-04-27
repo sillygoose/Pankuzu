@@ -49,10 +49,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .stp(let canProtocol):         obdLinkCommand = "STP \(canProtocol)"
     case .stpbr(let baudRate):          obdLinkCommand = "STPBR \(baudRate)"
 
-    case .batteryCurrent0:              obdLinkCommand = "STPX h:710, d:222AB2"
-    case .batteryCurrent1:              obdLinkCommand = "222AB2"
-    case .batteryCurrent2:              obdLinkCommand = "STPX h:710, d:222AB5"
-    case .batteryCurrent3:              obdLinkCommand = "222AB5"
+//    case .batteryCurrent0:              obdLinkCommand = "STPX h:710, d:222AB2"
+//    case .batteryCurrent1:              obdLinkCommand = "222AB2"
+//    case .batteryCurrent2:              obdLinkCommand = "STPX h:710, d:222AB5"
+//    case .batteryCurrent3:              obdLinkCommand = "222AB5"
 
 //    case .batteryCurrent4:              obdLinkCommand = "STPX h:17FC007B, d:03221E3D"
 //    case .batteryCurrent5:              obdLinkCommand = "03221E3D"
@@ -92,26 +92,20 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .vehicleCustomization:
       return ObdCommandPacket(type: .vehicleCustomization, commands: [
         //.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
-
         .atcra("17FE007X"),
         .atfcsh("17FC007B"),
         .atfcsd("300000"),
         .atfcsm(1),
-
-        //.ath(true), // Test if .atcp("17"), .atsh("FC007B"), are requitred with STPX
-//        .batteryVoltage,
-//        .batteryTemperature,
-
-        // ATSP6 + ATSH 710 + ATCRA 77A + ATFCSH 710 + ATFCSD 300000 + ATFCSM1         */
-        .stp(33), .stpo,
-        .atcra("77A"),
-        .atfcsh("710"),
-        .batteryCurrentCapacity,
-        .batteryDistanceToEmpty,
-
-        .stp(34), .stpo,
-        .atfcsh("17FC007B"),
-        .atcra("17FE007X"),
+//        // ATSP6 + ATSH 710 + ATCRA 77A + ATFCSH 710 + ATFCSD 300000 + ATFCSM1         */
+//        .stp(33), .stpo,
+//        .atcra("77A"),
+//        .atfcsh("710"),
+//        .batteryCurrentCapacity,
+//        .batteryDistanceToEmpty,
+//
+//        .stp(34), .stpo,
+//        .atfcsh("17FC007B"),
+//        .atcra("17FE007X"),
         .acChargerStatus, .dcChargerStatus,
         .gearSelected, .odometer, .speed,
         .batteryStateOfCharge, .batteryTemperature,

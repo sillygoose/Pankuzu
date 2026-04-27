@@ -407,7 +407,7 @@ public enum ObdResponse: Equatable, Sendable {
         return ".gearSelected(\(gear))"
 
       case .batteryDistanceToEmpty(let dte):
-        return String(format: ".batteryDistanceToEmpty(%.3f)", dte)
+        return String(format: ".batteryDistanceToEmpty(%.0f)", dte)
       case .batteryEnergyToEmpty(let ete):
         return String(format: ".batteryEnergyToEmpty(%.3f)", ete)
       case .batteryStateOfCharge(let soc):
