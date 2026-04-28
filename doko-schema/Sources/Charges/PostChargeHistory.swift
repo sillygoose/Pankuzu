@@ -21,14 +21,17 @@ extension Charge {
     if let batteryPower = chargeHistoryPacket.batteryPower {
       chargeHistories.batteryPower.append(DokoDataPoint(timestamp: timestamp, double: batteryPower))
     }
-    if let stateOfCharge = chargeHistoryPacket.batteryStateOfCharge {
-      chargeHistories.stateOfCharge.append(DokoDataPoint(timestamp: timestamp, double: stateOfCharge))
+    if let batteryStateOfCharge = chargeHistoryPacket.batteryStateOfCharge {
+      chargeHistories.stateOfCharge.append(DokoDataPoint(timestamp: timestamp, double: batteryStateOfCharge))
     }
     if let batteryEnergy = chargeHistoryPacket.batteryEnergy {
       chargeHistories.batteryEnergy.append(DokoDataPoint(timestamp: timestamp, double: batteryEnergy))
     }
-    if let energyToEmpty = chargeHistoryPacket.batteryEnergyToEmpty {
-      chargeHistories.energyToEmpty.append(DokoDataPoint(timestamp: timestamp, double: energyToEmpty))
+    if let batteryEnergyToEmpty = chargeHistoryPacket.batteryEnergyToEmpty {
+      chargeHistories.energyToEmpty.append(DokoDataPoint(timestamp: timestamp, double: batteryEnergyToEmpty))
+    }
+    if let batteryDistanceToEmpty = chargeHistoryPacket.batteryDistanceToEmpty {
+      chargeHistories.distanceToEmpty.append(DokoDataPoint(timestamp: timestamp, double: batteryDistanceToEmpty))
     }
     if let batteryTemperature = chargeHistoryPacket.batteryTemperature {
       chargeHistories.batteryTemp.append(DokoDataPoint(timestamp: timestamp, double: batteryTemperature))

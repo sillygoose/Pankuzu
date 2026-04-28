@@ -41,9 +41,8 @@ extension Charge {
 
     charge.distanceToEmptyStart = chargeStartResponse.batteryDistanceToEmpty
     charge.distanceToEmptyEnd = chargeStartResponse.batteryDistanceToEmpty
-    if let _ = chargeStartResponse.batteryDistanceToEmpty {
-      charge.range = 0.0
-    }
+    charge.range = charge.distanceToEmptyStart.flatMap { start in charge.distanceToEmptyEnd.map { end in start - end } }
+
     charge.stateOfChargeStart = chargeStartResponse.batteryStateOfCharge
     charge.stateOfChargeEnd = chargeStartResponse.batteryStateOfCharge
     charge.batteryStateOfHealth = chargeStartResponse.batteryStateOfHealth
@@ -82,9 +81,7 @@ extension Charge {
     chargeDraft.energy = chargeEndResponse.batteryEnergy
 
     chargeDraft.distanceToEmptyEnd = chargeEndResponse.batteryDistanceToEmpty
-    if let dteStart = chargeDraft.distanceToEmptyStart, let dteEnd = chargeEndResponse.batteryDistanceToEmpty {
-      chargeDraft.range = dteStart - dteEnd
-    }
+    chargeDraft.range = chargeDraft.distanceToEmptyStart.flatMap { start in chargeDraft.distanceToEmptyEnd.map { end in start - end } }
 
     chargeDraft.stateOfChargeEnd = chargeEndResponse.batteryStateOfCharge
     chargeDraft.batteryTempEnd = chargeEndResponse.batteryTemperature
@@ -113,9 +110,7 @@ extension Charge {
     chargeDraft.energyToEmptyEnd = chargeUpdateResponse.batteryEnergyToEmpty
 
     chargeDraft.distanceToEmptyEnd = chargeUpdateResponse.batteryDistanceToEmpty
-    if let dteStart = chargeDraft.energyToEmptyStart, let dteEnd = chargeUpdateResponse.batteryDistanceToEmpty {
-      chargeDraft.range = dteStart - dteEnd
-    }
+    chargeDraft.range = chargeDraft.distanceToEmptyStart.flatMap { start in chargeDraft.distanceToEmptyEnd.map { end in start - end } }
 
     chargeDraft.stateOfChargeEnd = chargeUpdateResponse.batteryStateOfCharge
     chargeDraft.batteryTempEnd = chargeUpdateResponse.batteryTemperature
