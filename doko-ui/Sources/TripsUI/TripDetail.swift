@@ -249,13 +249,13 @@ public struct TripDetailView: View {
 
         if let stateOfChargeStart = trip.stateOfChargeStart, let stateOfChargeEnd = trip.stateOfChargeEnd {
           let (stateOfChargeStartColor, stateOfChargeStartIcon) = {
-            if stateOfChargeStart < 25 { return (Color.red, "battery.25percent") }
-            if stateOfChargeStart < 50 { return (Color.yellow,"battery.50percent") }
+            if stateOfChargeStart < 10 { return (Color.red, "battery.25percent") }
+            if stateOfChargeStart < 25 { return (Color.yellow,"battery.50percent") }
             return (Color.green, "battery.75percent")
           }()
           let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
-            if stateOfChargeEnd < 25 { return (Color.red, "battery.25percent") }
-            if stateOfChargeEnd < 50 { return (Color.yellow,"battery.50percent") }
+            if stateOfChargeEnd < 10 { return (Color.red, "battery.25percent") }
+            if stateOfChargeEnd < 25 { return (Color.yellow,"battery.50percent") }
             return (Color.green, "battery.75percent")
           }()
           let stateOfChargeStart = Measurement(value: stateOfChargeStart, unit: UnitPercent.percent)
