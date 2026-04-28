@@ -41,6 +41,7 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case batteryStateOfHealth
   case batteryTemperature
   case batteryVoltage
+  //###
   case batteryVoltage0
   case batteryVoltage1
   case batteryVoltage2
@@ -58,6 +59,7 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case batteryCurrent5
   case batteryCurrent6
   case batteryCurrent7
+  //###
   case batteryOriginalCapacity
   case batteryCurrentCapacity
 
@@ -312,6 +314,7 @@ public enum ObdResponse: Equatable, Sendable {
   case batteryStateOfHealth(Double)
   case batteryTemperature(Double)
   case batteryVoltage(Double)
+  //###
   case batteryVoltage0(Double)
   case batteryVoltage1(Double)
   case batteryVoltage2(Double)
@@ -329,6 +332,7 @@ public enum ObdResponse: Equatable, Sendable {
   case batteryCurrent5(Double)
   case batteryCurrent6(Double)
   case batteryCurrent7(Double)
+  //###
   case batteryOriginalCapacity(Double)
   case batteryCurrentCapacity(Double)
 
