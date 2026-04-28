@@ -6,6 +6,24 @@ import VehicleInterface
 import ObdLinkCore
 import Vehicles
 
+private struct CommandGroup {
+  let commands: [ObdCommand]
+}
+
+private let can11Bit = CommandGroup(commands: [.stp(33), .stpo, .atcra("77A"), .atfcsh("710")])
+private let can29Bit = CommandGroup(commands: [.stp(34), .stpo, .atfcsh("17FC007B"), .atcra("17FE007X")])
+
+@resultBuilder
+private enum ObdCommandsBuilder {
+  static func buildExpression(_ e: ObdCommand) -> [ObdCommand] { [e] }
+  static func buildExpression(_ e: CommandGroup) -> [ObdCommand] { e.commands }
+  static func buildBlock(_ components: [ObdCommand]...) -> [ObdCommand] { components.flatMap { $0 } }
+}
+
+private func obdPacket(_ type: DokoPacketType, @ObdCommandsBuilder _ commands: () -> [ObdCommand]) -> ObdCommandPacket {
+  ObdCommandPacket(type: type, commands: commands())
+}
+
 public actor VwElectrics: ConnectedVehicleInterface {
   let logger = Logger(subsystem: "com.unchan.doko", category: "VwElectrics")
 
@@ -103,13 +121,15 @@ public actor VwElectrics: ConnectedVehicleInterface {
       ])
 
     case .tripStarting:
-      return ObdCommandPacket(type: .tripStarting, commands: [
-        .odometer,
-        .batteryStateOfCharge,
-        .batteryTemperature,
-        .batteryDistanceToEmpty,
-        .position,
-      ])
+      return obdPacket(.tripStarting) {
+        .odometer;
+        .batteryStateOfCharge;
+        .batteryTemperature;
+        can11Bit;
+        .batteryDistanceToEmpty;
+        can29Bit;
+        .position
+      }
     case .tripInProgress:
       return ObdCommandPacket(type: .tripInProgress, commands: [
         .gearSelected,
@@ -122,16 +142,18 @@ public actor VwElectrics: ConnectedVehicleInterface {
         //.batteryDistanceToEmpty,
       ])
     case .tripEnding:
-      return ObdCommandPacket(type: .tripEnding, commands: [
-        .weather,
-        .odometer,
-        .batteryStateOfCharge,
-        .batteryTemperature,
-        .batteryOriginalCapacity,
-        .batteryCurrentCapacity,
-        .batteryDistanceToEmpty,
-        .position,
-        ])
+      return obdPacket(.tripEnding) {
+        .weather;
+        .odometer;
+        .batteryStateOfCharge;
+        .batteryTemperature;
+        .batteryOriginalCapacity;
+        can11Bit;
+        .batteryCurrentCapacity;
+        .batteryDistanceToEmpty;
+        can29Bit;
+        .position
+      }
     case .tripData:
       return ObdCommandPacket(type: .tripData, commands: [
         .odometer,
