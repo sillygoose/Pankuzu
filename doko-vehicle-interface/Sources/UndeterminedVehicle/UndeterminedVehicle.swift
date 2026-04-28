@@ -6,6 +6,24 @@ import ObdLinkCore
 import VehicleInterface
 import Vehicles
 
+private struct CommandGroup {
+  let commands: [ObdCommand]
+}
+
+@resultBuilder
+private enum ObdCommandsBuilder {
+  static func buildExpression(_ e: ObdCommand) -> [ObdCommand] { [e] }
+  static func buildExpression(_ e: CommandGroup) -> [ObdCommand] { e.commands }
+  static func buildBlock(_ components: [ObdCommand]...) -> [ObdCommand] { components.flatMap { $0 } }
+}
+
+private func obdCommandPacket(_ type: DokoPacketType, @ObdCommandsBuilder _ commands: () -> [ObdCommand]) -> ObdCommandPacket {
+  ObdCommandPacket(type: type, commands: commands())
+}
+
+private let reset = CommandGroup(commands: [.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)])
+private let protocolDetect = CommandGroup(commands: [.vin, .stprs])
+
 public actor UndeterminedVehicle: ConnectedVehicleInterface {
   let logger = Logger(subsystem: "com.unchan.doko", category: "UndeterminedVehicle")
 
@@ -31,7 +49,7 @@ public actor UndeterminedVehicle: ConnectedVehicleInterface {
     default:                          obdLinkCommand = nil
     }
     guard let obdLinkCommand else {
-      DokoLogging.shared.postLoggingResponse(.error("vehicleObdCommand: \(command.description) not found"))
+      DokoLogging.shared.postLoggingResponse(.error("UV.vehicleObdCommand: \(command.description) not found"))
       return nil
     }
     return obdLinkCommand
@@ -40,21 +58,15 @@ public actor UndeterminedVehicle: ConnectedVehicleInterface {
   public func translateDokoCommandPacket(using packetType: DokoPacketType) async -> ObdCommandPacket? {
     switch packetType {
     case .reset:
-      return ObdCommandPacket(
-        type: .reset,
-        commands: [
-          .atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
-        ])
-
+      return obdCommandPacket(.reset) {
+        reset
+      }
     case .vin:
-      return ObdCommandPacket(
-        type: .vin,
-        commands: [
-          .vin, .stprs
-        ])
-
+      return obdCommandPacket(.vin) {
+        protocolDetect
+      }
     default:
-      DokoLogging.shared.postLoggingResponse(.error("translateDokoCommandPacket: unexpected \(packetType.description) packet"))
+      DokoLogging.shared.postLoggingResponse(.error("UV.translateDokoCommandPacket: unexpected \(packetType.description) packet"))
       return nil
     }
   }

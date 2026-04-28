@@ -10,9 +10,6 @@ private struct CommandGroup {
   let commands: [ObdCommand]
 }
 
-private let can11Bit = CommandGroup(commands: [.stp(33), .stpo, .atcra("77A"), .atfcsh("710")])
-private let can29Bit = CommandGroup(commands: [.stp(34), .stpo, .atfcsh("17FC007B"), .atcra("17FE007X")])
-
 @resultBuilder
 private enum ObdCommandsBuilder {
   static func buildExpression(_ e: ObdCommand) -> [ObdCommand] { [e] }
@@ -20,7 +17,7 @@ private enum ObdCommandsBuilder {
   static func buildBlock(_ components: [ObdCommand]...) -> [ObdCommand] { components.flatMap { $0 } }
 }
 
-private func obdPacket(_ type: DokoPacketType, @ObdCommandsBuilder _ commands: () -> [ObdCommand]) -> ObdCommandPacket {
+private func obdCommandPacket(_ type: DokoPacketType, @ObdCommandsBuilder _ commands: () -> [ObdCommand]) -> ObdCommandPacket {
   ObdCommandPacket(type: type, commands: commands())
 }
 
@@ -95,155 +92,140 @@ public actor VwElectrics: ConnectedVehicleInterface {
     return obdLinkCommand
   }
 
+  private let canbusInitialization = CommandGroup(commands: [.atcra("17FE007X"), .atfcsh("17FC007B"), .atfcsd("300000"), .atfcsm(1)])
+  private let canbusNormalAddressing = CommandGroup(commands: [.stp(33), .stpo, .atcra("77A"), .atfcsh("710")])
+  private let canbusExtendedAddressing = CommandGroup(commands: [.stp(34), .stpo, .atfcsh("17FC007B"), .atcra("17FE007X")])
+
   public func translateDokoCommandPacket(using packetType: DokoPacketType) async -> ObdCommandPacket? {
     switch packetType {
     case .vehicleCustomization:
-      return ObdCommandPacket(type: .vehicleCustomization, commands: [
-        //.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)
-        .atcra("17FE007X"),
-        .atfcsh("17FC007B"),
-        .atfcsd("300000"),
-        .atfcsm(1),
+      return obdCommandPacket(.vehicleCustomization) {
+        //.atz; .ate(false); .ats(false); .ath(false); .atcaf(true); .stcsegr(true); .atsp(0)
+        canbusInitialization;
 
-        .acChargerStatus, .dcChargerStatus,
-        .gearSelected, .odometer, .speed,
-        .batteryStateOfCharge, .batteryTemperature,
-        .batteryOriginalCapacity,
-        .batteryVoltage, .batteryCurrent,
-
-        //.batteryCurrentCapacity, .batteryDistanceToEmpty,
-      ])
+        .acChargerStatus;
+        .dcChargerStatus;
+        .gearSelected;
+        .odometer;
+        .speed;
+        .batteryStateOfCharge;
+        .batteryTemperature;
+        .batteryOriginalCapacity;
+        .batteryVoltage;
+        .batteryCurrent;
+        canbusNormalAddressing;
+        .batteryCurrentCapacity; .batteryDistanceToEmpty
+        canbusExtendedAddressing;
+      }
 
     case .idle:
-      return ObdCommandPacket(type: .idle, commands: [
-        .acChargerStatus, .dcChargerStatus,
-        .gearSelected,
-      ])
+      return obdCommandPacket(.idle) {
+        .acChargerStatus;
+        .dcChargerStatus;
+        .gearSelected;
+      }
 
     case .tripStarting:
-      return obdPacket(.tripStarting) {
+      return obdCommandPacket(.tripStarting) {
         .odometer;
         .batteryStateOfCharge;
         .batteryTemperature;
-        can11Bit;
+        canbusNormalAddressing;
         .batteryDistanceToEmpty;
-        can29Bit;
-        .position
+        canbusExtendedAddressing;
+        .position;
       }
+
     case .tripInProgress:
-      return ObdCommandPacket(type: .tripInProgress, commands: [
-        .gearSelected,
-      ])
+      return obdCommandPacket(.tripInProgress) {
+        .gearSelected;
+      }
+
     case .tripUpdate:
-      return ObdCommandPacket(type: .tripUpdate, commands: [
-        .position,
-        .odometer,
-        .batteryStateOfCharge, .batteryTemperature,
-        //.batteryDistanceToEmpty,
-      ])
+      return obdCommandPacket(.tripUpdate) {
+        .position;
+        .odometer;
+        .batteryStateOfCharge;
+        .batteryTemperature;
+      }
+
     case .tripEnding:
-      return obdPacket(.tripEnding) {
+      return obdCommandPacket(.tripEnding) {
+        .weather;
+        .position;
+        .odometer;
+        .batteryStateOfCharge;
+        .batteryTemperature;
+        .batteryOriginalCapacity;
+        canbusNormalAddressing;
+        .batteryCurrentCapacity;
+        .batteryDistanceToEmpty;
+        canbusExtendedAddressing;
+      }
+
+    case .tripData:
+      return obdCommandPacket(.tripData) {
+        .odometer;
+        .batteryStateOfCharge;
+        .batteryTemperature;
+        canbusNormalAddressing;
+        .batteryDistanceToEmpty;
+        canbusExtendedAddressing;
+      }
+
+    case .tripWeather:
+      return obdCommandPacket(.tripWeather) {
+        .weather
+      }
+
+    case .acChargeStarting, .dcChargeStarting:
+      return obdCommandPacket(packetType) {
         .weather;
         .odometer;
         .batteryStateOfCharge;
         .batteryTemperature;
         .batteryOriginalCapacity;
-        can11Bit;
+        canbusNormalAddressing;
         .batteryCurrentCapacity;
         .batteryDistanceToEmpty;
-        can29Bit;
-        .position
+        canbusExtendedAddressing;
+        .position;
       }
-    case .tripData:
-      return ObdCommandPacket(type: .tripData, commands: [
-        .odometer,
-        .batteryStateOfCharge, .batteryTemperature,
-        //.batteryDistanceToEmpty,
-      ])
-    case .tripWeather:
-      return ObdCommandPacket(type: .tripWeather, commands: [
-        .weather
-      ])
 
-    case .acChargeStarting:
-      return ObdCommandPacket(type: .acChargeStarting, commands: [
-        .odometer,
-        .batteryStateOfCharge,
-        .batteryTemperature,
-        // 11-but can commands
-        //.batteryDistanceToEmpty,
-        //.batteryCurrentCapacity,
-        // 29-bit can commands
-        .position, .weather,
-      ])
-    case .acChargeInProgress:
-      return ObdCommandPacket(type: .acChargeInProgress, commands: [
-        .acChargerStatus
-      ])
-    case .acChargeUpdate:
-      return ObdCommandPacket(type: .acChargeUpdate, commands: [
-        .batteryStateOfCharge, .batteryTemperature,
-      ])
-    case .acChargeEnding:
-      return ObdCommandPacket(type: .acChargeEnding, commands: [
-        .batteryStateOfCharge, .batteryTemperature,
-        .batteryOriginalCapacity,
-        // 11-but can commands
-        //.batteryDistanceToEmpty,
-        //.batteryCurrentCapacity,
-        // 29-bit can commands
-      ])
+    case .acChargeInProgress, .dcChargeInProgress:
+      return obdCommandPacket(packetType) {
+        packetType == .acChargeInProgress ? .acChargerStatus : .dcChargerStatus
+      }
 
-    case .dcChargeStarting:
-      return ObdCommandPacket(type: .dcChargeStarting, commands: [
-        .odometer,
-        .batteryStateOfCharge,
-        .batteryTemperature,
-        // 11-but can commands
-        //.batteryDistanceToEmpty,
-        //.batteryCurrentCapacity,
-        // 29-bit can commands
-        .position, .weather,
-      ])
-    case .dcChargeInProgress:
-      return ObdCommandPacket(type: .dcChargeInProgress, commands: [
-        .dcChargerStatus
-      ])
-    case .dcChargeUpdate:
-      return ObdCommandPacket(type: .dcChargeUpdate, commands: [
-        .batteryStateOfCharge, .batteryTemperature,
-      ])
-    case .dcChargeEnding:
-      return ObdCommandPacket(type: .dcChargeEnding, commands: [
-        .batteryStateOfCharge, .batteryTemperature,
-        .batteryOriginalCapacity,
-        // 11-but can commands
-        //.batteryDistanceToEmpty,
-        //.batteryCurrentCapacity,
-        // 29-bit can commands
-      ])
+    case .acChargeUpdate, .dcChargeUpdate:
+      return obdCommandPacket(packetType) {
+        .batteryStateOfCharge;
+        .batteryTemperature
+      }
 
-    case .acChargeHistory:
-      return ObdCommandPacket(type: .acChargeHistory, commands: [
-        .batteryStateOfCharge, .batteryTemperature,
-      ])
-    case .dcChargeHistory:
-      return ObdCommandPacket(type: .dcChargeHistory, commands: [
-        .batteryStateOfCharge, .batteryTemperature,
-      ])
+    case .acChargeEnding, .dcChargeEnding:
+      return obdCommandPacket(packetType) {
+        .batteryStateOfCharge;
+        .batteryTemperature;
+        .batteryOriginalCapacity;
+        .batteryOriginalCapacity;
+        canbusNormalAddressing;
+        .batteryCurrentCapacity;
+        .batteryDistanceToEmpty;
+        canbusExtendedAddressing;
+      }
 
-    case .tripEnergy:
-      return ObdCommandPacket(type: .tripEnergy, commands: [
-        .batteryVoltage, .batteryCurrent
-      ])
-    case .acChargeEnergy:
-      return ObdCommandPacket(type: .acChargeEnergy, commands: [
-        .batteryVoltage, .batteryCurrent
-      ])
-    case .dcChargeEnergy:
-      return ObdCommandPacket(type: .dcChargeEnergy, commands: [
-        .batteryVoltage, .batteryCurrent
-      ])
+    case .acChargeHistory, .dcChargeHistory:
+      return obdCommandPacket(packetType) {
+        .batteryStateOfCharge;
+        .batteryTemperature
+      }
+
+    case .tripEnergy, .acChargeEnergy, .dcChargeEnergy:
+      return obdCommandPacket(packetType) {
+        .batteryVoltage;
+        .batteryCurrent
+      }
 
     default:
       DokoLogging.shared.postLoggingResponse(.error("VWE.translateDokoCommandPacket: no packet translation for '\(packetType.description)'"))
