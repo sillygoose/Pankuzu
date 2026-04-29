@@ -32,9 +32,11 @@ public final class ChargeDetailBatteryTemperatureModel {
     let batteryValues = batteryTemp.map { $0.datapoint }
     let couplerValues = couplerTemp.map { $0.datapoint }
     let allValues = batteryValues + couplerValues
-    self.minYAxis = Measurement(value: min(minYAxis.value, floor((allValues.min() ?? 0) - 2)), unit: UnitTemperature.celsius)
+    let minY = floor(allValues.min() ?? 0) - 2
+    let maxY = ceil(allValues.max() ?? 0) + 2
+    self.minYAxis = Measurement(value: min(minYAxis.value, minY), unit: UnitTemperature.celsius)
       .converted(to: unit)
-    self.maxYAxis = Measurement(value: max(maxYAxis.value, ceil((allValues.max() ?? 0) + 2)), unit: UnitTemperature.celsius)
+    self.maxYAxis = Measurement(value: max(maxYAxis.value, maxY), unit: UnitTemperature.celsius)
       .converted(to: unit)
   }
 

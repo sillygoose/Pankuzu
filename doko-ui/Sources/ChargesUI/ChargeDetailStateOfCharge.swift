@@ -28,13 +28,13 @@ public final class ChargeDetailStateOfChargeModel {
     guard let chargeHistory, !chargeHistory.stateOfCharge.isEmpty else { return }
     stateOfCharge = downsample(chargeHistory.stateOfCharge, maxPoints: 60)
     batteryEnergy = downsample(chargeHistory.batteryEnergy, maxPoints: 60)
-    if let min = batteryEnergy.map(\.datapoint).min() {
-      maxBatteryEnergy = ceil(-min + 0.5)
+    if let max = batteryEnergy.map(\.datapoint).max() {
+      maxBatteryEnergy = ceil(max + 0.5)
     }
   }
 
   func normalizeBatteryEnergy(_ kWh: Double) -> Double {
-    -kWh / maxBatteryEnergy * 100
+    kWh / maxBatteryEnergy * 100
   }
 
   func kWhFromNormalized(_ normalized: Double) -> Double {
@@ -136,7 +136,7 @@ public struct ChargeDetailStateOfChargeView: View {
         .fontWeight(.semibold)
         .foregroundStyle(DesignTokens.Color.stateOfCharge)
       if let energyPoint = model.selectedEnergyPoint {
-        Text(String(format: "%.2f kWh", -energyPoint.datapoint))
+        Text(String(format: "%.2f kWh", energyPoint.datapoint))
           .font(.caption)
           .fontWeight(.semibold)
           .foregroundStyle(DesignTokens.Color.energy)
@@ -224,7 +224,7 @@ public struct ChargeDetailStateOfChargeView: View {
             Rectangle()
               .fill(DesignTokens.Color.energy)
               .frame(width: 20, height: 2)
-            Text("Energy Consumed")
+            Text("Energy Added")
               .font(.caption)
               .foregroundStyle(.secondary)
           }

@@ -49,7 +49,6 @@ public struct ToolsView: View {
           .presentationDetents([.large])
         }
       }
-      .navigationTitle("Tools")
     }
   }
 }

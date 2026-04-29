@@ -221,10 +221,11 @@ public struct SettingsView: View {
             })
           }
         }
+        .listRowInsets(EdgeInsets())
         TipView(DebuggingTip())
+          .listRowInsets(EdgeInsets())
       }
       .listStyle(.plain)
-      .padding(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
       .confirmationDialog("Log", isPresented: $showLogDialog) {
         Button("Copy Log") {
           debuggingModel.saveHistoryToClipboard()
@@ -277,7 +278,6 @@ public struct SettingsView: View {
           )
         }
       }
-      .navigationTitle("")
     }
   }
 
