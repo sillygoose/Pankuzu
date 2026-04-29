@@ -20,7 +20,8 @@ import CommonUI
     case chargeLocationMap
     case powerChart
     case energyUsedChart
-    case batteryChart
+    case stateOfChargeChart
+    case batteryTemperatureChart
     case stateOfHealthChart
 
     public var id: String {
@@ -37,8 +38,10 @@ import CommonUI
         return "powerChart"
       case .energyUsedChart:
         return "energyUsedChart"
-      case .batteryChart:
-        return "batteryChart"
+      case .stateOfChargeChart:
+        return "stateOfChargeChart"
+      case .batteryTemperatureChart:
+        return "batteryTemperatureChart"
       case .stateOfHealthChart:
         return "stateOfHealthChart"
       }
@@ -179,19 +182,19 @@ public struct ChargeDetailView: View {
       }
 
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
-        if let stateOfChargeStart = charge.stateOfChargeStart, let stateOfChargeEnd = charge.stateOfChargeEnd {
+        if let rawStateOfChargeStart = charge.stateOfChargeStart, let rawStateOfChargeEnd = charge.stateOfChargeEnd {
           let (stateOfChargeStartColor, stateOfChargeStartIcon) = {
-            if stateOfChargeStart < 25 { return (Color.red, "battery.25percent") }
-            if stateOfChargeStart < 50 { return (Color.yellow,"battery.50percent") }
+            if rawStateOfChargeStart < 25 { return (Color.red, "battery.25percent") }
+            if rawStateOfChargeStart < 50 { return (Color.yellow,"battery.50percent") }
             return (Color.green, "battery.75percent")
           }()
           let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
-            if stateOfChargeEnd < 25 { return (Color.red, "battery.25percent") }
-            if stateOfChargeEnd < 50 { return (Color.yellow,"battery.50percent") }
+            if rawStateOfChargeEnd < 25 { return (Color.red, "battery.25percent") }
+            if rawStateOfChargeEnd < 50 { return (Color.yellow,"battery.50percent") }
             return (Color.green, "battery.75percent")
           }()
-          let stateOfChargeStart = Measurement(value: stateOfChargeStart, unit: UnitPercent.percent)
-          let stateOfChargeEnd = Measurement(value: stateOfChargeEnd, unit: UnitPercent.percent)
+          let stateOfChargeStart = Measurement(value: rawStateOfChargeStart, unit: UnitPercent.percent)
+          let stateOfChargeEnd = Measurement(value: rawStateOfChargeEnd, unit: UnitPercent.percent)
           GridRangeButton(
             rangeName: "State Of Charge",
             startValue: String(format: "%.0f", stateOfChargeStart.value),
@@ -202,23 +205,25 @@ public struct ChargeDetailView: View {
             endUnit: stateOfChargeEnd.unit.symbol,
             endColor: stateOfChargeEndColor,
             endSymbol: stateOfChargeEndIcon,
-          ) {}
+          ) {
+            model.destination = .stateOfChargeChart
+          }
         }
 
-        if let distanceToEmptyStartMetric = charge.distanceToEmptyStart, let distanceToEmptyEndMetric = charge.distanceToEmptyEnd {
+        if let rawDistanceToEmptyStart = charge.distanceToEmptyStart, let rawDistanceToEmptyEnd = charge.distanceToEmptyEnd {
           let (distanceToEmptyStartColor, distanceToEmptyStartStartIcon) = {
-            if distanceToEmptyStartMetric < 35 { return (Color.red, "road.lanes.curved.left") }
-            if distanceToEmptyStartMetric < 70 { return (Color.yellow,"road.lanes.curved.left") }
+            if rawDistanceToEmptyStart < 35 { return (Color.red, "road.lanes.curved.left") }
+            if rawDistanceToEmptyStart < 70 { return (Color.yellow,"road.lanes.curved.left") }
             return (Color.green, "road.lanes.curved.left")
           }()
           let (distanceToEmptyEndColor, distanceToEmptyEndIcon) = {
-            if distanceToEmptyEndMetric < 35 { return (Color.red, "road.lanes.curved.right") }
-            if distanceToEmptyEndMetric < 70 { return (Color.yellow,"road.lanes.curved.right") }
+            if rawDistanceToEmptyEnd < 35 { return (Color.red, "road.lanes.curved.right") }
+            if rawDistanceToEmptyEnd < 70 { return (Color.yellow,"road.lanes.curved.right") }
             return (Color.green, "road.lanes.curved.right")
           }()
-          let distanceToEmptyStart = Measurement(value: distanceToEmptyStartMetric, unit: UnitLength.kilometers)
+          let distanceToEmptyStart = Measurement(value: rawDistanceToEmptyStart, unit: UnitLength.kilometers)
             .converted(to: model.appSettings.metric ? .kilometers : .miles)
-          let distanceToEmptyEnd = Measurement(value: distanceToEmptyEndMetric, unit: UnitLength.kilometers)
+          let distanceToEmptyEnd = Measurement(value: rawDistanceToEmptyEnd, unit: UnitLength.kilometers)
             .converted(to: model.appSettings.metric ? .kilometers : .miles)
           GridRangeButton(
             rangeName: "Distance To Empty",
@@ -230,23 +235,25 @@ public struct ChargeDetailView: View {
             endUnit: distanceToEmptyEnd.unit.symbol,
             endColor: distanceToEmptyEndColor,
             endSymbol: distanceToEmptyEndIcon,
-          ) {}
+          ) {
+            //###
+          }
         }
 
-        if let batteryTempStartMetric = charge.batteryTempStart, let batteryTempEndMetric = charge.batteryTempEnd {
+        if let rawBatteryTempStart = charge.batteryTempStart, let rawBatteryTempEnd = charge.batteryTempEnd {
           let (batteryTempStartColor, batteryTempStartIcon) = {
-            if batteryTempStartMetric < 10 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
-            if batteryTempStartMetric < 50 { return (Color.green, "batteryblock.stack") }
+            if rawBatteryTempStart < 10 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
+            if rawBatteryTempStart < 50 { return (Color.green, "batteryblock.stack") }
             return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
           }()
           let (batteryTempEndColor, batteryTempEndIcon) = {
-            if batteryTempEndMetric < 10 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
-            if batteryTempEndMetric < 50 { return (Color.green,"batteryblock.stack") }
+            if rawBatteryTempEnd < 10 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
+            if rawBatteryTempEnd < 50 { return (Color.green,"batteryblock.stack") }
             return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
           }()
-          let batteryTempStart = Measurement(value: batteryTempStartMetric, unit: UnitTemperature.celsius)
+          let batteryTempStart = Measurement(value: rawBatteryTempStart, unit: UnitTemperature.celsius)
             .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
-          let batteryTempEnd = Measurement(value: batteryTempEndMetric, unit: UnitTemperature.celsius)
+          let batteryTempEnd = Measurement(value: rawBatteryTempEnd, unit: UnitTemperature.celsius)
             .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
           GridRangeButton(
             rangeName: "Battery Temperature",
@@ -258,11 +265,13 @@ public struct ChargeDetailView: View {
             endUnit: batteryTempEnd.unit.symbol,
             endColor: batteryTempEndColor,
             endSymbol: batteryTempEndIcon,
-          ) {}
+          ) {
+            model.destination = .batteryTemperatureChart
+          }
         }
 
-        if let batteryStateOfHealth = charge.batteryStateOfHealth {
-          let batteryStateOfHealth = Measurement(value: batteryStateOfHealth, unit: UnitPercent.percent)
+        if let rawBatteryStateOfHealth = charge.batteryStateOfHealth {
+          let batteryStateOfHealth = Measurement(value: rawBatteryStateOfHealth, unit: UnitPercent.percent)
           let batteryStateOfHealthColor =
           batteryStateOfHealth.value < 80 ? Color.red : batteryStateOfHealth.value < 90 ? .yellow : .green
           GridRow {
@@ -303,6 +312,7 @@ public struct ChargeDetailView: View {
           .navigationBarTitleDisplayMode(.inline)
           .presentationDetents([.medium])
         }
+        
       case .editLocationForm(let location):
         NavigationStack {
           LocationFormView(
@@ -312,6 +322,7 @@ public struct ChargeDetailView: View {
           )
           .presentationDetents([.large])
         }
+        
       case .editVehicleForm(let vehicle):
         NavigationStack {
           VehicleFormView(
@@ -321,6 +332,7 @@ public struct ChargeDetailView: View {
           )
           .presentationDetents([.medium])
         }
+        
       case .chargeLocationMap:
         NavigationStack {
           ChargeDetailMapView(
@@ -330,6 +342,7 @@ public struct ChargeDetailView: View {
           )
           .presentationDetents([.large])
         }
+        
       case .powerChart:
         NavigationStack {
           ChargeDetailPowerChartView(
@@ -339,6 +352,7 @@ public struct ChargeDetailView: View {
           )
           .presentationDetents([.medium])
         }
+        
       case .energyUsedChart:
         NavigationStack {
           ChargeDetailEnergyView(
@@ -348,15 +362,27 @@ public struct ChargeDetailView: View {
           )
           .presentationDetents([.medium])
         }
-      case .batteryChart:
+        
+      case .batteryTemperatureChart:
         NavigationStack {
-          ChargeDetailBatteryView(
-            model: ChargeDetailBatteryModel(
+          ChargeDetailBatteryTemperatureView(
+            model: ChargeDetailBatteryTemperatureModel(
               charge: charge
             )
           )
           .presentationDetents([.medium])
         }
+       
+      case .stateOfChargeChart:
+        NavigationStack {
+          ChargeDetailStateOfChargeView(
+            model: ChargeDetailStateOfChargeModel(
+              charge: charge
+            )
+          )
+          .presentationDetents([.medium])
+        }
+
       case .stateOfHealthChart:
         NavigationStack {
           SoHHistoryView(
@@ -370,7 +396,6 @@ public struct ChargeDetailView: View {
       }
     }
   }
-
 }
 
 #Preview {

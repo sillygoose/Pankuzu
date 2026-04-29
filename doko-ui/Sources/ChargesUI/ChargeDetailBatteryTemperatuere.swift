@@ -8,32 +8,30 @@ import CommonUI
 
 @MainActor
 @Observable
-public final class TripDetailBatteryTemperatureModel {
-  var trip: Trip
+public final class ChargeDetailBatteryTemperatureModel {
+  var charge: Charge
 
-  @ObservationIgnored @FetchOne(TripData.none) var tripData
-  @ObservationIgnored @FetchOne(TripWeather.none) var tripWeather
+  @ObservationIgnored @FetchOne(ChargeHistory.none) var chargeHistory
   @ObservationIgnored @Shared(.appSettings) var appSettings
 
   var batteryTemp: [DokoDataPoint] = []
-  var weatherTemp: [DokoWeather] = []
+  var couplerTemp: [DokoDataPoint] = []
   var minYAxis: Measurement<UnitTemperature> = .init(value: -5, unit: .celsius)
   var maxYAxis: Measurement<UnitTemperature> = .init(value: 62, unit: .celsius)
-  var selectedBatteryPoint: DokoDataPoint?
-  var selectedWeatherPoint: DokoWeather?
+  var selectedPoint: DokoDataPoint?
+  var selectedCouplerPoint: DokoDataPoint?
 
-  public init(trip: Trip) {
-    self.trip = trip
-    _tripData = FetchOne(TripData.find(trip.id))
-    _tripWeather = FetchOne(TripWeather.find(trip.id))
+  public init(charge: Charge) {
+    self.charge = charge
+    _chargeHistory = FetchOne(ChargeHistory.find(charge.id))
 
-    guard let tripData else { return }
-    batteryTemp = downsample(tripData.batteryTemp, maxPoints: 60)
-    weatherTemp = tripWeather?.weather ?? []
+    guard let chargeHistory else { return }
+    batteryTemp = downsample(chargeHistory.batteryTemp, maxPoints: 60)
+    couplerTemp = downsample(chargeHistory.couplerTemp, maxPoints: 60)
 
     let batteryValues = batteryTemp.map { $0.datapoint }
-    let weatherValues = weatherTemp.map { $0.temperature }
-    let allValues = batteryValues + weatherValues
+    let couplerValues = couplerTemp.map { $0.datapoint }
+    let allValues = batteryValues + couplerValues
     self.minYAxis = Measurement(value: min(minYAxis.value, floor((allValues.min() ?? 0) - 2)), unit: UnitTemperature.celsius)
       .converted(to: unit)
     self.maxYAxis = Measurement(value: max(maxYAxis.value, ceil((allValues.max() ?? 0) + 2)), unit: UnitTemperature.celsius)
@@ -63,12 +61,12 @@ public final class TripDetailBatteryTemperatureModel {
   }
 }
 
-public struct TripDetailBatteryTemperatureView: View {
-  @Bindable var model: TripDetailBatteryTemperatureModel
+public struct ChargeDetailBatteryTemperatureView: View {
+  @Bindable var model: ChargeDetailBatteryTemperatureModel
 
   @Environment(\.dismiss) var dismiss
 
-  public init(model: TripDetailBatteryTemperatureModel) {
+  public init(model: ChargeDetailBatteryTemperatureModel) {
     self.model = model
   }
 
@@ -78,7 +76,7 @@ public struct TripDetailBatteryTemperatureView: View {
         ContentUnavailableView(
           "No Data",
           systemImage: "batteryblock.stack",
-          description: Text("No battery temperature data was recorded for this trip.")
+          description: Text("No battery temperature data was recorded for this charge.")
         )
       } else {
         Chart {
@@ -91,17 +89,17 @@ public struct TripDetailBatteryTemperatureView: View {
             .interpolationMethod(.monotone)
           }
 
-          ForEach(model.weatherTemp) { point in
+          ForEach(model.couplerTemp) { point in
             LineMark(
               x: .value("Time", point.timestamp),
-              y: .value("Temp", model.converted(point.temperature))
+              y: .value("Temp", model.converted(point.datapoint))
             )
-            .foregroundStyle(by: .value("Series", "Outside"))
+            .foregroundStyle(by: .value("Series", "Coupler"))
             .interpolationMethod(.monotone)
             .lineStyle(StrokeStyle(lineWidth: 2, dash: [6, 3]))
           }
 
-          if let selected = model.selectedBatteryPoint {
+          if let selected = model.selectedPoint {
             RuleMark(x: .value("Time", selected.timestamp))
               .foregroundStyle(.gray.opacity(0.5))
               .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
@@ -126,11 +124,11 @@ public struct TripDetailBatteryTemperatureView: View {
                   .font(.caption)
                   .fontWeight(.semibold)
                   .foregroundStyle(DesignTokens.Color.batteryTemperature)
-                if let weather = model.selectedWeatherPoint {
-                  Text(String(format: "%.1f %@", model.converted(weather.temperature), model.minYAxis.unit.symbol))
+                if let coupler = model.selectedCouplerPoint {
+                  Text(String(format: "%.1f %@", model.converted(coupler.datapoint), model.minYAxis.unit.symbol))
                     .font(.caption)
                     .fontWeight(.semibold)
-                    .foregroundStyle(DesignTokens.Color.weather)
+                    .foregroundStyle(.orange)
                 }
               }
               .padding(6)
@@ -141,10 +139,10 @@ public struct TripDetailBatteryTemperatureView: View {
         }
         .chartForegroundStyleScale([
           "Battery": DesignTokens.Color.batteryTemperature,
-          "Outside": DesignTokens.Color.weather
+          "Coupler": Color.orange
         ])
         .chartLegend(.hidden)
-        .chartXScale(domain: model.trip.timeStart...model.trip.timeEnd)
+        .chartXScale(domain: model.charge.timeStart...model.charge.timeEnd)
         .chartXAxis {
           AxisMarks(values: .automatic)
         }
@@ -166,16 +164,16 @@ public struct TripDetailBatteryTemperatureView: View {
                   .onChanged { value in
                     let x = value.location.x - geometry[proxy.plotFrame!].origin.x
                     guard let timestamp: Date = proxy.value(atX: x) else { return }
-                    model.selectedBatteryPoint = model.batteryTemp.min { a, b in
+                    model.selectedPoint = model.batteryTemp.min { a, b in
                       abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
                     }
-                    model.selectedWeatherPoint = model.weatherTemp.min { a, b in
+                    model.selectedCouplerPoint = model.couplerTemp.min { a, b in
                       abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
                     }
                   }
                   .onEnded { _ in
-                    model.selectedBatteryPoint = nil
-                    model.selectedWeatherPoint = nil
+                    model.selectedPoint = nil
+                    model.selectedCouplerPoint = nil
                   }
               )
           }
@@ -194,9 +192,9 @@ public struct TripDetailBatteryTemperatureView: View {
           }
           HStack(spacing: 6) {
             Rectangle()
-              .fill(DesignTokens.Color.weather)
+              .fill(Color.orange)
               .frame(width: 20, height: 2)
-            Text("Outside")
+            Text("Coupler")
               .font(.caption)
               .foregroundStyle(.secondary)
           }
@@ -220,12 +218,12 @@ public struct TripDetailBatteryTemperatureView: View {
     try? $0.bootstrapDatabase()
     try? $0.defaultDatabase.seedPreviews()
   }
-  @FetchAll var trips: [Trip]
+  @FetchAll var charges: [Charge]
   NavigationStack {
-    TripDetailView(
-      model: TripDetailModel(
+    ChargeDetailView(
+      model: ChargeDetailModel(
         destination: .batteryTemperatureChart,
-        tripID: trips.first!.id
+        chargeID: charges.first!.id
       )
     )
     .preferredColorScheme(.dark)

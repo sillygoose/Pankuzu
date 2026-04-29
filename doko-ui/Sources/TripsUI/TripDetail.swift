@@ -300,23 +300,25 @@ public struct TripDetailView: View {
             endUnit: distanceToEmptyEnd.unit.symbol,
             endColor: distanceToEmptyEndColor,
             endSymbol: distanceToEmptyEndIcon,
-          ) {}
+          ) {
+            //###
+          }
         }
 
-        if let batteryTempStartMetric = trip.batteryTempStart, let batteryTempEndMetric = trip.batteryTempEnd {
+        if let rawBatteryTempStart = trip.batteryTempStart, let rawBatteryTempEnd = trip.batteryTempEnd {
           let (batteryTempStartColor, batteryTempStartIcon) = {
-            if batteryTempStartMetric < 10 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
-            if batteryTempStartMetric < 50 { return (Color.green, "batteryblock.stack") }
+            if rawBatteryTempStart < 10 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
+            if rawBatteryTempStart < 50 { return (Color.green, "batteryblock.stack") }
             return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
           }()
           let (batteryTempEndColor, batteryTempEndIcon) = {
-            if batteryTempEndMetric < 10 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
-            if batteryTempEndMetric < 50 { return (Color.green,"batteryblock.stack") }
+            if rawBatteryTempEnd < 10 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
+            if rawBatteryTempEnd < 50 { return (Color.green,"batteryblock.stack") }
             return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
           }()
-          let batteryTempStart = Measurement(value: batteryTempStartMetric, unit: UnitTemperature.celsius)
+          let batteryTempStart = Measurement(value: rawBatteryTempStart, unit: UnitTemperature.celsius)
             .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
-          let batteryTempEnd = Measurement(value: batteryTempEndMetric, unit: UnitTemperature.celsius)
+          let batteryTempEnd = Measurement(value: rawBatteryTempEnd, unit: UnitTemperature.celsius)
             .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
           GridRangeButton(
             rangeName: "Battery Temperature",
@@ -369,6 +371,7 @@ public struct TripDetailView: View {
           )
           .presentationDetents([.large])
         }
+        
       case .editVehicleForm(let vehicle):
         NavigationStack {
           VehicleFormView(
@@ -378,6 +381,7 @@ public struct TripDetailView: View {
           )
           .presentationDetents([.medium])
         }
+        
       case .tripMap:
         NavigationStack {
           TripDetailMapView(
@@ -387,6 +391,7 @@ public struct TripDetailView: View {
           )
           .presentationDetents([.large])
         }
+        
       case .elevationChart:
         NavigationStack {
           TripDetailElevationView(
@@ -396,6 +401,7 @@ public struct TripDetailView: View {
           )
           .presentationDetents([.medium])
         }
+        
       case .weatherChart:
         NavigationStack {
           TripDetailWeatherView(
@@ -414,6 +420,7 @@ public struct TripDetailView: View {
           )
           .presentationDetents([.medium])
         }
+        
       case .stateOfChargeChart:
         NavigationStack {
           TripDetailStateOfChargeView(
@@ -423,6 +430,7 @@ public struct TripDetailView: View {
           )
           .presentationDetents([.medium])
         }
+        
       case .batteryTemperatureChart:
         NavigationStack {
           TripDetailBatteryTemperatureView(
@@ -432,6 +440,7 @@ public struct TripDetailView: View {
           )
           .presentationDetents([.medium])
         }
+        
       case .stateOfHealthChart:
         NavigationStack {
           SoHHistoryView(
