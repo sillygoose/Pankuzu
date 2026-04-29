@@ -169,7 +169,6 @@ public struct ChargeHistory: Hashable, Identifiable, Codable, Sendable {
     stateOfCharge: [DokoDataPoint] = [],
     batteryEnergy: [DokoDataPoint] = [],
     energyToEmpty: [DokoDataPoint] = [],
-//    distanceToEmpty: [DokoDataPoint] = [],
     batteryTemp: [DokoDataPoint] = [],
     couplerTemp: [DokoDataPoint] = []
   ) {
@@ -178,7 +177,6 @@ public struct ChargeHistory: Hashable, Identifiable, Codable, Sendable {
     self.stateOfCharge = stateOfCharge
     self.batteryEnergy = batteryEnergy
     self.energyToEmpty = energyToEmpty
-//    self.distanceToEmpty = distanceToEmpty
     self.batteryTemp = batteryTemp
     self.couplerTemp = couplerTemp
   }
