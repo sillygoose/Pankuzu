@@ -14,8 +14,8 @@ public final class TripDetailStateOfChargeModel {
   @ObservationIgnored @FetchOne(TripData.none) var tripData
 
   var stateOfCharge: [DokoDataPoint] = []
-  var minSoC: Double = 0
-  var maxSoC: Double = 100
+  var minYAxis: Measurement<UnitPercent> = .init(value: 0, unit: .percent)
+  var maxYAxis: Measurement<UnitPercent> = .init(value: 100, unit: .percent)
   var selectedPoint: DokoDataPoint?
 
   public init(trip: Trip) {
@@ -24,10 +24,6 @@ public final class TripDetailStateOfChargeModel {
 
     guard let tripData, !tripData.stateOfCharge.isEmpty else { return }
     stateOfCharge = downsample(tripData.stateOfCharge, maxPoints: 60)
-
-    let values = stateOfCharge.map(\.datapoint)
-    minSoC = max(0, floor((values.min() ?? 0) - 2))
-    maxSoC = min(100, ceil((values.max() ?? 100) + 2))
   }
 
   private func downsample(_ data: [DokoDataPoint], maxPoints: Int) -> [DokoDataPoint] {
@@ -45,11 +41,7 @@ public final class TripDetailStateOfChargeModel {
     }
   }
 
-  func color(for soc: Double) -> Color {
-    if soc < 25 { return .red }
-    if soc < 50 { return .yellow }
-    return .green
-  }
+
 }
 
 public struct TripDetailStateOfChargeView: View {
@@ -89,7 +81,7 @@ public struct TripDetailStateOfChargeView: View {
               x: .value("Time", selected.timestamp),
               y: .value("SoC", selected.datapoint)
             )
-            .foregroundStyle(model.color(for: selected.datapoint))
+            .foregroundStyle(DesignTokens.Color.stateOfCharge)
             .symbolSize(100)
 
             PointMark(
@@ -101,10 +93,10 @@ public struct TripDetailStateOfChargeView: View {
               VStack(spacing: 2) {
                 Text(selected.timestamp, style: .time)
                   .font(.caption2)
-                Text(String(format: "%.0f%%", selected.datapoint))
+                Text(String(format: "%.1f", selected.datapoint) + model.minYAxis.unit.symbol)
                   .font(.caption)
                   .fontWeight(.semibold)
-                  .foregroundStyle(model.color(for: selected.datapoint))
+                  .foregroundStyle(DesignTokens.Color.stateOfCharge)
               }
               .padding(6)
               .background(Color(.systemBackground).opacity(0.9))
@@ -116,7 +108,7 @@ public struct TripDetailStateOfChargeView: View {
         .chartXAxis {
           AxisMarks(values: .automatic)
         }
-        .chartYScale(domain: model.minSoC...model.maxSoC)
+        .chartYScale(domain: model.minYAxis.value...model.maxYAxis.value)
         .chartYAxis {
           AxisMarks(position: .trailing) { value in
             AxisValueLabel("\(value.as(Double.self)!.formatted())%")
@@ -146,6 +138,16 @@ public struct TripDetailStateOfChargeView: View {
         }
         .frame(width: 340, height: 300)
         .padding(.top, 20)
+
+        HStack(spacing: 6) {
+          Rectangle()
+            .fill(DesignTokens.Color.stateOfCharge)
+            .frame(width: 20, height: 2)
+          Text("State of Charge")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+        .padding(.top, 8)
       }
       Spacer()
     }
