@@ -247,19 +247,19 @@ public struct TripDetailView: View {
           }
         }
 
-        if let stateOfChargeStart = trip.stateOfChargeStart, let stateOfChargeEnd = trip.stateOfChargeEnd {
+        if let rawStateOfChargeStart = trip.stateOfChargeStart, let rawStateOfChargeEnd = trip.stateOfChargeEnd {
           let (stateOfChargeStartColor, stateOfChargeStartIcon) = {
-            if stateOfChargeStart < 10 { return (Color.red, "battery.25percent") }
-            if stateOfChargeStart < 25 { return (Color.yellow,"battery.50percent") }
+            if rawStateOfChargeStart < 10 { return (Color.red, "battery.25percent") }
+            if rawStateOfChargeStart < 25 { return (Color.yellow,"battery.50percent") }
             return (Color.green, "battery.75percent")
           }()
           let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
-            if stateOfChargeEnd < 10 { return (Color.red, "battery.25percent") }
-            if stateOfChargeEnd < 25 { return (Color.yellow,"battery.50percent") }
+            if rawStateOfChargeEnd < 10 { return (Color.red, "battery.25percent") }
+            if rawStateOfChargeEnd < 25 { return (Color.yellow,"battery.50percent") }
             return (Color.green, "battery.75percent")
           }()
-          let stateOfChargeStart = Measurement(value: stateOfChargeStart, unit: UnitPercent.percent)
-          let stateOfChargeEnd = Measurement(value: stateOfChargeEnd, unit: UnitPercent.percent)
+          let stateOfChargeStart = Measurement(value: rawStateOfChargeStart, unit: UnitPercent.percent)
+          let stateOfChargeEnd = Measurement(value: rawStateOfChargeEnd, unit: UnitPercent.percent)
           GridRangeButton(
             rangeName: "State Of Charge",
             startValue: String(format: "%.0f", stateOfChargeStart.value),
