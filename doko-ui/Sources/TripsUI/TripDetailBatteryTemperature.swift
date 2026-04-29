@@ -15,20 +15,22 @@ public final class TripDetailBatteryTemperatureModel {
   @ObservationIgnored @Shared(.appSettings) var appSettings
 
   var batteryTemp: [DokoDataPoint] = []
-  var minTemp: Double = 0
-  var maxTemp: Double = 0
+  var minTemp: Measurement<UnitTemperature> = .init(value: 0, unit: .celsius)
+  var maxTemp: Measurement<UnitTemperature> = .init(value: 60, unit: .celsius)
   var selectedPoint: DokoDataPoint?
 
   public init(trip: Trip) {
     self.trip = trip
     _tripData = FetchOne(TripData.find(trip.id))
 
-    guard let tripData, !tripData.batteryTemp.isEmpty else { return }
+    guard let tripData else { return }
     batteryTemp = downsample(tripData.batteryTemp, maxPoints: 60)
 
     let values = batteryTemp.map { converted($0.datapoint) }
-    minTemp = floor((values.min() ?? 0) - 2)
-    maxTemp = ceil((values.max() ?? 0) + 2)
+    self.minTemp = Measurement(value: min(minTemp.value, floor((values.min() ?? 0) - 2)), unit: UnitTemperature.celsius)
+      .converted(to: appSettings.metric ? .celsius : .fahrenheit)
+    self.maxTemp = Measurement(value: max(maxTemp.value, ceil((values.max() ?? 0) + 2)), unit: UnitTemperature.celsius)
+      .converted(to: appSettings.metric ? .celsius : .fahrenheit)
   }
 
   private func downsample(_ data: [DokoDataPoint], maxPoints: Int) -> [DokoDataPoint] {
@@ -103,7 +105,7 @@ public struct TripDetailBatteryTemperatureView: View {
               VStack(spacing: 2) {
                 Text(selected.timestamp, style: .time)
                   .font(.caption2)
-                Text(String(format: "%.1f %@", model.converted(selected.datapoint), model.unit.symbol))
+                Text(String(format: "%.1f %@", model.converted(selected.datapoint), model.minTemp.unit.symbol))
                   .font(.caption)
                   .fontWeight(.semibold)
                   .foregroundStyle(DesignTokens.Color.batteryTemperature)
@@ -118,10 +120,10 @@ public struct TripDetailBatteryTemperatureView: View {
         .chartXAxis {
           AxisMarks(values: .automatic)
         }
-        .chartYScale(domain: model.minTemp...model.maxTemp)
+        .chartYScale(domain: model.minTemp.value...model.maxTemp.value)
         .chartYAxis {
           AxisMarks(position: .trailing) { value in
-            AxisValueLabel("\(value.as(Double.self)!.formatted()) \(model.unit.symbol)")
+            AxisValueLabel("\(value.as(Double.self)!.formatted()) \(model.minTemp.unit.symbol)")
             AxisGridLine()
             AxisTick()
           }
