@@ -14,9 +14,12 @@ public final class TripDetailStateOfChargeModel {
   @ObservationIgnored @FetchOne(TripData.none) var tripData
 
   var stateOfCharge: [DokoDataPoint] = []
+  var batteryEnergy: [DokoDataPoint] = []
   var minYAxis: Measurement<UnitPercent> = .init(value: 0, unit: .percent)
   var maxYAxis: Measurement<UnitPercent> = .init(value: 100, unit: .percent)
+  var maxBatteryEnergy: Double = 1
   var selectedPoint: DokoDataPoint?
+  var selectedEnergyPoint: DokoDataPoint?
 
   public init(trip: Trip) {
     self.trip = trip
@@ -24,6 +27,18 @@ public final class TripDetailStateOfChargeModel {
 
     guard let tripData, !tripData.stateOfCharge.isEmpty else { return }
     stateOfCharge = downsample(tripData.stateOfCharge, maxPoints: 60)
+    batteryEnergy = downsample(tripData.batteryEnergy, maxPoints: 60)
+    if let min = batteryEnergy.map(\.datapoint).min() {
+      maxBatteryEnergy = ceil(-min + 0.5)
+    }
+  }
+
+  func normalizeBatteryEnergy(_ kWh: Double) -> Double {
+    -kWh / maxBatteryEnergy * 100
+  }
+
+  func kWhFromNormalized(_ normalized: Double) -> Double {
+    normalized / 100 * maxBatteryEnergy
   }
 
   private func downsample(_ data: [DokoDataPoint], maxPoints: Int) -> [DokoDataPoint] {
@@ -53,6 +68,85 @@ public struct TripDetailStateOfChargeView: View {
     self.model = model
   }
 
+  @ChartContentBuilder
+  private var socSeries: some ChartContent {
+    ForEach(model.stateOfCharge) { point in
+      LineMark(
+        x: .value("Time", point.timestamp),
+        y: .value("SoC", point.datapoint)
+      )
+      .foregroundStyle(by: .value("Series", "SoC"))
+      .interpolationMethod(.monotone)
+    }
+  }
+
+  @ChartContentBuilder
+  private var batteryEnergySeries: some ChartContent {
+    ForEach(model.batteryEnergy) { point in
+      LineMark(
+        x: .value("Time", point.timestamp),
+        y: .value("SoC", model.normalizeBatteryEnergy(point.datapoint))
+      )
+      .foregroundStyle(by: .value("Series", "Energy"))
+      .interpolationMethod(.monotone)
+      .lineStyle(StrokeStyle(lineWidth: 2, dash: [6, 3]))
+    }
+  }
+
+  @ChartContentBuilder
+  private var selectionMarks: some ChartContent {
+    if let selected = model.selectedPoint {
+      RuleMark(x: .value("Time", selected.timestamp))
+        .foregroundStyle(.gray.opacity(0.5))
+        .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
+
+      PointMark(
+        x: .value("Time", selected.timestamp),
+        y: .value("SoC", selected.datapoint)
+      )
+      .foregroundStyle(DesignTokens.Color.stateOfCharge)
+      .symbolSize(100)
+
+      if let energyPoint = model.selectedEnergyPoint {
+        PointMark(
+          x: .value("Time", energyPoint.timestamp),
+          y: .value("SoC", model.normalizeBatteryEnergy(energyPoint.datapoint))
+        )
+        .foregroundStyle(DesignTokens.Color.energy)
+        .symbolSize(100)
+      }
+
+      PointMark(
+        x: .value("Time", selected.timestamp),
+        y: .value("SoC", selected.datapoint)
+      )
+      .foregroundStyle(.clear)
+      .annotation(position: .top) {
+        selectionAnnotation(selected: selected)
+      }
+    }
+  }
+
+  private func selectionAnnotation(selected: DokoDataPoint) -> some View {
+    VStack(spacing: 2) {
+      Text(selected.timestamp, style: .time)
+        .font(.caption2)
+      Text(String(format: "%.1f", selected.datapoint) + model.minYAxis.unit.symbol)
+        .font(.caption)
+        .fontWeight(.semibold)
+        .foregroundStyle(DesignTokens.Color.stateOfCharge)
+      if let energyPoint = model.selectedEnergyPoint {
+        Text(String(format: "%.2f kWh", -energyPoint.datapoint))
+          .font(.caption)
+          .fontWeight(.semibold)
+          .foregroundStyle(DesignTokens.Color.energy)
+      }
+    }
+    .padding(6)
+    .background(Color(.systemBackground).opacity(0.9))
+    .cornerRadius(6)
+  }
+
   public var body: some View {
     VStack {
       if model.stateOfCharge.isEmpty {
@@ -63,47 +157,15 @@ public struct TripDetailStateOfChargeView: View {
         )
       } else {
         Chart {
-          ForEach(model.stateOfCharge) { point in
-            LineMark(
-              x: .value("Time", point.timestamp),
-              y: .value("SoC", point.datapoint)
-            )
-            .foregroundStyle(DesignTokens.Color.stateOfCharge)
-            .interpolationMethod(.monotone)
-          }
-
-          if let selected = model.selectedPoint {
-            RuleMark(x: .value("Time", selected.timestamp))
-              .foregroundStyle(.gray.opacity(0.5))
-              .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
-
-            PointMark(
-              x: .value("Time", selected.timestamp),
-              y: .value("SoC", selected.datapoint)
-            )
-            .foregroundStyle(DesignTokens.Color.stateOfCharge)
-            .symbolSize(100)
-
-            PointMark(
-              x: .value("Time", selected.timestamp),
-              y: .value("SoC", selected.datapoint)
-            )
-            .foregroundStyle(.clear)
-            .annotation(position: .top) {
-              VStack(spacing: 2) {
-                Text(selected.timestamp, style: .time)
-                  .font(.caption2)
-                Text(String(format: "%.1f", selected.datapoint) + model.minYAxis.unit.symbol)
-                  .font(.caption)
-                  .fontWeight(.semibold)
-                  .foregroundStyle(DesignTokens.Color.stateOfCharge)
-              }
-              .padding(6)
-              .background(Color(.systemBackground).opacity(0.9))
-              .cornerRadius(6)
-            }
-          }
+          socSeries
+          batteryEnergySeries
+          selectionMarks
         }
+        .chartForegroundStyleScale([
+          "SoC": DesignTokens.Color.stateOfCharge,
+          "Energy": DesignTokens.Color.energy
+        ])
+        .chartLegend(.hidden)
         .chartXScale(domain: model.trip.timeStart...model.trip.timeEnd)
         .chartXAxis {
           AxisMarks(values: .automatic)
@@ -113,6 +175,12 @@ public struct TripDetailStateOfChargeView: View {
           AxisMarks(position: .trailing) { value in
             AxisValueLabel("\(value.as(Double.self)!.formatted())%")
             AxisGridLine()
+            AxisTick()
+          }
+          AxisMarks(position: .leading, values: [0, 25, 50, 75, 100] as [Double]) { value in
+            if let v = value.as(Double.self) {
+              AxisValueLabel(String(format: "%.0f kWh", model.kWhFromNormalized(v)))
+            }
             AxisTick()
           }
         }
@@ -129,9 +197,13 @@ public struct TripDetailStateOfChargeView: View {
                     model.selectedPoint = model.stateOfCharge.min { a, b in
                       abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
                     }
+                    model.selectedEnergyPoint = model.batteryEnergy.min { a, b in
+                      abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
+                    }
                   }
                   .onEnded { _ in
                     model.selectedPoint = nil
+                    model.selectedEnergyPoint = nil
                   }
               )
           }
@@ -139,13 +211,23 @@ public struct TripDetailStateOfChargeView: View {
         .frame(width: 340, height: 300)
         .padding(.top, 20)
 
-        HStack(spacing: 6) {
-          Rectangle()
-            .fill(DesignTokens.Color.stateOfCharge)
-            .frame(width: 20, height: 2)
-          Text("State of Charge")
-            .font(.caption)
-            .foregroundStyle(.secondary)
+        HStack(spacing: 20) {
+          HStack(spacing: 6) {
+            Rectangle()
+              .fill(DesignTokens.Color.stateOfCharge)
+              .frame(width: 20, height: 2)
+            Text("State of Charge")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+          }
+          HStack(spacing: 6) {
+            Rectangle()
+              .fill(DesignTokens.Color.energy)
+              .frame(width: 20, height: 2)
+            Text("Energy Consumed")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+          }
         }
         .padding(.top, 8)
       }
