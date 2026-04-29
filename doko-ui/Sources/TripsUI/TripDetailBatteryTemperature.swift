@@ -12,25 +12,32 @@ public final class TripDetailBatteryTemperatureModel {
   var trip: Trip
 
   @ObservationIgnored @FetchOne(TripData.none) var tripData
+  @ObservationIgnored @FetchOne(TripWeather.none) var tripWeather
   @ObservationIgnored @Shared(.appSettings) var appSettings
 
   var batteryTemp: [DokoDataPoint] = []
-  var minTemp: Measurement<UnitTemperature> = .init(value: 0, unit: .celsius)
-  var maxTemp: Measurement<UnitTemperature> = .init(value: 60, unit: .celsius)
+  var weatherTemp: [DokoWeather] = []
+  var minYAxis: Measurement<UnitTemperature> = .init(value: -5, unit: .celsius)
+  var maxYAxis: Measurement<UnitTemperature> = .init(value: 62, unit: .celsius)
   var selectedPoint: DokoDataPoint?
+  var selectedWeatherPoint: DokoWeather?
 
   public init(trip: Trip) {
     self.trip = trip
     _tripData = FetchOne(TripData.find(trip.id))
+    _tripWeather = FetchOne(TripWeather.find(trip.id))
 
     guard let tripData else { return }
     batteryTemp = downsample(tripData.batteryTemp, maxPoints: 60)
+    weatherTemp = tripWeather?.weather ?? []
 
-    let values = batteryTemp.map { converted($0.datapoint) }
-    self.minTemp = Measurement(value: min(minTemp.value, floor((values.min() ?? 0) - 2)), unit: UnitTemperature.celsius)
-      .converted(to: appSettings.metric ? .celsius : .fahrenheit)
-    self.maxTemp = Measurement(value: max(maxTemp.value, ceil((values.max() ?? 0) + 2)), unit: UnitTemperature.celsius)
-      .converted(to: appSettings.metric ? .celsius : .fahrenheit)
+    let batteryValues = batteryTemp.map { $0.datapoint }
+    let weatherValues = weatherTemp.map { $0.temperature }
+    let allValues = batteryValues + weatherValues
+    self.minYAxis = Measurement(value: min(minYAxis.value, floor((allValues.min() ?? 0) - 2)), unit: UnitTemperature.celsius)
+      .converted(to: unit)
+    self.maxYAxis = Measurement(value: max(maxYAxis.value, ceil((allValues.max() ?? 0) + 2)), unit: UnitTemperature.celsius)
+      .converted(to: unit)
   }
 
   private func downsample(_ data: [DokoDataPoint], maxPoints: Int) -> [DokoDataPoint] {
@@ -80,8 +87,18 @@ public struct TripDetailBatteryTemperatureView: View {
               x: .value("Time", point.timestamp),
               y: .value("Temp", model.converted(point.datapoint))
             )
-            .foregroundStyle(DesignTokens.Color.batteryTemperature)
+            .foregroundStyle(by: .value("Series", "Battery"))
             .interpolationMethod(.monotone)
+          }
+
+          ForEach(model.weatherTemp) { point in
+            LineMark(
+              x: .value("Time", point.timestamp),
+              y: .value("Temp", model.converted(point.temperature))
+            )
+            .foregroundStyle(by: .value("Series", "Outside"))
+            .interpolationMethod(.monotone)
+            .lineStyle(StrokeStyle(lineWidth: 2, dash: [6, 3]))
           }
 
           if let selected = model.selectedPoint {
@@ -105,10 +122,16 @@ public struct TripDetailBatteryTemperatureView: View {
               VStack(spacing: 2) {
                 Text(selected.timestamp, style: .time)
                   .font(.caption2)
-                Text(String(format: "%.1f %@", model.converted(selected.datapoint), model.minTemp.unit.symbol))
+                Text(String(format: "%.1f %@", model.converted(selected.datapoint), model.minYAxis.unit.symbol))
                   .font(.caption)
                   .fontWeight(.semibold)
                   .foregroundStyle(DesignTokens.Color.batteryTemperature)
+                if let weather = model.selectedWeatherPoint {
+                  Text(String(format: "%.1f %@", model.converted(weather.temperature), model.minYAxis.unit.symbol))
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(DesignTokens.Color.weather)
+                }
               }
               .padding(6)
               .background(Color(.systemBackground).opacity(0.9))
@@ -116,14 +139,19 @@ public struct TripDetailBatteryTemperatureView: View {
             }
           }
         }
+        .chartForegroundStyleScale([
+          "Battery": DesignTokens.Color.batteryTemperature,
+          "Outside": DesignTokens.Color.weather
+        ])
+        .chartLegend(.hidden)
         .chartXScale(domain: model.trip.timeStart...model.trip.timeEnd)
         .chartXAxis {
           AxisMarks(values: .automatic)
         }
-        .chartYScale(domain: model.minTemp.value...model.maxTemp.value)
+        .chartYScale(domain: model.minYAxis.value...model.maxYAxis.value)
         .chartYAxis {
           AxisMarks(position: .trailing) { value in
-            AxisValueLabel("\(value.as(Double.self)!.formatted()) \(model.minTemp.unit.symbol)")
+            AxisValueLabel("\(value.as(Double.self)!.formatted()) \(model.minYAxis.unit.symbol)")
             AxisGridLine()
             AxisTick()
           }
@@ -141,15 +169,39 @@ public struct TripDetailBatteryTemperatureView: View {
                     model.selectedPoint = model.batteryTemp.min { a, b in
                       abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
                     }
+                    model.selectedWeatherPoint = model.weatherTemp.min { a, b in
+                      abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
+                    }
                   }
                   .onEnded { _ in
                     model.selectedPoint = nil
+                    model.selectedWeatherPoint = nil
                   }
               )
           }
         }
         .frame(width: 340, height: 300)
         .padding(.top, 20)
+
+        HStack(spacing: 20) {
+          HStack(spacing: 6) {
+            Rectangle()
+              .fill(DesignTokens.Color.batteryTemperature)
+              .frame(width: 20, height: 2)
+            Text("Battery")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+          }
+          HStack(spacing: 6) {
+            Rectangle()
+              .fill(DesignTokens.Color.weather)
+              .frame(width: 20, height: 2)
+            Text("Outside")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+          }
+        }
+        .padding(.top, 8)
       }
       Spacer()
     }
