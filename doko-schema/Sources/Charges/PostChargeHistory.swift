@@ -37,7 +37,7 @@ extension Charge {
       chargeHistories.couplerTemp.append(DokoDataPoint(timestamp: timestamp, double: couplerTemperature))
     }
     if let batteryDistanceToEmpty = chargeHistoryPacket.batteryDistanceToEmpty {
-      chargeHistories.distanceToEmpty = (chargeHistories.distanceToEmpty ?? []) + [DokoDataPoint(timestamp: timestamp, double: batteryDistanceToEmpty)]
+      chargeHistories.distanceToEmpty.append(DokoDataPoint(timestamp: timestamp, double: batteryDistanceToEmpty))
     }
     withErrorReporting {
       try database.write { db in

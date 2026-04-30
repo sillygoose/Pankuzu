@@ -19,7 +19,8 @@ import CommonUI
     case editVehicleForm(Vehicle)
     case chargeLocationMap
     case powerChart
-    case energyUsedChart
+    case energyAddedChart
+    case rangeAddedChart
     case stateOfChargeChart
     case batteryTemperatureChart
     case stateOfHealthChart
@@ -36,8 +37,10 @@ import CommonUI
         return "chargeLocationMap"
       case .powerChart:
         return "powerChart"
-      case .energyUsedChart:
-        return "energyUsedChart"
+      case .energyAddedChart:
+        return "energyAddedChart"
+      case .rangeAddedChart:
+        return "rangeAddedChart"
       case .stateOfChargeChart:
         return "stateOfChargeChart"
       case .batteryTemperatureChart:
@@ -166,7 +169,7 @@ public struct ChargeDetailView: View {
               symbolName: "bolt.circle.fill",
               title: "Energy Added"
             ) {
-              model.destination = .energyUsedChart
+              model.destination = .energyAddedChart
             }
 
             GridValue(
@@ -284,6 +287,7 @@ public struct ChargeDetailView: View {
             ) {
               model.destination = .stateOfHealthChart
             }
+            Color.clear
           }
         }
       }
@@ -353,10 +357,20 @@ public struct ChargeDetailView: View {
           .presentationDetents([.medium])
         }
         
-      case .energyUsedChart:
+      case .energyAddedChart:
         NavigationStack {
           ChargeDetailEnergyView(
             model: ChargeDetailEnergyModel(
+              charge: charge
+            )
+          )
+          .presentationDetents([.medium])
+        }
+        
+      case .rangeAddedChart:
+        NavigationStack {
+          ChargeDetailEnergyView(
+            model: ChargeDetailEnergyModel( //###
               charge: charge
             )
           )

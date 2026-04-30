@@ -1,6 +1,6 @@
 import Foundation
 import SwiftUI
-import MapKit
+import TipKit
 
 import Sharing
 
@@ -463,6 +463,7 @@ public struct TripDetailView: View {
   }
   @FetchAll() var trips: [Trip]
   NavigationStack {
+    let _ = try? Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
     TripDetailView(
       model: TripDetailModel(
         tripID: trips.first!.id

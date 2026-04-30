@@ -163,8 +163,8 @@ public struct ChargeHistory: Hashable, Identifiable, Codable, Sendable {
   @Column(as: [DokoDataPoint].JSONRepresentation.self)
   public var couplerTemp: [DokoDataPoint]
 
-  @Column(as: [DokoDataPoint].JSONRepresentation?.self)
-  public var distanceToEmpty: [DokoDataPoint]?
+  @Column(as: [DokoDataPoint].JSONRepresentation.self)
+  public var distanceToEmpty: [DokoDataPoint]
 
   public init(
     chargeID: Charge.ID,
@@ -174,7 +174,7 @@ public struct ChargeHistory: Hashable, Identifiable, Codable, Sendable {
     energyToEmpty: [DokoDataPoint] = [],
     batteryTemp: [DokoDataPoint] = [],
     couplerTemp: [DokoDataPoint] = [],
-    distanceToEmpty: [DokoDataPoint]? = nil
+    distanceToEmpty: [DokoDataPoint] = []
   ) {
     self.chargeID = chargeID
     self.batteryPower = batteryPower
@@ -195,6 +195,6 @@ public struct ChargeHistory: Hashable, Identifiable, Codable, Sendable {
     energyToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .energyToEmpty) ?? []
     batteryTemp = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryTemp) ?? []
     couplerTemp = try container.decodeIfPresent([DokoDataPoint].self, forKey: .couplerTemp) ?? []
-    distanceToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .distanceToEmpty)
+    distanceToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .distanceToEmpty) ?? []
   }
 }

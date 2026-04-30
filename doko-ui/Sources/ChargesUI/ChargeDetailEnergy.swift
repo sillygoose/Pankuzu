@@ -233,7 +233,7 @@ public struct ChargeDetailEnergyView: View {
   NavigationStack {
     ChargeDetailView(
       model: ChargeDetailModel(
-        destination: .energyUsedChart,
+        destination: .energyAddedChart,
         chargeID: charges.first!.id
       )
     )
