@@ -369,8 +369,8 @@ public struct ChargeDetailView: View {
         
       case .rangeAddedChart:
         NavigationStack {
-          ChargeDetailEnergyView(
-            model: ChargeDetailEnergyModel( //###
+          ChargeDetailRangeAddedView(
+            model: ChargeDetailRangeAddedModel(
               charge: charge
             )
           )
