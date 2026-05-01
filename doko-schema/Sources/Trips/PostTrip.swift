@@ -114,6 +114,7 @@ extension Trip {
     tripDraft.range = tripDraft.distanceToEmptyStart.flatMap { start in tripEndResponse.batteryDistanceToEmpty.map { end in start - end } }
 
     tripDraft.stateOfChargeEnd = tripEndResponse.batteryStateOfCharge
+    tripDraft.batteryStateOfHealth = tripEndResponse.batteryStateOfHealth
     tripDraft.batteryTempEnd = tripEndResponse.batteryTemperature
 
     tripDraft.weatherTempEnd = tripEndResponse.weather?.temperature

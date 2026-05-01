@@ -55,8 +55,6 @@ public final class TripDetailStateOfChargeModel {
       } ?? first
     }
   }
-
-
 }
 
 public struct TripDetailStateOfChargeView: View {
@@ -64,7 +62,9 @@ public struct TripDetailStateOfChargeView: View {
 
   @Environment(\.dismiss) var dismiss
 
-  public init(model: TripDetailStateOfChargeModel) {
+  public init(
+    model: TripDetailStateOfChargeModel
+  ) {
     self.model = model
   }
 

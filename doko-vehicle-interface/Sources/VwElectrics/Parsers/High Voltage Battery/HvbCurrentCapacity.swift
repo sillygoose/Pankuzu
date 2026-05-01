@@ -26,7 +26,7 @@ func parseHvbCurrentCapacity(_ input: String) throws -> Double {
 #if DEBUG
   @Shared(.simIdle) var simIdle
   if simIdle {
-    return 74
+    return 77.0
   }
 #endif
   var input = input[...].utf8
