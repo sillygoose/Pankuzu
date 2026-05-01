@@ -179,7 +179,6 @@ public struct ChargeDetailView: View {
               symbolName: "bolt",
               title: "Peak Power"
             )
-
           }
         }
       }
@@ -239,7 +238,7 @@ public struct ChargeDetailView: View {
             endColor: distanceToEmptyEndColor,
             endSymbol: distanceToEmptyEndIcon,
           ) {
-            //###
+            model.destination = .rangeAddedChart
           }
         }
 

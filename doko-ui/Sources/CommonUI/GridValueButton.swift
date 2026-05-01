@@ -8,7 +8,14 @@ public struct GridValueButton: View {
   let title: String
   let action: () -> Void
 
-  public init(color: Color, value: String?, units: String?, symbolName: String, title: String, action: @escaping () -> Void) {
+  public init(
+    color: Color,
+    value: String?,
+    units: String?,
+    symbolName: String,
+    title: String,
+    action: @escaping () -> Void
+  ) {
     self.color = color
     self.value = value
     self.units = units
@@ -26,7 +33,9 @@ public struct GridValueButton: View {
             .bold()
             .foregroundStyle(color)
             .frame(width: 32, height: 32)
+          
           Spacer()
+          
           if let value {
             Text("\(value)")
               .font(DesignTokens.Font.title)
@@ -35,12 +44,15 @@ public struct GridValueButton: View {
               .foregroundStyle(DesignTokens.Color.value)
           }
         }
+        
         HStack {
           Text(title)
             .lineLimit(1)
             .font(DesignTokens.Font.headline)
             .foregroundStyle(.gray)
+          
           Spacer()
+          
           if let units {
             Text("\(units)")
               .lineLimit(1)

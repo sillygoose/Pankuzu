@@ -27,6 +27,7 @@ public final class TripDetailModel {
     case stateOfChargeChart
     case batteryTemperatureChart
     case stateOfHealthChart
+    case rangeConsumedChart
 
     public var id: String {
       switch self {
@@ -48,6 +49,8 @@ public final class TripDetailModel {
         return "batteryTemperatureChart"
       case .stateOfHealthChart:
         return "stateOfHealthChart"
+      case .rangeConsumedChart:
+        return "rangeConsumedChart"
       }
     }
   }
@@ -301,7 +304,7 @@ public struct TripDetailView: View {
             endColor: distanceToEmptyEndColor,
             endSymbol: distanceToEmptyEndIcon,
           ) {
-            //###
+            model.destination = .rangeConsumedChart
           }
         }
 
@@ -447,6 +450,16 @@ public struct TripDetailView: View {
             model: SoHHistoryModel(
               vehicleID: trip.vehicleID,
               currentID: trip.id
+            )
+          )
+          .presentationDetents([.medium])
+        }
+
+      case .rangeConsumedChart:
+        NavigationStack {
+          TripDetailRangeConsumedView(
+            model: TripDetailRangeConsumedModel(
+              trip: trip
             )
           )
           .presentationDetents([.medium])

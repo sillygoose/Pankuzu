@@ -144,6 +144,7 @@ public func appDatabase() throws -> any DatabaseWriter {
         "stateOfCharge" TEXT NOT NULL,
         "batteryEnergy" TEXT NOT NULL,
         "energyToEmpty" TEXT NOT NULL,
+        "distanceToEmpty" TEXT NOT NULL,
         "batteryTemp" TEXT NOT NULL
       ) STRICT
       """
@@ -209,7 +210,7 @@ public func appDatabase() throws -> any DatabaseWriter {
         "energyToEmpty" TEXT NOT NULL,
         "batteryTemp" TEXT NOT NULL,
         "couplerTemp" TEXT NOT NULL,
-        "distanceToEmpty" TEXT
+        "distanceToEmpty" TEXT NOT NULL
       ) STRICT
       """
     )

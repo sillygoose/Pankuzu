@@ -26,17 +26,20 @@ extension Trip {
     
     let timestamp = tripDataPacket.completedAt
     tripData.odometer.append(DokoDataPoint(timestamp: timestamp, double: odometer))
-    if let stateOfCharge = tripDataPacket.batteryStateOfCharge {
-      tripData.stateOfCharge.append(DokoDataPoint(timestamp: timestamp, double: stateOfCharge))
+    if let batteryStateOfCharge = tripDataPacket.batteryStateOfCharge {
+      tripData.stateOfCharge.append(DokoDataPoint(timestamp: timestamp, double: batteryStateOfCharge))
     }
-    if let energyToEmpty = tripDataPacket.batteryEnergyToEmpty {
-      tripData.energyToEmpty.append(DokoDataPoint(timestamp: timestamp, double: energyToEmpty))
+    if let batteryEnergyToEmpty = tripDataPacket.batteryEnergyToEmpty {
+      tripData.energyToEmpty.append(DokoDataPoint(timestamp: timestamp, double: batteryEnergyToEmpty))
+    }
+    if let batteryDistanceToEmpty = tripDataPacket.batteryDistanceToEmpty {
+      tripData.distanceToEmpty.append(DokoDataPoint(timestamp: timestamp, double: batteryDistanceToEmpty))
     }
     if let batteryEnergy = tripDataPacket.batteryEnergy {
       tripData.batteryEnergy.append(DokoDataPoint(timestamp: timestamp, double: batteryEnergy))
     }
-    if let batteryTemp = tripDataPacket.batteryTemperature {
-      tripData.batteryTemp.append(DokoDataPoint(timestamp: timestamp, double: batteryTemp))
+    if let batteryTemperature = tripDataPacket.batteryTemperature {
+      tripData.batteryTemp.append(DokoDataPoint(timestamp: timestamp, double: batteryTemperature))
     }
     withErrorReporting {
       try database.write { db in

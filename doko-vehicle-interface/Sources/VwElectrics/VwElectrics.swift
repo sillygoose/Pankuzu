@@ -114,7 +114,8 @@ public actor VwElectrics: ConnectedVehicleInterface {
         .batteryVoltage;
         .batteryCurrent;
         canbusNormalAddressing;
-        .batteryCurrentCapacity; .batteryDistanceToEmpty
+        .batteryCurrentCapacity;
+        .batteryDistanceToEmpty;
         canbusExtendedAddressing;
       }
 

@@ -135,7 +135,7 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
       case .gearSelected:
         return ".gearSelected"
       case .batteryDistanceToEmpty:
-        return ".distanceToEmpty"
+        return ".batteryDistanceToEmpty"
       case .batteryEenergyToEmpty:
         return ".batteryEenergyToEmpty"
       case .batteryStateOfCharge:
@@ -146,6 +146,7 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".batteryTemperature"
       case .batteryVoltage:
         return ".batteryVoltage"
+        //###
       case .batteryVoltage0:
         return ".batteryVoltage0"
       case .batteryVoltage1:
@@ -162,8 +163,10 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".batteryVoltage6"
       case .batteryVoltage7:
         return ".batteryVoltage7"
+        //###
       case .batteryCurrent:
         return ".batteryCurrent"
+        //###
       case .batteryCurrent0:
         return ".batteryCurrent0"
       case .batteryCurrent1:
@@ -180,6 +183,7 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".batteryCurrent6"
       case .batteryCurrent7:
         return ".batteryCurrent7"
+        //###
       case .batteryOriginalCapacity:
         return ".batteryOriginalCapacity"
       case .batteryCurrentCapacity:

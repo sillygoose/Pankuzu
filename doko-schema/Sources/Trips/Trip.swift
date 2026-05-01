@@ -202,6 +202,9 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
   public var energyToEmpty: [DokoDataPoint]
 
   @Column(as: [DokoDataPoint].JSONRepresentation.self)
+  public var distanceToEmpty: [DokoDataPoint]
+
+  @Column(as: [DokoDataPoint].JSONRepresentation.self)
   public var batteryTemp: [DokoDataPoint]
 
   public init(
@@ -210,6 +213,7 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
     stateOfCharge: [DokoDataPoint] = [],
     batteryEnergy: [DokoDataPoint] = [],
     energyToEmpty: [DokoDataPoint] = [],
+    distanceToEmpty: [DokoDataPoint] = [],
     batteryTemp: [DokoDataPoint] = []
   ) {
     self.tripID = tripID
@@ -217,7 +221,20 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
     self.stateOfCharge = stateOfCharge
     self.batteryEnergy = batteryEnergy
     self.energyToEmpty = energyToEmpty
+    self.distanceToEmpty = distanceToEmpty
     self.batteryTemp = batteryTemp
+  }
+  
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    tripID = try container.decode(Trip.ID.self, forKey: .tripID)
+    odometer = try container.decodeIfPresent([DokoDataPoint].self, forKey: .odometer) ?? []
+    stateOfCharge = try container.decodeIfPresent([DokoDataPoint].self, forKey: .stateOfCharge) ?? []
+    batteryEnergy = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryEnergy) ?? []
+    energyToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .energyToEmpty) ?? []
+    distanceToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .distanceToEmpty) ?? []
+    batteryTemp = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryTemp) ?? []
+    distanceToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .distanceToEmpty) ?? []
   }
 }
 
