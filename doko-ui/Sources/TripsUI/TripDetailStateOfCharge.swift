@@ -18,7 +18,7 @@ public final class TripDetailStateOfChargeModel {
   var minYAxis: Measurement<UnitPercent> = .init(value: 0, unit: .percent)
   var maxYAxis: Measurement<UnitPercent> = .init(value: 100, unit: .percent)
   var maxBatteryEnergy: Double = 1
-  var selectedPoint: DokoDataPoint?
+  var selectedStateOfChargePoint: DokoDataPoint?
   var selectedEnergyPoint: DokoDataPoint?
 
   public init(trip: Trip) {
@@ -95,7 +95,7 @@ public struct TripDetailStateOfChargeView: View {
 
   @ChartContentBuilder
   private var selectionMarks: some ChartContent {
-    if let selected = model.selectedPoint {
+    if let selected = model.selectedStateOfChargePoint {
       RuleMark(x: .value("Time", selected.timestamp))
         .foregroundStyle(.gray.opacity(0.5))
         .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
@@ -179,7 +179,8 @@ public struct TripDetailStateOfChargeView: View {
           }
           AxisMarks(position: .leading, values: [0, 25, 50, 75, 100] as [Double]) { value in
             if let v = value.as(Double.self) {
-              AxisValueLabel(String(format: "%.0f kWh", model.kWhFromNormalized(v)))
+              let fmt = model.maxBatteryEnergy < 2.2 ? "%.1f kWh" : "%.0f kWh"
+              AxisValueLabel(String(format: fmt, model.kWhFromNormalized(v)))
             }
             AxisTick()
           }
@@ -194,7 +195,7 @@ public struct TripDetailStateOfChargeView: View {
                   .onChanged { value in
                     let x = value.location.x - geometry[proxy.plotFrame!].origin.x
                     guard let timestamp: Date = proxy.value(atX: x) else { return }
-                    model.selectedPoint = model.stateOfCharge.min { a, b in
+                    model.selectedStateOfChargePoint = model.stateOfCharge.min { a, b in
                       abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
                     }
                     model.selectedEnergyPoint = model.batteryEnergy.min { a, b in
@@ -202,7 +203,7 @@ public struct TripDetailStateOfChargeView: View {
                     }
                   }
                   .onEnded { _ in
-                    model.selectedPoint = nil
+                    model.selectedStateOfChargePoint = nil
                     model.selectedEnergyPoint = nil
                   }
               )
