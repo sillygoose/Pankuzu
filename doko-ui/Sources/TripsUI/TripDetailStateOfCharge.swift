@@ -95,34 +95,34 @@ public struct TripDetailStateOfChargeView: View {
 
   @ChartContentBuilder
   private var selectionMarks: some ChartContent {
-    if let selected = model.selectedStateOfChargePoint {
-      RuleMark(x: .value("Time", selected.timestamp))
+    if let selectedStateOfChargePoint = model.selectedStateOfChargePoint {
+      RuleMark(x: .value("Time", selectedStateOfChargePoint.timestamp))
         .foregroundStyle(.gray.opacity(0.5))
         .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
 
       PointMark(
-        x: .value("Time", selected.timestamp),
-        y: .value("SoC", selected.datapoint)
+        x: .value("Time", selectedStateOfChargePoint.timestamp),
+        y: .value("SoC", selectedStateOfChargePoint.datapoint)
       )
       .foregroundStyle(DesignTokens.Color.stateOfCharge)
       .symbolSize(100)
 
-      if let energyPoint = model.selectedEnergyPoint {
+      if let selectedEnergyPoint = model.selectedEnergyPoint {
         PointMark(
-          x: .value("Time", energyPoint.timestamp),
-          y: .value("SoC", model.normalizeBatteryEnergy(energyPoint.datapoint))
+          x: .value("Time", selectedEnergyPoint.timestamp),
+          y: .value("SoC", model.normalizeBatteryEnergy(selectedEnergyPoint.datapoint))
         )
         .foregroundStyle(DesignTokens.Color.energy)
         .symbolSize(100)
       }
 
       PointMark(
-        x: .value("Time", selected.timestamp),
-        y: .value("SoC", selected.datapoint)
+        x: .value("Time", selectedStateOfChargePoint.timestamp),
+        y: .value("SoC", selectedStateOfChargePoint.datapoint)
       )
       .foregroundStyle(.clear)
       .annotation(position: .top) {
-        selectionAnnotation(selected: selected)
+        selectionAnnotation(selected: selectedStateOfChargePoint)
       }
     }
   }

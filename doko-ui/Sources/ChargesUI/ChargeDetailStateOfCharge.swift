@@ -18,7 +18,7 @@ public final class ChargeDetailStateOfChargeModel {
   var minYAxis: Measurement<UnitPercent> = .init(value: 0, unit: .percent)
   var maxYAxis: Measurement<UnitPercent> = .init(value: 100, unit: .percent)
   var maxBatteryEnergy: Double = 1
-  var selectedPoint: DokoDataPoint?
+  var selectedStateOfChargePoint: DokoDataPoint?
   var selectedEnergyPoint: DokoDataPoint?
 
   public init(charge: Charge) {
@@ -85,7 +85,7 @@ public struct ChargeDetailStateOfChargeView: View {
     ForEach(model.batteryEnergy) { point in
       LineMark(
         x: .value("Time", point.timestamp),
-        y: .value("SoC", model.normalizeBatteryEnergy(point.datapoint))
+        y: .value("Energy", model.normalizeBatteryEnergy(point.datapoint))
       )
       .foregroundStyle(by: .value("Series", "Energy"))
       .interpolationMethod(.monotone)
@@ -95,34 +95,34 @@ public struct ChargeDetailStateOfChargeView: View {
 
   @ChartContentBuilder
   private var selectionMarks: some ChartContent {
-    if let selected = model.selectedPoint {
-      RuleMark(x: .value("Time", selected.timestamp))
+    if let selectedStateOfChargePoint = model.selectedStateOfChargePoint {
+      RuleMark(x: .value("Time", selectedStateOfChargePoint.timestamp))
         .foregroundStyle(.gray.opacity(0.5))
         .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
 
       PointMark(
-        x: .value("Time", selected.timestamp),
-        y: .value("SoC", selected.datapoint)
+        x: .value("Time", selectedStateOfChargePoint.timestamp),
+        y: .value("SoC", selectedStateOfChargePoint.datapoint)
       )
       .foregroundStyle(DesignTokens.Color.stateOfCharge)
       .symbolSize(100)
 
-      if let energyPoint = model.selectedEnergyPoint {
+      if let selectedEnergyPoint = model.selectedEnergyPoint {
         PointMark(
-          x: .value("Time", energyPoint.timestamp),
-          y: .value("SoC", model.normalizeBatteryEnergy(energyPoint.datapoint))
+          x: .value("Time", selectedEnergyPoint.timestamp),
+          y: .value("SoC", model.normalizeBatteryEnergy(selectedEnergyPoint.datapoint))
         )
         .foregroundStyle(DesignTokens.Color.energy)
         .symbolSize(100)
       }
 
       PointMark(
-        x: .value("Time", selected.timestamp),
-        y: .value("SoC", selected.datapoint)
+        x: .value("Time", selectedStateOfChargePoint.timestamp),
+        y: .value("SoC", selectedStateOfChargePoint.datapoint)
       )
       .foregroundStyle(.clear)
       .annotation(position: .top) {
-        selectionAnnotation(selected: selected)
+        selectionAnnotation(selected: selectedStateOfChargePoint)
       }
     }
   }
@@ -136,7 +136,7 @@ public struct ChargeDetailStateOfChargeView: View {
         .fontWeight(.semibold)
         .foregroundStyle(DesignTokens.Color.stateOfCharge)
       if let energyPoint = model.selectedEnergyPoint {
-        Text(String(format: "%.2f kWh", energyPoint.datapoint))
+        Text(String(format: "%.1f kWh", energyPoint.datapoint))
           .font(.caption)
           .fontWeight(.semibold)
           .foregroundStyle(DesignTokens.Color.energy)
@@ -179,7 +179,8 @@ public struct ChargeDetailStateOfChargeView: View {
           }
           AxisMarks(position: .leading, values: [0, 25, 50, 75, 100] as [Double]) { value in
             if let v = value.as(Double.self) {
-              AxisValueLabel(String(format: "%.0f kWh", model.kWhFromNormalized(v)))
+              let fmt = model.maxBatteryEnergy < 2.2 ? "%.1f kWh" : "%.0f kWh"
+              AxisValueLabel(String(format: fmt, model.kWhFromNormalized(v)))
             }
             AxisTick()
           }
@@ -194,7 +195,7 @@ public struct ChargeDetailStateOfChargeView: View {
                   .onChanged { value in
                     let x = value.location.x - geometry[proxy.plotFrame!].origin.x
                     guard let timestamp: Date = proxy.value(atX: x) else { return }
-                    model.selectedPoint = model.stateOfCharge.min { a, b in
+                    model.selectedStateOfChargePoint = model.stateOfCharge.min { a, b in
                       abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
                     }
                     model.selectedEnergyPoint = model.batteryEnergy.min { a, b in
@@ -202,7 +203,7 @@ public struct ChargeDetailStateOfChargeView: View {
                     }
                   }
                   .onEnded { _ in
-                    model.selectedPoint = nil
+                    model.selectedStateOfChargePoint = nil
                     model.selectedEnergyPoint = nil
                   }
               )
