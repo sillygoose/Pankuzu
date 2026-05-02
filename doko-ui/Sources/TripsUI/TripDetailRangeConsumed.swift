@@ -7,7 +7,7 @@ import CommonUI
 
 @MainActor
 @Observable
-public final class TripDetailRangeConsumedModel {
+public final class TripDetailRangeEfficiencyModel {
   var trip: Trip
 
   @ObservationIgnored @FetchOne(TripData.none) var tripData
@@ -65,12 +65,12 @@ public final class TripDetailRangeConsumedModel {
   }
 }
 
-public struct TripDetailRangeConsumedView: View {
-  @Bindable var model: TripDetailRangeConsumedModel
+public struct TripDetailRangeEfficiencyView: View {
+  @Bindable var model: TripDetailRangeEfficiencyModel
 
   @Environment(\.dismiss) var dismiss
 
-  public init(model: TripDetailRangeConsumedModel) {
+  public init(model: TripDetailRangeEfficiencyModel) {
     self.model = model
   }
 
@@ -233,7 +233,7 @@ public struct TripDetailRangeConsumedView: View {
       }
       Spacer()
     }
-    .navigationTitle(Text("Range Consumed"))
+    .navigationTitle(Text("Range Efficiency"))
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem {
@@ -252,7 +252,7 @@ public struct TripDetailRangeConsumedView: View {
   NavigationStack {
     TripDetailView(
       model: TripDetailModel(
-        destination: .rangeConsumedChart,
+        destination: .rangeEfficiencyChart,
         tripID: trips.first!.id
       )
     )
