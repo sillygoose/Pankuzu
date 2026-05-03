@@ -167,150 +167,135 @@ public struct TripDetailView: View {
       let distance = rawDistance.converted(to: model.appSettings.metric ? .kilometers : .miles)
       let averageSpeed = rawAverageSpeed.converted(to: model.appSettings.metric ? .kilometersPerHour : .milesPerHour)
       
-      Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
-        GridRow {
-          GridValue(
-            color: .yellow,
-            value: String(format: "%.1f", odometer.value),
-            units: odometer.unit.symbol,
-            symbolName: "gauge.open.with.lines.needle.33percent",
-            title: "Odometer"
-          )
-          GridValue(
-            color: .gray,
-            value: duration.formatted(
-              .time(pattern: .hourMinute(padHourToLength: 2))
-            ),
-            units: "hh:mm",
-            symbolName: "clock",
-            title: "Duration"
-          )
-        }
-        
-        GridRow {
-          GridValue(
-            color: .blue,
-            value: String(format: "%.1f", distance.value),
-            units: distance.unit.symbol,
-            symbolName: "road.lanes",
-            title: "Distance"
-          )
-          
-          GridValue(
-            color: .orange,
-            value: String(format: "%.0f", averageSpeed.value),
-            units: averageSpeed.unit.symbol,
-            symbolName: "powermeter",
-            title: "Speed"
-          )
-        }
-        
+      LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+        GridValue(
+          color: .yellow,
+          value: String(format: "%.1f", odometer.value),
+          units: odometer.unit.symbol,
+          symbolName: "gauge.open.with.lines.needle.33percent",
+          title: "Odometer"
+        )
+        GridValue(
+          color: .gray,
+          value: duration.formatted(
+            .time(pattern: .hourMinute(padHourToLength: 2))
+          ),
+          units: "hh:mm",
+          symbolName: "clock",
+          title: "Duration"
+        )
+
+        GridValue(
+          color: .blue,
+          value: String(format: "%.1f", distance.value),
+          units: distance.unit.symbol,
+          symbolName: "road.lanes",
+          title: "Distance"
+        )
+        GridValue(
+          color: .orange,
+          value: String(format: "%.0f", averageSpeed.value),
+          units: averageSpeed.unit.symbol,
+          symbolName: "powermeter",
+          title: "Speed"
+        )
+
         if let energy = trip.energy {
           let energyUsed = Measurement(value: energy, unit: UnitEnergy.kilowattHours)
           let metricEfficiency = Measurement(
             value: energyUsed.value == 0.0 ? 0.0 : rawDistance.value / energyUsed.value,
             unit: UnitEnergyEfficiency.kilometersPerKilowattHour
           )
-          let efficiency = metricEfficiency
-            .converted(
-              to:model.appSettings.metric ? model.appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
-            )
-          
-          GridRow {
-            GridValueButton(
-              color: .red,
-              value: String(format: "%.1f", energyUsed.value),
-              units: energyUsed.unit.symbol,
-              symbolName: "bolt.circle.fill",
-              title: "Energy Used"
-            ) {
-              model.destination = .energyUsedChart
-            }
-            
-            GridValue(
-              color: .green,
-              value: String(format: "%.1f", efficiency.value),
-              units: efficiency.unit.symbol,
-              symbolName: "ev.charger",
-              title: "Efficiency"
-            )
+          let efficiency = metricEfficiency.converted(
+            to: model.appSettings.metric ? model.appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
+          )
+          GridValueButton(
+            color: .red,
+            value: String(format: "%.1f", energyUsed.value),
+            units: energyUsed.unit.symbol,
+            symbolName: "bolt.circle.fill",
+            title: "Energy Used"
+          ) {
+            model.destination = .energyUsedChart
+          }
+          GridValue(
+            color: .green,
+            value: String(format: "%.1f", efficiency.value),
+            units: efficiency.unit.symbol,
+            symbolName: "ev.charger",
+            title: "Efficiency"
+          )
+        }
+
+        if let rawStateOfChargeEnd = trip.stateOfChargeEnd {
+          let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
+            if rawStateOfChargeEnd < 5 { return (Color.red, "battery.0percent") }
+            if rawStateOfChargeEnd < 30 { return (Color.yellow, "battery.25percent") }
+            if rawStateOfChargeEnd < 55 { return (Color.green, "battery.50percent") }
+            if rawStateOfChargeEnd < 80 { return (Color.green, "battery.75percent") }
+            return (Color.green, "battery.100percent")
+          }()
+          let stateOfChargeEnd = Measurement(value: rawStateOfChargeEnd, unit: UnitPercent.percent)
+          GridValueButton(
+            color: stateOfChargeEndColor,
+            value: String(format: "%.0f", stateOfChargeEnd.value),
+            units: stateOfChargeEnd.unit.symbol,
+            symbolName: stateOfChargeEndIcon,
+            title: "State of Charge"
+          ) {
+            model.destination = .stateOfChargeChart
           }
         }
-        
-        GridRow {
-          if let rawStateOfChargeEnd = trip.stateOfChargeEnd {
-            let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
-              if rawStateOfChargeEnd < 5 { return (Color.red, "battery.0percent") }
-              if rawStateOfChargeEnd < 30 { return (Color.yellow, "battery.25percent") }
-              if rawStateOfChargeEnd < 55 { return (Color.green,"battery.50percent") }
-              if rawStateOfChargeEnd < 80 { return (Color.green,"battery.75percent") }
-              return (Color.green, "battery.100percent")
-            }()
-            let stateOfChargeEnd = Measurement(value: rawStateOfChargeEnd, unit: UnitPercent.percent)
-            GridValueButton(
-              color: stateOfChargeEndColor,
-              value: String(format: "%.0f", stateOfChargeEnd.value),
-              units: stateOfChargeEnd.unit.symbol,
-              symbolName: stateOfChargeEndIcon,
-              title: "State of Charge"
-            ) {
-              model.destination = .stateOfChargeChart
-            }
-          }
-          
-          if let rawBatteryTempEnd = trip.batteryTempEnd {
-            let (batteryTempEndColor, batteryTempEndIcon) = {
-              if rawBatteryTempEnd < 5 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
-              if rawBatteryTempEnd < 50 { return (Color.green,"batteryblock.stack") }
-              return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
-            }()
-            let batteryTempEnd = Measurement(value: rawBatteryTempEnd, unit: UnitTemperature.celsius)
-              .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
-            GridValueButton(
-              color: batteryTempEndColor,
-              value: String(format: "%.0f", batteryTempEnd.value),
-              units: batteryTempEnd.unit.symbol,
-              symbolName: batteryTempEndIcon,
-              title: "Temperature"
-            ) {
-              model.destination = .batteryTemperatureChart
-            }
+
+        if let rawBatteryTempEnd = trip.batteryTempEnd {
+          let (batteryTempEndColor, batteryTempEndIcon) = {
+            if rawBatteryTempEnd < 5 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
+            if rawBatteryTempEnd < 50 { return (Color.green, "batteryblock.stack") }
+            return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
+          }()
+          let batteryTempEnd = Measurement(value: rawBatteryTempEnd, unit: UnitTemperature.celsius)
+            .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
+          GridValueButton(
+            color: batteryTempEndColor,
+            value: String(format: "%.0f", batteryTempEnd.value),
+            units: batteryTempEnd.unit.symbol,
+            symbolName: batteryTempEndIcon,
+            title: "Temperature"
+          ) {
+            model.destination = .batteryTemperatureChart
           }
         }
-        
-        GridRow {
-          if let rawDistanceToEmptyStart = trip.distanceToEmptyStart, let rawDistanceToEmptyEnd = trip.distanceToEmptyEnd {
-            let rangeConsumed = Measurement(value: rawDistanceToEmptyStart - rawDistanceToEmptyEnd, unit: UnitLength.kilometers)
-              .converted(to: model.appSettings.metric ? .kilometers : .miles)
-            let rangeEfficiency = distance - rangeConsumed
-            GridValueButton(
-              color: rangeEfficiency.value < 0 ? Color.orange : Color.blue,
-              value: String(format: "%.0f", rangeEfficiency.value),
-              units: rangeEfficiency.unit.symbol,
-              symbolName: "road.lanes.curved.right",
-              title: "Range Efficiency"
-            ) {
-              model.destination = .rangeEfficiencyChart
-            }
+
+        if let rawDistanceToEmptyStart = trip.distanceToEmptyStart, let rawDistanceToEmptyEnd = trip.distanceToEmptyEnd {
+          let rangeConsumed = Measurement(value: rawDistanceToEmptyStart - rawDistanceToEmptyEnd, unit: UnitLength.kilometers)
+            .converted(to: model.appSettings.metric ? .kilometers : .miles)
+          let rangeEfficiency = distance - rangeConsumed
+          GridValueButton(
+            color: rangeEfficiency.value < 0 ? Color.orange : Color.blue,
+            value: String(format: "%.0f", rangeEfficiency.value),
+            units: rangeEfficiency.unit.symbol,
+            symbolName: "road.lanes.curved.right",
+            title: "Range Efficiency"
+          ) {
+            model.destination = .rangeEfficiencyChart
           }
-          
-          if let rawBatteryStateOfHealth = trip.batteryStateOfHealth {
-            let batteryStateOfHealth = Measurement(value: rawBatteryStateOfHealth, unit: UnitPercent.percent)
-            let batteryStateOfHealthColor = {
-              if batteryStateOfHealth.value < 80 { return Color.red }
-              if batteryStateOfHealth.value < 90 { return Color.yellow }
-              return Color.green
-            }()
-            
-            GridValueButton(
-              color: batteryStateOfHealthColor,
-              value: String(format: "%.0f", batteryStateOfHealth.value),
-              units: batteryStateOfHealth.unit.symbol,
-              symbolName: "batteryblock.stack.fill",
-              title: "State of Health"
-            ) {
-              model.destination = .stateOfHealthChart
-            }
+        }
+
+        if let rawBatteryStateOfHealth = trip.batteryStateOfHealth {
+          let batteryStateOfHealth = Measurement(value: rawBatteryStateOfHealth, unit: UnitPercent.percent)
+          let batteryStateOfHealthColor = {
+            if batteryStateOfHealth.value < 80 { return Color.red }
+            if batteryStateOfHealth.value < 90 { return Color.yellow }
+            return Color.green
+          }()
+          GridValueButton(
+            color: batteryStateOfHealthColor,
+            value: String(format: "%.0f", batteryStateOfHealth.value),
+            units: batteryStateOfHealth.unit.symbol,
+            symbolName: "batteryblock.stack.fill",
+            title: "State of Health"
+          ) {
+            model.destination = .stateOfHealthChart
           }
         }
       }

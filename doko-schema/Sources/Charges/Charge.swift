@@ -58,11 +58,12 @@ public struct Charge: Equatable, Hashable, Identifiable, Codable, Sendable {
     timeEnd: Date,
     chargerType: ChargerType,
     odometer: Double,
-    energy: Double? = nil,
     energyToEmptyStart: Double? = nil,
     energyToEmptyEnd: Double? = nil,
+    energy: Double? = nil,
     distanceToEmptyStart: Double? = nil,
     distanceToEmptyEnd: Double? = nil,
+    range: Double? = nil,
     stateOfChargeStart: Double? = nil,
     stateOfChargeEnd: Double? = nil,
     batteryStateOfHealth: Double? = nil,
@@ -88,7 +89,9 @@ public struct Charge: Equatable, Hashable, Identifiable, Codable, Sendable {
     self.energyToEmptyStart = energyToEmptyStart
     self.energyToEmptyEnd = energyToEmptyEnd
     self.energy = energy
-
+    self.distanceToEmptyStart = distanceToEmptyStart
+    self.distanceToEmptyEnd = distanceToEmptyEnd
+    self.range = range
     self.stateOfChargeStart = stateOfChargeStart
     self.stateOfChargeEnd = stateOfChargeEnd
     self.distanceToEmptyStart = distanceToEmptyStart
