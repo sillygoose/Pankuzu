@@ -22,7 +22,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
   
   public var tripMapStyle: DisplayMapStyle = .standard
   public var chargeMapStyle: DisplayMapStyle = .standard
-  
+
   public var tripMapPolyline: Bool = true
   public var showElevationOnPath: Bool = false
   public var identicalTripPositionDistance: Double = 10
@@ -142,8 +142,6 @@ extension AppSettings {
     if let v = standard.object(forKey: "ApplicationSettings-iCloudSync") as? Bool { s.iCloudSync = v }
     if let v = standard.object(forKey: "ApplicationSettings-poiThreshold") as? Double { s.poiThreshold = v }
     if let v = standard.object(forKey: "ApplicationSettings-duplicateLocationThreshold") as? Double { s.duplicateLocationThreshold = v }
-    if let v = standard.string(forKey: "ApplicationSettings-tripMapStyle").flatMap(DisplayMapStyle.init) { s.tripMapStyle = v }
-    if let v = standard.string(forKey: "ApplicationSettings-chargeMapStyle").flatMap(DisplayMapStyle.init) { s.chargeMapStyle = v }
     if let v = standard.object(forKey: "ApplicationSettings-tripMapPolyline") as? Bool { s.tripMapPolyline = v }
     if let v = standard.object(forKey: "ApplicationSettings-showElevationOnPath") as? Bool { s.showElevationOnPath = v }
     if let v = standard.object(forKey: "ApplicationSettings-identicalTripPositionDistance") as? Double { s.identicalTripPositionDistance = v }
@@ -162,7 +160,6 @@ extension AppSettings {
 public enum DisplayMapStyle: String, Codable, CaseIterable, Equatable, Identifiable, Sendable {
   case standard
   case hybrid
-  case imagery
 
   public var id: Self { self }
 
@@ -173,8 +170,6 @@ public enum DisplayMapStyle: String, Codable, CaseIterable, Equatable, Identifia
       return .standard
     case .hybrid:
       return .hybrid
-    case .imagery:
-      return .imagery
     }
   }
 }

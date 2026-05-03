@@ -65,9 +65,9 @@ public struct TripDetailMapView: View {
   @Bindable var model: TripDetailMapModel
 
   @State var mapCameraPosition: MapCameraPosition
+  @State var showStylePicker = false
 
   @Shared(.appSettings) var appSettings
-
   @Environment(\.dismiss) var dismiss
 
   public init(
@@ -131,7 +131,17 @@ public struct TripDetailMapView: View {
       }
       .mapStyle(appSettings.tripMapStyle.mapStyle)
     }
+    .confirmationDialog("Map Style", isPresented: $showStylePicker) {
+      ForEach(DisplayMapStyle.allCases) { style in
+        Button(style.name) { $appSettings.tripMapStyle.withLock { $0 = style } }
+      }
+    }
     .toolbar {
+      ToolbarItem(placement: .topBarLeading) {
+        Button { showStylePicker = true } label: {
+          Image(systemName: "map")
+        }
+      }
       ToolbarItem {
         Button("Done") { dismiss() }
       }

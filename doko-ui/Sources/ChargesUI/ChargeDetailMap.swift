@@ -2,7 +2,7 @@ import SwiftUI
 import MapKit
 
 import Sharing
-
+import DokoSharing
 import DokoSchema
 import DokoTypes
 
@@ -33,6 +33,7 @@ public struct ChargeDetailMapView: View {
   @Bindable var model: ChargeDetailMapModel
 
   @State var mapCameraPosition: MapCameraPosition
+  @State var showStylePicker = false
 
   @Shared(.appSettings) var appSettings
   @Environment(\.dismiss) var dismiss
@@ -61,7 +62,17 @@ public struct ChargeDetailMapView: View {
       }
       .mapStyle(appSettings.chargeMapStyle.mapStyle)
     }
+    .confirmationDialog("Map Style", isPresented: $showStylePicker) {
+      ForEach(DisplayMapStyle.allCases) { style in
+        Button(style.name) { $appSettings.chargeMapStyle.withLock { $0 = style } }
+      }
+    }
     .toolbar {
+      ToolbarItem(placement: .topBarLeading) {
+        Button { showStylePicker = true } label: {
+          Image(systemName: "map")
+        }
+      }
       ToolbarItem {
         Button("Done") { dismiss() }
       }

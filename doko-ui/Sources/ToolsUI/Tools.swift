@@ -35,6 +35,7 @@ public struct ToolsView: View {
         }
         .buttonStyle(.plain)
         .listRowBackground(Color.clear)
+        .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
         .padding([.leading, .trailing], -20)
       }
       .listStyle(.plain)

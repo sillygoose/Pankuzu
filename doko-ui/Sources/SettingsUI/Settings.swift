@@ -80,145 +80,126 @@ public struct SettingsView: View {
           }
 
           Divider()
+        }
+        .listRowInsets(EdgeInsets())
 
-          GridRow {
-            GridValueButton(
-              color: .cyan,
-              value: "\(model.vehicleStats.count)",
-              units: nil,
-              symbolName: "car.2",
-              title: "Vehicles"
-            ) {
-              path.append(Destination.vehicleSettings)
-            }
-
-            GridValueButton(
-              color: .blue,
-              value: "\(model.locationStats.count)",
-              units: nil,
-              symbolName: "location",
-              title: "Locations"
-            ) {
-              path.append(Destination.locationSettings)
-            }
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+          GridValueButton(
+            color: .cyan,
+            value: "\(model.vehicleStats.count)",
+            units: nil,
+            symbolName: "car.2",
+            title: "Vehicles"
+          ) {
+            path.append(Destination.vehicleSettings)
           }
 
-          GridRow {
-            GridValueButton(
-              color: .green,
-              value: nil,
-              units: nil,
-              symbolName: "network",
-              title: "Database"
-            ) {
-              path.append(Destination.databaseSettings)
-            }
-
-            GridValueButton(
-              color: .purple,
-              value: nil,
-              units: nil,
-              symbolName: "leaf",
-              title: "Add Trip/Charge"
-            ) {
-              path.append(Destination.databseSeeding)
-            }
+          GridValueButton(
+            color: .blue,
+            value: "\(model.locationStats.count)",
+            units: nil,
+            symbolName: "location",
+            title: "Locations"
+          ) {
+            path.append(Destination.locationSettings)
           }
 
-          GridRow {
-            GridValueButton(
-              color: .orange,
-              value: nil,
-              units: nil,
-              symbolName: "ruler",
-              title: "Units"
-            ) {
-              path.append(Destination.unitsSettings)
-            }
-
-            GridValueButton(
-              color: .teal,
-              value: nil,
-              units: nil,
-              symbolName: "map.fill",
-              title: "Maps"
-            ) {
-              path.append(Destination.mapsSettings)
-            }
+          GridValueButton(
+            color: .green,
+            value: nil,
+            units: nil,
+            symbolName: "network",
+            title: "Database"
+          ) {
+            path.append(Destination.databaseSettings)
           }
 
-          GridRow {
-            GridValueButton(
-              color: .blue,
-              value: nil,
-              units: nil,
-              symbolName: "icloud",
-              title: "iCloud"
-            ) {
-              path.append(Destination.iCloudSettings)
-            }
-
-            GridValueButton(
-              color: .indigo,
-              value: nil,
-              units: nil,
-              symbolName: "arrow.trianglehead.2.clockwise",
-              title: "Integrations"
-            ) {
-              path.append(Destination.integrations)
-            }
+          GridValueButton(
+            color: .purple,
+            value: nil,
+            units: nil,
+            symbolName: "leaf",
+            title: "Add Trip/Charge"
+          ) {
+            path.append(Destination.databseSeeding)
           }
 
-          GridRow {
-            GridValueButton(
-              color: .mint,
-              value: nil,
-              units: nil,
-              symbolName: "wrench.and.screwdriver.fill",
-              title: "Scan Tool"
-            ) {
-              path.append(Destination.scanTools)
-            }
+          GridValueButton(
+            color: .orange,
+            value: nil,
+            units: nil,
+            symbolName: "ruler",
+            title: "Units"
+          ) {
+            path.append(Destination.unitsSettings)
+          }
 
-            GridValueButton(
-              color: .gray,
-              value: nil,
-              units: nil,
-              symbolName: "gearshape.2.fill",
-              title: "Advanced"
-            ) {
-              path.append(Destination.advancedSettings)
+          GridValueButton(
+            color: .blue,
+            value: nil,
+            units: nil,
+            symbolName: "icloud",
+            title: "iCloud"
+          ) {
+            path.append(Destination.iCloudSettings)
+          }
+
+          GridValueButton(
+            color: .indigo,
+            value: nil,
+            units: nil,
+            symbolName: "arrow.trianglehead.2.clockwise",
+            title: "Integrations"
+          ) {
+            path.append(Destination.integrations)
+          }
+
+          GridValueButton(
+            color: .mint,
+            value: nil,
+            units: nil,
+            symbolName: "wrench.and.screwdriver.fill",
+            title: "Scan Tool"
+          ) {
+            path.append(Destination.scanTools)
+          }
+
+          GridValueButton(
+            color: .gray,
+            value: nil,
+            units: nil,
+            symbolName: "gearshape.2.fill",
+            title: "Advanced"
+          ) {
+            path.append(Destination.advancedSettings)
+          }
+
+          GridValueButton(
+            color: .red,
+            value: nil,
+            units: nil,
+            symbolName: "ladybug.circle.fill",
+            title: "Debugging"
+          ) {
+            if debuggingLongPressed {
+              debuggingLongPressed = false
+            } else {
+              path.append(Destination.debugging)
             }
           }
-          
-          GridRow {
-            GridValueButton(
-              color: .yellow,
-              value: nil,
-              units: nil,
-              symbolName: "info.circle.fill",
-              title: "About"
-            ) {
-              path.append(Destination.about)
-            }
+          .simultaneousGesture(LongPressGesture().onEnded { _ in
+            debuggingLongPressed = true
+            showLogDialog = true
+          })
 
-            GridValueButton(
-              color: .red,
-              value: nil,
-              units: nil,
-              symbolName: "ladybug.circle.fill",
-              title: "Debugging"
-            ) {
-              if debuggingLongPressed {
-                debuggingLongPressed = false
-              } else {
-                path.append(Destination.debugging)
-              }
-            }
-            .simultaneousGesture(LongPressGesture().onEnded { _ in
-              debuggingLongPressed = true
-              showLogDialog = true
-            })
+          GridValueButton(
+            color: .yellow,
+            value: nil,
+            units: nil,
+            symbolName: "info.circle.fill",
+            title: "About"
+          ) {
+            path.append(Destination.about)
           }
         }
         .listRowInsets(EdgeInsets())
@@ -246,8 +227,6 @@ public struct SettingsView: View {
           )
         case .unitsSettings:
           UnitsSettingsView()
-        case .mapsSettings:
-          MapsSettingsView()
         case .debugging:
           DebuggingView(
             model: DebuggingModel()
@@ -285,7 +264,6 @@ public struct SettingsView: View {
     case vehicleSettings
     case locationSettings
     case unitsSettings
-    case mapsSettings
     case databaseSettings
     case about
     case debugging
