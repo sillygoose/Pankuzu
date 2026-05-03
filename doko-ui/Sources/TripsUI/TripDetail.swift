@@ -175,6 +175,7 @@ public struct TripDetailView: View {
           symbolName: "gauge.open.with.lines.needle.33percent",
           title: "Odometer"
         )
+        
         GridValue(
           color: .gray,
           value: duration.formatted(
@@ -192,6 +193,7 @@ public struct TripDetailView: View {
           symbolName: "road.lanes",
           title: "Distance"
         )
+        
         GridValue(
           color: .orange,
           value: String(format: "%.0f", averageSpeed.value),
@@ -227,6 +229,26 @@ public struct TripDetailView: View {
           )
         }
 
+        if let rawStateOfChargeStart = trip.stateOfChargeStart {
+          let (stateOfChargeStartColor, stateOfChargeStartIcon) = {
+            if rawStateOfChargeStart < 5 { return (Color.red, "battery.0percent") }
+            if rawStateOfChargeStart < 30 { return (Color.yellow, "battery.25percent") }
+            if rawStateOfChargeStart < 55 { return (Color.green, "battery.50percent") }
+            if rawStateOfChargeStart < 80 { return (Color.green, "battery.75percent") }
+            return (Color.green, "battery.100percent")
+          }()
+          let stateOfChargeStart = Measurement(value: rawStateOfChargeStart, unit: UnitPercent.percent)
+          GridValueButton(
+            color: stateOfChargeStartColor,
+            value: String(format: "%.0f", stateOfChargeStart.value),
+            units: stateOfChargeStart.unit.symbol,
+            symbolName: stateOfChargeStartIcon,
+            title: "Starting SoC"
+          ) {
+            model.destination = .stateOfChargeChart
+          }
+        }
+
         if let rawStateOfChargeEnd = trip.stateOfChargeEnd {
           let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
             if rawStateOfChargeEnd < 5 { return (Color.red, "battery.0percent") }
@@ -241,7 +263,7 @@ public struct TripDetailView: View {
             value: String(format: "%.0f", stateOfChargeEnd.value),
             units: stateOfChargeEnd.unit.symbol,
             symbolName: stateOfChargeEndIcon,
-            title: "State of Charge"
+            title: "Ending SoC"
           ) {
             model.destination = .stateOfChargeChart
           }
@@ -250,7 +272,7 @@ public struct TripDetailView: View {
         if let rawBatteryTempEnd = trip.batteryTempEnd {
           let (batteryTempEndColor, batteryTempEndIcon) = {
             if rawBatteryTempEnd < 5 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
-            if rawBatteryTempEnd < 50 { return (Color.green, "batteryblock.stack") }
+            if rawBatteryTempEnd < 50 { return (Color.gray, "batteryblock.stack") }
             return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
           }()
           let batteryTempEnd = Measurement(value: rawBatteryTempEnd, unit: UnitTemperature.celsius)
@@ -260,7 +282,7 @@ public struct TripDetailView: View {
             value: String(format: "%.0f", batteryTempEnd.value),
             units: batteryTempEnd.unit.symbol,
             symbolName: batteryTempEndIcon,
-            title: "Temperature"
+            title: "Battery Temp"
           ) {
             model.destination = .batteryTemperatureChart
           }
@@ -299,6 +321,7 @@ public struct TripDetailView: View {
           }
         }
       }
+      .padding([.bottom], 10)
     }
     .navigationTitle(
       "\(trip.timeStart.formatted(date: .numeric, time: .shortened))"
