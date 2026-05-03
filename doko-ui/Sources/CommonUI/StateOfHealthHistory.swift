@@ -110,7 +110,7 @@ public struct SoHHistoryView: View {
           }
         }
       }
-      .chartYScale(domain: yMin...101)
+      .chartYScale(domain: yMin...102)
       .chartYAxis {
         AxisMarks(position: .trailing) { value in
           if let pct = value.as(Double.self) {

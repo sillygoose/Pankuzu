@@ -13,24 +13,31 @@ public struct ToolsView: View {
   @Bindable var model: ToolsModel
 
   @State private var isAddingCharge = false
+  @State private var path = NavigationPath()
 
   public init(model: ToolsModel) {
     self.model = model
   }
 
   public var body: some View {
-    NavigationStack {
+    NavigationStack(path: $path) {
       TipView(ToolsAddChargeTip())
       List {
-        Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
-          GridRow {
-            GridButton(
-              color: .green,
-              symbolName: "ev.charger",
-              title: "Add Charge"
-            ) {
-              isAddingCharge = true
-            }
+        LazyVGrid(columns: [GridItem(.flexible())], spacing: 8) {
+          GridButton(
+            color: .green,
+            symbolName: "ev.charger",
+            title: "Add Charge"
+          ) {
+            isAddingCharge = true
+          }
+
+          GridButton(
+            color: .mint,
+            symbolName: "chart.bar.fill",
+            title: "Charge History"
+          ) {
+            path.append(Destination.chargeHistory)
           }
         }
         .buttonStyle(.plain)
@@ -50,7 +57,17 @@ public struct ToolsView: View {
           .presentationDetents([.large])
         }
       }
+      .navigationDestination(for: Destination.self) { destination in
+        switch destination {
+        case .chargeHistory:
+          ChargeHistoryChartView()
+        }
+      }
     }
+  }
+
+  enum Destination: Hashable {
+    case chargeHistory
   }
 }
 
