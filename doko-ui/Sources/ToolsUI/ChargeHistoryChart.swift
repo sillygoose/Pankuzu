@@ -97,51 +97,90 @@ final class ChargeHistoryChartModel {
 
 struct ChargeHistoryChartView: View {
   @State var model = ChargeHistoryChartModel()
+  @State private var selectedMonth: Date?
+
+  @ChartContentBuilder
+  private var barSeries: some ChartContent {
+    ForEach(model.chartEntries.filter { $0.type != "Total" }) { entry in
+      BarMark(
+        x: .value("Month", entry.monthDate, unit: .month),
+        y: .value("kWh", entry.kWh)
+      )
+      .foregroundStyle(by: .value("Type", entry.type))
+    }
+  }
+
+  @ChartContentBuilder
+  private var selectionMark: some ChartContent {
+    if let month = selectedMonth,
+       let ac = model.chartEntries.first(where: { $0.monthDate == month && $0.type == "AC" }),
+       let dc = model.chartEntries.first(where: { $0.monthDate == month && $0.type == "DCFC" }),
+       let total = model.chartEntries.first(where: { $0.monthDate == month && $0.type == "Total" }) {
+      RuleMark(x: .value("Month", month, unit: .month))
+        .foregroundStyle(.gray.opacity(0.5))
+        .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
+      PointMark(
+        x: .value("Month", month, unit: .month),
+        y: .value("kWh", total.kWh)
+      )
+      .foregroundStyle(.clear)
+      .annotation(position: .top) {
+        VStack(spacing: 2) {
+          Text(month, format: .dateTime.month(.wide).year())
+            .font(.caption2)
+          Text(String(format: "%.1f kWh Total", total.kWh))
+            .font(.caption).fontWeight(.semibold).foregroundStyle(Color.blue)
+          Text(String(format: "%.1f kWh AC", ac.kWh))
+            .font(.caption).fontWeight(.semibold).foregroundStyle(Color.orange)
+          Text(String(format: "%.1f kWh DCFC", dc.kWh))
+            .font(.caption).fontWeight(.semibold).foregroundStyle(Color.green)
+        }
+        .padding(6)
+        .background(Color(.systemBackground).opacity(0.9))
+        .cornerRadius(6)
+      }
+    }
+  }
 
   var body: some View {
-    ScrollView {
-      VStack(alignment: .leading, spacing: 12) {
-        Menu {
+    VStack(spacing: 0) {
+      Menu {
+        Button {
+          model.setVehicleMenu(vehicleID: nil)
+          model.computeEntries()
+        } label: {
+          Text(model.allVehiclesTitle)
+          Image(systemName: model.displayVehicleID == nil ? "checkmark" : "car.2")
+        }
+        ForEach(model.vehicles) { vehicle in
           Button {
-            model.setVehicleMenu(vehicleID: nil)
+            model.setVehicleMenu(vehicleID: vehicle.id)
             model.computeEntries()
           } label: {
-            Text(model.allVehiclesTitle)
-            Image(systemName: model.displayVehicleID == nil ? "checkmark" : "car.2")
+            Text(vehicle.yearMakeModel)
+            Image(systemName: model.displayVehicleID == vehicle.id ? "checkmark" : (vehicle.truck ? "truck.pickup.side" : "car.side"))
           }
-          
-          ForEach(model.vehicles) { vehicle in
-            Button {
-              model.setVehicleMenu(vehicleID: vehicle.id)
-              model.computeEntries()
-            } label: {
-              Text(vehicle.yearMakeModel)
-              Image(systemName: model.displayVehicleID == vehicle.id ? "checkmark" : (vehicle.truck ? "truck.pickup.side" : "car.side"))
-            }
-          }
-        } label: {
-          GridButton(
-            color: .mint,
-            symbolName: model.vehicleButtonImage,
-            title: model.vehicleButtonTitle
-          ) {}
         }
-        .padding(.horizontal)
+      } label: {
+        GridButton(color: .mint, symbolName: model.vehicleButtonImage, title: model.vehicleButtonTitle) {}
+      }
+      .padding(.horizontal)
+      .padding(.vertical, 8)
 
+      if model.chartEntries.allSatisfy({ $0.kWh == 0 }) {
+        ContentUnavailableView(
+          "No Data",
+          systemImage: "bolt.slash",
+          description: Text("No charging sessions were logged in the past year.")
+        )
+      } else {
         Chart {
-          ForEach(model.chartEntries) { entry in
-            BarMark(
-              x: .value("Month", entry.monthDate, unit: .month),
-              y: .value("kWh", entry.kWh)
-            )
-            .foregroundStyle(by: .value("Type", entry.type))
-            .position(by: .value("Type", entry.type))
-          }
+          barSeries
+          selectionMark
         }
         .chartForegroundStyleScale([
           "AC": Color.orange,
-          "DCFC": Color.green,
-          "Total": Color.blue
+          "DCFC": Color.green
         ])
         .chartXAxis {
           AxisMarks(values: .stride(by: .month)) { _ in
@@ -156,17 +195,33 @@ struct ChargeHistoryChartView: View {
           }
         }
         .chartLegend(position: .bottom, alignment: .center, spacing: 16)
+        .chartOverlay { proxy in
+          GeometryReader { geometry in
+            Rectangle()
+              .fill(.clear)
+              .contentShape(Rectangle())
+              .gesture(
+                DragGesture(minimumDistance: 0)
+                  .onChanged { value in
+                    let x = value.location.x - geometry[proxy.plotFrame!].origin.x
+                    guard let date: Date = proxy.value(atX: x) else { return }
+                    let months = model.chartEntries.map(\.monthDate)
+                    selectedMonth = months.min {
+                      abs($0.timeIntervalSince(date)) < abs($1.timeIntervalSince(date))
+                    }
+                  }
+                  .onEnded { _ in selectedMonth = nil }
+              )
+          }
+        }
         .frame(height: 280)
         .padding(.horizontal)
-
       }
-      .padding(.vertical)
+      Spacer()
     }
     .navigationTitle("Charge History")
     .navigationBarTitleDisplayMode(.inline)
-    .onChange(of: model.charges.count) { _, _ in
-      model.computeEntries()
-    }
+    .onChange(of: model.charges.count) { _, _ in model.computeEntries() }
   }
 }
 

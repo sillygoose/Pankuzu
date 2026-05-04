@@ -243,92 +243,112 @@ final class TripEfficiencyChartModel {
 struct TripEfficiencyChartView: View {
   @State var model = TripEfficiencyChartModel()
 
-  var body: some View {
-    ScrollView {
-      VStack(alignment: .leading, spacing: 12) {
-        Picker("Efficiency Unit", selection: Binding(
-          get: { model.efficiencyUnit },
-          set: { newValue in model.$efficiencyUnit.withLock { $0 = newValue } }
-        )) {
-          ForEach(TripEfficiencyUnit.allCases, id: \.self) { unit in
-            Text(unit.rawValue).tag(unit)
-          }
-        }
-        .pickerStyle(.segmented)
-        .padding(.horizontal)
+  @ChartContentBuilder
+  private var efficiencySeries: some ChartContent {
+    ForEach(model.efficiencyEntries) { entry in
+      let eff = entry.efficiency.converted(to: model.efficiencyConversionUnit).value
+      LineMark(
+        x: .value("Month", entry.monthDate, unit: .month),
+        y: .value(model.efficiencyUnit.rawValue, eff)
+      )
+      .foregroundStyle(by: .value("Series", "Efficiency (\(model.efficiencyUnit.rawValue))"))
+      .symbol(by: .value("Series", "Efficiency (\(model.efficiencyUnit.rawValue))"))
+    }
+  }
 
-        Menu {
+  @ChartContentBuilder
+  private var temperatureSeries: some ChartContent {
+    ForEach(model.temperatureEntries) { entry in
+      let temp = entry.temperature.converted(to: model.temperatureConversionUnit).value
+      LineMark(
+        x: .value("Month", entry.monthDate, unit: .month),
+        y: .value(model.temperatureUnit, model.normalizeTemperature(temp))
+      )
+      .foregroundStyle(by: .value("Series", "Temperature (\(model.temperatureUnit))"))
+      .symbol(by: .value("Series", "Temperature (\(model.temperatureUnit))"))
+    }
+  }
+
+  @ChartContentBuilder
+  private var selectionMark: some ChartContent {
+    if let selected = model.selectedTemperatureEntry {
+      let eff = model.efficiencyEntries.first(where: { $0.monthDate == selected.monthDate })
+        .map { $0.efficiency.converted(to: model.efficiencyConversionUnit).value }
+      RuleMark(x: .value("Month", selected.monthDate, unit: .month))
+        .foregroundStyle(.gray.opacity(0.5))
+        .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
+      PointMark(
+        x: .value("Month", selected.monthDate, unit: .month),
+        y: .value(model.efficiencyUnit.rawValue, eff ?? model.efficiencyAxisMax)
+      )
+      .foregroundStyle(.clear)
+      .annotation(position: .top) {
+        VStack(spacing: 2) {
+          Text(selected.monthDate, format: .dateTime.month(.wide).year())
+            .font(.caption2)
+          if let eff {
+            Text(String(format: "\(model.efficiencyFormat) \(model.efficiencyUnit.rawValue)", eff))
+              .font(.caption).fontWeight(.semibold).foregroundStyle(Color.green)
+          }
+          let temp = selected.temperature.converted(to: model.temperatureConversionUnit).value
+          Text(String(format: "%.1f%@", temp, model.temperatureUnit))
+            .font(.caption).fontWeight(.semibold).foregroundStyle(Color.orange)
+        }
+        .padding(6)
+        .background(Color(.systemBackground).opacity(0.9))
+        .cornerRadius(6)
+      }
+    }
+  }
+
+  var body: some View {
+    VStack(spacing: 0) {
+      Picker("Efficiency Unit", selection: Binding(
+        get: { model.efficiencyUnit },
+        set: { newValue in model.$efficiencyUnit.withLock { $0 = newValue } }
+      )) {
+        ForEach(TripEfficiencyUnit.allCases, id: \.self) { unit in
+          Text(unit.rawValue).tag(unit)
+        }
+      }
+      .pickerStyle(.segmented)
+      .padding(.horizontal)
+      .padding(.vertical, 20)
+
+      Menu {
+        Button {
+          model.setVehicleMenu(vehicleID: nil)
+          model.computeEntries()
+        } label: {
+          Text(model.allVehiclesTitle)
+          Image(systemName: model.displayVehicleID == nil ? "checkmark" : "car.2")
+        }
+        ForEach(model.vehicles) { vehicle in
           Button {
-            model.setVehicleMenu(vehicleID: nil)
+            model.setVehicleMenu(vehicleID: vehicle.id)
             model.computeEntries()
           } label: {
-            Text(model.allVehiclesTitle)
-            Image(systemName: model.displayVehicleID == nil ? "checkmark" : "car.2")
+            Text(vehicle.yearMakeModel)
+            Image(systemName: model.displayVehicleID == vehicle.id ? "checkmark" : (vehicle.truck ? "truck.pickup.side" : "car.side"))
           }
-          
-          ForEach(model.vehicles) { vehicle in
-            Button {
-              model.setVehicleMenu(vehicleID: vehicle.id)
-              model.computeEntries()
-            } label: {
-              Text(vehicle.yearMakeModel)
-              Image(systemName: model.displayVehicleID == vehicle.id ? "checkmark" : (vehicle.truck ? "truck.pickup.side" : "car.side"))
-            }
-          }
-        } label: {
-          GridButton(color: .mint, symbolName: model.vehicleButtonImage, title: model.vehicleButtonTitle) {}
         }
-        .padding(.horizontal)
+      } label: {
+        GridButton(color: .mint, symbolName: model.vehicleButtonImage, title: model.vehicleButtonTitle) {}
+      }
+      .padding(.horizontal)
+      .padding(.bottom, 20)
 
+      if model.efficiencyEntries.isEmpty && model.temperatureEntries.isEmpty {
+        ContentUnavailableView(
+          "No Data",
+          systemImage: "chart.bar.xaxis",
+          description: Text("No trips with energy and weather data logged in the past year.")
+        )
+      } else {
         Chart {
-          ForEach(model.efficiencyEntries) { entry in
-            let eff = entry.efficiency.converted(to: model.efficiencyConversionUnit).value
-            BarMark(
-              x: .value("Month", entry.monthDate, unit: .month),
-              y: .value(model.efficiencyUnit.rawValue, eff)
-            )
-            .foregroundStyle(by: .value("Series", "Efficiency (\(model.efficiencyUnit.rawValue))"))
-            .position(by: .value("Type", "efficiency"))
-          }
-
-          ForEach(model.temperatureEntries) { entry in
-            let temp = entry.temperature.converted(to: model.temperatureConversionUnit).value
-            BarMark(
-              x: .value("Month", entry.monthDate, unit: .month),
-              y: .value(model.temperatureUnit, model.normalizeTemperature(temp))
-            )
-            .foregroundStyle(by: .value("Series", "Temperature (\(model.temperatureUnit))"))
-            .position(by: .value("Type", "temperature"))
-          }
-
-          if let selected = model.selectedTemperatureEntry {
-            let eff = model.efficiencyEntries.first(where: { $0.monthDate == selected.monthDate })
-              .map { $0.efficiency.converted(to: model.efficiencyConversionUnit).value }
-            RuleMark(x: .value("Month", selected.monthDate, unit: .month))
-              .foregroundStyle(.gray.opacity(0.5))
-              .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
-            PointMark(
-              x: .value("Month", selected.monthDate, unit: .month),
-              y: .value(model.efficiencyUnit.rawValue, eff ?? model.efficiencyAxisMax)
-            )
-            .foregroundStyle(.clear)
-            .annotation(position: .top) {
-              VStack(spacing: 2) {
-                Text(selected.monthDate, format: .dateTime.month(.wide).year())
-                  .font(.caption2)
-                if let eff {
-                  Text(String(format: "\(model.efficiencyFormat) \(model.efficiencyUnit.rawValue)", eff))
-                    .font(.caption).fontWeight(.semibold).foregroundStyle(Color.green)
-                }
-                let temp = selected.temperature.converted(to: model.temperatureConversionUnit).value
-                Text(String(format: "%.1f%@", temp, model.temperatureUnit))
-                  .font(.caption).fontWeight(.semibold).foregroundStyle(Color.orange)
-              }
-              .padding(6)
-              .background(Color(.systemBackground).opacity(0.9))
-              .cornerRadius(6)
-            }
-          }
+          efficiencySeries
+          temperatureSeries
+          selectionMark
         }
         .chartForegroundStyleScale([
           "Efficiency (\(model.efficiencyUnit.rawValue))": Color.green,
@@ -376,16 +396,12 @@ struct TripEfficiencyChartView: View {
         .frame(height: 300)
         .padding(.horizontal)
       }
-      .padding(.vertical)
+      Spacer()
     }
     .navigationTitle("Trip Efficiency")
     .navigationBarTitleDisplayMode(.inline)
-    .onChange(of: model.trips.count) { _, _ in
-      model.computeEntries()
-    }
-    .onChange(of: model.efficiencyUnit) { _, _ in
-      model.computeEntries()
-    }
+    .onChange(of: model.trips.count) { _, _ in model.computeEntries() }
+    .onChange(of: model.efficiencyUnit) { _, _ in model.computeEntries() }
   }
 }
 

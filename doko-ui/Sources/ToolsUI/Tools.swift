@@ -25,7 +25,7 @@ public struct ToolsView: View {
       List {
         LazyVGrid(columns: [GridItem(.flexible())], spacing: 8) {
           GridButton(
-            color: .green,
+            color: .orange,
             symbolName: "ev.charger",
             title: "Add Charge"
           ) {
@@ -33,7 +33,7 @@ public struct ToolsView: View {
           }
 
           GridButton(
-            color: .mint,
+            color: .yellow,
             symbolName: "chart.bar.fill",
             title: "Charge History"
           ) {
