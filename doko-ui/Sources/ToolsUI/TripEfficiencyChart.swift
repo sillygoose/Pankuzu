@@ -240,6 +240,7 @@ struct TripEfficiencyChartView: View {
             yStart: .value("Temp Min", model.temperatureAxisMin),
             yEnd: .value(model.temperatureUnit, temperature)
           )
+          .foregroundStyle(by: .value("Series", "Mean Temperature (\(model.temperatureUnit))"))
           if let selected = model.selectedTemperatureEntry, selected.id == entry.id {
             RuleMark(x: .value("Month", entry.monthDate, unit: .month))
               .foregroundStyle(.gray.opacity(0.5))
@@ -306,6 +307,9 @@ struct TripEfficiencyChartView: View {
     .navigationTitle("Trip Efficiency")
     .navigationBarTitleDisplayMode(.inline)
     .onChange(of: model.trips.count) { _, _ in
+      model.computeEntries()
+    }
+    .onChange(of: model.efficiencyUnit) { _, _ in
       model.computeEntries()
     }
   }
