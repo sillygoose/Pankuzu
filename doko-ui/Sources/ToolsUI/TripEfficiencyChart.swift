@@ -51,6 +51,7 @@ final class TripEfficiencyChartModel {
   var temperatureMax: Measurement<UnitTemperature> = Measurement(value: 45, unit: UnitTemperature.celsius)
 
   fileprivate var efficiencyEntries: [TripEfficiency] = []
+  fileprivate var selectedEfficiencyEntry: TripEfficiency?
   var efficiencyMin: Measurement<UnitEnergyEfficiency> = Measurement(value: 0, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
   var efficiencyMax: Measurement<UnitEnergyEfficiency> = Measurement(value: 10, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
 
@@ -89,11 +90,52 @@ final class TripEfficiencyChartModel {
   }
 
   var temperatureAxisMin: Double {
-    return temperatureMin.converted(to: temperatureConversionUnit).value
+    temperatureMin.converted(to: temperatureConversionUnit).value
   }
 
   var temperatureAxisMax: Double {
-    return temperatureMax.converted(to: temperatureConversionUnit).value
+    temperatureMax.converted(to: temperatureConversionUnit).value
+  }
+
+  var efficiencyAxisMin: Double {
+    let a = efficiencyMin.converted(to: efficiencyConversionUnit).value
+    let b = efficiencyMax.converted(to: efficiencyConversionUnit).value
+    return min(a, b)
+  }
+
+  var efficiencyAxisMax: Double {
+    let a = efficiencyMin.converted(to: efficiencyConversionUnit).value
+    let b = efficiencyMax.converted(to: efficiencyConversionUnit).value
+    return max(a, b)
+  }
+
+  var efficiencyFormat: String {
+    switch efficiencyUnit {
+    case .kmPerKWh, .milesPerKWh: return "%.1f"
+    case .kWhPer100km: return "%.1f"
+    }
+  }
+
+  // Maps a temperature display value onto the efficiency y-axis scale (0...efficiencyAxisMax)
+  func normalizeTemperature(_ temp: Double) -> Double {
+    let tempRange = temperatureAxisMax - temperatureAxisMin
+    guard tempRange > 0, efficiencyAxisMax > 0 else { return 0 }
+    return max(0, (temp - temperatureAxisMin) / tempRange * efficiencyAxisMax)
+  }
+
+  // Inverse — used to label right-axis ticks with actual temperature
+  func temperatureFromNormalized(_ normalized: Double) -> Double {
+    guard efficiencyAxisMax > 0 else { return temperatureAxisMin }
+    return temperatureAxisMin + (normalized / efficiencyAxisMax) * (temperatureAxisMax - temperatureAxisMin)
+  }
+
+  // Normalized y-positions (on efficiency scale) for 5 right-axis temperature ticks
+  var temperatureAxisTicks: [Double] {
+    guard temperatureAxisMax > temperatureAxisMin else { return [] }
+    return (0..<5).map { i in
+      let temp = temperatureAxisMin + Double(i) / 4.0 * (temperatureAxisMax - temperatureAxisMin)
+      return normalizeTemperature(temp)
+    }
   }
 
   init() {
@@ -144,10 +186,10 @@ final class TripEfficiencyChartModel {
       let rawMeanTemperature = tempTrips.map(\.weighted).reduce(0, +) / totalDuration
       return TripTemperature(monthDate: start, temperature: Measurement(value: rawMeanTemperature, unit: .celsius))
     }
-    let minYAxis = floor((temperatureEntries.map(\.temperature.value).min() ?? 0) - 10)
-    let maxYAxis = ceil((temperatureEntries.map(\.temperature.value).max() ?? 1) + 10)
-    temperatureMin.value = min(0.0, minYAxis)
-    temperatureMax.value = max(45.0, maxYAxis)
+    let minYAxis = floor((temperatureEntries.map(\.temperature.value).min() ?? 0) - 3)
+    let maxYAxis = ceil((temperatureEntries.map(\.temperature.value).max() ?? 1) + 3)
+    temperatureMin.value = minYAxis //min(0.0, minYAxis)
+    temperatureMax.value = maxYAxis //max(45.0, maxYAxis)
 //    for (_, temperature) in temperatureEntries.enumerated() {
 //      print(temperature.temperature.converted(to: temperatureConversionUnit))
 //    }
@@ -167,9 +209,14 @@ final class TripEfficiencyChartModel {
       let rawEfficiency = efficiencyTrips.map(\.distance).reduce(0, +) / totalEnergy
       return TripEfficiency(monthDate: start, efficiency: Measurement(value: rawEfficiency, unit: .kilometersPerKilowattHour))
     }
-//    for (_, efficiency) in efficiencyEntries.enumerated() {
-//      print(efficiency.efficiency.converted(to: efficiencyConversionUnit))
-//    }
+
+    // Set efficiency axis bounds in km/kWh with a 15% buffer
+    let effValues = efficiencyEntries.map(\.efficiency.value)
+    if let lo = effValues.min(), let hi = effValues.max() {
+      let buffer = max(0.5, (hi - lo) * 0.15)
+      efficiencyMin = Measurement(value: max(0, lo - buffer), unit: .kilometersPerKilowattHour)
+      efficiencyMax = Measurement(value: hi + buffer, unit: .kilometersPerKilowattHour)
+    }
   }
   
   func setVehicleMenu(vehicleID: Vehicle.ID?) {
@@ -233,31 +280,49 @@ struct TripEfficiencyChartView: View {
         }
         .padding(.horizontal)
 
-        Chart(model.temperatureEntries) { entry in
-          let temperature = entry.temperature.converted(to: model.temperatureConversionUnit).value
-          BarMark(
-            x: .value("Month", entry.monthDate, unit: .month),
-            yStart: .value("Temp Min", model.temperatureAxisMin),
-            yEnd: .value(model.temperatureUnit, temperature)
-          )
-          .foregroundStyle(by: .value("Series", "Mean Temperature (\(model.temperatureUnit))"))
-          if let selected = model.selectedTemperatureEntry, selected.id == entry.id {
-            RuleMark(x: .value("Month", entry.monthDate, unit: .month))
+        Chart {
+          ForEach(model.efficiencyEntries) { entry in
+            let eff = entry.efficiency.converted(to: model.efficiencyConversionUnit).value
+            BarMark(
+              x: .value("Month", entry.monthDate, unit: .month),
+              y: .value(model.efficiencyUnit.rawValue, eff)
+            )
+            .foregroundStyle(by: .value("Series", "Efficiency (\(model.efficiencyUnit.rawValue))"))
+            .position(by: .value("Type", "efficiency"))
+          }
+
+          ForEach(model.temperatureEntries) { entry in
+            let temp = entry.temperature.converted(to: model.temperatureConversionUnit).value
+            BarMark(
+              x: .value("Month", entry.monthDate, unit: .month),
+              y: .value(model.temperatureUnit, model.normalizeTemperature(temp))
+            )
+            .foregroundStyle(by: .value("Series", "Temperature (\(model.temperatureUnit))"))
+            .position(by: .value("Type", "temperature"))
+          }
+
+          if let selected = model.selectedTemperatureEntry {
+            let eff = model.efficiencyEntries.first(where: { $0.monthDate == selected.monthDate })
+              .map { $0.efficiency.converted(to: model.efficiencyConversionUnit).value }
+            RuleMark(x: .value("Month", selected.monthDate, unit: .month))
               .foregroundStyle(.gray.opacity(0.5))
               .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
             PointMark(
-              x: .value("Month", entry.monthDate, unit: .month),
-              y: .value(model.temperatureUnit, temperature)
+              x: .value("Month", selected.monthDate, unit: .month),
+              y: .value(model.efficiencyUnit.rawValue, eff ?? model.efficiencyAxisMax)
             )
             .foregroundStyle(.clear)
-            .annotation(position: temperature >= 0 ? .top : .bottom) {
+            .annotation(position: .top) {
               VStack(spacing: 2) {
-                Text(entry.monthDate, format: .dateTime.month(.wide).year())
+                Text(selected.monthDate, format: .dateTime.month(.wide).year())
                   .font(.caption2)
-                Text(String(format: "%.1f%@", temperature, model.temperatureUnit))
-                  .font(.caption)
-                  .fontWeight(.semibold)
-                  .foregroundStyle(Color.orange)
+                if let eff {
+                  Text(String(format: "\(model.efficiencyFormat) \(model.efficiencyUnit.rawValue)", eff))
+                    .font(.caption).fontWeight(.semibold).foregroundStyle(Color.green)
+                }
+                let temp = selected.temperature.converted(to: model.temperatureConversionUnit).value
+                Text(String(format: "%.1f%@", temp, model.temperatureUnit))
+                  .font(.caption).fontWeight(.semibold).foregroundStyle(Color.orange)
               }
               .padding(6)
               .background(Color(.systemBackground).opacity(0.9))
@@ -265,9 +330,12 @@ struct TripEfficiencyChartView: View {
             }
           }
         }
-        .chartForegroundStyleScale(["Mean Temperature (\(model.temperatureUnit))": Color.orange])
+        .chartForegroundStyleScale([
+          "Efficiency (\(model.efficiencyUnit.rawValue))": Color.green,
+          "Temperature (\(model.temperatureUnit))": Color.orange
+        ])
         .chartXScale(domain: model.windowStart...model.windowEnd)
-        .chartYScale(domain: model.temperatureAxisMin...model.temperatureAxisMax)
+        .chartYScale(domain: 0...model.efficiencyAxisMax)
         .chartXAxis {
           AxisMarks(values: .stride(by: .month)) { _ in
             AxisValueLabel(format: .dateTime.month(.abbreviated))
@@ -275,9 +343,15 @@ struct TripEfficiencyChartView: View {
           }
         }
         .chartYAxis {
-          AxisMarks { value in
-            AxisValueLabel(String(format: "%.0f \(model.temperatureUnit)", value.as(Double.self) ?? 0))
+          AxisMarks(position: .leading) { value in
+            AxisValueLabel(String(format: "\(model.efficiencyFormat)", value.as(Double.self) ?? 0))
             AxisGridLine()
+          }
+          AxisMarks(position: .trailing, values: model.temperatureAxisTicks) { value in
+            if let normalized = value.as(Double.self) {
+              let temp = model.temperatureFromNormalized(normalized)
+              AxisValueLabel(String(format: "%.0f\(model.temperatureUnit)", temp))
+            }
           }
         }
         .chartLegend(position: .bottom, alignment: .center, spacing: 16)
@@ -299,7 +373,7 @@ struct TripEfficiencyChartView: View {
               )
           }
         }
-        .frame(height: 280)
+        .frame(height: 300)
         .padding(.horizontal)
       }
       .padding(.vertical)
