@@ -172,10 +172,6 @@ final class TripEfficiencyChartModel {
     }
   }
   
-  func setDisplayPeriod(_ newUnit: TripEfficiencyUnit) {
-    $efficiencyUnit.withLock { $0 = newUnit }
-  }
-
   func setVehicleMenu(vehicleID: Vehicle.ID?) {
     $displayVehicleID.withLock { $0 = vehicleID }
     updateVehicleMenuLabels(vehicleID: vehicleID)
@@ -205,8 +201,7 @@ struct TripEfficiencyChartView: View {
       VStack(alignment: .leading, spacing: 12) {
         Picker("Efficiency Unit", selection: Binding(
           get: { model.efficiencyUnit },
-//          set: { newValue in model.$efficiencyUnit.withLock { $0 = newValue } }
-          set: { model.setDisplayPeriod($0) }
+          set: { newValue in model.$efficiencyUnit.withLock { $0 = newValue } }
         )) {
           ForEach(TripEfficiencyUnit.allCases, id: \.self) { unit in
             Text(unit.rawValue).tag(unit)
