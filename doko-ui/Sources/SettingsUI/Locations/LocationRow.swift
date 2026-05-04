@@ -25,8 +25,8 @@ struct LocationRow: View {
 
 #Preview {
   let _ = prepareDependencies {
-    try! $0.bootstrapDatabase()
-    try! $0.defaultDatabase.seedPreviews()
+    try? $0.bootstrapDatabase()
+    try? $0.defaultDatabase.seedPreviews()
   }
   @FetchAll var locations: [Location]
   NavigationStack {

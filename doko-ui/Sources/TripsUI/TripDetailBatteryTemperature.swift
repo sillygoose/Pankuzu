@@ -180,7 +180,8 @@ public struct TripDetailBatteryTemperatureView: View {
               )
           }
         }
-        .frame(width: 340, height: 300)
+        .frame( height: 300)
+        .padding(.horizontal)
         .padding(.top, 20)
 
         HStack(spacing: 20) {

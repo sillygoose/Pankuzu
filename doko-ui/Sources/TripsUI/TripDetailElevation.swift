@@ -161,7 +161,12 @@ public struct TripDetailElevationView: View {
         }
       }
       .chartYScale(domain: model.minimumElevation.value...model.maximumElevation.value)
-      .chartYAxis(.automatic)
+      .chartYAxis {
+        AxisMarks { value in
+          AxisValueLabel(String(format: "%.0f\(model.maximumElevation.unit.symbol)", value.as(Double.self) ?? 0))
+          AxisGridLine()
+        }
+      }
       .chartXAxis(.automatic)
       .chartOverlay { proxy in
         GeometryReader { geometry in
@@ -199,8 +204,8 @@ public struct TripDetailElevationView: View {
 
 #Preview {
   let _ = prepareDependencies {
-    try! $0.bootstrapDatabase()
-    try! $0.defaultDatabase.seedPreviews()
+    try? $0.bootstrapDatabase()
+    try? $0.defaultDatabase.seedPreviews()
   }
   @FetchAll var trips: [Trip]
   NavigationStack {
