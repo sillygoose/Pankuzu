@@ -39,6 +39,14 @@ public struct ToolsView: View {
           ) {
             path.append(Destination.chargeHistory)
           }
+
+          GridButton(
+            color: .green,
+            symbolName: "chart.line.uptrend.xyaxis",
+            title: "Trip Efficiency"
+          ) {
+            path.append(Destination.tripEfficiency)
+          }
         }
         .buttonStyle(.plain)
         .listRowBackground(Color.clear)
@@ -61,6 +69,8 @@ public struct ToolsView: View {
         switch destination {
         case .chargeHistory:
           ChargeHistoryChartView()
+        case .tripEfficiency:
+          TripEfficiencyChartView()
         }
       }
     }
@@ -68,6 +78,7 @@ public struct ToolsView: View {
 
   enum Destination: Hashable {
     case chargeHistory
+    case tripEfficiency
   }
 }
 
