@@ -24,13 +24,13 @@ enum TripEfficiencyUnit: String, CaseIterable, Codable, Hashable, Sendable {
   case kWhPer100km = "kWh/100km"
 }
 
-struct TripTemperatureEntry: Identifiable {
+fileprivate struct TripTemperature: Identifiable {
   var id: TimeInterval { monthDate.timeIntervalSince1970 }
   let monthDate: Date
   var temperature: Measurement<UnitTemperature>
 }
 
-struct TripEfficiencyEntry: Identifiable {
+fileprivate struct TripEfficiency: Identifiable {
   var id: TimeInterval { monthDate.timeIntervalSince1970 }
   let monthDate: Date
   var efficiency: Measurement<UnitEnergyEfficiency>
@@ -41,15 +41,17 @@ struct TripEfficiencyEntry: Identifiable {
 final class TripEfficiencyChartModel {
   @ObservationIgnored @FetchAll var vehicles: [Vehicle]
   @ObservationIgnored @FetchAll var trips: [Trip]
+  
   @ObservationIgnored @Shared(.tripEfficiencyDisplayVehicleID) var displayVehicleID
-  @ObservationIgnored @Shared(.appSettings) var appSettings
   @ObservationIgnored @Shared(.tripEfficiencyUnit) var efficiencyUnit
 
-  var temperatureEntries: [TripTemperatureEntry] = []
+  fileprivate var temperatureEntries: [TripTemperature] = []
   var temperatureMin: Measurement<UnitTemperature> = Measurement(value: 0, unit: UnitTemperature.celsius)
   var temperatureMax: Measurement<UnitTemperature> = Measurement(value: 45, unit: UnitTemperature.celsius)
 
-  var efficiencyEntries: [TripEfficiencyEntry] = []
+  fileprivate var efficiencyEntries: [TripEfficiency] = []
+  var efficiencyMin: Measurement<UnitEnergyEfficiency> = Measurement(value: 0, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
+  var efficiencyMax: Measurement<UnitEnergyEfficiency> = Measurement(value: 10, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
 
   var vehicleButtonTitle: String = "All Vehicles"
   var vehicleButtonImage: String = "car.2"
@@ -109,9 +111,6 @@ final class TripEfficiencyChartModel {
       animation: .default
     )
 
-//    temperatureMin = Measurement(value: 0, unit: UnitTemperature.celsius)
-//    temperatureMax = Measurement(value: 45, unit: UnitTemperature.celsius)
-
     updateVehicleMenuLabels(vehicleID: displayVehicleID)
     computeEntries()
   }
@@ -142,8 +141,12 @@ final class TripEfficiencyChartModel {
       let totalDuration = tempTrips.map(\.duration).reduce(0, +)
       guard totalDuration > 0 else { return nil }
       let rawMeanTemperature = tempTrips.map(\.weighted).reduce(0, +) / totalDuration
-      return TripTemperatureEntry(monthDate: start, temperature: Measurement(value: rawMeanTemperature, unit: .celsius))
+      return TripTemperature(monthDate: start, temperature: Measurement(value: rawMeanTemperature, unit: .celsius))
     }
+    let minYAxis = floor((temperatureEntries.map(\.temperature.value).min() ?? 0) - 10)
+    let maxYAxis = ceil((temperatureEntries.map(\.temperature.value).max() ?? 1) + 10)
+    temperatureMin.value = min(0.0, minYAxis)
+    temperatureMax.value = max(45.0, maxYAxis)
     for (_, temperature) in temperatureEntries.enumerated() {
       print(temperature.temperature.converted(to: temperatureConversionUnit))
     }
@@ -161,7 +164,7 @@ final class TripEfficiencyChartModel {
       let totalEnergy = efficiencyTrips.map(\.energy).reduce(0, +)
       guard totalEnergy > 0 else { return nil }
       let rawEfficiency = efficiencyTrips.map(\.distance).reduce(0, +) / totalEnergy
-      return TripEfficiencyEntry(monthDate: start, efficiency: Measurement(value: rawEfficiency, unit: .kilometersPerKilowattHour))
+      return TripEfficiency(monthDate: start, efficiency: Measurement(value: rawEfficiency, unit: .kilometersPerKilowattHour))
     }
     for (_, efficiency) in efficiencyEntries.enumerated() {
       print(efficiency.efficiency.converted(to: efficiencyConversionUnit))
@@ -234,11 +237,11 @@ struct TripEfficiencyChartView: View {
         .padding(.horizontal)
 
         Chart(model.temperatureEntries) { entry in
-          let convertedTemperature = entry.temperature.converted(to: model.temperatureConversionUnit).value
+          let temperature = entry.temperature.converted(to: model.temperatureConversionUnit).value
           BarMark(
             x: .value("Month", entry.monthDate, unit: .month),
             yStart: .value("Temp Min", model.yAxisMin),
-            yEnd: .value(model.temperatureUnit, convertedTemperature)
+            yEnd: .value(model.temperatureUnit, temperature)
           )
 //          .foregroundStyle(by: .value("Series", "Mean Temp (\(model.temperatureUnit))"))
         }
