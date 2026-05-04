@@ -88,11 +88,11 @@ final class TripEfficiencyChartModel {
     }
   }
 
-  var yAxisMin: Double {
+  var temperatureAxisMin: Double {
     return temperatureMin.converted(to: temperatureConversionUnit).value
   }
 
-  var yAxisMax: Double {
+  var temperatureAxisMax: Double {
     return temperatureMax.converted(to: temperatureConversionUnit).value
   }
 
@@ -237,7 +237,7 @@ struct TripEfficiencyChartView: View {
           let temperature = entry.temperature.converted(to: model.temperatureConversionUnit).value
           BarMark(
             x: .value("Month", entry.monthDate, unit: .month),
-            yStart: .value("Temp Min", model.yAxisMin),
+            yStart: .value("Temp Min", model.temperatureAxisMin),
             yEnd: .value(model.temperatureUnit, temperature)
           )
           if let selected = model.selectedTemperatureEntry, selected.id == entry.id {
@@ -266,7 +266,7 @@ struct TripEfficiencyChartView: View {
         }
         .chartForegroundStyleScale(["Mean Temperature (\(model.temperatureUnit))": Color.orange])
         .chartXScale(domain: model.windowStart...model.windowEnd)
-        .chartYScale(domain: model.yAxisMin...model.yAxisMax)
+        .chartYScale(domain: model.temperatureAxisMin...model.temperatureAxisMax)
         .chartXAxis {
           AxisMarks(values: .stride(by: .month)) { _ in
             AxisValueLabel(format: .dateTime.month(.abbreviated))
