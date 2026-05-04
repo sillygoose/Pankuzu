@@ -148,9 +148,9 @@ final class TripEfficiencyChartModel {
     let maxYAxis = ceil((temperatureEntries.map(\.temperature.value).max() ?? 1) + 10)
     temperatureMin.value = min(0.0, minYAxis)
     temperatureMax.value = max(45.0, maxYAxis)
-    for (_, temperature) in temperatureEntries.enumerated() {
-      print(temperature.temperature.converted(to: temperatureConversionUnit))
-    }
+//    for (_, temperature) in temperatureEntries.enumerated() {
+//      print(temperature.temperature.converted(to: temperatureConversionUnit))
+//    }
 
     efficiencyEntries = (0..<13).compactMap { offset in
       let start = calendar.date(byAdding: .month, value: -(12 - offset), to: currentMonthStart)!
@@ -167,9 +167,9 @@ final class TripEfficiencyChartModel {
       let rawEfficiency = efficiencyTrips.map(\.distance).reduce(0, +) / totalEnergy
       return TripEfficiency(monthDate: start, efficiency: Measurement(value: rawEfficiency, unit: .kilometersPerKilowattHour))
     }
-    for (_, efficiency) in efficiencyEntries.enumerated() {
-      print(efficiency.efficiency.converted(to: efficiencyConversionUnit))
-    }
+//    for (_, efficiency) in efficiencyEntries.enumerated() {
+//      print(efficiency.efficiency.converted(to: efficiencyConversionUnit))
+//    }
   }
   
   func setVehicleMenu(vehicleID: Vehicle.ID?) {
