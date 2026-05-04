@@ -46,6 +46,7 @@ final class TripEfficiencyChartModel {
   @ObservationIgnored @Shared(.tripEfficiencyUnit) var efficiencyUnit
 
   fileprivate var temperatureEntries: [TripTemperature] = []
+  fileprivate var selectedTemperatureEntry: TripTemperature?
   var temperatureMin: Measurement<UnitTemperature> = Measurement(value: 0, unit: UnitTemperature.celsius)
   var temperatureMax: Measurement<UnitTemperature> = Measurement(value: 45, unit: UnitTemperature.celsius)
 
@@ -204,6 +205,7 @@ struct TripEfficiencyChartView: View {
       VStack(alignment: .leading, spacing: 12) {
         Picker("Efficiency Unit", selection: Binding(
           get: { model.efficiencyUnit },
+//          set: { newValue in model.$efficiencyUnit.withLock { $0 = newValue } }
           set: { model.setDisplayPeriod($0) }
         )) {
           ForEach(TripEfficiencyUnit.allCases, id: \.self) { unit in
@@ -243,7 +245,29 @@ struct TripEfficiencyChartView: View {
             yStart: .value("Temp Min", model.yAxisMin),
             yEnd: .value(model.temperatureUnit, temperature)
           )
-//          .foregroundStyle(by: .value("Series", "Mean Temp (\(model.temperatureUnit))"))
+          if let selected = model.selectedTemperatureEntry, selected.id == entry.id {
+            RuleMark(x: .value("Month", entry.monthDate, unit: .month))
+              .foregroundStyle(.gray.opacity(0.5))
+              .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
+            PointMark(
+              x: .value("Month", entry.monthDate, unit: .month),
+              y: .value(model.temperatureUnit, temperature)
+            )
+            .foregroundStyle(.clear)
+            .annotation(position: temperature >= 0 ? .top : .bottom) {
+              VStack(spacing: 2) {
+                Text(entry.monthDate, format: .dateTime.month(.wide).year())
+                  .font(.caption2)
+                Text(String(format: "%.1f%@", temperature, model.temperatureUnit))
+                  .font(.caption)
+                  .fontWeight(.semibold)
+                  .foregroundStyle(Color.orange)
+              }
+              .padding(6)
+              .background(Color(.systemBackground).opacity(0.9))
+              .cornerRadius(6)
+            }
+          }
         }
         .chartForegroundStyleScale(["Mean Temperature (\(model.temperatureUnit))": Color.orange])
         .chartXScale(domain: model.windowStart...model.windowEnd)
@@ -261,6 +285,24 @@ struct TripEfficiencyChartView: View {
           }
         }
         .chartLegend(position: .bottom, alignment: .center, spacing: 16)
+        .chartOverlay { proxy in
+          GeometryReader { geometry in
+            Rectangle()
+              .fill(.clear)
+              .contentShape(Rectangle())
+              .gesture(
+                DragGesture(minimumDistance: 0)
+                  .onChanged { value in
+                    let x = value.location.x - geometry[proxy.plotFrame!].origin.x
+                    guard let date: Date = proxy.value(atX: x) else { return }
+                    model.selectedTemperatureEntry = model.temperatureEntries.min {
+                      abs($0.monthDate.timeIntervalSince(date)) < abs($1.monthDate.timeIntervalSince(date))
+                    }
+                  }
+                  .onEnded { _ in model.selectedTemperatureEntry = nil }
+              )
+          }
+        }
         .frame(height: 280)
         .padding(.horizontal)
       }
