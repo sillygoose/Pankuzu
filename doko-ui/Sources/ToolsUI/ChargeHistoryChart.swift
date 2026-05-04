@@ -165,7 +165,7 @@ struct ChargeHistoryChartView: View {
         GridButton(color: .mint, symbolName: model.vehicleButtonImage, title: model.vehicleButtonTitle) {}
       }
       .padding(.horizontal)
-      .padding(.vertical, 8)
+      .padding(.vertical, 30)
 
       if model.chartEntries.allSatisfy({ $0.kWh == 0 }) {
         ContentUnavailableView(
