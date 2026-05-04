@@ -109,6 +109,7 @@ struct ChargeHistoryChartView: View {
             Text(model.allVehiclesTitle)
             Image(systemName: model.displayVehicleID == nil ? "checkmark" : "car.2")
           }
+          
           ForEach(model.vehicles) { vehicle in
             Button {
               model.setVehicleMenu(vehicleID: vehicle.id)
