@@ -99,6 +99,12 @@ public struct TripDetailBatteryTemperatureView: View {
             .foregroundStyle(by: .value("Series", "Outside"))
             .interpolationMethod(.monotone)
             .lineStyle(StrokeStyle(lineWidth: 2, dash: [6, 3]))
+            PointMark(
+              x: .value("Time", point.timestamp),
+              y: .value("Temp", model.converted(point.temperature))
+            )
+            .foregroundStyle(by: .value("Series", "Outside"))
+            .symbolSize(40)
           }
 
           if let selected = model.selectedBatteryPoint {
@@ -122,12 +128,12 @@ public struct TripDetailBatteryTemperatureView: View {
               VStack(spacing: 2) {
                 Text(selected.timestamp, style: .time)
                   .font(.caption2)
-                Text(String(format: "%.1f %@", model.converted(selected.datapoint), model.minYAxis.unit.symbol))
+                Text(String(format: "%.0f %@", model.converted(selected.datapoint), model.minYAxis.unit.symbol))
                   .font(.caption)
                   .fontWeight(.semibold)
                   .foregroundStyle(DesignTokens.Color.batteryTemperature)
                 if let weather = model.selectedWeatherPoint {
-                  Text(String(format: "%.1f %@", model.converted(weather.temperature), model.minYAxis.unit.symbol))
+                  Text(String(format: "%.0f %@", model.converted(weather.temperature), model.minYAxis.unit.symbol))
                     .font(.caption)
                     .fontWeight(.semibold)
                     .foregroundStyle(DesignTokens.Color.weather)

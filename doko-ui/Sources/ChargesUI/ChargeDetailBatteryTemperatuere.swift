@@ -122,12 +122,12 @@ public struct ChargeDetailBatteryTemperatureView: View {
               VStack(spacing: 2) {
                 Text(selected.timestamp, style: .time)
                   .font(.caption2)
-                Text(String(format: "%.1f %@", model.converted(selected.datapoint), model.minYAxis.unit.symbol))
+                Text(String(format: "%.0f %@", model.converted(selected.datapoint), model.minYAxis.unit.symbol))
                   .font(.caption)
                   .fontWeight(.semibold)
                   .foregroundStyle(DesignTokens.Color.batteryTemperature)
                 if let coupler = model.selectedCouplerPoint {
-                  Text(String(format: "%.1f %@", model.converted(coupler.datapoint), model.minYAxis.unit.symbol))
+                  Text(String(format: "%.0f %@", model.converted(coupler.datapoint), model.minYAxis.unit.symbol))
                     .font(.caption)
                     .fontWeight(.semibold)
                     .foregroundStyle(.orange)
