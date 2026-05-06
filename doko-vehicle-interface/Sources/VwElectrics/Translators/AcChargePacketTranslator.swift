@@ -136,13 +136,13 @@ extension VwElectrics {
       dokoResponses[.error] = DokoCommandResponse(command: .acChargeHistory, response: .error("arguments"))
       return DokoResponsePacket(type: .acChargeHistory, responses: dokoResponses)
     }
+    dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .acChargeHistory, response: .batteryStateOfCharge(stateOfCharge))
     if let batteryPower {
       dokoResponses[.batteryPower] = DokoCommandResponse(command: .acChargeHistory, response: .batteryPower(batteryPower))
     }
     if let batteryEnergy {
       dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .batteryEnergy(batteryEnergy))
     }
-    dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .acChargeHistory, response: .batteryStateOfCharge(stateOfCharge))
     if let batteryTemperature = responsePacket.batteryTemperature {
       dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .acChargeHistory, response: .batteryTemperature(batteryTemperature))
     }

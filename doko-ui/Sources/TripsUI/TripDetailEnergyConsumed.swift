@@ -35,14 +35,13 @@ public final class TripDetailEnergyModel {
     guard let tripData else { return }
     energyToEmpty = downsample(tripData.energyToEmpty, maxPoints: 60)
 
-    if let initialEnergy = trip.energyToEmptyStart {
-      let rawBatteryEnergy = tripData.batteryEnergy
-      calculatedEnergy = rawBatteryEnergy.map { point in
-        DokoDataPoint(timestamp: point.timestamp, double: initialEnergy + point.datapoint)
-      }
-      calculatedEnergy = downsample(calculatedEnergy, maxPoints: 60)
+    let initialEnergy = trip.energyToEmptyStart ?? 0.0
+    let rawBatteryEnergy = tripData.batteryEnergy
+    calculatedEnergy = rawBatteryEnergy.map { point in
+      DokoDataPoint(timestamp: point.timestamp, double: initialEnergy + point.datapoint)
     }
-    guard !energyToEmpty.isEmpty || !calculatedEnergy.isEmpty else { return }
+    calculatedEnergy = downsample(calculatedEnergy, maxPoints: 60)
+    guard !calculatedEnergy.isEmpty else { return }
 
     let datapoints = (energyToEmpty + calculatedEnergy).map(\.datapoint)
     let minEnergy = datapoints.min() ?? .greatestFiniteMagnitude
@@ -80,6 +79,13 @@ public struct TripDetailEnergyView: View {
 
   public var body: some View {
     VStack {
+      if model.energyToEmpty.isEmpty && model.calculatedEnergy.isEmpty {
+        ContentUnavailableView(
+          "No Energy Data",
+          systemImage: "bolt.slash",
+          description: Text("No energy data was recorded for this trip.")
+        )
+      } else {
       VStack {
         Chart {
           ForEach(model.energyToEmpty) { point in
@@ -209,8 +215,8 @@ public struct TripDetailEnergyView: View {
         .frame(width: 340, height: 300)
         .padding(.top, 20)
       }
+      } // else
       Spacer()
-      .padding()
     }
     .navigationTitle(Text("Energy Consumed"))
     .navigationBarTitleDisplayMode(.inline)

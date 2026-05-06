@@ -154,73 +154,9 @@ extension ObdResponsePacket {
     guard case let .batteryVoltage(v)? = responses[.batteryVoltage]?.response else { return nil }
     return v
   }
-  public var batteryVoltage0: Double? {
-    guard case let .batteryVoltage0(v)? = responses[.batteryVoltage0]?.response else { return nil }
-    return v
-  }
-  public var batteryVoltage1: Double? {
-    guard case let .batteryVoltage1(v)? = responses[.batteryVoltage1]?.response else { return nil }
-    return v
-  }
-  public var batteryVoltage2: Double? {
-    guard case let .batteryVoltage2(v)? = responses[.batteryVoltage2]?.response else { return nil }
-    return v
-  }
-  public var batteryVoltage3: Double? {
-    guard case let .batteryVoltage3(v)? = responses[.batteryVoltage3]?.response else { return nil }
-    return v
-  }
-  public var batteryVoltage4: Double? {
-    guard case let .batteryVoltage4(v)? = responses[.batteryVoltage4]?.response else { return nil }
-    return v
-  }
-  public var batteryVoltage5: Double? {
-    guard case let .batteryVoltage5(v)? = responses[.batteryVoltage5]?.response else { return nil }
-    return v
-  }
-  public var batteryVoltage6: Double? {
-    guard case let .batteryVoltage6(v)? = responses[.batteryVoltage6]?.response else { return nil }
-    return v
-  }
-  public var batteryVoltage7: Double? {
-    guard case let .batteryVoltage7(v)? = responses[.batteryVoltage7]?.response else { return nil }
-    return v
-  }
 
   public var batteryCurrent: Double? {
     guard case let .batteryCurrent(v)? = responses[.batteryCurrent]?.response else { return nil }
-    return v
-  }
-  public var batteryCurrent0: Double? {
-    guard case let .batteryCurrent0(v)? = responses[.batteryCurrent0]?.response else { return nil }
-    return v
-  }
-  public var batteryCurrent1: Double? {
-    guard case let .batteryCurrent1(v)? = responses[.batteryCurrent1]?.response else { return nil }
-    return v
-  }
-  public var batteryCurrent2: Double? {
-    guard case let .batteryCurrent2(v)? = responses[.batteryCurrent2]?.response else { return nil }
-    return v
-  }
-  public var batteryCurrent3: Double? {
-    guard case let .batteryCurrent3(v)? = responses[.batteryCurrent3]?.response else { return nil }
-    return v
-  }
-  public var batteryCurrent4: Double? {
-    guard case let .batteryCurrent4(v)? = responses[.batteryCurrent4]?.response else { return nil }
-    return v
-  }
-  public var batteryCurrent5: Double? {
-    guard case let .batteryCurrent5(v)? = responses[.batteryCurrent5]?.response else { return nil }
-    return v
-  }
-  public var batteryCurrent6: Double? {
-    guard case let .batteryCurrent6(v)? = responses[.batteryCurrent6]?.response else { return nil }
-    return v
-  }
-  public var batteryCurrent7: Double? {
-    guard case let .batteryCurrent7(v)? = responses[.batteryCurrent7]?.response else { return nil }
     return v
   }
   

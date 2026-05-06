@@ -107,6 +107,5 @@ struct PankuzuApp: App {
         }
       }
     }
-
   }
 }

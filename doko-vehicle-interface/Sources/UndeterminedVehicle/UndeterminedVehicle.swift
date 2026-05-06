@@ -59,16 +59,17 @@ public actor UndeterminedVehicle: ConnectedVehicleInterface {
     switch packetType {
     case .reset:
       return obdCommandPacket(.reset) {
-        reset
+        reset;
       }
+      
     case .vin:
       return obdCommandPacket(.vin) {
-        protocolDetect
+        protocolDetect;
       }
+      
     default:
       DokoLogging.shared.postLoggingResponse(.error("UV.translateDokoCommandPacket: unexpected \(packetType.description) packet"))
       return nil
     }
   }
 }
-

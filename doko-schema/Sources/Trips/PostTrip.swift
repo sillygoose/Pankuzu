@@ -170,9 +170,9 @@ extension Trip {
     tripDraft.energyToEmptyEnd = tripUpdateResponse.batteryEnergyToEmpty
     tripDraft.energy = tripUpdateResponse.batteryEnergy.map { -$0 }
 
-//###    tripDraft.distanceToEmptyEnd = tripUpdateResponse.batteryDistanceToEmpty
-//    tripDraft.range = tripDraft.distanceToEmptyStart.flatMap { start in tripUpdateResponse.batteryDistanceToEmpty.map { end in start - end } }
-
+    tripDraft.distanceToEmptyEnd = tripUpdateResponse.batteryDistanceToEmpty
+    tripDraft.range = tripDraft.distanceToEmptyStart.flatMap { start in tripUpdateResponse.batteryDistanceToEmpty.map { end in start - end } }
+    
     tripDraft.stateOfChargeEnd = tripUpdateResponse.batteryStateOfCharge
     tripDraft.batteryTempEnd = tripUpdateResponse.batteryTemperature
 

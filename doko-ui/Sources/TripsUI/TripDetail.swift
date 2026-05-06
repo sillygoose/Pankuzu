@@ -282,7 +282,7 @@ public struct TripDetailView: View {
             value: String(format: "%.0f", batteryTempEnd.value),
             units: batteryTempEnd.unit.symbol,
             symbolName: batteryTempEndIcon,
-            title: "Battery Temp"
+            title: "Temperature"
           ) {
             model.destination = .batteryTemperatureChart
           }
@@ -294,7 +294,7 @@ public struct TripDetailView: View {
           let rangeEfficiency = distance - rangeConsumed
           GridValueButton(
             color: rangeEfficiency.value < 0 ? Color.orange : Color.blue,
-            value: String(format: "%.0f", rangeEfficiency.value),
+            value: String(format: "%+.0f", rangeEfficiency.value),
             units: rangeEfficiency.unit.symbol,
             symbolName: "road.lanes.curved.right",
             title: "Range Efficiency"

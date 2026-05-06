@@ -135,16 +135,16 @@ extension FordElectrics {
       dokoResponses[.error] = DokoCommandResponse(command: .dcChargeHistory, response: .error("arguments"))
       return DokoResponsePacket(type: .dcChargeHistory, responses: dokoResponses)
     }
+    dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: .dcChargeHistory, response: .batteryEnergyToEmpty(energyToEmpty))
+    dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .dcChargeHistory, response: .batteryStateOfCharge(stateOfCharge))
+    dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .dcChargeHistory, response: .batteryTemperature(batteryTemperature))
+    dokoResponses[.couplerTemperature] = DokoCommandResponse(command: .dcChargeHistory, response: .couplerTemperature(couplerTemperature))
     if let batteryPower {
       dokoResponses[.batteryPower] = DokoCommandResponse(command: .dcChargeHistory, response: .batteryPower(batteryPower))
     }
     if let batteryEnergy {
       dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .dcChargeHistory, response: .batteryEnergy(batteryEnergy))
     }
-    dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: .dcChargeHistory, response: .batteryEnergyToEmpty(energyToEmpty))
-    dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .dcChargeHistory, response: .batteryStateOfCharge(stateOfCharge))
-    dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .dcChargeHistory, response: .batteryTemperature(batteryTemperature))
-    dokoResponses[.couplerTemperature] = DokoCommandResponse(command: .dcChargeHistory, response: .couplerTemperature(couplerTemperature))
     return DokoResponsePacket(type: .dcChargeHistory, responses: dokoResponses)
   }
 }

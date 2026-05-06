@@ -41,25 +41,7 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case batteryStateOfHealth
   case batteryTemperature
   case batteryVoltage
-  //###
-  case batteryVoltage0
-  case batteryVoltage1
-  case batteryVoltage2
-  case batteryVoltage3
-  case batteryVoltage4
-  case batteryVoltage5
-  case batteryVoltage6
-  case batteryVoltage7
   case batteryCurrent
-  case batteryCurrent0
-  case batteryCurrent1
-  case batteryCurrent2
-  case batteryCurrent3
-  case batteryCurrent4
-  case batteryCurrent5
-  case batteryCurrent6
-  case batteryCurrent7
-  //###
   case batteryOriginalCapacity
   case batteryCurrentCapacity
 
@@ -146,44 +128,8 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".batteryTemperature"
       case .batteryVoltage:
         return ".batteryVoltage"
-        //###
-      case .batteryVoltage0:
-        return ".batteryVoltage0"
-      case .batteryVoltage1:
-        return ".batteryVoltage1"
-      case .batteryVoltage2:
-        return ".batteryVoltage2"
-      case .batteryVoltage3:
-        return ".batteryVoltage3"
-      case .batteryVoltage4:
-        return ".batteryVoltage4"
-      case .batteryVoltage5:
-        return ".batteryVoltage5"
-      case .batteryVoltage6:
-        return ".batteryVoltage6"
-      case .batteryVoltage7:
-        return ".batteryVoltage7"
-        //###
       case .batteryCurrent:
         return ".batteryCurrent"
-        //###
-      case .batteryCurrent0:
-        return ".batteryCurrent0"
-      case .batteryCurrent1:
-        return ".batteryCurrent1"
-      case .batteryCurrent2:
-        return ".batteryCurrent2"
-      case .batteryCurrent3:
-        return ".batteryCurrent3"
-      case .batteryCurrent4:
-        return ".batteryCurrent4"
-      case .batteryCurrent5:
-        return ".batteryCurrent5"
-      case .batteryCurrent6:
-        return ".batteryCurrent6"
-      case .batteryCurrent7:
-        return ".batteryCurrent7"
-        //###
       case .batteryOriginalCapacity:
         return ".batteryOriginalCapacity"
       case .batteryCurrentCapacity:
@@ -318,25 +264,7 @@ public enum ObdResponse: Equatable, Sendable {
   case batteryStateOfHealth(Double)
   case batteryTemperature(Double)
   case batteryVoltage(Double)
-  //###
-  case batteryVoltage0(Double)
-  case batteryVoltage1(Double)
-  case batteryVoltage2(Double)
-  case batteryVoltage3(Double)
-  case batteryVoltage4(Double)
-  case batteryVoltage5(Double)
-  case batteryVoltage6(Double)
-  case batteryVoltage7(Double)
   case batteryCurrent(Double)
-  case batteryCurrent0(Double)
-  case batteryCurrent1(Double)
-  case batteryCurrent2(Double)
-  case batteryCurrent3(Double)
-  case batteryCurrent4(Double)
-  case batteryCurrent5(Double)
-  case batteryCurrent6(Double)
-  case batteryCurrent7(Double)
-  //###
   case batteryOriginalCapacity(Double)
   case batteryCurrentCapacity(Double)
 
@@ -426,40 +354,8 @@ public enum ObdResponse: Equatable, Sendable {
         return String(format: ".batteryTemperature(%.0f℃)", temperature)
       case .batteryVoltage(let voltage):
         return String(format: ".batteryVoltage(%.1f)", voltage)
-      case .batteryVoltage0(let voltage):
-        return String(format: ".batteryVoltage0(%.1f)", voltage)
-      case .batteryVoltage1(let voltage):
-        return String(format: ".batteryVoltage1(%.1f)", voltage)
-      case .batteryVoltage2(let voltage):
-        return String(format: ".batteryVoltage2(%.1f)", voltage)
-      case .batteryVoltage3(let voltage):
-        return String(format: ".batteryVoltage3(%.1f)", voltage)
-      case .batteryVoltage4(let voltage):
-        return String(format: ".batteryVoltage4(%.1f)", voltage)
-      case .batteryVoltage5(let voltage):
-        return String(format: ".batteryVoltage5(%.1f)", voltage)
-      case .batteryVoltage6(let voltage):
-        return String(format: ".batteryVoltage6(%.1f)", voltage)
-      case .batteryVoltage7(let voltage):
-        return String(format: ".batteryVoltage7(%.1f)", voltage)
       case .batteryCurrent(let current):
         return String(format: ".batteryCurrent(%.1f)", current)
-      case .batteryCurrent0(let current):
-        return String(format: ".batteryCurrent0(%.1f)", current)
-      case .batteryCurrent1(let current):
-        return String(format: ".batteryCurrent1(%.1f)", current)
-      case .batteryCurrent2(let current):
-        return String(format: ".batteryCurrent2(%.1f)", current)
-      case .batteryCurrent3(let current):
-        return String(format: ".batteryCurrent3(%.1f)", current)
-      case .batteryCurrent4(let current):
-        return String(format: ".batteryCurrent4(%.1f)", current)
-      case .batteryCurrent5(let current):
-        return String(format: ".batteryCurrent5(%.1f)", current)
-      case .batteryCurrent6(let current):
-        return String(format: ".batteryCurrent6(%.1f)", current)
-      case .batteryCurrent7(let current):
-        return String(format: ".batteryCurrent7(%.1f)", current)
       case .batteryOriginalCapacity(let kwh):
         return String(format: ".batteryOriginalCapacity(%.1f)", kwh)
       case .batteryCurrentCapacity(let kwh):

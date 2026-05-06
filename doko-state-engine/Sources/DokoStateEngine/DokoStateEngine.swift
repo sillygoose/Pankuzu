@@ -157,14 +157,6 @@ public final class DokoStateEngine {
             var nextState = dokoResponsePacket.nextState ?? .tripStarting
             if nextState == .tripInProgress {
               do {
-                //###
-                if dokoResponsePacket.batteryStateOfHealth == nil {
-                  DokoLogging.shared.postLoggingResponse(.error(".tripStarting: missing .batteryStateOfHealth "))
-                }
-                if dokoResponsePacket.batteryDistanceToEmpty == nil {
-                  DokoLogging.shared.postLoggingResponse(.error(".tripStarting: missing .batteryDistanceToEmpty "))
-                }
-                //###
                 let vehicleID = connectedVehicle.vehicle?.id
                 self.tripInProgress = try Trip.postTripStartRecord(
                   vehicleID: vehicleID,

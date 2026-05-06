@@ -103,20 +103,20 @@ public actor VwElectrics: ConnectedVehicleInterface {
         //.atz; .ate(false); .ats(false); .ath(false); .atcaf(true); .stcsegr(true); .atsp(0)
         canbusInitialization;
 
-        .acChargerStatus;
-        .dcChargerStatus;
-        .gearSelected;
-        .odometer;
-        .speed;
-        .batteryStateOfCharge;
-        .batteryTemperature;
-        .batteryOriginalCapacity;
-        .batteryVoltage;
-        .batteryCurrent;
-        canbusNormalAddressing;
-        .batteryCurrentCapacity;
-        .batteryDistanceToEmpty;
-        canbusExtendedAddressing;
+//        .acChargerStatus;
+//        .dcChargerStatus;
+//        .gearSelected;
+//        .odometer;
+//        .speed;
+//        .batteryStateOfCharge;
+//        .batteryTemperature;
+//        .batteryOriginalCapacity;
+//        .batteryVoltage;
+//        .batteryCurrent;
+//        canbusNormalAddressing;
+//        .batteryCurrentCapacity;
+//        .batteryDistanceToEmpty;
+//        canbusExtendedAddressing;
       }
 
     case .idle:
@@ -201,7 +201,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .acChargeUpdate, .dcChargeUpdate:
       return obdCommandPacket(packetType) {
         .batteryStateOfCharge;
-        .batteryTemperature
+        .batteryTemperature;
+        canbusNormalAddressing;
+        .batteryDistanceToEmpty;
+        canbusExtendedAddressing;
       }
 
     case .acChargeEnding, .dcChargeEnding:
@@ -219,7 +222,10 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .acChargeHistory, .dcChargeHistory:
       return obdCommandPacket(packetType) {
         .batteryStateOfCharge;
-        .batteryTemperature
+        .batteryTemperature;
+        canbusNormalAddressing;
+        .batteryDistanceToEmpty;
+        canbusExtendedAddressing;
       }
 
     case .tripEnergy, .acChargeEnergy, .dcChargeEnergy:
