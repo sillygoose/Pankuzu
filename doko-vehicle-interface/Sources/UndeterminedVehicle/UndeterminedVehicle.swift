@@ -21,9 +21,6 @@ private func obdCommandPacket(_ type: DokoPacketType, @ObdCommandsBuilder _ comm
   ObdCommandPacket(type: type, commands: commands())
 }
 
-private let reset = CommandGroup(commands: [.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)])
-private let protocolDetect = CommandGroup(commands: [.vin, .stprs])
-
 public actor UndeterminedVehicle: ConnectedVehicleInterface {
   let logger = Logger(subsystem: "com.unchan.doko", category: "UndeterminedVehicle")
 
@@ -55,6 +52,9 @@ public actor UndeterminedVehicle: ConnectedVehicleInterface {
     return obdLinkCommand
   }
   
+  private let reset = CommandGroup(commands: [.atz, .ate(false), .ats(false), .ath(false), .atcaf(true), .stcsegr(true), .atsp(0)])
+  private let protocolDetect = CommandGroup(commands: [.vin, .stprs])
+
   public func translateDokoCommandPacket(using packetType: DokoPacketType) async -> ObdCommandPacket? {
     switch packetType {
     case .reset:
