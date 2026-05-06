@@ -36,7 +36,7 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case gearSelected
   
   case batteryDistanceToEmpty
-  case batteryEenergyToEmpty
+  case batteryEnergyToEmpty
   case batteryStateOfCharge
   case batteryStateOfHealth
   case batteryTemperature
@@ -118,8 +118,8 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".gearSelected"
       case .batteryDistanceToEmpty:
         return ".batteryDistanceToEmpty"
-      case .batteryEenergyToEmpty:
-        return ".batteryEenergyToEmpty"
+      case .batteryEnergyToEmpty:
+        return ".batteryEnergyToEmpty"
       case .batteryStateOfCharge:
         return ".batteryStateOfCharge"
       case .batteryStateOfHealth:

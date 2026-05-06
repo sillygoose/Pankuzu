@@ -12,6 +12,15 @@ extension SharedKey where Self == AppStorageKey<Vehicle.ID?>.Default {
   }
 }
 
+extension SharedKey where Self == AppStorageKey<Bool>.Default {
+  static var chargeHistoryShowAc: Self {
+    Self[.appStorage("chargeHistoryShowAc"), default: true]
+  }
+  static var chargeHistoryShowDc: Self {
+    Self[.appStorage("chargeHistoryShowDc"), default: true]
+  }
+}
+
 struct ChargeBarEntry: Identifiable {
   var id: String { "\(monthDate.timeIntervalSince1970)-\(type)" }
   let monthDate: Date
@@ -25,6 +34,8 @@ final class ChargeHistoryChartModel {
   @ObservationIgnored @FetchAll var vehicles: [Vehicle]
   @ObservationIgnored @FetchAll var charges: [Charge]
   @ObservationIgnored @Shared(.chargeHistoryDisplayVehicleID) var displayVehicleID
+  @ObservationIgnored @Shared(.chargeHistoryShowAc) var showAc
+  @ObservationIgnored @Shared(.chargeHistoryShowDc) var showDc
 
   var chartEntries: [ChargeBarEntry] = []
   var vehicleButtonTitle: String = "All Vehicles"
@@ -53,6 +64,29 @@ final class ChargeHistoryChartModel {
     computeEntries()
   }
 
+  var yearlyAcKWh: Double { chartEntries.filter { $0.type == "AC" }.map(\.kWh).reduce(0, +) }
+  var yearlyDcKWh: Double { chartEntries.filter { $0.type == "DCFC" }.map(\.kWh).reduce(0, +) }
+  var yearlyTotalKWh: Double { yearlyAcKWh + yearlyDcKWh }
+  var yearlyChargeCount: Int {
+    let filtered = displayVehicleID.map { id in charges.filter { $0.vehicleID == id } } ?? charges
+    return filtered.filter { charge in
+      (showAc && charge.chargerType == .ac) || (showDc && charge.chargerType == .dc)
+    }.count
+  }
+  var yearlyAcCount: Int {
+    guard showAc else { return 0 }
+    let filtered = displayVehicleID.map { id in charges.filter { $0.vehicleID == id } } ?? charges
+    return filtered.filter { $0.chargerType == .ac }.count
+  }
+  var yearlyDcCount: Int {
+    guard showDc else { return 0 }
+    let filtered = displayVehicleID.map { id in charges.filter { $0.vehicleID == id } } ?? charges
+    return filtered.filter { $0.chargerType == .dc }.count
+  }
+
+  func toggleAc() { $showAc.withLock { $0.toggle() } }
+  func toggleDc() { $showDc.withLock { $0.toggle() } }
+
   func computeEntries() {
     let calendar = Calendar.current
     let monthStart = calendar.dateComponents([.year, .month], from: Date())
@@ -64,8 +98,8 @@ final class ChargeHistoryChartModel {
       let start = calendar.date(byAdding: .month, value: -(12 - offset), to: currentMonthStart)!
       let end = calendar.date(byAdding: .month, value: 1, to: start)!
       let month = filtered.filter { $0.timeStart >= start && $0.timeStart < end }
-      let acKWh = month.filter { $0.chargerType == .ac }.compactMap(\.energy).reduce(0, +)
-      let dcKWh = month.filter { $0.chargerType == .dc }.compactMap(\.energy).reduce(0, +)
+      let acKWh = showAc ? month.filter { $0.chargerType == .ac }.compactMap(\.energy).reduce(0, +) : 0
+      let dcKWh = showDc ? month.filter { $0.chargerType == .dc }.compactMap(\.energy).reduce(0, +) : 0
       return [
         ChargeBarEntry(monthDate: start, type: "AC", kWh: acKWh),
         ChargeBarEntry(monthDate: start, type: "DCFC", kWh: dcKWh),
@@ -104,7 +138,8 @@ struct ChargeHistoryChartView: View {
     ForEach(model.chartEntries.filter { $0.type != "Total" }) { entry in
       BarMark(
         x: .value("Month", entry.monthDate, unit: .month),
-        y: .value("kWh", entry.kWh)
+        y: .value("kWh", entry.kWh),
+        width: .ratio(0.5)
       )
       .foregroundStyle(by: .value("Type", entry.type))
     }
@@ -144,28 +179,24 @@ struct ChargeHistoryChartView: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      Menu {
-        Button {
-          model.setVehicleMenu(vehicleID: nil)
-          model.computeEntries()
-        } label: {
-          Text(model.allVehiclesTitle)
-          Image(systemName: model.displayVehicleID == nil ? "checkmark" : "car.2")
-        }
-        ForEach(model.vehicles) { vehicle in
-          Button {
-            model.setVehicleMenu(vehicleID: vehicle.id)
-            model.computeEntries()
-          } label: {
-            Text(vehicle.yearMakeModel)
-            Image(systemName: model.displayVehicleID == vehicle.id ? "checkmark" : (vehicle.truck ? "truck.pickup.side" : "car.side"))
-          }
-        }
-      } label: {
-        GridButton(color: .mint, symbolName: model.vehicleButtonImage, title: model.vehicleButtonTitle) {}
+      LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+        GridValue(color: .blue, value: "\(model.yearlyChargeCount)", units: "", symbolName: "bolt.car", title: "Charges")
+        GridValue(color: .blue, value: String(format: "%.0f", model.yearlyTotalKWh), units: "kWh", symbolName: "bolt.batteryblock", title: "Total Energy")
+        GridButton(color: .orange, symbolName: "powerplug", title: "AC") { model.toggleAc(); model.computeEntries() }
+          .opacity(model.showAc ? 1.0 : 0.4)
+        GridButton(color: .green, symbolName: "ev.charger", title: "DC") { model.toggleDc(); model.computeEntries() }
+          .opacity(model.showDc ? 1.0 : 0.4)
+        GridValue(color: .orange, value: "\(model.yearlyAcCount)", units: "", symbolName: "bolt.car", title: "Sessions")
+          .opacity(model.showAc ? 1.0 : 0.4)
+        GridValue(color: .green, value: "\(model.yearlyDcCount)", units: "", symbolName: "bolt.car", title: "Sessions")
+          .opacity(model.showDc ? 1.0 : 0.4)
+        GridValue(color: .orange, value: String(format: "%.0f", model.yearlyAcKWh), units: "kWh", symbolName: "powerplug", title: "Energy")
+          .opacity(model.showAc ? 1.0 : 0.4)
+        GridValue(color: .green, value: String(format: "%.0f", model.yearlyDcKWh), units: "kWh", symbolName: "ev.charger", title: "Energy")
+          .opacity(model.showDc ? 1.0 : 0.4)
       }
       .padding(.horizontal)
-      .padding(.vertical, 30)
+      .padding(.bottom, 40)
 
       if model.chartEntries.allSatisfy({ $0.kWh == 0 }) {
         ContentUnavailableView(
@@ -221,6 +252,30 @@ struct ChargeHistoryChartView: View {
     }
     .navigationTitle("Charge History")
     .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Menu {
+          Button {
+            model.setVehicleMenu(vehicleID: nil)
+            model.computeEntries()
+          } label: {
+            Text(model.allVehiclesTitle)
+            Image(systemName: model.displayVehicleID == nil ? "checkmark" : "car.2")
+          }
+          ForEach(model.vehicles) { vehicle in
+            Button {
+              model.setVehicleMenu(vehicleID: vehicle.id)
+              model.computeEntries()
+            } label: {
+              Text(vehicle.yearMakeModel)
+              Image(systemName: model.displayVehicleID == vehicle.id ? "checkmark" : (vehicle.truck ? "truck.pickup.side" : "car.side"))
+            }
+          }
+        } label: {
+          Label(model.vehicleButtonTitle, systemImage: model.vehicleButtonImage)
+        }
+      }
+    }
     .onChange(of: model.charges.count) { _, _ in model.computeEntries() }
   }
 }

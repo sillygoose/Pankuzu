@@ -131,7 +131,7 @@ extension ObdResponsePacket {
   }
   
   public var batteryEnergyToEmpty: Double? {
-    guard case let .batteryEnergyToEmpty(v)? = responses[.batteryEenergyToEmpty]?.response else { return nil }
+    guard case let .batteryEnergyToEmpty(v)? = responses[.batteryEnergyToEmpty]?.response else { return nil }
     return v
   }
   

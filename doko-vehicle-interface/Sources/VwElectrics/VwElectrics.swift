@@ -121,9 +121,9 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
     case .idle:
       return obdCommandPacket(.idle) {
+        .gearSelected;
         .acChargerStatus;
         .dcChargerStatus;
-        .gearSelected;
       }
 
     case .tripStarting:
@@ -195,7 +195,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
     case .acChargeInProgress, .dcChargeInProgress:
       return obdCommandPacket(packetType) {
-        packetType == .acChargeInProgress ? .acChargerStatus : .dcChargerStatus
+        packetType == .acChargeInProgress ? .acChargerStatus : .dcChargerStatus;
       }
 
     case .acChargeUpdate, .dcChargeUpdate:
@@ -231,7 +231,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .tripEnergy, .acChargeEnergy, .dcChargeEnergy:
       return obdCommandPacket(packetType) {
         .batteryVoltage;
-        .batteryCurrent
+        .batteryCurrent;
       }
 
     default:

@@ -51,7 +51,7 @@ extension FordMachE {
         let gearSelected = try parseGearSelected(response)
         commandResponse = .gearSelected(gearSelected)
 
-      case .batteryEenergyToEmpty:
+      case .batteryEnergyToEmpty:
         let ete = try parseHvbEnergyToEmpty(response)
         commandResponse = .batteryEnergyToEmpty(ete)
       case .batteryStateOfCharge:
