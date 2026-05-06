@@ -19,9 +19,10 @@ public final class DokoWeatherManager: Sendable {
   public var latestWeather: DokoCurrentWeather? {
     @Dependency(\.date.now) var now
     guard
-      let latest = _latestWeatherUpdate,
+      var latest = _latestWeatherUpdate,
       now.timeIntervalSince(latest.timestamp) < 660
     else { return nil }
+    latest.timestamp = now
     return latest
   }
 
