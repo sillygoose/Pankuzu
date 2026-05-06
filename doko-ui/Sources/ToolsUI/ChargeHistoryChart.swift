@@ -184,7 +184,7 @@ struct ChargeHistoryChartView: View {
         GridValue(color: .blue, value: String(format: "%.0f", model.yearlyTotalKWh), units: "kWh", symbolName: "bolt.batteryblock", title: "Total Energy")
         GridButton(color: .orange, symbolName: "powerplug", title: "AC") { model.toggleAc(); model.computeEntries() }
           .opacity(model.showAc ? 1.0 : 0.4)
-        GridButton(color: .green, symbolName: "ev.charger", title: "DC") { model.toggleDc(); model.computeEntries() }
+        GridButton(color: .green, symbolName: "ev.charger", title: "DCFC") { model.toggleDc(); model.computeEntries() }
           .opacity(model.showDc ? 1.0 : 0.4)
         GridValue(color: .orange, value: "\(model.yearlyAcCount)", units: "", symbolName: "bolt.car", title: "Sessions")
           .opacity(model.showAc ? 1.0 : 0.4)
@@ -221,7 +221,7 @@ struct ChargeHistoryChartView: View {
         }
         .chartYAxis {
           AxisMarks { value in
-            AxisValueLabel(String(format: "%.0f kWh", value.as(Double.self) ?? 0))
+            AxisValueLabel(String(format: "%.0f", value.as(Double.self) ?? 0))
             AxisGridLine()
           }
         }
