@@ -20,8 +20,10 @@ public struct AppSettings: Codable, Equatable, Sendable {
   public var poiThreshold: Double = 75
   public var duplicateLocationThreshold: Double = 35
   
-  public var tripMapStyle: DisplayMapStyle = .standard
-  public var chargeMapStyle: DisplayMapStyle = .standard
+  public var tripMapStyle: DisplayMapStyle = .street
+  public var tripMap3D: Bool = false
+  public var chargeMapStyle: DisplayMapStyle = .street
+  public var chargeMap3D: Bool = false
 
   public var tripMapPolyline: Bool = true
   public var showElevationOnPath: Bool = false
@@ -43,7 +45,9 @@ public struct AppSettings: Codable, Equatable, Sendable {
   public enum CodingKeys: String, CodingKey {
     case backgroundMode, accessorySerialNumber, metric, kWhPer100km, iCloudSync
     case poiThreshold, duplicateLocationThreshold
-    case tripMapStyle, chargeMapStyle, tripMapPolyline, showElevationOnPath
+    case tripMapStyle, tripMap3D
+    case chargeMapStyle, chargeMap3D
+    case tripMapPolyline, showElevationOnPath
     case identicalTripPositionDistance, tripPositionCourseDeviation
     case maximumTripPositionDistance, maximumTripElevationDistance, minimumTripElevationChange
     case deletedRecordRetentionDays
@@ -61,7 +65,9 @@ public struct AppSettings: Codable, Equatable, Sendable {
     try c.encode(poiThreshold, forKey: .poiThreshold)
     try c.encode(duplicateLocationThreshold, forKey: .duplicateLocationThreshold)
     try c.encode(tripMapStyle, forKey: .tripMapStyle)
+    try c.encode(tripMap3D, forKey: .tripMap3D)
     try c.encode(chargeMapStyle, forKey: .chargeMapStyle)
+    try c.encode(chargeMap3D, forKey: .chargeMap3D)
     try c.encode(tripMapPolyline, forKey: .tripMapPolyline)
     try c.encode(showElevationOnPath, forKey: .showElevationOnPath)
     try c.encode(identicalTripPositionDistance, forKey: .identicalTripPositionDistance)
@@ -88,8 +94,10 @@ public struct AppSettings: Codable, Equatable, Sendable {
     iCloudSync = try c.decodeIfPresent(Bool.self, forKey: .iCloudSync) ?? false
     poiThreshold = try c.decodeIfPresent(Double.self, forKey: .poiThreshold) ?? 75
     duplicateLocationThreshold = try c.decodeIfPresent(Double.self, forKey: .duplicateLocationThreshold) ?? 35
-    tripMapStyle = try c.decodeIfPresent(DisplayMapStyle.self, forKey: .tripMapStyle) ?? .standard
-    chargeMapStyle = try c.decodeIfPresent(DisplayMapStyle.self, forKey: .chargeMapStyle) ?? .standard
+    tripMapStyle = (try? c.decodeIfPresent(DisplayMapStyle.self, forKey: .tripMapStyle)) ?? .street
+    tripMap3D = try c.decodeIfPresent(Bool.self, forKey: .tripMap3D) ?? false
+    chargeMapStyle = (try? c.decodeIfPresent(DisplayMapStyle.self, forKey: .chargeMapStyle)) ?? .street
+    chargeMap3D = try c.decodeIfPresent(Bool.self, forKey: .chargeMap3D) ?? false
     tripMapPolyline = try c.decodeIfPresent(Bool.self, forKey: .tripMapPolyline) ?? true
     showElevationOnPath = try c.decodeIfPresent(Bool.self, forKey: .showElevationOnPath) ?? false
     identicalTripPositionDistance = try c.decodeIfPresent(Double.self, forKey: .identicalTripPositionDistance) ?? 10
@@ -158,18 +166,25 @@ extension AppSettings {
 }
 
 public enum DisplayMapStyle: String, Codable, CaseIterable, Equatable, Identifiable, Sendable {
-  case standard
-  case hybrid
+  case street
+  case satellite
 
   public var id: Self { self }
 
   public var name: String { rawValue.capitalized }
+  
   public var mapStyle: MapStyle {
     switch self {
-    case .standard:
-      return .standard
-    case .hybrid:
-      return .hybrid
+    case .street: return .standard(elevation: .flat)
+    case .satellite: return .hybrid(elevation: .realistic)
+    }
+  }
+  
+  public var is3d: Bool {
+    switch self {
+    case .street: return false
+    case .satellite: return true
     }
   }
 }
+

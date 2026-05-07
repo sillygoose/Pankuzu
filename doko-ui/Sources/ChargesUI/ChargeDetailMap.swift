@@ -22,8 +22,8 @@ public final class ChargeDetailMapModel {
       longitude: charge.longitude
     )
     let mapSpan = MKCoordinateSpan(
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01
+      latitudeDelta: 0.0025,
+      longitudeDelta: 0.0025
     )
     self.coordinateRegion = MKCoordinateRegion(center: mapCenter, span: mapSpan)
   }
@@ -34,6 +34,8 @@ public struct ChargeDetailMapView: View {
 
   @State var mapCameraPosition: MapCameraPosition
   @State var showStylePicker = false
+//  @State var is3D = false
+  @State var currentCamera: MapCamera?
 
   @Shared(.appSettings) var appSettings
   @Environment(\.dismiss) var dismiss
@@ -43,6 +45,25 @@ public struct ChargeDetailMapView: View {
   ) {
     self.model = model
     self.mapCameraPosition = .region(model.coordinateRegion)
+  }
+
+  private func toggle3D() {
+//    is3D.toggle()
+    $appSettings.chargeMap3D.withLock { $0.toggle() }
+    let base = currentCamera ?? MapCamera(
+      centerCoordinate: CLLocationCoordinate2D(latitude: model.charge.latitude, longitude: model.charge.longitude),
+      distance: 500,
+      heading: 0,
+      pitch: 0
+    )
+    withAnimation {
+      mapCameraPosition = .camera(MapCamera(
+        centerCoordinate: base.centerCoordinate,
+        distance: base.distance,
+        heading: base.heading,
+        pitch: appSettings.chargeMap3D ? 50 : 0
+      ))
+    }
   }
 
   public var body: some View {
@@ -61,6 +82,7 @@ public struct ChargeDetailMapView: View {
         .tint(.indigo)
       }
       .mapStyle(appSettings.chargeMapStyle.mapStyle)
+      .onMapCameraChange(frequency: .continuous) { context in currentCamera = context.camera }
     }
     .confirmationDialog("Map Style", isPresented: $showStylePicker) {
       ForEach(DisplayMapStyle.allCases) { style in
@@ -70,7 +92,12 @@ public struct ChargeDetailMapView: View {
     .toolbar {
       ToolbarItem(placement: .topBarLeading) {
         Button { showStylePicker = true } label: {
-          Image(systemName: "map")
+          Image(systemName: appSettings.chargeMapStyle == .satellite ? "globe" : "car")
+        }
+      }
+      if appSettings.chargeMapStyle == .satellite {
+        ToolbarItem(placement: .topBarLeading) {
+          Button(appSettings.chargeMap3D ? "2D" : "3D") { toggle3D() }
         }
       }
       ToolbarItem {

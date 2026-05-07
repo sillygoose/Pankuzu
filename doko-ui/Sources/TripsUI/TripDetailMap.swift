@@ -66,6 +66,7 @@ public struct TripDetailMapView: View {
 
   @State var mapCameraPosition: MapCameraPosition
   @State var showStylePicker = false
+  @State var currentCamera: MapCamera?
 
   @Shared(.appSettings) var appSettings
   @Environment(\.dismiss) var dismiss
@@ -75,6 +76,26 @@ public struct TripDetailMapView: View {
   ) {
     self.model = model
     self.mapCameraPosition = .region(model.coordinateRegion)
+  }
+
+  private func toggle3D() {
+    $appSettings.tripMap3D.withLock { $0.toggle() }
+    let span = model.coordinateRegion.span
+    let fallbackDistance = max(span.latitudeDelta, span.longitudeDelta) * 111_000
+    let base = currentCamera ?? MapCamera(
+      centerCoordinate: model.coordinateRegion.center,
+      distance: fallbackDistance,
+      heading: 0,
+      pitch: 0
+    )
+    withAnimation {
+      mapCameraPosition = .camera(MapCamera(
+        centerCoordinate: base.centerCoordinate,
+        distance: base.distance,
+        heading: base.heading,
+        pitch: appSettings.tripMap3D ? 50 : 0
+      ))
+    }
   }
 
   public var body: some View {
@@ -130,6 +151,7 @@ public struct TripDetailMapView: View {
         }
       }
       .mapStyle(appSettings.tripMapStyle.mapStyle)
+      .onMapCameraChange(frequency: .continuous) { context in currentCamera = context.camera }
     }
     .confirmationDialog("Map Style", isPresented: $showStylePicker) {
       ForEach(DisplayMapStyle.allCases) { style in
@@ -139,7 +161,12 @@ public struct TripDetailMapView: View {
     .toolbar {
       ToolbarItem(placement: .topBarLeading) {
         Button { showStylePicker = true } label: {
-          Image(systemName: "map")
+          Image(systemName: appSettings.tripMapStyle == .satellite ? "globe" : "car")
+        }
+      }
+      if appSettings.tripMapStyle == .satellite {
+        ToolbarItem(placement: .topBarLeading) {
+          Button(appSettings.tripMap3D ? "2D" : "3D") { toggle3D() }
         }
       }
       ToolbarItem {
