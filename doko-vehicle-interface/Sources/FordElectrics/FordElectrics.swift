@@ -155,9 +155,11 @@ public actor FordElectrics: ConnectedVehicleInterface {
 
     case .acChargeUpdate, .dcChargeUpdate:
       return obdCommandPacket(packetType) {
+        .batteryVoltage;
+        .batteryCurrent;
         .batteryStateOfCharge;
         .batteryTemperature;
-        .acChargerCouplerTemperature;
+        packetType == .acChargeUpdate ? .acChargerCouplerTemperature : .dcChargerCouplerTemperature;
       }
 
     case .acChargeEnding, .dcChargeEnding:
