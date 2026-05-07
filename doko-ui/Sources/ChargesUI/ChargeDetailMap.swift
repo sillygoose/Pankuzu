@@ -34,7 +34,6 @@ public struct ChargeDetailMapView: View {
 
   @State var mapCameraPosition: MapCameraPosition
   @State var showStylePicker = false
-//  @State var is3D = false
   @State var currentCamera: MapCamera?
 
   @Shared(.appSettings) var appSettings
@@ -48,13 +47,12 @@ public struct ChargeDetailMapView: View {
   }
 
   private func toggle3D() {
-//    is3D.toggle()
     $appSettings.chargeMap3D.withLock { $0.toggle() }
     let base = currentCamera ?? MapCamera(
       centerCoordinate: CLLocationCoordinate2D(latitude: model.charge.latitude, longitude: model.charge.longitude),
       distance: 500,
       heading: 0,
-      pitch: 0
+      pitch: appSettings.chargeMap3D ? 50 : 0
     )
     withAnimation {
       mapCameraPosition = .camera(MapCamera(
@@ -83,6 +81,15 @@ public struct ChargeDetailMapView: View {
       }
       .mapStyle(appSettings.chargeMapStyle.mapStyle)
       .onMapCameraChange(frequency: .continuous) { context in currentCamera = context.camera }
+      .onAppear {
+        guard appSettings.chargeMap3D else { return }
+        mapCameraPosition = .camera(MapCamera(
+          centerCoordinate: CLLocationCoordinate2D(latitude: model.charge.latitude, longitude: model.charge.longitude),
+          distance: 500,
+          heading: 0,
+          pitch: 50
+        ))
+      }
     }
     .confirmationDialog("Map Style", isPresented: $showStylePicker) {
       ForEach(DisplayMapStyle.allCases) { style in

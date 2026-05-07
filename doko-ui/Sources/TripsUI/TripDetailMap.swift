@@ -10,7 +10,6 @@ public final class TripDetailMapModel {
   var trip: Trip
 
   @ObservationIgnored @FetchOne(TripPosition.none) var tripPositions
-
   @ObservationIgnored @FetchOne(TripElevation.none) var tripElevations
 
   var tripPath: [CLLocationCoordinate2D] = []
@@ -81,7 +80,7 @@ public struct TripDetailMapView: View {
   private func toggle3D() {
     $appSettings.tripMap3D.withLock { $0.toggle() }
     let span = model.coordinateRegion.span
-    let fallbackDistance = max(span.latitudeDelta, span.longitudeDelta) * 111_000
+    let fallbackDistance = max(span.latitudeDelta, span.longitudeDelta) * 111_000 * (appSettings.tripMap3D ? 2.5 : 1.0)
     let base = currentCamera ?? MapCamera(
       centerCoordinate: model.coordinateRegion.center,
       distance: fallbackDistance,
@@ -129,7 +128,7 @@ public struct TripDetailMapView: View {
               count: model.tripPath.count
             )
           )
-          .stroke(.blue, lineWidth: 5)
+          .stroke(.blue, lineWidth: appSettings.tripMapStyle == .satellite ? 2 : 3)
         } else {
           ForEach(Array(model.tripPath.enumerated()), id: \.offset) { _, coord in
             Annotation("", coordinate: coord) {
@@ -152,6 +151,17 @@ public struct TripDetailMapView: View {
       }
       .mapStyle(appSettings.tripMapStyle.mapStyle)
       .onMapCameraChange(frequency: .continuous) { context in currentCamera = context.camera }
+      .onAppear {
+        guard appSettings.tripMap3D else { return }
+        let span = model.coordinateRegion.span
+        let distance = max(span.latitudeDelta, span.longitudeDelta) * 111_000 * 2.5
+        mapCameraPosition = .camera(MapCamera(
+          centerCoordinate: model.coordinateRegion.center,
+          distance: distance,
+          heading: 0,
+          pitch: 50
+        ))
+      }
     }
     .confirmationDialog("Map Style", isPresented: $showStylePicker) {
       ForEach(DisplayMapStyle.allCases) { style in
