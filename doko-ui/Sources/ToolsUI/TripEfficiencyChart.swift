@@ -36,6 +36,12 @@ fileprivate struct TripEfficiency: Identifiable {
   var efficiency: Measurement<UnitEnergyEfficiency>
 }
 
+fileprivate struct MonthlyMileage: Identifiable {
+  var id: TimeInterval { monthDate.timeIntervalSince1970 }
+  let monthDate: Date
+  var distanceKm: Double
+}
+
 @MainActor
 @Observable
 final class TripEfficiencyChartModel {
@@ -50,6 +56,7 @@ final class TripEfficiencyChartModel {
   var temperatureMin: Measurement<UnitTemperature> = Measurement(value: 0, unit: UnitTemperature.celsius)
   var temperatureMax: Measurement<UnitTemperature> = Measurement(value: 45, unit: UnitTemperature.celsius)
 
+  fileprivate var monthlyMileageEntries: [MonthlyMileage] = []
   fileprivate var efficiencyEntries: [TripEfficiency] = []
   fileprivate var selectedEfficiencyEntry: TripEfficiency?
   var efficiencyMin: Measurement<UnitEnergyEfficiency> = Measurement(value: 0, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
@@ -113,6 +120,20 @@ final class TripEfficiencyChartModel {
     switch efficiencyUnit {
     case .kmPerKWh, .milesPerKWh: return "%.1f"
     case .kWhPer100km: return "%.1f"
+    }
+  }
+
+  var distanceUnit: String {
+    switch efficiencyUnit {
+    case .milesPerKWh: return "mi"
+    case .kmPerKWh, .kWhPer100km: return "km"
+    }
+  }
+
+  var distanceConversionFactor: Double {
+    switch efficiencyUnit {
+    case .milesPerKWh: return 0.621371
+    case .kmPerKWh, .kWhPer100km: return 1.0
     }
   }
 
@@ -210,6 +231,15 @@ final class TripEfficiencyChartModel {
       return TripEfficiency(monthDate: start, efficiency: Measurement(value: rawEfficiency, unit: .kilometersPerKilowattHour))
     }
 
+    monthlyMileageEntries = (0..<13).compactMap { offset in
+      let start = calendar.date(byAdding: .month, value: -(12 - offset), to: currentMonthStart)!
+      let end = calendar.date(byAdding: .month, value: 1, to: start)!
+      let month = filtered.filter { $0.timeStart >= start && $0.timeStart < end }
+      let total = month.map(\.distance).reduce(0, +)
+      guard total > 0 else { return nil }
+      return MonthlyMileage(monthDate: start, distanceKm: total)
+    }
+
     // Set efficiency axis bounds in km/kWh with a 15% buffer
     let effValues = efficiencyEntries.map(\.efficiency.value)
     if let lo = effValues.min(), let hi = effValues.max() {
@@ -302,6 +332,7 @@ struct TripEfficiencyChartView: View {
   }
 
   var body: some View {
+    ScrollView {
     VStack(spacing: 0) {
       Picker("Efficiency Unit", selection: Binding(
         get: { model.efficiencyUnit },
@@ -395,9 +426,35 @@ struct TripEfficiencyChartView: View {
         }
         .frame(height: 300)
         .padding(.horizontal)
+
+        if !model.monthlyMileageEntries.isEmpty {
+          HStack {
+            Text("Monthly Totals")
+              .font(.headline)
+            Spacer()
+          }
+          .padding(.horizontal)
+          .padding(.top, 24)
+          VStack(spacing: 0) {
+            ForEach(model.monthlyMileageEntries.reversed()) { entry in
+              HStack {
+                Text(entry.monthDate, format: .dateTime.month(.wide).year())
+                  .foregroundStyle(.primary)
+                Spacer()
+                Text(String(format: "%.0f %@", entry.distanceKm * model.distanceConversionFactor, model.distanceUnit))
+                  .foregroundStyle(.secondary)
+              }
+              .padding(.horizontal)
+              .padding(.vertical, 10)
+              Divider()
+                .padding(.leading)
+            }
+          }
+          .padding(.top, 16)
+        }
       }
-      Spacer()
     }
+    } // ScrollView
     .navigationTitle("Trip Efficiency")
     .navigationBarTitleDisplayMode(.inline)
     .onChange(of: model.trips.count) { _, _ in model.computeEntries() }
