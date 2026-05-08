@@ -200,6 +200,8 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
     case .acChargeUpdate, .dcChargeUpdate:
       return obdCommandPacket(packetType) {
+        .batteryVoltage;
+        .batteryCurrent;
         .batteryStateOfCharge;
         .batteryTemperature;
         canbusNormalAddressing;

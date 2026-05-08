@@ -26,9 +26,6 @@ extension FordElectrics {
     dokoResponses[.nextState] = DokoCommandResponse(command: .tripStarting, response: .nextState(.tripInProgress))
     dokoResponses[.position] = DokoCommandResponse(command: .tripStarting, response: .position(position))
     dokoResponses[.odometer] = DokoCommandResponse(command: .tripStarting, response: .odometer(odometer))
-//    if let batteryEnergy {
-//      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripStarting, response: .batteryEnergy(batteryEnergy))
-//    }
     dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: .tripStarting, response: .batteryEnergyToEmpty(energyToEmpty))
     dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .tripStarting, response: .batteryStateOfCharge(stateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripStarting, response: .batteryTemperature(batteryTemperature))
