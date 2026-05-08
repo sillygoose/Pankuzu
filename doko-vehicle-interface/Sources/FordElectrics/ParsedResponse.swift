@@ -47,6 +47,9 @@ extension FordElectrics {
       case .batteryEnergyToEmpty:
         let ete = try parseHvbEnergyToEmpty(response)
         commandResponse = .batteryEnergyToEmpty(ete)
+      case .batteryDistanceToEmpty:
+        let ete = try parseHvbDistanceToEmpty(response)
+        commandResponse = .batteryDistanceToEmpty(ete)
       case .batteryStateOfCharge:
         let soc = try parseHvbStateOfCharge(response)
         commandResponse = .batteryStateOfCharge(soc)
