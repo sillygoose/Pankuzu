@@ -4,6 +4,7 @@ import OSLog
 import SQLiteData
 
 import DokoTypes
+import DokoLogging
 import DokoSchemaTypes
 
 @DokoEngineActor

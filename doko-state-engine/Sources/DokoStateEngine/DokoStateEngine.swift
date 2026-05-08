@@ -277,7 +277,7 @@ public final class DokoStateEngine {
             }
             guard let tripID = self.tripInProgress?.id else { throw StateEngineError.missingTripID }
             do {
-              try Trip.postTripDataRecord(tripID: tripID, tripDataPacket: dokoResponsePacket)
+              try Trip.postTripData(tripID: tripID, tripDataPacket: dokoResponsePacket)
             } catch {
               DokoLogging.shared.postLoggingResponse(.error(".tripData: \(String(describing: error))"))
             }

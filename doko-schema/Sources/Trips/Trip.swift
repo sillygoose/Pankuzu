@@ -5,6 +5,7 @@ import SQLiteData
 import Vehicles
 import Locations
 import DokoSchemaTypes
+import DokoLogging
 
 @Table("trip")
 public struct Trip: Equatable, Identifiable, Hashable, Codable, Sendable {
@@ -225,17 +226,16 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
     self.batteryTemp = batteryTemp
   }
   
-  public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    tripID = try container.decode(Trip.ID.self, forKey: .tripID)
-    odometer = try container.decodeIfPresent([DokoDataPoint].self, forKey: .odometer) ?? []
-    stateOfCharge = try container.decodeIfPresent([DokoDataPoint].self, forKey: .stateOfCharge) ?? []
-    batteryEnergy = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryEnergy) ?? []
-    energyToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .energyToEmpty) ?? []
-    distanceToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .distanceToEmpty) ?? []
-    batteryTemp = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryTemp) ?? []
-    distanceToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .distanceToEmpty) ?? []
-  }
+//  public init(from decoder: Decoder) throws {
+//    let container = try decoder.container(keyedBy: CodingKeys.self)
+//    tripID = try container.decode(Trip.ID.self, forKey: .tripID)
+//    odometer = try container.decodeIfPresent([DokoDataPoint].self, forKey: .odometer) ?? []
+//    stateOfCharge = try container.decodeIfPresent([DokoDataPoint].self, forKey: .stateOfCharge) ?? []
+//    batteryEnergy = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryEnergy) ?? []
+//    energyToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .energyToEmpty) ?? []
+//    distanceToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .distanceToEmpty) ?? []
+//    batteryTemp = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryTemp) ?? []
+//  }
 }
 
 @Table("tripWeather")

@@ -3,6 +3,7 @@ import Foundation
 import SQLiteData
 
 import DokoTypes
+import DokoLogging
 import DokoLocationManager
 import Vehicles
 import Locations
@@ -73,7 +74,7 @@ extension Trip {
       }
     }
     guard let tripID else { throw TripError.tripWriteError }
-    try? postTripDataRecord(tripID: tripID, tripDataPacket: tripStartResponse)
+    try? postTripData(tripID: tripID, tripDataPacket: tripStartResponse)
     try? postTripWeatherRecord(tripID: tripID, tripWeatherPacket: tripStartResponse)
     try? postTripPositionRecord(tripID: tripID, tripPositionPacket: tripStartResponse)
     return Trip.Draft(trip)
@@ -133,7 +134,7 @@ extension Trip {
     guard let tripID = tripDraft.id else {
       return tripDraft
     }
-    try? postTripDataRecord(tripID: tripID, tripDataPacket: tripEndResponse)
+    try? postTripData(tripID: tripID, tripDataPacket: tripEndResponse)
     try? postTripWeatherRecord(tripID: tripID, tripWeatherPacket: tripEndResponse)
     try? postTripPositionRecord(tripID: tripID, tripPositionPacket: tripEndResponse)
     return tripDraft

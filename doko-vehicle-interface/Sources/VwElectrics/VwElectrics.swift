@@ -146,6 +146,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
       return obdCommandPacket(.tripUpdate) {
         .position;
         .odometer;
+        .speed;
         .batteryStateOfCharge;
         .batteryTemperature;
       }

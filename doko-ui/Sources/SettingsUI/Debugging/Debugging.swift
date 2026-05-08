@@ -42,7 +42,8 @@ class DebuggingModel {
   @ObservationIgnored @Shared(.logPacketManagerPackets) var logPacketManagerPackets
   @ObservationIgnored @Shared(.logICloudPackets) var logICloudPackets
   @ObservationIgnored @Shared(.logIntegrationPackets) var logIntegrationPackets
-  
+  @ObservationIgnored @Shared(.logDatabasePackets) var logDatabasePackets
+
 #if DEBUG
   @ObservationIgnored @Shared(.simIdle) var simIdle
   @ObservationIgnored @Shared(.simTrip) var simTrip
@@ -206,6 +207,13 @@ struct DebuggingView: View {
             isOn: Binding(
               get: { model.logIntegrationPackets },
               set: { isOn, _ in model.$logIntegrationPackets.withLock { $0 = isOn } }
+            )
+          )
+          Toggle(
+            "Database",
+            isOn: Binding(
+              get: { model.logDatabasePackets },
+              set: { isOn, _ in model.$logDatabasePackets.withLock { $0 = isOn } }
             )
           )
         } footer: {

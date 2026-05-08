@@ -31,12 +31,14 @@ let package = Package(
     .target(
       name: "Vehicles",
       dependencies: [
+        .product(name: "DokoLogging", package: "doko-logging"),
         .product(name: "SQLiteData", package: "sqlite-data"),
       ]
     ),
     .target(
       name: "Locations",
       dependencies: [
+        .product(name: "DokoLogging", package: "doko-logging"),
         .product(name: "SQLiteData", package: "sqlite-data"),
       ]
     ),
@@ -46,6 +48,7 @@ let package = Package(
         "Vehicles",
         "Locations",
         "DokoSchemaTypes",
+        .product(name: "DokoLogging", package: "doko-logging"),
         .product(name: "DokoTypes", package: "doko-core"),
         .product(name: "DokoLocationManager", package: "doko-managers"),
         .product(name: "SQLiteData", package: "sqlite-data"),
@@ -57,6 +60,7 @@ let package = Package(
         "Vehicles",
         "Locations",
         "DokoSchemaTypes",
+        .product(name: "DokoLogging", package: "doko-logging"),
         .product(name: "DokoTypes", package: "doko-core"),
         .product(name: "DokoLocationManager", package: "doko-managers"),
         .product(name: "SQLiteData", package: "sqlite-data"),

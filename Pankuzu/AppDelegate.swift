@@ -24,13 +24,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
   ) {
     let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-    print("Device token: \(tokenString)")
+    print("Device token: \(tokenString)") //###
   }
 
   func application(
     _ application: UIApplication,
     didFailToRegisterForRemoteNotificationsWithError error: Error
   ) {
-    print("Failed to register for notifications: \(error)")
+    print("Failed to register for notifications: \(error)") //###
   }
 }
