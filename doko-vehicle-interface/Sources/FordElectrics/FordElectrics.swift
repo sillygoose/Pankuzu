@@ -107,7 +107,6 @@ public actor FordElectrics: ConnectedVehicleInterface {
       return obdCommandPacket(packetType) {
         .position;
         .odometer;
-        .speed;
         .batteryStateOfCharge;
         .batteryTemperature;
       }

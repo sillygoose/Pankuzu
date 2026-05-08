@@ -146,7 +146,6 @@ public actor VwElectrics: ConnectedVehicleInterface {
       return obdCommandPacket(.tripUpdate) {
         .position;
         .odometer;
-        .speed;
         .batteryStateOfCharge;
         .batteryTemperature;
       }
@@ -244,3 +243,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
   }
 }
 
+/*
+ 01:54.037 .speed(?): ?
+ Type: Error | Timestamp: 2026-05-08 11:01:54.037760-04:00 | Process: Pankuzu | Library: Pankuzu.debug.dylib | Subsystem: com.unchan.doko | Category: ObdLinkManager | TID: 0x2e9331
+ */

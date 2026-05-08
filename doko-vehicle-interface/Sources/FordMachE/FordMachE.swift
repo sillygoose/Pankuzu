@@ -114,7 +114,6 @@ public actor FordMachE: ConnectedVehicleInterface {
       return obdCommandPacket(packetType) {
         .position;
         .odometer;
-        .speed;
         .batteryStateOfCharge;
         .batteryTemperature;
       }
