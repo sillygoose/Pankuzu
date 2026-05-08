@@ -56,7 +56,7 @@ extension Trip {
         }
         DokoLogging.shared.postLoggingResponse(.database("postTripData: success"))
       } catch {
-        DokoLogging.shared.postLoggingResponse(.database("postTripData: \(error)"))
+        DokoLogging.shared.postLoggingResponse(.error("postTripData: \(error)"))
         throw error
       }
     }

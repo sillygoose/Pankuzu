@@ -18,7 +18,7 @@ extension FordMachE {
       return DokoResponsePacket(type: .tripStarting, responses: dokoResponses)
     }
     batteryPower = nil
-    batteryEnergy = nil
+    batteryEnergy = 0.0
     lastEnergyUpdateTime = responsePacket.completedAt
     lastBatteryPower = nil
     meanTemperatureSum = 0.0
@@ -31,6 +31,9 @@ extension FordMachE {
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripStarting, response: .batteryTemperature(batteryTemperature))
     if let batteryStateOfHealth = responsePacket.batteryStateOfHealth {
       dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .tripStarting, response: .batteryStateOfHealth(batteryStateOfHealth))
+    }
+    if let batteryEnergy = batteryEnergy {
+      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripStarting, response: .batteryEnergy(batteryEnergy))
     }
     return DokoResponsePacket(type: .tripStarting, responses: dokoResponses)
   }

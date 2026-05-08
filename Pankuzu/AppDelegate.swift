@@ -4,6 +4,7 @@ import UserNotifications
 
 import CoreLocationManager
 import DokoNotificationManager
+import DokoLogging
 
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(
@@ -24,13 +25,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
   ) {
     let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-    print("Device token: \(tokenString)") //###
+    DokoLogging.shared.postLoggingResponse(.info("Device token: \(tokenString)"))
+
   }
 
   func application(
     _ application: UIApplication,
     didFailToRegisterForRemoteNotificationsWithError error: Error
   ) {
-    print("Failed to register for notifications: \(error)") //###
+    DokoLogging.shared.postLoggingResponse(.error("Failed to register for notifications: \(error)"))
   }
 }

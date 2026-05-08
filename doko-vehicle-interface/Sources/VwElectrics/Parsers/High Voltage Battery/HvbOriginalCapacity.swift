@@ -1,22 +1,6 @@
 import ParsingHelpers
 import DokoDebug
-
-/*
- 82K096S3PLG0
- 82K0963SK011
-
- 62 F1B3
- 04
- 7100
- 38324B30393633534B303131
- 7101
- 4845495A4B55454857505959
- 7102
- 534B30373830393630334B41
- 7103
- 454F42445959595959595959
-
- */
+import DokoLogging
 
 private struct anyBatteryPackParser: Parser {
   func parse(_ input: inout Substring.UTF8View) throws -> String {
@@ -49,7 +33,7 @@ func parseHvbOriginalCapacity(_ input: String) throws -> Double {
     "82K0963SK011": 79.9,
   ]
   guard let originalCapacity = id4BatteryPacks[batteryPack] else {
-    //### post error to log
+    DokoLogging.shared.postLoggingResponse(.error(".hvbOriginalCapacity: \(batteryPack)"))
     throw ParsingError()
   }
   return originalCapacity
