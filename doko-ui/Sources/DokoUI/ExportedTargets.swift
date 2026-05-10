@@ -1,4 +1,4 @@
-@_exported import ToolsUI
+@_exported import ExploreUI
 @_exported import VehiclesUI
 @_exported import LocationsUI
 @_exported import TripsUI

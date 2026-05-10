@@ -5,23 +5,23 @@ import CommonUI
 import ChargesUI
 import DokoSharing
 
-@MainActor @Observable public final class ToolsModel {
+@MainActor @Observable public final class ExploreModel {
   public init() {}
 }
 
-public struct ToolsView: View {
-  @Bindable var model: ToolsModel
+public struct ExploreView: View {
+  @Bindable var model: ExploreModel
 
   @State private var isAddingCharge = false
   @State private var path = NavigationPath()
 
-  public init(model: ToolsModel) {
+  public init(model: ExploreModel) {
     self.model = model
   }
 
   public var body: some View {
     NavigationStack(path: $path) {
-      TipView(ToolsAddChargeTip())
+      TipView(ExploreAddChargeTip())
       List {
         LazyVGrid(columns: [GridItem(.flexible())], spacing: 8) {
           GridButton(
@@ -85,8 +85,8 @@ public struct ToolsView: View {
 #Preview {
   NavigationStack {
     let _ = try? Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
-    ToolsView(
-      model: ToolsModel()
+    ExploreView(
+      model: ExploreModel()
     )
     .preferredColorScheme(.dark)
   }

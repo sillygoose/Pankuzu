@@ -80,7 +80,7 @@ public struct EditChargeDetailTip: Tip {
   }
 }
 
-public struct ToolsAddChargeTip: Tip {
+public struct ExploreAddChargeTip: Tip {
   public init() {}
 
   public var title: Text {
@@ -88,7 +88,7 @@ public struct ToolsAddChargeTip: Tip {
   }
 
   public var message: Text? {
-    Text("You can add a missing charge by tapping the Add Charge button and entering the values from the Ford app.")
+    Text("You can add a missing charge by tapping the Add Charge button and entering the values from the vehicle or charging app.")
   }
 
   public var image: Image? {

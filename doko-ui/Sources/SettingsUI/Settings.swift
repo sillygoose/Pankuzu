@@ -134,15 +134,15 @@ public struct SettingsView: View {
             path.append(Destination.unitsSettings)
           }
 
-          GridValueButton(
-            color: .blue,
-            value: nil,
-            units: nil,
-            symbolName: "icloud",
-            title: "iCloud"
-          ) {
-            path.append(Destination.iCloudSettings)
-          }
+//          GridValueButton(
+//            color: .blue,
+//            value: nil,
+//            units: nil,
+//            symbolName: "icloud",
+//            title: "iCloud"
+//          ) {
+//            path.append(Destination.iCloudSettings)
+//          }
 
           GridValueButton(
             color: .indigo,

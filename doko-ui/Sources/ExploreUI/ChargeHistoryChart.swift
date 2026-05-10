@@ -182,10 +182,6 @@ struct ChargeHistoryChartView: View {
       LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
         GridValue(color: .blue, value: "\(model.yearlyChargeCount)", units: "", symbolName: "bolt.car", title: "Charges")
         GridValue(color: .blue, value: String(format: "%.0f", model.yearlyTotalKWh), units: "kWh", symbolName: "bolt.batteryblock", title: "Total Energy")
-        GridButton(color: .orange, symbolName: "powerplug", title: "AC") { model.toggleAc(); model.computeEntries() }
-          .opacity(model.showAc ? 1.0 : 0.4)
-        GridButton(color: .green, symbolName: "ev.charger", title: "DCFC") { model.toggleDc(); model.computeEntries() }
-          .opacity(model.showDc ? 1.0 : 0.4)
         GridValue(color: .orange, value: "\(model.yearlyAcCount)", units: "", symbolName: "bolt.car", title: "Sessions")
           .opacity(model.showAc ? 1.0 : 0.4)
         GridValue(color: .green, value: "\(model.yearlyDcCount)", units: "", symbolName: "bolt.car", title: "Sessions")

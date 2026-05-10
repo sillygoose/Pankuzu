@@ -8,7 +8,7 @@ import DokoNotificationManager
 @MainActor
 @Observable
 class AppModel {
-  enum Tab { case trips, charges, tools, settings }
+  enum Tab { case trips, charges, explore, settings }
   var selectedTab: Tab
 
   init(
@@ -36,11 +36,11 @@ struct AppView: View {
       .tabItem { Label("Charges", systemImage: "bolt.fill") }
       .tag(AppModel.Tab.charges)
       
-      ToolsView(
-        model: ToolsModel()
+      ExploreView(
+        model: ExploreModel()
       )
-      .tabItem { Label("Tools", systemImage: "hammer.circle") }
-      .tag(AppModel.Tab.tools)
+      .tabItem { Label("Explore", systemImage: "binoculars") }
+      .tag(AppModel.Tab.explore)
 
       SettingsView(
         model: SettingsModel()
@@ -57,7 +57,7 @@ struct AppView: View {
       model.selectedTab = .charges
     }
     .onReceive(NotificationCenter.default.publisher(for: .pankuzuOpenTools)) { _ in
-      model.selectedTab = .tools
+      model.selectedTab = .explore
     }
     .onReceive(NotificationCenter.default.publisher(for: .pankuzuOpenSettings)) { _ in
       model.selectedTab = .settings
@@ -96,7 +96,7 @@ struct AppView: View {
   }
   AppView(
     model: AppModel(
-      selectedTab: .tools
+      selectedTab: .explore
     )
   )
 }
