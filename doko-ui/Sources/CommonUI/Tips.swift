@@ -80,11 +80,11 @@ public struct EditChargeDetailTip: Tip {
   }
 }
 
-public struct ExploreAddChargeTip: Tip {
+public struct ExploreAddMissingChargeTip: Tip {
   public init() {}
 
   public var title: Text {
-    Text("Add Charge")
+    Text("Add Missing Charge")
   }
 
   public var message: Text? {

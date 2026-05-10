@@ -21,13 +21,13 @@ public struct ExploreView: View {
 
   public var body: some View {
     NavigationStack(path: $path) {
-      TipView(ExploreAddChargeTip())
+      TipView(ExploreAddMissingChargeTip())
       List {
         LazyVGrid(columns: [GridItem(.flexible())], spacing: 8) {
           GridButton(
             color: .orange,
             symbolName: "ev.charger",
-            title: "Add Charge"
+            title: "Add Missing Charge"
           ) {
             isAddingCharge = true
           }
