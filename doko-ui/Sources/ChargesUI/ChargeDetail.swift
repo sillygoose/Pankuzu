@@ -14,7 +14,6 @@ import CommonUI
 
 @MainActor @Observable public final class ChargeDetailModel {
   public enum Destination: Identifiable {
-    case editChargeForm(Charge)
     case editLocationForm(Location)
     case editVehicleForm(Vehicle)
     case chargeLocationMap
@@ -25,11 +24,9 @@ import CommonUI
     case batteryTemperatureChart
     case couplerTemperatureChart
     case stateOfHealthChart
-    
+
     public var id: String {
       switch self {
-      case .editChargeForm(let charge):
-        return "editChargeForm-\(charge.id)"
       case .editLocationForm(let location):
         return "editLocationForm-\(location.id)"
       case .editVehicleForm(let vehicle):
@@ -95,7 +92,6 @@ public struct ChargeDetailView: View {
     let peakPower = Measurement(value: model.maximumPower ?? 0.0, unit: UnitPower.kilowatts)
     
     ScrollView {
-      TipView(EditChargeDetailTip())
       Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 8) {
         GridRow {
           GridButton(color: .blue, symbolName: "map.fill", title: "Map") {
@@ -329,11 +325,6 @@ public struct ChargeDetailView: View {
       .padding([.bottom], 10)
     }
     .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Button("Edit") {
-          model.destination = .editChargeForm(charge)
-        }
-      }
     }
     .navigationTitle(
       "\(charge.timeStart.formatted(date: .numeric, time: .shortened))"
@@ -341,18 +332,6 @@ public struct ChargeDetailView: View {
     .navigationBarTitleDisplayMode(.inline)
     .sheet(item: $model.destination) { destination in
       switch destination {
-      case .editChargeForm(let charge):
-        NavigationStack {
-          ChargeFormView(
-            model: ChargeFormModel(
-              charge: Charge.Draft(charge)
-            )
-          )
-          .navigationTitle("Edit Charge")
-          .navigationBarTitleDisplayMode(.inline)
-          .presentationDetents([.medium])
-        }
-        
       case .editLocationForm(let location):
         NavigationStack {
           LocationFormView(

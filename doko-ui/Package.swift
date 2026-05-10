@@ -69,6 +69,7 @@ let package = Package(
         "CommonUI",
         "ChargesUI",
         .product(name: "DokoSharing", package: "doko-sharing"),
+        .product(name: "DokoSchema", package: "doko-schema"),
       ]
     ),
     .target(

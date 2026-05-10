@@ -64,37 +64,91 @@ public struct ChargeDetailsTip: Tip {
   }
 }
 
-public struct EditChargeDetailTip: Tip {
+public struct ExploreTabTip: Tip {
   public init() {}
 
   public var title: Text {
-    Text("Edit Charge Details")
+    Text("Explore")
   }
+
+  let intro           = "Use the Explore your data in new and different ways:"
+  let addMissing      = "- add missing charges from your vehicle or charging app"
+  let editExiisting   = "- update a partial charge with the final values"
+  let chargeHistory   = "- check out your charing history over the past year"
+  let tripEfficiency  = "- see how much you drove and how your EV efficiency is changing with the weather"
 
   public var message: Text? {
-    Text("You can update an incomplete charge by tapping the Edit button and entering the values from the Ford app.")
-  }
-
-  public var image: Image? {
-    Image(systemName: "plus.circle")
-  }
-}
-
-public struct ExploreAddMissingChargeTip: Tip {
-  public init() {}
-
-  public var title: Text {
-    Text("Add Missing Charge")
-  }
-
-  public var message: Text? {
-    Text("You can add a missing charge by tapping the Add Charge button and entering the values from the vehicle or charging app.")
+    Text("\(intro)\n\n\(addMissing)\n\n\(editExiisting)\n\n\(chargeHistory)\n\n\(tripEfficiency)")
   }
 
   public var image: Image? {
     Image(systemName: "ev.charger")
   }
 }
+
+//public struct ExploreAddMissingChargeTip: Tip {
+//  public init() {}
+//
+//  public var title: Text {
+//    Text("Add Missing Charge")
+//  }
+//
+//  public var message: Text? {
+//    Text("You can add a missing charge by tapping the Add Missing Charge button and entering the values from the vehicle or charging app.")
+//  }
+//
+//  public var image: Image? {
+//    Image(systemName: "ev.charger")
+//  }
+//}
+//
+//public struct EditExistingChargeTip: Tip {
+//  public init() {}
+//
+//  public var title: Text {
+//    Text("Edit Existing Charge")
+//  }
+//
+//  public var message: Text? {
+//    Text("You can update an incomplete charge by tapping the Edit Exisiting Charge button and entering the values from the vehicle or charging app.")
+//  }
+//
+//  public var image: Image? {
+//    Image(systemName: "pencil")
+//  }
+//}
+//
+//public struct ChargeHistoryTip: Tip {
+//  public init() {}
+//
+//  public var title: Text {
+//    Text("Charge History")
+//  }
+//
+//  public var message: Text? {
+//    Text("Take a look at your charing history over the past year and see just how much energy you used.")
+//  }
+//
+//  public var image: Image? {
+//    Image(systemName: "calendar")
+//  }
+//}
+//
+//public struct TripEfficiencyTip: Tip {
+//  public init() {}
+//
+//  public var title: Text {
+//    Text("Trip Efficiency")
+//  }
+//
+//  public var message: Text? {
+//    Text("Wondering how much you drove and how your EV efficiency is changing with the weather? Check it all out in the Trip Efficiency charts.")
+//  }
+//
+//  public var image: Image? {
+//    Image(systemName: "leaf.fill")
+//  }
+//}
 
 public struct DebuggingTip: Tip {
   public init() {}

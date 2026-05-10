@@ -6,7 +6,7 @@ import DokoSharing
 
 @MainActor
 @Observable
-public final class ChargeFormModel: Identifiable {
+public final class EditChargeFormModel: Identifiable {
   var charge: Charge.Draft
   let unmodifiedCharge: Charge.Draft
 
@@ -25,7 +25,8 @@ public final class ChargeFormModel: Identifiable {
   var unchanged: Bool {
     charge.timeEnd == unmodifiedCharge.timeEnd &&
     charge.energy == unmodifiedCharge.energy &&
-    charge.stateOfChargeEnd == unmodifiedCharge.stateOfChargeEnd
+    charge.stateOfChargeEnd == unmodifiedCharge.stateOfChargeEnd &&
+    charge.odometer == unmodifiedCharge.odometer
   }
 
   func cancelButtonTapped() {
@@ -49,12 +50,17 @@ public final class ChargeFormModel: Identifiable {
   }
 }
 
-public struct ChargeFormView: View {
+public struct EditChargeFormView: View {
   @Environment(\.dismiss) var dismiss
-  @Bindable var model: ChargeFormModel
+  @Bindable var model: EditChargeFormModel
+
+  @Shared(.appSettings) var appSettings
 
   @State private var durationHours: Int = 0
   @State private var durationMinutes: Int = 0
+
+  @FocusState private var odometerFocused: Bool
+  @State private var odometerText: String = ""
 
   @FocusState private var energyFocused: Bool
   @State private var energyText: String = ""
@@ -62,7 +68,7 @@ public struct ChargeFormView: View {
   @FocusState private var socEndFocused: Bool
   @State private var socEndText: String = ""
 
-  public init(model: ChargeFormModel) {
+  public init(model: EditChargeFormModel) {
     self.model = model
   }
 
@@ -90,10 +96,22 @@ public struct ChargeFormView: View {
         }
         .frame(height: 120)
       } header: {
-        Text("Session")
+        Text("Session Duration")
       }
 
       Section {
+        HStack {
+          Text("Odometer")
+          Spacer()
+          TextField("0", text: $odometerText)
+            .multilineTextAlignment(.trailing)
+            .keyboardType(.decimalPad)
+            .focused($odometerFocused)
+            .frame(width: 80)
+          Text(appSettings.metric ? "km" : "mi")
+            .foregroundStyle(.secondary)
+        }
+
         HStack {
           Text("Energy Added")
           Spacer()
@@ -118,18 +136,30 @@ public struct ChargeFormView: View {
             .foregroundStyle(.secondary)
         }
       } header: {
-        Text("Energy")
+        Text("Charge Details")
       }
     }
     .onAppear {
       let totalSeconds = Int(model.charge.timeEnd.timeIntervalSince(model.charge.timeStart))
       durationHours = totalSeconds / 3600
       durationMinutes = ((totalSeconds % 3600) / 60 / 5) * 5
+      let displayOdometer = Measurement(value: model.charge.odometer, unit: UnitLength.kilometers)
+        .converted(to: appSettings.metric ? .kilometers : .miles)
+      odometerText = String(format: "%.0f", displayOdometer.value)
       energyText = model.charge.energy.map { String(format: "%.1f", $0) } ?? ""
       socEndText = model.charge.stateOfChargeEnd.map { String(Int($0)) } ?? ""
     }
     .onChange(of: durationHours) { updateTimeEnd() }
     .onChange(of: durationMinutes) { updateTimeEnd() }
+    .onChange(of: odometerText) { _, newText in
+      let input = Double(newText) ?? 0
+      model.charge.odometer = appSettings.metric
+        ? input
+        : Measurement(value: input, unit: UnitLength.miles).converted(to: .kilometers).value
+    }
+    .onChange(of: odometerFocused) { _, focused in
+      if focused { odometerText = "" }
+    }
     .onChange(of: energyText) { _, newText in
       if let value = Double(newText) {
         model.charge.energy = value
@@ -192,8 +222,8 @@ public struct ChargeFormView: View {
   }
   @FetchAll() var charges: [Charge]
   NavigationStack {
-    ChargeFormView(
-      model: ChargeFormModel(
+    EditChargeFormView(
+      model: EditChargeFormModel(
         charge: Charge.Draft(charges.first!)
       )
     )

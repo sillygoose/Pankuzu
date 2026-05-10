@@ -37,7 +37,6 @@ public final class AddChargeFormModel: Identifiable {
     vehicleID != nil &&
     chargerType != .none &&
     (durationHours > 0 || durationMinutes > 0) &&
-    Double(odometerText) != nil &&
     Double(energyText) != nil &&
     Double(socStartText) != nil &&
     Double(socEndText) != nil
@@ -48,8 +47,9 @@ public final class AddChargeFormModel: Identifiable {
   }
 
   func saveButtonTapped(latitude: Double, longitude: Double) {
-    guard let vehicleID, let odometerInput = Double(odometerText) else { return }
+    guard let vehicleID else { return }
 
+    let odometerInput = Double(odometerText) ?? 0
     let odometer = appSettings.metric
       ? odometerInput
       : Measurement(value: odometerInput, unit: UnitLength.miles).converted(to: .kilometers).value
@@ -223,7 +223,7 @@ public struct AddChargeFormView: View {
         HStack {
           Text("Odometer")
           Spacer()
-          TextField(appSettings.metric ? "km" : "mi", text: $model.odometerText)
+          TextField("0", text: $model.odometerText)
             .multilineTextAlignment(.trailing)
             .keyboardType(.decimalPad)
             .focused($odometerFocused)

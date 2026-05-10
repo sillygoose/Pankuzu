@@ -21,9 +21,9 @@ public struct ExploreView: View {
 
   public var body: some View {
     NavigationStack(path: $path) {
-      TipView(ExploreAddMissingChargeTip())
       List {
-        LazyVGrid(columns: [GridItem(.flexible())], spacing: 8) {
+        TipView(ExploreTabTip())
+        LazyVGrid(columns: [GridItem(.flexible())], spacing: 16) {
           GridButton(
             color: .orange,
             symbolName: "ev.charger",
@@ -33,8 +33,16 @@ public struct ExploreView: View {
           }
 
           GridButton(
+            color: .blue,
+            symbolName: "pencil",
+            title: "Edit Existing Charge"
+          ) {
+            path.append(Destination.editExistingCharge)
+          }
+
+          GridButton(
             color: .yellow,
-            symbolName: "chart.bar.fill",
+            symbolName: "calendar",
             title: "Charge History"
           ) {
             path.append(Destination.chargeHistory)
@@ -42,7 +50,7 @@ public struct ExploreView: View {
 
           GridButton(
             color: .green,
-            symbolName: "chart.line.uptrend.xyaxis",
+            symbolName: "leaf.fill",
             title: "Trip Efficiency"
           ) {
             path.append(Destination.tripEfficiency)
@@ -67,6 +75,8 @@ public struct ExploreView: View {
       }
       .navigationDestination(for: Destination.self) { destination in
         switch destination {
+        case .editExistingCharge:
+          EditExistingChargeView(model: EditExistingChargeModel())
         case .chargeHistory:
           ChargeHistoryChartView()
         case .tripEfficiency:
@@ -77,6 +87,7 @@ public struct ExploreView: View {
   }
 
   enum Destination: Hashable {
+    case editExistingCharge
     case chargeHistory
     case tripEfficiency
   }
