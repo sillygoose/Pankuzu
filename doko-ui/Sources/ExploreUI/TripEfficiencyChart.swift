@@ -207,13 +207,8 @@ final class TripEfficiencyChartModel {
       let rawMeanTemperature = tempTrips.map(\.weighted).reduce(0, +) / totalDuration
       return TripTemperature(monthDate: start, temperature: Measurement(value: rawMeanTemperature, unit: .celsius))
     }
-    let minYAxis = floor((temperatureEntries.map(\.temperature.value).min() ?? 0) - 3)
-    let maxYAxis = ceil((temperatureEntries.map(\.temperature.value).max() ?? 1) + 3)
-    temperatureMin.value = minYAxis //min(0.0, minYAxis)
-    temperatureMax.value = maxYAxis //max(45.0, maxYAxis)
-//    for (_, temperature) in temperatureEntries.enumerated() {
-//      print(temperature.temperature.converted(to: temperatureConversionUnit))
-//    }
+    temperatureMin.value = floor((temperatureEntries.map(\.temperature.value).min() ?? 0) - 3)
+    temperatureMax.value = ceil((temperatureEntries.map(\.temperature.value).max() ?? 1) + 3)
 
     efficiencyEntries = (0..<13).compactMap { offset in
       let start = calendar.date(byAdding: .month, value: -(12 - offset), to: currentMonthStart)!
@@ -426,15 +421,14 @@ struct TripEfficiencyChartView: View {
         }
         .frame(height: 300)
         .padding(.horizontal)
+        .padding(.bottom, 30)
 
         if !model.monthlyMileageEntries.isEmpty {
           HStack {
             Text("Monthly Totals")
               .font(.headline)
-            Spacer()
           }
           .padding(.horizontal)
-          .padding(.top, 24)
           VStack(spacing: 0) {
             ForEach(model.monthlyMileageEntries.reversed()) { entry in
               HStack {

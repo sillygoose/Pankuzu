@@ -43,7 +43,6 @@ public struct GridStatusButton: View {
               .font(DesignTokens.Font.largeTitle)
               .bold()
               .foregroundStyle(leftSymbolColor)
-              .frame(width: 32, height: 32)
             Text(leftSymbolTitle)
               .lineLimit(1)
               .font(DesignTokens.Font.headline)
@@ -56,7 +55,6 @@ public struct GridStatusButton: View {
                 .font(DesignTokens.Font.largeTitle)
                 .bold()
                 .foregroundStyle(centerSymbolColor)
-                .frame(width: 32, height: 32)
               Text(centerSymbolTitle)
                 .lineLimit(1)
                 .font(DesignTokens.Font.headline)
@@ -71,11 +69,9 @@ public struct GridStatusButton: View {
                 .bold()
                 .symbolEffect(.pulse, options: .repeating)
                 .foregroundStyle(rightSymbolColor)
-                .frame(width: 32, height: 32)
             } else {
               Image(systemName: "square.fill")
                 .font(DesignTokens.Font.largeTitle)
-                .frame(width: 32, height: 32)
                 .opacity(0)
             }
             Text(rightSymbolTitle)

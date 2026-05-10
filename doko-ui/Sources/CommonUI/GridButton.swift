@@ -25,8 +25,7 @@ public struct GridButton: View {
           .font(DesignTokens.Font.title)
           .bold()
           .foregroundStyle(color)
-          .frame(width: 32, height: 32)
-        
+
         Text(title)
           .lineLimit(1)
           .font(DesignTokens.Font.headline)
