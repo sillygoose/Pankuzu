@@ -35,7 +35,7 @@ public struct EditExistingChargeView: View {
       .buttonStyle(.plain)
     }
     .listStyle(.plain)
-    .navigationTitle("Select Charge To edit")
+    .navigationTitle("Select Charge")
     .navigationBarTitleDisplayMode(.inline)
     .sheet(item: $editingCharge) { charge in
       NavigationStack {
