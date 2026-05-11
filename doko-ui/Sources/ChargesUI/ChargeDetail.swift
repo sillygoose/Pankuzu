@@ -175,26 +175,6 @@ public struct ChargeDetailView: View {
           )
         }
         
-        if let rawStateOfChargeStart = charge.stateOfChargeStart {
-          let (stateOfChargeStartColor, stateOfChargeStartIcon) = {
-            if rawStateOfChargeStart < 5 { return (Color.red, "battery.0percent") }
-            if rawStateOfChargeStart < 30 { return (Color.yellow, "battery.25percent") }
-            if rawStateOfChargeStart < 55 { return (Color.green, "battery.50percent") }
-            if rawStateOfChargeStart < 80 { return (Color.green, "battery.75percent") }
-            return (Color.green, "battery.100percent")
-          }()
-          let stateOfChargeStart = Measurement(value: rawStateOfChargeStart, unit: UnitPercent.percent)
-          GridValueButton(
-            color: stateOfChargeStartColor,
-            value: String(format: "%.0f", stateOfChargeStart.value),
-            units: stateOfChargeStart.unit.symbol,
-            symbolName: stateOfChargeStartIcon,
-            title: "Starting SoC"
-          ) {
-            model.destination = .stateOfChargeChart
-          }
-        }
-
         if let rawStateOfChargeEnd = charge.stateOfChargeEnd {
           let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
             if rawStateOfChargeEnd < 5 { return (Color.red, "battery.0percent") }
@@ -209,66 +189,9 @@ public struct ChargeDetailView: View {
             value: String(format: "%.0f", stateOfChargeEnd.value),
             units: stateOfChargeEnd.unit.symbol,
             symbolName: stateOfChargeEndIcon,
-            title: "Ending SoC"
+            title: "State of Charge"
           ) {
             model.destination = .stateOfChargeChart
-          }
-        }
-
-        if let rawBatteryTempStart = charge.batteryTempStart {
-          let (batteryTempStartColor, batteryTempStartIcon) = {
-            if rawBatteryTempStart < 5 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
-            if rawBatteryTempStart < 50 { return (Color.gray, "batteryblock.stack") }
-            return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
-          }()
-          let batteryTempStart = Measurement(value: rawBatteryTempStart, unit: UnitTemperature.celsius)
-            .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
-          GridValueButton(
-            color: batteryTempStartColor,
-            value: String(format: "%.0f", batteryTempStart.value),
-            units: batteryTempStart.unit.symbol,
-            symbolName: batteryTempStartIcon,
-            title: "Start Battery"
-          ) {
-            model.destination = .batteryTemperatureChart
-          }
-        }
-
-        if let rawBatteryTempEnd = charge.batteryTempEnd {
-          let (batteryTempEndColor, batteryTempEndIcon) = {
-            if rawBatteryTempEnd < 5 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
-            if rawBatteryTempEnd < 50 { return (Color.gray, "batteryblock.stack") }
-            return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
-          }()
-          let batteryTempEnd = Measurement(value: rawBatteryTempEnd, unit: UnitTemperature.celsius)
-            .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
-          GridValueButton(
-            color: batteryTempEndColor,
-            value: String(format: "%.0f", batteryTempEnd.value),
-            units: batteryTempEnd.unit.symbol,
-            symbolName: batteryTempEndIcon,
-            title: "Ending Battery"
-          ) {
-            model.destination = .batteryTemperatureChart
-          }
-        }
-
-        if let rawCouplerTempStart = charge.couplerTempStart {
-          let (couplerTempStartColor, couplerTempStartIcon) = {
-            if rawCouplerTempStart < 5 { return (Color.blue, "ev.plug.dc.ccs2") }
-            if rawCouplerTempStart < 50 { return (Color.yellow, "ev.plug.dc.ccs2") }
-            return (Color.red, "ev.plug.dc.ccs2")
-          }()
-          let couplerTempStart = Measurement(value: rawCouplerTempStart, unit: UnitTemperature.celsius)
-            .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
-          GridValueButton(
-            color: couplerTempStartColor,
-            value: String(format: "%.0f", couplerTempStart.value),
-            units: couplerTempStart.unit.symbol,
-            symbolName: couplerTempStartIcon,
-            title: "Starting Coupler"
-          ) {
-            model.destination = .couplerTemperatureChart
           }
         }
 
@@ -285,11 +208,12 @@ public struct ChargeDetailView: View {
             value: String(format: "%.0f", couplerTempEnd.value),
             units: couplerTempEnd.unit.symbol,
             symbolName: couplerTempEndIcon,
-            title: "Ending Coupler"
+            title: "Coupler"
           ) {
             model.destination = .couplerTemperatureChart
           }
         }
+        
         if let rawDistanceToEmptyStart = charge.distanceToEmptyStart, let rawDistanceToEmptyEnd = charge.distanceToEmptyEnd {
           let rangeAdded = Measurement(value: rawDistanceToEmptyEnd - rawDistanceToEmptyStart, unit: UnitLength.kilometers)
             .converted(to: model.appSettings.metric ? .kilometers : .miles)
@@ -301,6 +225,25 @@ public struct ChargeDetailView: View {
             title: "Range Added"
           ) {
             model.destination = .rangeAddedChart
+          }
+        }
+
+        if let rawBatteryTempEnd = charge.batteryTempEnd {
+          let (batteryTempEndColor, batteryTempEndIcon) = {
+            if rawBatteryTempEnd < 5 { return (Color.blue, "batteryblock.stack.badge.snowflake") }
+            if rawBatteryTempEnd < 50 { return (Color.gray, "batteryblock.stack") }
+            return (Color.red, "batteryblock.stack.trianglebadge.exclamationmark")
+          }()
+          let batteryTempEnd = Measurement(value: rawBatteryTempEnd, unit: UnitTemperature.celsius)
+            .converted(to: model.appSettings.metric ? .celsius : .fahrenheit)
+          GridValueButton(
+            color: batteryTempEndColor,
+            value: String(format: "%.0f", batteryTempEnd.value),
+            units: batteryTempEnd.unit.symbol,
+            symbolName: batteryTempEndIcon,
+            title: "Battery"
+          ) {
+            model.destination = .batteryTemperatureChart
           }
         }
 

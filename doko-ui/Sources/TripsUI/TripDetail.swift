@@ -229,26 +229,6 @@ public struct TripDetailView: View {
           )
         }
 
-        if let rawStateOfChargeStart = trip.stateOfChargeStart {
-          let (stateOfChargeStartColor, stateOfChargeStartIcon) = {
-            if rawStateOfChargeStart < 5 { return (Color.red, "battery.0percent") }
-            if rawStateOfChargeStart < 30 { return (Color.yellow, "battery.25percent") }
-            if rawStateOfChargeStart < 55 { return (Color.green, "battery.50percent") }
-            if rawStateOfChargeStart < 80 { return (Color.green, "battery.75percent") }
-            return (Color.green, "battery.100percent")
-          }()
-          let stateOfChargeStart = Measurement(value: rawStateOfChargeStart, unit: UnitPercent.percent)
-          GridValueButton(
-            color: stateOfChargeStartColor,
-            value: String(format: "%.0f", stateOfChargeStart.value),
-            units: stateOfChargeStart.unit.symbol,
-            symbolName: stateOfChargeStartIcon,
-            title: "Starting SoC"
-          ) {
-            model.destination = .stateOfChargeChart
-          }
-        }
-
         if let rawStateOfChargeEnd = trip.stateOfChargeEnd {
           let (stateOfChargeEndColor, stateOfChargeEndIcon) = {
             if rawStateOfChargeEnd < 5 { return (Color.red, "battery.0percent") }
@@ -263,7 +243,7 @@ public struct TripDetailView: View {
             value: String(format: "%.0f", stateOfChargeEnd.value),
             units: stateOfChargeEnd.unit.symbol,
             symbolName: stateOfChargeEndIcon,
-            title: "Ending SoC"
+            title: "State of Charge"
           ) {
             model.destination = .stateOfChargeChart
           }
