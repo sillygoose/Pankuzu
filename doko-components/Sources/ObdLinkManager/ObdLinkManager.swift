@@ -132,6 +132,7 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
       }
       self.obdResponseStreamContinuation = obdResponseContinuation
 
+      self.responseBuffer.removeAll()
       self.commandProcessingTaskHandle = commandProcessingTask()
       $connectedAccessoryName.withLock { $0 = newAccessory.name }
       $connectedAccessorySerialNumber.withLock { $0 = newAccessory.serialNumber }

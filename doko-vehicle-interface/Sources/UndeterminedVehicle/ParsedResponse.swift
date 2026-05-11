@@ -11,18 +11,25 @@ extension UndeterminedVehicle {
       var commandResponse: ObdResponse
       switch command {
       case .atz:
-        commandResponse = .atz(response)
+        let atz = try parseATZ(response)
+        commandResponse = .atz(atz)
       case .ate(let enabled):
+        try parseATE(response)
         commandResponse = .ate(enabled)
       case .ath(let enabled):
+        try parseATH(response)
         commandResponse = .ath(enabled)
       case .atcaf(let enabled):
+        try parseATCAF(response)
         commandResponse = .atcaf(enabled)
       case .ats(let enabled):
+        try parseATS(response)
         commandResponse = .ats(enabled)
       case .stcsegr(let enabled):
+        try parseSTCSEGR(response)
         commandResponse = .stcsegr(enabled)
       case .atsp(let busProtocol):
+//        try p7arseATCP(response)
         commandResponse = .atsp(busProtocol)
       case .stprs:
         commandResponse = .stprs(response)

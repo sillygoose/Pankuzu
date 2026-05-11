@@ -27,8 +27,24 @@ public actor UndeterminedVehicle: ConnectedVehicleInterface {
   nonisolated public let vehicle: Vehicle?
   nonisolated public let name: String = "UndeterminedVehicle"
 
+  #if DEBUG
+  private let savedLogObdPackets: Bool
+  #endif
+
   public init() {
     self.vehicle = nil
+    #if DEBUG
+    @Shared(.logObdPackets) var logObdPackets
+    savedLogObdPackets = logObdPackets
+    $logObdPackets.withLock { $0 = true }
+    #endif
+  }
+
+  deinit {
+    #if DEBUG
+    @Shared(.logObdPackets) var logObdPackets
+    $logObdPackets.withLock { $0 = savedLogObdPackets }
+    #endif
   }
 
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {

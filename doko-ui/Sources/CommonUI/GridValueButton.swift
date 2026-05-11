@@ -32,6 +32,7 @@ public struct GridValueButton: View {
             .font(DesignTokens.Font.title)
             .bold()
             .foregroundStyle(color)
+            .frame(width: 48, height: 32)
           Spacer()
           if let value {
             Text("\(value)")
