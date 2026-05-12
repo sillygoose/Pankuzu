@@ -19,7 +19,7 @@ extension Trip {
       let position = tripStartResponse.position,
       let odometer = tripStartResponse.odometer
     else {
-      throw TripError.tripWriteError
+      throw TripError.tripArgumentError
     }
 
     guard let originID = DokoLocationManager.shared.addLocation(
@@ -88,7 +88,7 @@ extension Trip {
       let position = tripEndResponse.position,
       let odometer = tripEndResponse.odometer
     else {
-      throw TripError.tripWriteError
+      throw TripError.tripArgumentError
     }
     var tripDraft = tripDraft
 
@@ -148,7 +148,7 @@ extension Trip {
       let position = tripUpdateResponse.position,
       let odometer = tripUpdateResponse.odometer
     else {
-      throw TripError.tripUpdateError
+      throw TripError.tripArgumentError
     }
     var tripDraft = tripDraft
 

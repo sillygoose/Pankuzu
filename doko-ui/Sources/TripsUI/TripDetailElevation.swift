@@ -150,7 +150,7 @@ public struct TripDetailElevationView: View {
             VStack(spacing: 2) {
               Text(selected.timestamp, style: .time)
                 .font(.caption2)
-              Text(elevation.formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(0)))))
+              Text(String(format: "%.0f %@", elevation.value, elevation.unit.symbol))
                 .font(.caption)
                 .fontWeight(.semibold)
             }

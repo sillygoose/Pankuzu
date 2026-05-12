@@ -3,7 +3,7 @@ import Foundation
 extension Trip {
   public enum TripError: Error, LocalizedError {
     case unknownVehicle
-    case tripWriteError, tripUpdateError, tripLocationError
+    case tripArgumentError, tripWriteError, tripLocationError
     case tripPositionArgumentError, tripElevationrgumentError, tripDataArgumentError, tripWeatherArgumentError
 
     public var errorDescription: String {
@@ -11,10 +11,10 @@ extension Trip {
       case .unknownVehicle:
         "Expected an active vehicle but was missing"
 
+      case .tripArgumentError:
+        "Missing Trip agruments"
       case .tripWriteError:
         "Error writing a Trip record"
-      case .tripUpdateError:
-        "Error updating the Trip draft record"
       case .tripLocationError:
         "Error processing Trip location"
         

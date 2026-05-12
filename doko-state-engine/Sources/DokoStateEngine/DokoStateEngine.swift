@@ -166,7 +166,7 @@ public final class DokoStateEngine {
                 await LiveActivityManager.shared.startTrip()
                 $activeSession.withLock { $0 = .trip }
               } catch {
-                DokoLogging.shared.postLoggingResponse(.error(".tripStarting: \(String(describing: error))"))
+                DokoLogging.shared.postLoggingResponse(.error(".tripStarting: \(error.localizedDescription))"))
                 nextState = .tripStarting
               }
             }
