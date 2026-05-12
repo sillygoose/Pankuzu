@@ -77,3 +77,9 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
     Self[.appStorage("ApplicationSettings-logDatabasePackets"), default: false]
   }
 }
+
+extension SharedKey where Self == AppStorageKey<Bool>.Default {
+  public static var alwaysLogStartup: Self {
+    Self[.appStorage("ApplicationSettings-alwaysLogStartup"), default: false]
+  }
+}

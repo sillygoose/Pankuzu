@@ -165,8 +165,11 @@ public final class DokoStateEngine {
                 await CoreLocationManager.shared.startPacketUpdates()
                 await LiveActivityManager.shared.startTrip()
                 $activeSession.withLock { $0 = .trip }
+              } catch let error as StateEngineError {
+                DokoLogging.shared.postLoggingResponse(.error(".tripStarting: \(error.errorDescription)"))
+                nextState = .tripStarting
               } catch {
-                DokoLogging.shared.postLoggingResponse(.error(".tripStarting: \(error.localizedDescription))"))
+                DokoLogging.shared.postLoggingResponse(.error(".tripStarting: \(String(describing: error)))"))
                 nextState = .tripStarting
               }
             }
@@ -213,8 +216,10 @@ public final class DokoStateEngine {
                   windSock: windSock
                 )
               )
+            } catch let error as StateEngineError {
+              DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(error.errorDescription)"))
             } catch {
-              DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(String(describing: error))"))
+              DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(String(describing: error)))"))
             }
 
           case .tripEnding:
@@ -238,8 +243,11 @@ public final class DokoStateEngine {
                 )
                 self.tripInProgress = nil
                 $activeSession.withLock { $0 = nil }
+              } catch let error as StateEngineError {
+                DokoLogging.shared.postLoggingResponse(.error(".tripEnding: \(error.errorDescription)"))
+                nextState = .tripEnding
               } catch {
-                DokoLogging.shared.postLoggingResponse(.error(".tripEnding: \(String(describing: error))"))
+                DokoLogging.shared.postLoggingResponse(.error(".tripEnding: \(String(describing: error)))"))
                 nextState = .tripEnding
               }
             }

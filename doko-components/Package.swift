@@ -23,6 +23,8 @@ let package = Package(
     .target(
       name: "ObdLinkManager",
       dependencies: [
+        .product(name: "CoreLocationManager", package: "doko-managers"),
+        .product(name: "DokoNotificationManager", package: "doko-managers"),
         .product(name: "DokoPacketManager", package: "doko-managers"),
         .product(name: "DokoVehicleManager", package: "doko-managers"),
         .product(name: "ObdLinkCore", package: "obdlink-core"),

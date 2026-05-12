@@ -58,6 +58,7 @@ public struct DisplayPeriodPicker: View {
 
   @Environment(\.calendar) var calendar
 
+  @State private var showCalendar = false
   @State var multiDatePicker: Set<DateComponents> = []
   @State private var dates: Set<DateComponents> = []
   let datePickerComponents: Set<Calendar.Component> = [.calendar, .era, .year, .month, .day]
@@ -125,24 +126,36 @@ public struct DisplayPeriodPicker: View {
       .pickerStyle(.segmented)
 
       if case .custom(_, _) = datePicker {
-        DisclosureGroup {
-          MultiDatePicker(
-            "Select dates",
-            selection: datesBinding,
-            in: bounds
-          )
-          .padding([.bottom], -DesignTokens.Padding.pickerSpacing)
-        } label: {
-          let dateMap = dates.compactMap { calendar.date(from: $0) }
-          if let startOfPeriod = dateMap.min(), let endOfPeriod = dateMap.max() {
-            let startPeriodString = String("\(startOfPeriod.formatted(date: .numeric, time: .omitted))")
-            let endPeriodString = String("\(endOfPeriod.formatted(date: .numeric, time: .omitted))")
-            Label("\(startPeriodString) thru \(endPeriodString)", systemImage: "calendar")
-          } else {
-            Label("No dates selected", systemImage: "calendar")
+        let dateMap = dates.compactMap { calendar.date(from: $0) }
+        HStack {
+          Spacer()
+          Button {
+            showCalendar = true
+          } label: {
+            if let startOfPeriod = dateMap.min(), let endOfPeriod = dateMap.max() {
+              Label(
+                "\(startOfPeriod.formatted(date: .numeric, time: .omitted)) thru \(endOfPeriod.formatted(date: .numeric, time: .omitted))",
+                systemImage: "calendar"
+              )
+            } else {
+              Label("No dates selected", systemImage: "calendar")
+            }
           }
+          .padding(.vertical, 10)
         }
-        .padding([.top], DesignTokens.Padding.pickerSpacing)
+        .sheet(isPresented: $showCalendar) {
+          NavigationStack {
+            MultiDatePicker("Select dates", selection: datesBinding, in: bounds)
+              .navigationTitle("Select Date Range")
+              .navigationBarTitleDisplayMode(.inline)
+              .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                  Button("Done") { showCalendar = false }
+                }
+              }
+          }
+          .presentationDetents([.medium, .large])
+        }
       }
     }
     .onAppear{

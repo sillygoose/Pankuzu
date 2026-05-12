@@ -4,6 +4,8 @@ import OSLog
 
 import DokoTypes
 import DokoLogging
+import CoreLocationManager
+import DokoNotificationManager
 import DokoSharing
 import DokoPacketManager
 import ObdLinkCore
@@ -12,6 +14,7 @@ import DokoVehicleManager
 enum ObdLinkError: Error, LocalizedError {
   case accessoryNotFound(String)
   case sessionFailed
+  case locationPermissions
   case inputStreamNotAvailable
   case outputStreamNotAvailable
   case missingDisconnectUserInfo
@@ -23,6 +26,8 @@ enum ObdLinkError: Error, LocalizedError {
       "No protocol '\(protocolString)'"
     case .sessionFailed:
       "Failed to create EA session"
+    case .locationPermissions:
+      "Must have Always location permission to create session"
     case .inputStreamNotAvailable:
       "Failed to create session input stream"
     case .outputStreamNotAvailable:
@@ -98,6 +103,9 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
     guard appSettings.backgroundMode else { return }
     let accessories = EAAccessoryManager.shared().connectedAccessories
     do {
+      guard CoreLocationManager.shared.authorizationStatus == .authorizedAlways else {
+        throw ObdLinkError.locationPermissions
+      }
       guard let newAccessory = accessories.first(where: { $0.protocolStrings.contains(protocolString) }) else {
         throw ObdLinkError.accessoryNotFound(self.protocolString)
       }
@@ -110,7 +118,7 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
       guard let inputStream = newSession.inputStream else {
         throw ObdLinkError.inputStreamNotAvailable
       }
-      guard let  outputStream = newSession.outputStream else {
+      guard let outputStream = newSession.outputStream else {
         throw ObdLinkError.outputStreamNotAvailable
       }
 
@@ -137,6 +145,10 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
       $connectedAccessoryName.withLock { $0 = newAccessory.name }
       $connectedAccessorySerialNumber.withLock { $0 = newAccessory.serialNumber }
       DokoLogging.shared.postLoggingResponse(.connect("\(newAccessory.name)"))
+    } catch ObdLinkError.locationPermissions {
+      self.logger.error("\(timestamp()) ObdLinkManager.connect: \(ObdLinkError.locationPermissions.errorDescription)")
+      DokoLogging.shared.postLoggingResponse(.error("\(ObdLinkError.locationPermissions.errorDescription)"))
+      Task { await DokoNotificationManager.shared.locationPermissionNotification() }
     } catch let error as ObdLinkError {
       self.logger.error("\(timestamp()) ObdLinkManager.connect: \(error.errorDescription)")
       DokoLogging.shared.postLoggingResponse(.error("\(error.errorDescription)"))

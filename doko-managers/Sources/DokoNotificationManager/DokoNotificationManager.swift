@@ -51,6 +51,15 @@ public final class DokoNotificationManager: NSObject, Sendable {
     }
   }
   
+  public func locationPermissionNotification() async {
+    let content = UNMutableNotificationContent()
+    content.title = "Location Permission Error"
+    content.body = "Location permission must be Always in order to use background mode."
+    content.sound = .default
+    content.userInfo = ["destination": "locationSettings"]
+    await sendNotification(content: content)
+  }
+
   public func accessoryConnectedNotification(accessoryName: String) async {
     let content = UNMutableNotificationContent()
     content.title = "Scan Tool Connected"
@@ -107,6 +116,10 @@ extension DokoNotificationManager: UNUserNotificationCenterDelegate {
     case "trips":    NotificationCenter.default.post(name: .pankuzuOpenTrips,    object: nil)
     case "charges":  NotificationCenter.default.post(name: .pankuzuOpenCharges,  object: nil)
     case "settings": NotificationCenter.default.post(name: .pankuzuOpenSettings, object: nil)
+    case "locationSettings":
+      if let url = URL(string: UIApplication.openSettingsURLString) {
+        Task { @MainActor in UIApplication.shared.open(url) }
+      }
     default: break
     }
     completionHandler()

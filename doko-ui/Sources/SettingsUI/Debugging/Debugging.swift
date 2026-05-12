@@ -43,6 +43,7 @@ class DebuggingModel {
   @ObservationIgnored @Shared(.logICloudPackets) var logICloudPackets
   @ObservationIgnored @Shared(.logIntegrationPackets) var logIntegrationPackets
   @ObservationIgnored @Shared(.logDatabasePackets) var logDatabasePackets
+  @ObservationIgnored @Shared(.alwaysLogStartup) var alwaysLogStartup
 
 #if DEBUG
   @ObservationIgnored @Shared(.simIdle) var simIdle
@@ -132,6 +133,14 @@ struct DebuggingView: View {
   
   var body: some View {
     List {
+      Toggle(
+        "Always Log Startup",
+        isOn: Binding(
+          get: { model.alwaysLogStartup },
+          set: { isOn, _ in model.$alwaysLogStartup.withLock { $0 = isOn } }
+        )
+      )
+
       DisclosureGroup(
         isExpanded: Binding(
           get: { loggingExpanded },
@@ -195,13 +204,13 @@ struct DebuggingView: View {
               set: { isOn, _ in model.$logPacketManagerPackets.withLock { $0 = isOn } }
             )
           )
-          Toggle(
-            "iCloud",
-            isOn: Binding(
-              get: { model.logICloudPackets },
-              set: { isOn, _ in model.$logICloudPackets.withLock { $0 = isOn } }
-            )
-          )
+//          Toggle(
+//            "iCloud",
+//            isOn: Binding(
+//              get: { model.logICloudPackets },
+//              set: { isOn, _ in model.$logICloudPackets.withLock { $0 = isOn } }
+//            )
+//          )
           Toggle(
             "Integrations",
             isOn: Binding(
@@ -319,6 +328,7 @@ struct DebuggingView: View {
           }
           .buttonStyle(.borderless)
         }
+        .padding(.bottom, 20)
         
         VStack(alignment: .leading, spacing: 0) {
           Text("History:")
@@ -360,7 +370,7 @@ struct DebuggingView: View {
             .padding()
           }
           .frame(maxWidth: .infinity, alignment: .leading)
-          .frame(maxHeight: 300)
+          .frame(minHeight: 300, maxHeight: 500)
           .background(Color(.secondarySystemBackground))
           .cornerRadius(8)
         }
