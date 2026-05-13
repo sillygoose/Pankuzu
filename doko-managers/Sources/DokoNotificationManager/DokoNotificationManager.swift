@@ -78,6 +78,15 @@ public final class DokoNotificationManager: NSObject, Sendable {
     await sendNotification(content: content)
   }
 
+  public func unknownVehicleNotification(vehicle: String) async {
+    let content = UNMutableNotificationContent()
+    content.title = "Unsupported Vehicle"
+    content.body = "Connected to an unsupported vehicle and cannot proceed, connection will be droppped and disabled."
+    content.sound = .default
+    content.userInfo = ["destination": "settings"]
+    await sendNotification(content: content)
+  }
+
   public func startTripNotification(vehicle: String) async {
     let content = UNMutableNotificationContent()
     content.title = "Starting New Trip"

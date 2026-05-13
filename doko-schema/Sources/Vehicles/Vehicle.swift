@@ -108,10 +108,17 @@ extension VehicleProtocol {
       }
     case "WVG":
       let pos78 = String(vin[vin.index(vin.startIndex, offsetBy: 6)...vin.index(vin.startIndex, offsetBy: 7)])
-      return (pos78 == "E1" || pos78 == "E2") ? "ID.4" : "Unknown"
+      switch pos78 {
+      case "E1", "E2", "E8": return "ID.4"
+      case "EB": return "ID.Buzz"
+      default: return "Unknown"
+      }
     case "1V2":
       let pos78 = String(vin[vin.index(vin.startIndex, offsetBy: 6)...vin.index(vin.startIndex, offsetBy: 7)])
-      return pos78 == "E8" ? "ID.4" : "Unknown"
+      switch pos78 {
+      case "E8": return "ID.4"
+      default: return "Unknown"
+      }
     default:
       return "Unknown"
     }
@@ -144,10 +151,17 @@ extension VehicleProtocol {
       return validGVWR && validEngine ? .fordElectric : .undetermined
     case "WVG":
       let pos78 = String(vin[vin.index(vin.startIndex, offsetBy: 6)...vin.index(vin.startIndex, offsetBy: 7)])
-      return (pos78 == "E1" || pos78 == "E2") ? .vwElectric : .undetermined
+      switch pos78 {
+      case "E1", "E2", "E8": return .vwElectric
+      case "EB": return .vwElectric
+      default: return .undetermined
+      }
     case "1V2":
       let pos78 = String(vin[vin.index(vin.startIndex, offsetBy: 6)...vin.index(vin.startIndex, offsetBy: 7)])
-      return pos78 == "E8" ? .vwElectric : .undetermined
+      switch pos78 {
+      case "E8": return .vwElectric
+      default: return .undetermined
+      }
     default:
       return .undetermined
     }

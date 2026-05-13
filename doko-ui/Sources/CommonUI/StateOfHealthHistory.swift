@@ -12,6 +12,36 @@ struct SoHPoint: Identifiable {
   let isCurrent: Bool
 }
 
+enum SoHPeriod: String, CaseIterable {
+  case week = "Week"
+  case month = "Month"
+  case year = "Year"
+
+  var visibleInterval: TimeInterval {
+    switch self {
+    case .week:  return 7 * 24 * 3600
+    case .month: return 30 * 24 * 3600
+    case .year:  return 365 * 24 * 3600
+    }
+  }
+
+  var axisStride: Calendar.Component {
+    switch self {
+    case .week:  return .day
+    case .month: return .weekOfYear
+    case .year:  return .month
+    }
+  }
+
+  var axisFormat: Date.FormatStyle {
+    switch self {
+    case .week:  return .dateTime.month(.abbreviated).day()
+    case .month: return .dateTime.month(.abbreviated).day()
+    case .year:  return .dateTime.month(.abbreviated).year(.twoDigits)
+    }
+  }
+}
+
 @MainActor
 @Observable
 public final class SoHHistoryModel {
@@ -59,8 +89,8 @@ public struct SoHHistoryView: View {
   @Bindable var model: SoHHistoryModel
 
   @Environment(\.dismiss) var dismiss
-  @State private var xDomainLength: TimeInterval? = nil
-  @State private var zoomBase: TimeInterval? = nil
+  @State private var period: SoHPeriod = .month
+  @State private var scrollPosition: Date = Date()
 
   public init(model: SoHHistoryModel) {
     self.model = model
@@ -71,18 +101,24 @@ public struct SoHHistoryView: View {
     return floor((min - 10) / 10) * 10
   }
 
-  var fullRange: TimeInterval {
-    guard let first = model.points.first?.date,
-          let last = model.points.last?.date else { return 0 }
-    return last.timeIntervalSince(first) * 1.1
+  var xDomainStart: Date {
+    model.points.first?.date ?? Date().addingTimeInterval(-period.visibleInterval)
   }
 
-  var visibleDomain: TimeInterval {
-    xDomainLength ?? max(fullRange, 1)
+  func anchorToNow() {
+    scrollPosition = Date().addingTimeInterval(-period.visibleInterval)
   }
 
   public var body: some View {
-    VStack {
+    VStack(spacing: 0) {
+      Picker("Period", selection: $period) {
+        ForEach(SoHPeriod.allCases, id: \.self) { p in
+          Text(p.rawValue).tag(p)
+        }
+      }
+      .pickerStyle(.segmented)
+      .padding()
+
       Chart {
         ForEach(model.points) { point in
           LineMark(
@@ -121,20 +157,19 @@ public struct SoHHistoryView: View {
         }
       }
       .chartScrollableAxes(.horizontal)
-      .chartXVisibleDomain(length: visibleDomain)
-      .chartXAxis(.automatic)
+      .chartXVisibleDomain(length: period.visibleInterval)
+      .chartScrollPosition(x: $scrollPosition)
+      .chartXScale(domain: xDomainStart...Date())
+      .chartXAxis {
+        AxisMarks(values: .stride(by: period.axisStride)) { _ in
+          AxisGridLine()
+          AxisTick()
+          AxisValueLabel(format: period.axisFormat)
+        }
+      }
       .chartLegend(position: .bottom)
       .frame(maxHeight: .infinity)
-      .padding()
-      .gesture(
-        MagnificationGesture()
-          .onChanged { scale in
-            if zoomBase == nil { zoomBase = visibleDomain }
-            let newLength = zoomBase! / scale
-            xDomainLength = max(7 * 24 * 3600, min(fullRange, newLength))
-          }
-          .onEnded { _ in zoomBase = nil }
-      )
+      .padding(.horizontal)
     }
     .navigationTitle(Text("State of Health History"))
     .navigationBarTitleDisplayMode(.inline)
@@ -143,5 +178,9 @@ public struct SoHHistoryView: View {
         Button("Done") { dismiss() }
       }
     }
+    .onAppear { anchorToNow() }
+    .onChange(of: period) { anchorToNow() }
+    .onChange(of: model.charges.count) { model.buildPoints() }
+    .onChange(of: model.trips.count) { model.buildPoints() }
   }
 }
