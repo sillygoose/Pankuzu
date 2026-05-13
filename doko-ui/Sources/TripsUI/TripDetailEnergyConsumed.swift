@@ -173,15 +173,17 @@ public struct TripDetailEnergyView: View {
         ])
         .chartLegend(position: .bottom) {
           HStack {
-            HStack(spacing: 4) {
-              Circle().fill(.red).frame(width: 8, height: 8)
-              Text("Vehicle Energy To Empty")
-                .foregroundStyle(.red)
+            if !model.energyToEmpty.isEmpty {
+              HStack(spacing: 4) {
+                Circle().fill(.red).frame(width: 8, height: 8)
+                Text("Vehicle Energy To Empty")
+                  .foregroundStyle(.red)
+              }
+              Spacer()
             }
-            Spacer()
             HStack(spacing: 4) {
               Circle().fill(.blue).frame(width: 8, height: 8)
-              Text("Battery Energy Estimate")
+              Text("Battery Energy Consumed")
                 .foregroundStyle(.blue)
             }
           }
