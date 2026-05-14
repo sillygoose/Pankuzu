@@ -90,7 +90,7 @@ public final class DokoNotificationManager: NSObject, Sendable {
   public func startTripNotification(vehicle: String) async {
     let content = UNMutableNotificationContent()
     content.title = "Starting New Trip"
-    content.body = "Logging a new trip in your \(vehicle), tap to enable Live Activities."
+    content.body = "Starting a trip in your \(vehicle), tap to show Live Activities."
     content.sound = .default
     content.userInfo = ["destination": "trips"]
     await sendNotification(content: content)
@@ -99,7 +99,7 @@ public final class DokoNotificationManager: NSObject, Sendable {
   public func startChargeNotification(vehicle: String) async {
     let content = UNMutableNotificationContent()
     content.title = "Starting New Charge"
-    content.body = "Logging a new charge in your \(vehicle), tap to enable Live Activities."
+    content.body = "Starting a charge in your \(vehicle), tap to show Live Activities."
     content.sound = .default
     content.userInfo = ["destination": "charges"]
     await sendNotification(content: content)
