@@ -1,5 +1,3 @@
-//import Shared
-
 private struct stcsegr: Parser {
   var body: some Parser<Substring.UTF8View, Void> {
     OneOf {
