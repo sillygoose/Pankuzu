@@ -68,8 +68,8 @@ public struct DokoPosition: Equatable, Hashable, Codable, Sendable {
     self.elevation = position.altitude
     self.course = position.course < 0 ? nil : Double(position.course)
     self.speed = position.speed < 0 ? nil : Double(position.speed) * 3.6
-    self.horizontalAccuracy = position.horizontalAccuracy
-    self.verticalAccuracy = position.verticalAccuracy
+    self.horizontalAccuracy = nil
+    self.verticalAccuracy = nil
   }
 }
 

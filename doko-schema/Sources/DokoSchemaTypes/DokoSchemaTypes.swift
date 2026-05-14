@@ -83,8 +83,8 @@ public struct VehiclePosition: Identifiable, Equatable, Hashable, Codable, Senda
     self.elevation = elevation
     self.course = course
     self.speed = speed
-    self.horizontalAccuracy = horizontalAccuracy
-    self.verticalAccuracy = verticalAccuracy
+    self.horizontalAccuracy = nil
+    self.verticalAccuracy = nil
   }
 
   public init(position: DokoPosition) {
@@ -94,8 +94,8 @@ public struct VehiclePosition: Identifiable, Equatable, Hashable, Codable, Senda
     self.elevation = position.elevation
     self.course = position.course
     self.speed = position.speed
-    self.horizontalAccuracy = position.horizontalAccuracy
-    self.verticalAccuracy = position.verticalAccuracy
+    self.horizontalAccuracy = nil
+    self.verticalAccuracy = nil
   }
 }
 
@@ -112,12 +112,12 @@ public struct VehicleElevation: Identifiable, Equatable, Hashable, Codable, Send
   ) {
     self.timestamp = timestamp
     self.elevation = elevation
-    self.verticalAccuracy = verticalAccuracy
+    self.verticalAccuracy = nil
   }
 
   public init(position: DokoPosition) {
     self.timestamp = position.timestamp
     self.elevation = position.elevation
-    self.verticalAccuracy = position.verticalAccuracy
+    self.verticalAccuracy = nil
   }
 }

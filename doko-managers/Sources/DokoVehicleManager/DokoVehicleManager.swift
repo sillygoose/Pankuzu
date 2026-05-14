@@ -133,20 +133,25 @@ extension DokoVehicleManager {
       $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: nil) }
       return nil
     }
+    
     self.logger.debug("\(timestamp()) DVM.setVin(\(vin))")
-    if let vehicle = vehicles.first(where: { $0.vin == vin }) {
-      self.logger.debug("\(timestamp()) DVM.setVin: \(vehicle.model), \(vehicle.vehicleType.description)")
-      $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: vehicle) }
-      return vehicle
+    let unknownVehicle = Vehicle(vin: vin)
+    let vehicleInterface = setVehicleInterface(to: unknownVehicle)
+    $connectedVehicleInterface.withLock { $0 = vehicleInterface }
+    guard vehicleInterface.vehicle != nil else {
+      return nil
+    }
+    
+    if let existingVehicle = vehicles.first(where: { $0.vin == vin }) {
+      self.logger.debug("\(timestamp()) DVM.setVin: \(existingVehicle.model), \(existingVehicle.vehicleType.description)")
+      return existingVehicle
     }
 
-    let newVehicle = Vehicle(vin: vin)
-    guard let _ = addVehicle(newVehicle: newVehicle) else {
+    guard let _ = addVehicle(newVehicle: unknownVehicle) else {
       DokoLogging.shared.postLoggingResponse(.error("DVM.setVin: could not add new vehicle"))
       return nil
     }
-    self.logger.debug("\(timestamp()) DVM.setVin: \(newVehicle.model), \(newVehicle.vehicleType.description)")
-    $connectedVehicleInterface.withLock { $0 = setVehicleInterface(to: newVehicle) }
-    return newVehicle
+    self.logger.debug("\(timestamp()) DVM.setVin: \(unknownVehicle.model), \(unknownVehicle.vehicleType.description)")
+    return unknownVehicle
   }
 }

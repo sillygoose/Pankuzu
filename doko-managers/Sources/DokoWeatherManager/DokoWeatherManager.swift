@@ -21,7 +21,10 @@ public final class DokoWeatherManager: Sendable {
     guard
       var latest = _latestWeatherUpdate,
       now.timeIntervalSince(latest.timestamp) < 660
-    else { return nil }
+    else {
+      _latestWeatherUpdate = nil
+      return nil
+    }
     latest.timestamp = now
     return latest
   }

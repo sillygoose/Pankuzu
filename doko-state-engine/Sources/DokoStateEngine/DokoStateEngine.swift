@@ -11,6 +11,7 @@ import DokoPacketManager
 import DokoVehicleManager
 import DokoNotificationManager
 import DokoLiveActivityManager
+import ObdLinkManager
 
 import Trips
 import Charges
@@ -111,6 +112,7 @@ public final class DokoStateEngine {
         }
         do {
           DokoLogging.shared.postLoggingResponse(.schedulers("processing: \(dokoResponsePacket.type.description)"))
+          DokoLogging.shared.postDokoResponsePacket(responsePacket: dokoResponsePacket)
           switch dokoResponsePacket.type {
           case .reset:
             guard case .reset = vehicleState else {
@@ -124,8 +126,16 @@ public final class DokoStateEngine {
               throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
             }
             var nextState: VehicleState = .vin
-            if let vin = dokoResponsePacket.vin, let _ = DokoVehicleManager.shared.setVin(vin: vin) {
-              nextState = dokoResponsePacket.nextState ?? .vin
+            if let vin = dokoResponsePacket.vin {
+              if let _ = DokoVehicleManager.shared.setVin(vin: vin) {
+                nextState = dokoResponsePacket.nextState ?? .vin
+              }
+              else {
+                await DokoNotificationManager.shared.unsupportedVehicleNotification()
+                try? await Task.sleep(for: .seconds(3))
+                await MainActor.run { ObdLinkManager.shared.disconnect() }
+                nextState = .vin
+              }
             }
             $vehicleState.withLock { $0 = nextState }
 
@@ -474,7 +484,6 @@ public final class DokoStateEngine {
         } catch {
           DokoLogging.shared.postLoggingResponse(.error("dokoResponseProcessing: \(String(describing: error))"))
         }
-        DokoLogging.shared.postDokoResponsePacket(responsePacket: dokoResponsePacket)
       }
       DokoLogging.shared.postLoggingResponse(.info("SE.ResponseProcessing ended"))
       self.logger.info("\(timestamp()) StateEngine.obdResponseProcessing() stopped")
