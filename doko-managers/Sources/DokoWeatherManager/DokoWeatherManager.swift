@@ -22,7 +22,6 @@ public final class DokoWeatherManager: Sendable {
       var latest = _latestWeatherUpdate,
       now.timeIntervalSince(latest.timestamp) < 660
     else {
-      _latestWeatherUpdate = nil
       return nil
     }
     latest.timestamp = now
@@ -34,11 +33,12 @@ public final class DokoWeatherManager: Sendable {
   }
 
   public func currentWeather(for location: CLLocation) async -> DokoCurrentWeather? {
+    @Dependency(\.date.now) var now
     do {
       let weather = try await self.weatherService.weather(for: location)
       let currentWeather = weather.currentWeather
       let dokoCurrentWeather = DokoCurrentWeather(
-        timestamp: currentWeather.date,
+        timestamp: now,
         temperature: currentWeather.temperature.converted(to: .celsius).value,
         windSpeed: currentWeather.wind.speed.converted(to: .metersPerSecond).value,
         windGust: currentWeather.wind.gust?.converted(to: .metersPerSecond).value,
