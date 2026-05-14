@@ -3,6 +3,8 @@ import OSLog
 import DokoLogging
 import ObdLinkCore
 
+import Shared
+
 extension UndeterminedVehicle {
   public func vehicleObdCommandResponse(_ command: ObdCommand, _ response: String, rawCommand: String) async -> ObdCommandResponse {
     self.logger.info("\(timestamp()) UV.parsedResponse(\(command.description), \(response))")

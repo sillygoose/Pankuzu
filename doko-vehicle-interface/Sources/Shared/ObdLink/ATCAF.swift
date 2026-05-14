@@ -1,4 +1,4 @@
-import ParsingHelpers
+//import Shared
 
 private struct atcaf: Parser {
   var body: some Parser<Substring.UTF8View, Void> {
@@ -11,7 +11,7 @@ private struct atcaf: Parser {
   }
 }
 
-func parseATCAF(_ input: String) throws {
+public func parseATCAF(_ input: String) throws {
   var input = input[...].utf8
   try atcaf().parse(&input)
 }

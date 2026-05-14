@@ -6,18 +6,37 @@ import ObdLinkCore
 import DokoWeatherManager
 import CoreLocationManager
 
+import Shared
+
 extension VwElectrics {
   public func vehicleObdCommandResponse(_ command: ObdCommand, _ response: String, rawCommand: String) async -> ObdCommandResponse {
     let result: ObdResult = .ok
     do {
       var commandResponse: ObdResponse
       switch command {
+      //###
       case .atz:
-        commandResponse = .atz(response)
+        let atz = try parseATZ(response)
+        commandResponse = .atz(atz)
       case .ate(let enabled):
+        try parseATE(response)
         commandResponse = .ate(enabled)
       case .ath(let enabled):
+        try parseATH(response)
         commandResponse = .ath(enabled)
+      case .atcaf(let enabled):
+        try parseATCAF(response)
+        commandResponse = .atcaf(enabled)
+      case .ats(let enabled):
+        try parseATS(response)
+        commandResponse = .ats(enabled)
+      //###
+      case .atsp(let canProtocol):
+        commandResponse = .atsp(canProtocol)
+      case .atsh(let header):
+        commandResponse = .atsh(header)
+      case .atcp(let header):
+        commandResponse = .atcp(header)
       case .atcfc(let enabled):
         commandResponse = .atcfc(enabled)
       case .atfcsm(let mode):
@@ -26,16 +45,6 @@ extension VwElectrics {
         commandResponse = .atfcsh(header)
       case .atfcsd(let data):
         commandResponse = .atfcsd(data)
-      case .atcaf(let enabled):
-        commandResponse = .atcaf(enabled)
-      case .ats(let enabled):
-        commandResponse = .ats(enabled)
-      case .atsp(let canProtocol):
-        commandResponse = .atsp(canProtocol)
-      case .atsh(let header):
-        commandResponse = .atsh(header)
-      case .atcp(let header):
-        commandResponse = .atcp(header)
       case .atcf(let pattern):
         commandResponse = .atcf(pattern)
       case .atcra(let pattern):

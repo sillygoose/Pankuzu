@@ -1,4 +1,4 @@
-import ParsingHelpers
+//import Shared
 
 private struct stcsegr: Parser {
   var body: some Parser<Substring.UTF8View, Void> {
@@ -11,7 +11,7 @@ private struct stcsegr: Parser {
   }
 }
 
-func parseSTCSEGR(_ input: String) throws {
+public func parseSTCSEGR(_ input: String) throws {
   var input = input[...].utf8
   try stcsegr().parse(&input)
 }

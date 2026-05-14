@@ -1,4 +1,4 @@
-import ParsingHelpers
+//import Shared
 
 private struct ats: Parser {
   var body: some Parser<Substring.UTF8View, Void> {
@@ -11,7 +11,7 @@ private struct ats: Parser {
   }
 }
 
-func parseATS(_ input: String) throws {
+public func parseATS(_ input: String) throws {
   var input = input[...].utf8
   try ats().parse(&input)
 }
