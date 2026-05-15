@@ -113,12 +113,14 @@ public struct TripDetailEnergyView: View {
               .foregroundStyle(.gray.opacity(0.5))
               .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
 
-            PointMark(
-              x: .value("time", selected.timestamp),
-              y: .value("energy", selected.datapoint)
-            )
-            .foregroundStyle(.red)
-            .symbolSize(100)
+            if !model.energyToEmpty.isEmpty {
+              PointMark(
+                x: .value("time", selected.timestamp),
+                y: .value("energy", selected.datapoint)
+              )
+              .foregroundStyle(.red)
+              .symbolSize(100)
+            }
 
             if let calculatedPoint = model.selectedCalculatedPoint {
               PointMark(
@@ -139,8 +141,10 @@ public struct TripDetailEnergyView: View {
                 Text(selected.timestamp, style: .time)
                   .font(.caption2)
                 HStack(spacing: 8) {
-                  Text(String(format: "%.3f", selected.datapoint))
-                    .foregroundStyle(.red)
+                  if !model.energyToEmpty.isEmpty {
+                    Text(String(format: "%.3f", selected.datapoint))
+                      .foregroundStyle(.red)
+                  }
                   if let calculatedPoint = model.selectedCalculatedPoint {
                     Text(String(format: "%.3f", calculatedPoint.datapoint))
                       .foregroundStyle(.blue)
@@ -200,12 +204,11 @@ public struct TripDetailEnergyView: View {
                     let x = value.location.x - geometry[proxy.plotFrame!].origin.x
                     guard let timestamp: Date = proxy.value(atX: x) else { return }
 
-                    model.selectedPoint = model.energyToEmpty.min { a, b in
-                      abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
+                    let nearest: ([DokoDataPoint]) -> DokoDataPoint? = { points in
+                      points.min { abs($0.timestamp.timeIntervalSince(timestamp)) < abs($1.timestamp.timeIntervalSince(timestamp)) }
                     }
-                    model.selectedCalculatedPoint = model.calculatedEnergy.min { a, b in
-                      abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
-                    }
+                    model.selectedPoint = nearest(model.energyToEmpty) ?? nearest(model.calculatedEnergy)
+                    model.selectedCalculatedPoint = nearest(model.calculatedEnergy)
                   }
                   .onEnded { _ in
                     model.selectedPoint = nil
