@@ -44,25 +44,14 @@ public actor VwElectrics: ConnectedVehicleInterface {
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
     let obdLinkCommand: String?
     switch command {
-    case .atz:                          obdLinkCommand = "ATZ"
-    case .ate(let enabled):             obdLinkCommand = "ATE \(enabled ? 1 : 0)"
-    case .ath(let enabled):             obdLinkCommand = "ATH \(enabled ? 1 : 0)"
-    case .atcfc(let enabled):           obdLinkCommand = "ATCFC \(enabled ? 1 : 0)"
-    case .atfcsm(let mode):             obdLinkCommand = "ATFCSM \(mode)"
-    case .atfcsh(let header):           obdLinkCommand = "ATFCSH \(header)"
-    case .atfcsd(let data):             obdLinkCommand = "ATFCSD \(data)"
-    case .atcaf(let enabled):           obdLinkCommand = "ATCAF \(enabled ? 1 : 0)"
-    case .ats(let enabled):             obdLinkCommand = "ATS \(enabled ? 1 : 0)"
-    case .atsp(let canProtocol):        obdLinkCommand = "ATSP \(canProtocol)"
-    case .atsh(let header):             obdLinkCommand = "ATSH \(header)"
-    case .atcp(let header):             obdLinkCommand = "ATCP \(header)"
-    case .atcf(let pattern):            obdLinkCommand = "ATCF \(pattern)"
-    case .atcra(let pattern):           obdLinkCommand = "ATCRA \(pattern)"
-    case .atcm(let mask):               obdLinkCommand = "ATCM \(mask)"
-    case .stcsegr(let enabled):         obdLinkCommand = "STCSEGR \(enabled ? 1 : 0)"
+    case .atcra(let pattern):           obdLinkCommand = "ATCRA\(pattern)"
+    case .atfcsh(let header):           obdLinkCommand = "ATFCSH\(header)"
+    case .atfcsd(let data):             obdLinkCommand = "ATFCSD\(data)"
+    case .atfcsm(let mode):             obdLinkCommand = "ATFCSM\(mode)"
+
     case .stpo:                         obdLinkCommand = "STPO"
-    case .stp(let canProtocol):         obdLinkCommand = "STP \(canProtocol)"
-    case .stpbr(let baudRate):          obdLinkCommand = "STPBR \(baudRate)"
+    case .stp(let canProtocol):         obdLinkCommand = "STP\(canProtocol)"
+    case .stpbr(let baudRate):          obdLinkCommand = "STPBR\(baudRate)"
 
     case .gearSelected:                 obdLinkCommand = "STPX h:17FC0076, d:22210E"
     case .odometer:                     obdLinkCommand = "STPX h:17FC0076, d:22295A"
@@ -100,23 +89,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
     switch packetType {
     case .vehicleCustomization:
       return obdCommandPacket(.vehicleCustomization) {
-        //.atz; .ate(false); .ats(false); .ath(false); .atcaf(true); .stcsegr(true); .atsp(0)
         canbusInitialization;
-
-//        .acChargerStatus;
-//        .dcChargerStatus;
-//        .gearSelected;
-//        .odometer;
-//        .speed;
-//        .batteryStateOfCharge;
-//        .batteryTemperature;
-//        .batteryOriginalCapacity;
-//        .batteryVoltage;
-//        .batteryCurrent;
-//        canbusNormalAddressing;
-//        .batteryCurrentCapacity;
-//        .batteryDistanceToEmpty;
-//        canbusExtendedAddressing;
       }
 
     case .idle:

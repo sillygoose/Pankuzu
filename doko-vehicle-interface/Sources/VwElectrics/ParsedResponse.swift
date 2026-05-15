@@ -14,48 +14,27 @@ extension VwElectrics {
     do {
       var commandResponse: ObdResponse
       switch command {
-      //###
-      case .atz:
-        let atz = try parseATZ(response)
-        commandResponse = .atz(atz)
-      case .ate(let enabled):
-        try parseATE(response)
-        commandResponse = .ate(enabled)
-      case .ath(let enabled):
-        try parseATH(response)
-        commandResponse = .ath(enabled)
-      case .atcaf(let enabled):
-        try parseATCAF(response)
-        commandResponse = .atcaf(enabled)
-      case .ats(let enabled):
-        try parseATS(response)
-        commandResponse = .ats(enabled)
-      //###
-      case .atsp(let canProtocol):
-        commandResponse = .atsp(canProtocol)
-      case .atsh(let header):
-        commandResponse = .atsh(header)
-      case .atcp(let header):
-        commandResponse = .atcp(header)
-      case .atcfc(let enabled):
-        commandResponse = .atcfc(enabled)
-      case .atfcsm(let mode):
-        commandResponse = .atfcsm(mode)
+      case .atcra(let pattern):
+        try parseATCRA(response)
+        commandResponse = .atcra(pattern)
       case .atfcsh(let header):
+        try parseATFCSH(response)
         commandResponse = .atfcsh(header)
       case .atfcsd(let data):
+        try parseATFCSD(response)
         commandResponse = .atfcsd(data)
-      case .atcf(let pattern):
-        commandResponse = .atcf(pattern)
-      case .atcra(let pattern):
-        commandResponse = .atcra(pattern)
-      case .atcm(let mask):
-        commandResponse = .atcm(mask)
-      case .stcsegr(let enabled):
-        commandResponse = .stcsegr(enabled)
-      case .stp(let proto):
-        commandResponse = .stp(proto)
+      case .atfcsm(let mode):
+        try parseATFCSM(response)
+        commandResponse = .atfcsm(mode)
+
+      case .stp(let canProtocol):
+        try parseSTP(response)
+        commandResponse = .stp(canProtocol)
+      case .stpbr(let baudRate):
+        try parseSTPBR(response)
+        commandResponse = .stpbr(baudRate)
       case .stpo:
+        try parseSTPO(response)
         commandResponse = .stpo(response)
 
       case .position:

@@ -42,14 +42,11 @@ public actor FordElectrics: ConnectedVehicleInterface {
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
     let obdLinkCommand: String?
     switch command {
-    case .stpx(let header, let did):    obdLinkCommand = String(format: "STPX h:%X, d:22%0X", header, did)
-    case .ath(let enabled):             obdLinkCommand = "ATH\(enabled ? 1 : 0)"
-
     case .gearSelected:                 obdLinkCommand = "STPX h:7E2, d:221E12"
     case .acChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224888"
     case .dcChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224897"
 
-    case .batteryEnergyToEmpty:        obdLinkCommand = "STPX h:7E4, d:224848"
+    case .batteryEnergyToEmpty:         obdLinkCommand = "STPX h:7E4, d:224848"
     case .batteryStateOfCharge:         obdLinkCommand = "STPX h:7E4, d:224845"
     case .batteryStateOfHealth:         obdLinkCommand = "STPX h:7E4, d:22490C"
     case .batteryTemperature:           obdLinkCommand = "STPX h:7E4, d:224800"

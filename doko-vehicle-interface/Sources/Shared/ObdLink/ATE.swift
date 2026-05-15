@@ -3,9 +3,11 @@ import Parsing
 private struct ate: Parser {
   var body: some Parser<Substring.UTF8View, Void> {
     OneOf {
-      "ATE0".utf8;
-      "ATE1".utf8;
-      "".utf8;
+      Parse {
+        "ATE".utf8
+        First().filter { $0 == UInt8(ascii: "0") || $0 == UInt8(ascii: "1") }
+      }.map { _ in () }
+      "".utf8
     }
     "OK".utf8
   }

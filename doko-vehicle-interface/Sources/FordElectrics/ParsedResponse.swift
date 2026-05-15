@@ -14,11 +14,6 @@ extension FordElectrics {
     do {
       var commandResponse: ObdResponse
       switch command {
-      case .ath(let enabled):
-        commandResponse = .ath(enabled)
-      case .stpx(_, _):
-        commandResponse = .stpx(response)
-
       case .position:
         guard let position = await CoreLocationManager.shared.currentLocation else {
           throw ParsedResponseError.locationUnavailable

@@ -31,9 +31,11 @@ extension UndeterminedVehicle {
         try parseSTCSEGR(response)
         commandResponse = .stcsegr(enabled)
       case .atsp(let busProtocol):
+        try parseATSP(response)
         commandResponse = .atsp(busProtocol)
       case .stprs:
-        commandResponse = .stprs(response)
+        let canbusProtocol = try parseSTPRS(response)
+        commandResponse = .stprs(canbusProtocol)
         
       case .vin:
         let vin = try parseVin(response)

@@ -1,10 +1,10 @@
 import Parsing
 
-private struct atsp: Parser {
+private struct stpbr: Parser {
   var body: some Parser<Substring.UTF8View, Void> {
     OneOf {
       Parse {
-        "ATSP".utf8
+        "STPBR".utf8
         Prefix(1...) { (UInt8(ascii: "0")...UInt8(ascii: "9")).contains($0) }
       }.map { _ in () }
       "".utf8
@@ -13,6 +13,6 @@ private struct atsp: Parser {
   }
 }
 
-public func parseATSP(_ input: String) throws -> Void {
-  try atsp().parse(input)
+public func parseSTPBR(_ input: String) throws -> Void {
+  try stpbr().parse(input)
 }
