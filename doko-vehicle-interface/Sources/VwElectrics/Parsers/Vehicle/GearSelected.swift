@@ -1,14 +1,6 @@
 import Shared
 import DokoDebug
 
-/*
- Ready  Technical  Driving mode position (P-N-D-B)  logic
- UDS SID  0x17fc0076 03 22 21 0e 55 55 55 55
- 17  17fc0076  03 22 21 0e 55 55 55 55
- 0x17fe0076 05 62 21 0e XX YY aa aa
- 17fe0076  05 62 21 0e XX YY aa aa  YY=08->P,YY=05->D,YY=0c->B,YY=07->R,YY=06->N
- */
-
 private enum GearSelected: Int {
   case unknown = -1
   case park = 8

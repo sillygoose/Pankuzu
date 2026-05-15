@@ -21,6 +21,5 @@ func parseVin(_ input: String) throws -> String {
   @Shared(.simVin) var simVin
   if simIdle { return simVin }
 #endif
-  var input = input[...].utf8
-  return try vinParser().parse(&input)
+  return try vinParser().parse(input)
 }

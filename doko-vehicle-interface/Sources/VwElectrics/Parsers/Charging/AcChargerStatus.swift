@@ -1,14 +1,6 @@
 import Shared
 import DokoDebug
 
-/*
- Ready  Technical  Car operation mode  logic  UDS SID
- 0x17fc007b 03 22 74 48 55 55 55 55  17
- 17fc007b  03 22 74 48 55 55 55 55
- 0x17fe007b 04 62 74 48 XX aa aa aa
- 17fe007b  04 62 74 48 XX aa aa aa  XX = 0 => standby, XX = 1 => driving, XX = 4 => AC charging, XX = 6 => DC charging
- */
-
 private struct chargerStatus: Parser {
   func parse(_ input: inout Substring.UTF8View) throws -> Bool {
     let prefix = input.prefix(2)

@@ -1,15 +1,18 @@
+import Parsing
+
 private struct atz: Parser {
-  var body: some Parser<Substring.UTF8View, Substring.UTF8View> {
-    OneOf {
-      "ATZ".utf8;
-      "".utf8
+  var body: some Parser<Substring.UTF8View, Substring> {
+    Parse(Substring.init) {
+      OneOf {
+        "ATZ".utf8;
+        "".utf8
+      }
+      Rest().map(Substring.init)
     }
-    Rest()
   }
 }
 
 public func parseATZ(_ input: String) throws -> String {
-  var input = input[...].utf8
-  let version = try atz().parse(&input)
-  return String(bytes: version, encoding: .utf8) ?? "???"
+  let version = try atz().parse(input)
+  return String(version)
 }

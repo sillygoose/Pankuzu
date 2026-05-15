@@ -31,7 +31,6 @@ extension UndeterminedVehicle {
         try parseSTCSEGR(response)
         commandResponse = .stcsegr(enabled)
       case .atsp(let busProtocol):
-//        try p7arseATCP(response)
         commandResponse = .atsp(busProtocol)
       case .stprs:
         commandResponse = .stprs(response)

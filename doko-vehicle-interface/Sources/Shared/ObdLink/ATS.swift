@@ -1,3 +1,5 @@
+import Parsing
+
 private struct ats: Parser {
   var body: some Parser<Substring.UTF8View, Void> {
     OneOf {
@@ -10,6 +12,5 @@ private struct ats: Parser {
 }
 
 public func parseATS(_ input: String) throws {
-  var input = input[...].utf8
-  try ats().parse(&input)
+  try ats().parse(input)
 }

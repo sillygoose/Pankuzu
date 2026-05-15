@@ -1,3 +1,5 @@
+import Parsing
+
 private struct athParser: Parser {
   var body: some Parser<Substring.UTF8View, Void> {
     OneOf {
@@ -10,6 +12,5 @@ private struct athParser: Parser {
 }
 
 public func parseATH(_ input: String) throws {
-  var input = input[...].utf8
-  try athParser().parse(&input)
+  try athParser().parse(input)
 }

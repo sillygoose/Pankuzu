@@ -1,3 +1,5 @@
+import Parsing
+
 private struct stcsegr: Parser {
   var body: some Parser<Substring.UTF8View, Void> {
     OneOf {
@@ -10,6 +12,5 @@ private struct stcsegr: Parser {
 }
 
 public func parseSTCSEGR(_ input: String) throws {
-  var input = input[...].utf8
-  try stcsegr().parse(&input)
+  try stcsegr().parse(input)
 }

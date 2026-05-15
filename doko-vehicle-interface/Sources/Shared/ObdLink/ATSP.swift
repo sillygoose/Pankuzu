@@ -1,12 +1,4 @@
-private struct actualATSP: Parser {
-  var body: some Parser<Substring.UTF8View, Void> {
-    OneOf {
-      "ATSP0".utf8;
-      "".utf8
-    }
-    "OK".utf8
-  }
-}
+import Parsing
 
 private struct atsp: Parser {
   var body: some Parser<Substring.UTF8View, Void> {
@@ -19,6 +11,5 @@ private struct atsp: Parser {
 }
 
 public func parseATSP(_ input: String) throws {
-  var input = input[...].utf8
-  try atsp().parse(&input)
+  try atsp().parse(input)
 }

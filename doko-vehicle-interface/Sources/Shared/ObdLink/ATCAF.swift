@@ -1,3 +1,5 @@
+import Parsing
+
 private struct atcaf: Parser {
   var body: some Parser<Substring.UTF8View, Void> {
     OneOf {
@@ -10,6 +12,5 @@ private struct atcaf: Parser {
 }
 
 public func parseATCAF(_ input: String) throws {
-  var input = input[...].utf8
-  try atcaf().parse(&input)
+  try atcaf().parse(input)
 }
