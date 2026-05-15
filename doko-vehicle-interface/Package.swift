@@ -99,6 +99,12 @@ let package = Package(
         .product(name: "Parsing", package: "swift-parsing"),
       ]
     ),
+    .testTarget(
+      name: "SharedTests",
+      dependencies: [
+        "Shared",
+      ]
+    ),
   ],
   swiftLanguageModes: [.v6]
 )
