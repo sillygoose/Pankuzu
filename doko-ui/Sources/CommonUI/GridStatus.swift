@@ -1,21 +1,21 @@
 import SwiftUI
 
 public struct GridStatusButton: View {
-  let leftSymbolTitle: String
   let leftSymbol: String
   let leftSymbolColor: Color
+  let leftSymbolTitle: String
   let centerSymbol: String?
   let centerSymbolColor: Color?
-  let centerSymbolTitle: String
+  let centerSymbolTitle: String?
   let rightSymbol: String?
   let rightSymbolColor: Color?
-  let rightSymbolTitle: String
+  let rightSymbolTitle: String?
   let action: () -> Void
-  
+
   public init(
     leftSymbol: String, leftSymbolColor: Color, leftSymbolTitle: String,
-    centerSymbol: String? = nil, centerSymbolColor: Color? = nil, centerSymbolTitle: String,
-    rightSymbol: String? = nil, rightSymbolColor: Color? = nil, rightSymbolTitle: String,
+    centerSymbol: String? = nil, centerSymbolColor: Color? = nil, centerSymbolTitle: String? = nil,
+    rightSymbol: String? = nil, rightSymbolColor: Color? = nil, rightSymbolTitle: String? = nil,
     action: @escaping () -> Void
   ) {
     self.leftSymbol = leftSymbol
@@ -31,13 +31,13 @@ public struct GridStatusButton: View {
   }
   
   public var body: some View {
-    Button(action: action) {
-      VStack {
-        Text("Scan Tool Status")
-          .lineLimit(1)
-          .font(DesignTokens.Font.headline)
-          .foregroundStyle(.gray)
-        HStack(spacing: 0) {
+    VStack {
+      Text("Scan Tool Status")
+        .lineLimit(1)
+        .font(DesignTokens.Font.headline)
+        .foregroundStyle(.gray)
+      HStack(spacing: 0) {
+        Button(action: action) {
           VStack {
             Image(systemName: leftSymbol)
               .font(DesignTokens.Font.largeTitle)
@@ -48,42 +48,46 @@ public struct GridStatusButton: View {
               .font(DesignTokens.Font.headline)
               .foregroundStyle(.gray)
           }
-          .frame(maxWidth: .infinity)
-          if let centerSymbol, let centerSymbolColor {
-            VStack {
-              Image(systemName: centerSymbol)
-                .font(DesignTokens.Font.largeTitle)
-                .bold()
-                .foregroundStyle(centerSymbolColor)
+        }
+        .buttonStyle(.borderless)
+        .frame(maxWidth: .infinity)
+        if let centerSymbol, let centerSymbolColor {
+          VStack {
+            Image(systemName: centerSymbol)
+              .font(DesignTokens.Font.largeTitle)
+              .bold()
+              .foregroundStyle(centerSymbolColor)
+            if let centerSymbolTitle {
               Text(centerSymbolTitle)
                 .lineLimit(1)
                 .font(DesignTokens.Font.headline)
                 .foregroundStyle(.gray)
             }
-            .frame(maxWidth: .infinity)
           }
-          VStack {
-            if let rightSymbol, let rightSymbolColor {
-              Image(systemName: rightSymbol)
-                .font(DesignTokens.Font.largeTitle)
-                .bold()
-                .symbolEffect(.pulse, options: .repeating)
-                .foregroundStyle(rightSymbolColor)
-            } else {
-              Image(systemName: "square.fill")
-                .font(DesignTokens.Font.largeTitle)
-                .opacity(0)
-            }
+          .frame(maxWidth: .infinity)
+        }
+        VStack {
+          if let rightSymbol, let rightSymbolColor {
+            Image(systemName: rightSymbol)
+              .font(DesignTokens.Font.largeTitle)
+              .bold()
+              .symbolEffect(.pulse, options: .repeating)
+              .foregroundStyle(rightSymbolColor)
+          } else {
+            Image(systemName: "square.fill")
+              .font(DesignTokens.Font.largeTitle)
+              .opacity(0)
+          }
+          if let rightSymbolTitle {
             Text(rightSymbolTitle)
               .lineLimit(1)
               .font(DesignTokens.Font.headline)
               .foregroundStyle(.gray)
           }
-          .frame(maxWidth: .infinity)
         }
+        .frame(maxWidth: .infinity)
       }
     }
-    .buttonStyle(.borderless)
     .padding(DesignTokens.Padding.cardInsets)
     .background(DesignTokens.Color.cardBackground)
     .cornerRadius(DesignTokens.CornerRadius.medium)

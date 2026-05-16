@@ -151,6 +151,26 @@ public struct TripDetailMapView: View {
       }
       .mapStyle(appSettings.tripMapStyle.mapStyle)
       .onMapCameraChange(frequency: .continuous) { context in currentCamera = context.camera }
+      .task {
+        try? await Task.sleep(for: .seconds(0.25))
+        let center = model.coordinateRegion.center
+        let nudged = CLLocationCoordinate2D(
+          latitude: center.latitude + 0.000001,
+          longitude: center.longitude
+        )
+        if let cam = currentCamera {
+          mapCameraPosition = .camera(MapCamera(
+            centerCoordinate: nudged,
+            distance: cam.distance,
+            heading: cam.heading,
+            pitch: cam.pitch
+          ))
+        } else {
+          var region = model.coordinateRegion
+          region.center = nudged
+          mapCameraPosition = .region(region)
+        }
+      }
       .onAppear {
         guard appSettings.tripMap3D else { return }
         let span = model.coordinateRegion.span
