@@ -123,10 +123,9 @@ public struct SoHHistoryView: View {
         ForEach(model.points) { point in
           LineMark(
             x: .value("Date", point.date),
-            y: .value("SoH", point.soh),
-            series: .value("Source", point.source == .charge ? "Charge" : "Trip")
+            y: .value("SoH", point.soh)
           )
-          .foregroundStyle(point.source == .charge ? Color.green : Color.blue)
+          .foregroundStyle(.secondary)
           .interpolationMethod(.monotone)
 
           PointMark(
@@ -167,9 +166,21 @@ public struct SoHHistoryView: View {
           AxisValueLabel(format: period.axisFormat)
         }
       }
-      .chartLegend(position: .bottom)
+      .chartLegend(.hidden)
       .frame(maxHeight: .infinity)
       .padding(.horizontal)
+
+      HStack(spacing: 20) {
+        HStack(spacing: 6) {
+          Circle().fill(Color.green).frame(width: 8, height: 8)
+          Text("Charge").font(.caption).foregroundStyle(.secondary)
+        }
+        HStack(spacing: 6) {
+          Circle().fill(Color.blue).frame(width: 8, height: 8)
+          Text("Trip").font(.caption).foregroundStyle(.secondary)
+        }
+      }
+      .padding(.bottom, 8)
     }
     .navigationTitle(Text("State of Health History"))
     .navigationBarTitleDisplayMode(.inline)

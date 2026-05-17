@@ -192,13 +192,15 @@ public struct ChargeDetailBatteryTemperatureView: View {
               .font(.caption)
               .foregroundStyle(.secondary)
           }
-          HStack(spacing: 6) {
-            Rectangle()
-              .fill(Color.orange)
-              .frame(width: 20, height: 2)
-            Text("Coupler")
-              .font(.caption)
-              .foregroundStyle(.secondary)
+          if !model.couplerTemp.isEmpty {
+            HStack(spacing: 6) {
+              Rectangle()
+                .fill(Color.orange)
+                .frame(width: 20, height: 2)
+              Text("Coupler")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
           }
         }
         .padding(.top, 8)
