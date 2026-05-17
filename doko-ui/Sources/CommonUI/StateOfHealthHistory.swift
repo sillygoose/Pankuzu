@@ -2,6 +2,7 @@ import SwiftUI
 import Charts
 
 import DokoSchema
+import DokoSharing
 
 struct SoHPoint: Identifiable {
   enum Source { case charge, trip }
@@ -89,7 +90,7 @@ public struct SoHHistoryView: View {
   @Bindable var model: SoHHistoryModel
 
   @Environment(\.dismiss) var dismiss
-  @State private var period: SoHPeriod = .month
+  @AppStorage("sohHistoryPeriod", store: .pankuzu) private var period: SoHPeriod = .month
   @State private var scrollPosition: Date = Date()
 
   public init(model: SoHHistoryModel) {
