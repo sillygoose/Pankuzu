@@ -85,6 +85,12 @@ let package = Package(
         .product(name: "DokoTypes", package: "doko-core"),
       ]
     ),
+    .testTarget(
+      name: "VehiclesTests",
+      dependencies: [
+        "Vehicles",
+      ]
+    ),
   ],
   swiftLanguageModes: [.v6]
 )

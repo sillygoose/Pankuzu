@@ -209,6 +209,14 @@ struct VINDecoderTests {
     #expect(v.make == "VW")
   }
 
+  @Test func vwGermanyEB() {
+    // WVG + pos7-8 = EB → ID.Buzz
+    let v = Vehicle(decoding: "WVGZZZEBZNB000001")
+    #expect(v.vehicleType == .vwElectric)
+    #expect(v.model == "ID.Buzz")
+    #expect(v.make == "VW")
+  }
+
   @Test func vwGermanyInvalidPositions() {
     // WVG + pos7-8 = E8 → undetermined
     let v = Vehicle(decoding: "WVGZZZE8ZNB000001")

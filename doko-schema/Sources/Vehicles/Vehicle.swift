@@ -109,7 +109,7 @@ extension VehicleProtocol {
     case "WVG":
       let pos78 = String(vin[vin.index(vin.startIndex, offsetBy: 6)...vin.index(vin.startIndex, offsetBy: 7)])
       switch pos78 {
-      case "E1", "E2", "E8": return "ID.4"
+      case "E1", "E2": return "ID.4"
       case "EB": return "ID.Buzz"
       default: return "Unknown"
       }
@@ -152,7 +152,7 @@ extension VehicleProtocol {
     case "WVG":
       let pos78 = String(vin[vin.index(vin.startIndex, offsetBy: 6)...vin.index(vin.startIndex, offsetBy: 7)])
       switch pos78 {
-      case "E1", "E2", "E8": return .vwElectric
+      case "E1", "E2": return .vwElectric
       case "EB": return .vwElectric
       default: return .undetermined
       }

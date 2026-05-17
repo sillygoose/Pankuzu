@@ -104,6 +104,12 @@ let package = Package(
         .product(name: "Dependencies", package: "swift-dependencies"),
       ]
     ),
+    .testTarget(
+      name: "DokoABRPTests",
+      dependencies: [
+        "DokoABRP",
+      ]
+    ),
   ],
   swiftLanguageModes: [.v6]
 )
