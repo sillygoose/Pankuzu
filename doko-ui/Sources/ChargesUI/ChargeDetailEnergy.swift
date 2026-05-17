@@ -31,11 +31,17 @@ public final class ChargeDetailEnergyModel {
     let chargeDuration = charge.timeEnd.timeIntervalSince(charge.timeStart)
     useSecondsForXAxis = chargeDuration < 300
 
-    guard let chargeHistory, !chargeHistory.energyToEmpty.isEmpty else {
-      self.minEnergy = floor(0)
-      self.maxEnergy = ceil(100)
+    guard let chargeHistory else { return }
+
+    if chargeHistory.energyToEmpty.isEmpty {
+      guard !chargeHistory.batteryEnergy.isEmpty else { return }
+      calculatedEnergy = downsample(chargeHistory.batteryEnergy, maxPoints: 60)
+      let datapoints = calculatedEnergy.map(\.datapoint)
+      self.minEnergy = floor(datapoints.min() ?? 0)
+      self.maxEnergy = ceil(datapoints.max() ?? 100)
       return
     }
+
     energyToEmpty = downsample(chargeHistory.energyToEmpty, maxPoints: 60)
 
     if let initialEnergy = charge.energyToEmptyStart {
@@ -109,12 +115,14 @@ public struct ChargeDetailEnergyView: View {
               .foregroundStyle(.gray.opacity(0.5))
               .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
 
-            PointMark(
-              x: .value("time", selected.timestamp),
-              y: .value("energy", selected.datapoint)
-            )
-            .foregroundStyle(.green)
-            .symbolSize(100)
+            if !model.energyToEmpty.isEmpty {
+              PointMark(
+                x: .value("time", selected.timestamp),
+                y: .value("energy", selected.datapoint)
+              )
+              .foregroundStyle(.green)
+              .symbolSize(100)
+            }
 
             if let calculatedPoint = model.selectedCalculatedPoint {
               PointMark(
@@ -135,8 +143,10 @@ public struct ChargeDetailEnergyView: View {
                 Text(selected.timestamp, style: .time)
                   .font(.caption2)
                 HStack(spacing: 8) {
-                  Text(String(format: "%.3f", selected.datapoint))
-                    .foregroundStyle(.green)
+                  if !model.energyToEmpty.isEmpty {
+                    Text(String(format: "%.3f", selected.datapoint))
+                      .foregroundStyle(.green)
+                  }
                   if let calculatedPoint = model.selectedCalculatedPoint {
                     Text(String(format: "%.3f", calculatedPoint.datapoint))
                       .foregroundStyle(.blue)
@@ -169,16 +179,22 @@ public struct ChargeDetailEnergyView: View {
         ])
         .chartLegend(position: .bottom) {
           HStack {
-            HStack(spacing: 4) {
-              Circle().fill(.green).frame(width: 8, height: 8)
-              Text("Vehicle Energy To Empty")
-                .foregroundStyle(.green)
+            if !model.energyToEmpty.isEmpty {
+              HStack(spacing: 4) {
+                Circle().fill(.green).frame(width: 8, height: 8)
+                Text("Vehicle Energy To Empty")
+                  .foregroundStyle(.green)
+              }
             }
-            Spacer()
-            HStack(spacing: 4) {
-              Circle().fill(.blue).frame(width: 8, height: 8)
-              Text("Battery Energy Estimate")
-                .foregroundStyle(.blue)
+            if !model.energyToEmpty.isEmpty && !model.calculatedEnergy.isEmpty {
+              Spacer()
+            }
+            if !model.calculatedEnergy.isEmpty {
+              HStack(spacing: 4) {
+                Circle().fill(.blue).frame(width: 8, height: 8)
+                Text("Energy Added")
+                  .foregroundStyle(.blue)
+              }
             }
           }
           .font(.caption)
@@ -194,12 +210,11 @@ public struct ChargeDetailEnergyView: View {
                     let x = value.location.x - geometry[proxy.plotFrame!].origin.x
                     guard let timestamp: Date = proxy.value(atX: x) else { return }
 
-                    model.selectedPoint = model.energyToEmpty.min { a, b in
-                      abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
+                    let nearest: ([DokoDataPoint]) -> DokoDataPoint? = { points in
+                      points.min { abs($0.timestamp.timeIntervalSince(timestamp)) < abs($1.timestamp.timeIntervalSince(timestamp)) }
                     }
-                    model.selectedCalculatedPoint = model.calculatedEnergy.min { a, b in
-                      abs(a.timestamp.timeIntervalSince(timestamp)) < abs(b.timestamp.timeIntervalSince(timestamp))
-                    }
+                    model.selectedPoint = nearest(model.energyToEmpty) ?? nearest(model.calculatedEnergy)
+                    model.selectedCalculatedPoint = nearest(model.calculatedEnergy)
                   }
                   .onEnded { _ in
                     model.selectedPoint = nil
