@@ -7,8 +7,22 @@ import DokoSchema
 import DokoSharing
 
 @MainActor @Observable public final class SettingsModel {
-  @ObservationIgnored @FetchOne(Vehicle.select { Stats.Columns(count: $0.count()) })
-  var vehicleStats = Stats()
+  @ObservationIgnored @FetchOne(
+    Trip
+      .where { $0.isDeleted.eq(false) }
+      .select { Stats.Columns(count: $0.count()) }
+  ) var tripStats = Stats()
+
+  @ObservationIgnored @FetchOne(
+    Charge
+      .where { $0.isDeleted.eq(false) }
+      .select { Stats.Columns(count: $0.count()) }
+  ) var chargeStats = Stats()
+
+  @ObservationIgnored @FetchOne(
+    Vehicle
+      .select { Stats.Columns(count: $0.count()) }
+  ) var vehicleStats = Stats()
 
   @ObservationIgnored @FetchOne(
     Location
@@ -84,6 +98,22 @@ public struct SettingsView: View {
         .listRowInsets(EdgeInsets())
 
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+          GridValue(
+            color: .blue,
+            value: "\(model.tripStats.count)",
+            units: nil,
+            symbolName: "point.bottomleft.forward.to.point.topright.scurvepath.fill",
+            title: "Trips"
+          )
+
+          GridValue(
+            color: .green,
+            value: "\(model.chargeStats.count)",
+            units: nil,
+            symbolName: "bolt.car",
+            title: "Charges"
+          )
+
           GridValueButton(
             color: .cyan,
             value: "\(model.vehicleStats.count)",

@@ -3,12 +3,14 @@ import SwiftUI
 public struct GridValue: View {
   let color: Color
   let value: String
-  let units: String
+  let units: String?
   let symbolName: String
   let title: String
   
   public init(
-    color: Color, value: String, units: String,
+    color: Color,
+    value: String,
+    units: String? = nil,
     symbolName: String,
     title: String
   ) {
@@ -39,9 +41,12 @@ public struct GridValue: View {
           .font(DesignTokens.Font.headline)
           .opacity(DesignTokens.Opacity.subtle)
         Spacer()
-        Text(units)
-          .lineLimit(1)
-          .font(DesignTokens.Font.callout)
+        if let units {
+          Text("\(units)")
+            .lineLimit(1)
+            .font(DesignTokens.Font.headline)
+            .foregroundStyle(.gray)
+        }
       }
     }
     .padding(DesignTokens.Padding.cardInsets)
