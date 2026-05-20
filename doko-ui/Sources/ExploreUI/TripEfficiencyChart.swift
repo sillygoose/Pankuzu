@@ -8,13 +8,13 @@ import CommonUI
 
 extension SharedKey where Self == AppStorageKey<Vehicle.ID?>.Default {
   static var tripEfficiencyDisplayVehicleID: Self {
-    Self[.appStorage("TripDisplayVehicleID"), default: nil]
+    Self[.appStorage("TripEfficiencyDisplayVehicleID"), default: nil]
   }
 }
 
 extension SharedKey where Self == AppStorageKey<TripEfficiencyUnit>.Default {
   static var tripEfficiencyUnit: Self {
-    Self[.appStorage("tripEfficiencyUnit"), default: .kmPerKWh]
+    Self[.appStorage("TripEfficiencyUnit"), default: .kmPerKWh]
   }
 }
 

@@ -4,7 +4,7 @@ import Charts
 import DokoSchema
 import DokoSharing
 
-struct SoHPoint: Identifiable {
+struct StateOfHealthPoint: Identifiable {
   enum Source { case charge, trip }
   let id: UUID
   let date: Date
@@ -13,7 +13,7 @@ struct SoHPoint: Identifiable {
   let isCurrent: Bool
 }
 
-enum SoHPeriod: String, CaseIterable {
+enum StateOfHealthPeriod: String, CaseIterable {
   case week = "Week"
   case month = "Month"
   case year = "Year"
@@ -45,10 +45,10 @@ enum SoHPeriod: String, CaseIterable {
 
 @MainActor
 @Observable
-public final class SoHHistoryModel {
+public final class StateOfHealthHistoryModel {
   var vehicleID: Vehicle.ID
   var currentID: UUID
-  var points: [SoHPoint] = []
+  var points: [StateOfHealthPoint] = []
 
   @ObservationIgnored @FetchAll(Charge.none) var charges: [Charge]
   @ObservationIgnored @FetchAll(Trip.none) var trips: [Trip]
@@ -74,26 +74,26 @@ public final class SoHHistoryModel {
   }
 
   func buildPoints() {
-    let chargePoints = charges.compactMap { c -> SoHPoint? in
+    let chargePoints = charges.compactMap { c -> StateOfHealthPoint? in
       guard let soh = c.batteryStateOfHealth else { return nil }
-      return SoHPoint(id: c.id, date: c.timeStart, soh: soh, source: .charge, isCurrent: c.id == currentID)
+      return StateOfHealthPoint(id: c.id, date: c.timeStart, soh: soh, source: .charge, isCurrent: c.id == currentID)
     }
-    let tripPoints = trips.compactMap { t -> SoHPoint? in
+    let tripPoints = trips.compactMap { t -> StateOfHealthPoint? in
       guard let soh = t.batteryStateOfHealth else { return nil }
-      return SoHPoint(id: t.id, date: t.timeStart, soh: soh, source: .trip, isCurrent: t.id == currentID)
+      return StateOfHealthPoint(id: t.id, date: t.timeStart, soh: soh, source: .trip, isCurrent: t.id == currentID)
     }
     points = (chargePoints + tripPoints).sorted { $0.date < $1.date }
   }
 }
 
-public struct SoHHistoryView: View {
-  @Bindable var model: SoHHistoryModel
+public struct StateOfHealthHistoryView: View {
+  @Bindable var model: StateOfHealthHistoryModel
 
   @Environment(\.dismiss) var dismiss
-  @AppStorage("sohHistoryPeriod", store: .pankuzu) private var period: SoHPeriod = .month
+  @AppStorage("sohHistoryPeriod", store: .pankuzu) private var period: StateOfHealthPeriod = .month
   @State private var scrollPosition: Date = Date()
 
-  public init(model: SoHHistoryModel) {
+  public init(model: StateOfHealthHistoryModel) {
     self.model = model
   }
 
@@ -113,7 +113,7 @@ public struct SoHHistoryView: View {
   public var body: some View {
     VStack(spacing: 0) {
       Picker("Period", selection: $period) {
-        ForEach(SoHPeriod.allCases, id: \.self) { p in
+        ForEach(StateOfHealthPeriod.allCases, id: \.self) { p in
           Text(p.rawValue).tag(p)
         }
       }

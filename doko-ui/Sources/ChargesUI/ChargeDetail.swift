@@ -367,8 +367,8 @@ public struct ChargeDetailView: View {
         
       case .stateOfHealthChart:
         NavigationStack {
-          SoHHistoryView(
-            model: SoHHistoryModel(
+          StateOfHealthHistoryView(
+            model: StateOfHealthHistoryModel(
               vehicleID: charge.vehicleID,
               currentID: charge.id
             )
