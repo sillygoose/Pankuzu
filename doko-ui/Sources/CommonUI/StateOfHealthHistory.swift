@@ -5,7 +5,7 @@ import DokoSchema
 import DokoSharing
 
 extension SharedKey where Self == AppStorageKey<StateOfHealthPeriod>.Default {
-  static var stateOfHealthPeriod: Self {
+  static var stateOfHealthDisplayPeriod: Self {
     Self[.appStorage("StateOfHealtHistoryDisplayhPeriod"), default: .week]
   }
 }
@@ -58,6 +58,8 @@ public final class StateOfHealthHistoryModel {
 
   @ObservationIgnored @FetchAll(Charge.none) var charges: [Charge]
   @ObservationIgnored @FetchAll(Trip.none) var trips: [Trip]
+  @ObservationIgnored @Shared(.stateOfHealthDisplayPeriod) var displayPeriod
+  var scrollPosition: Date = Date()
 
   public init(vehicleID: Vehicle.ID, currentID: UUID) {
     self.vehicleID = vehicleID
@@ -76,7 +78,9 @@ public final class StateOfHealthHistoryModel {
         .where { $0.batteryStateOfHealth.isNot(nil) }
         .order { $0.timeStart.asc() }
     )
+//    scrollPosition = Date()
     buildPoints()
+    anchorToNow()
   }
 
   func buildPoints() {
@@ -90,15 +94,26 @@ public final class StateOfHealthHistoryModel {
     }
     points = (chargePoints + tripPoints).sorted { $0.date < $1.date }
   }
+
+  @discardableResult
+  func setDisplayPeriod(_ newPeriod: StateOfHealthPeriod) -> StateOfHealthPeriod {
+    $displayPeriod.withLock { $0 = newPeriod }
+    return newPeriod
+  }
+
+  var xDomainStart: Date {
+    points.first?.date ?? Date().addingTimeInterval(-displayPeriod.visibleInterval)
+  }
+
+  func anchorToNow() {
+    scrollPosition = Date().addingTimeInterval(-displayPeriod.visibleInterval)
+  }
 }
 
 public struct StateOfHealthHistoryView: View {
   @Bindable var model: StateOfHealthHistoryModel
 
   @Environment(\.dismiss) var dismiss
-  @AppStorage("sohHistoryPeriod", store: .pankuzu) private var period: StateOfHealthPeriod = .month //###
-//  @Shared(.stateOfHealthPeriod) var period
-  @State private var scrollPosition: Date = Date()
 
   public init(
     model: StateOfHealthHistoryModel
@@ -111,19 +126,14 @@ public struct StateOfHealthHistoryView: View {
     return floor((min - 10) / 10) * 10
   }
 
-  var xDomainStart: Date {
-    model.points.first?.date ?? Date().addingTimeInterval(-period.visibleInterval)
-  }
-
-  func anchorToNow() {
-    scrollPosition = Date().addingTimeInterval(-period.visibleInterval)
-  }
-
   public var body: some View {
     VStack(spacing: 0) {
-      Picker("Period", selection: $period) {
-        ForEach(StateOfHealthPeriod.allCases, id: \.self) { p in
-          Text(p.rawValue).tag(p)
+      Picker("Period", selection: Binding(
+        get: { model.displayPeriod },
+        set: { newValue in model.$displayPeriod.withLock { $0 = newValue } }
+      )) {
+        ForEach(StateOfHealthPeriod.allCases, id: \.self) { period in
+          Text(period.rawValue).tag(period)
         }
       }
       .pickerStyle(.segmented)
@@ -166,14 +176,14 @@ public struct StateOfHealthHistoryView: View {
         }
       }
       .chartScrollableAxes(.horizontal)
-      .chartXVisibleDomain(length: period.visibleInterval)
-      .chartScrollPosition(x: $scrollPosition)
-      .chartXScale(domain: xDomainStart...Date())
+      .chartXVisibleDomain(length: model.displayPeriod.visibleInterval)
+      .chartScrollPosition(x: $model.scrollPosition)
+      .chartXScale(domain: model.xDomainStart...Date())
       .chartXAxis {
-        AxisMarks(values: .stride(by: period.axisStride)) { _ in
+        AxisMarks(values: .stride(by: model.displayPeriod.axisStride)) { _ in
           AxisGridLine()
           AxisTick()
-          AxisValueLabel(format: period.axisFormat)
+          AxisValueLabel(format: model.displayPeriod.axisFormat)
         }
       }
       .chartLegend(.hidden)
@@ -199,9 +209,6 @@ public struct StateOfHealthHistoryView: View {
         Button("Done") { dismiss() }
       }
     }
-    .onAppear { anchorToNow() }
-    .onChange(of: period) { anchorToNow() }
-    .onChange(of: model.charges.count) { model.buildPoints() }
-    .onChange(of: model.trips.count) { model.buildPoints() }
+    .onChange(of: model.displayPeriod) { model.anchorToNow() }
   }
 }
