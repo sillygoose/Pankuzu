@@ -15,7 +15,7 @@ struct RestoreOptions {
 struct BackupOptions {
   var includeTrips: Bool = true
   var includeCharges: Bool = true
-  var includeSettings: Bool = false
+  var includeSettings: Bool = true
   var useDateRange: Bool = false
 
   // startDate is always midnight of the selected day.
