@@ -4,6 +4,12 @@ import Charts
 import DokoSchema
 import DokoSharing
 
+extension SharedKey where Self == AppStorageKey<StateOfHealthPeriod>.Default {
+  static var stateOfHealthPeriod: Self {
+    Self[.appStorage("StateOfHealtHistoryDisplayhPeriod"), default: .week]
+  }
+}
+
 struct StateOfHealthPoint: Identifiable {
   enum Source { case charge, trip }
   let id: UUID
@@ -90,10 +96,13 @@ public struct StateOfHealthHistoryView: View {
   @Bindable var model: StateOfHealthHistoryModel
 
   @Environment(\.dismiss) var dismiss
-  @AppStorage("sohHistoryPeriod", store: .pankuzu) private var period: StateOfHealthPeriod = .month
+  @AppStorage("sohHistoryPeriod", store: .pankuzu) private var period: StateOfHealthPeriod = .month //###
+//  @Shared(.stateOfHealthPeriod) var period
   @State private var scrollPosition: Date = Date()
 
-  public init(model: StateOfHealthHistoryModel) {
+  public init(
+    model: StateOfHealthHistoryModel
+  ) {
     self.model = model
   }
 
