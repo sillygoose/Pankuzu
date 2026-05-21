@@ -2,7 +2,7 @@ import Foundation
 
 import Sharing
 
-public enum ActiveSession: Sendable {
+public enum ActiveSession: String, Sendable {
   case trip
   case acCharge, dcCharge
 

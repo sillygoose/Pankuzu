@@ -353,10 +353,6 @@ public final class ObdLinkManager: NSObject, @MainActor StreamDelegate {
     }
   }
 
-  public func setBackgroundMode(_ enabled: Bool) {
-    $appSettings.backgroundMode.withLock { $0 = enabled }
-  }
-
   @objc func connectAccessory(connectingAccessory: NotificationCenter.Publisher.Output) {
     guard appSettings.backgroundMode else { return }
     if session == nil {
