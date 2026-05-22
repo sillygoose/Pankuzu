@@ -23,7 +23,7 @@ public final class DokoNotificationManager: NSObject, Sendable {
 
   public func requestAuthorization() async -> Bool {
     do {
-      let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
+      let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound, .carPlay])
       if granted {
         await MainActor.run {
           UIApplication.shared.registerForRemoteNotifications()

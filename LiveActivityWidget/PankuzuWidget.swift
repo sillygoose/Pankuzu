@@ -11,7 +11,7 @@ struct PankuzuWidgetEntry: TimelineEntry {
 
 struct PankuzuWidgetProvider: TimelineProvider {
   func placeholder(in context: Context) -> PankuzuWidgetEntry {
-    PankuzuWidgetEntry(date: .now, activeSession: .trip)
+    PankuzuWidgetEntry(date: .now, activeSession: nil)
   }
 
   func getSnapshot(in context: Context, completion: @escaping (PankuzuWidgetEntry) -> Void) {
@@ -23,8 +23,8 @@ struct PankuzuWidgetProvider: TimelineProvider {
   }
 
   private func makeEntry() -> PankuzuWidgetEntry {
-    let raw = UserDefaults.pankuzu.string(forKey: "widget-session")
-    return PankuzuWidgetEntry(date: .now, activeSession: raw.flatMap { ActiveSession(rawValue: $0) })
+    @Shared(.widgetSession) var widgetSession
+    return PankuzuWidgetEntry(date: .now, activeSession: ActiveSession(rawValue: widgetSession))
   }
 }
 

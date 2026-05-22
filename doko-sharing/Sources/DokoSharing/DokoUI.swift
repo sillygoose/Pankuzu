@@ -20,3 +20,9 @@ extension SharedKey where Self == InMemoryKey<ActiveSession?>.Default {
     Self[.inMemory("DokoUI-ActiveSession"), default: nil]
   }
 }
+
+extension SharedKey where Self == AppStorageKey<String>.Default {
+  public static var widgetSession: Self {
+    Self[.appStorage("widget-session", store: .pankuzu), default: ""]
+  }
+}

@@ -106,6 +106,7 @@ public final class DokoStateEngine {
       @Shared(.connectedVehicleInterface) var connectedVehicle
       @Shared(.activeSession) var activeSession
       @Shared(.appSettings) var appSettings
+      @Shared(.widgetSession) var widgetSession
       self.logger.info("\(timestamp()) SE.obdResponseProcessing() started")
       while !Task.isCancelled {
         guard let dokoResponsePacket = await DokoPacketManager.shared.removeDokoResponsePacket() else {
@@ -176,8 +177,11 @@ public final class DokoStateEngine {
                 await CoreLocationManager.shared.startPacketUpdates()
                 await LiveActivityManager.shared.startTrip()
                 $activeSession.withLock { $0 = .trip }
-                UserDefaults.pankuzu.set(ActiveSession.trip.rawValue, forKey: "widget-session")
-                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
+                $widgetSession.withLock { $0 = ActiveSession.trip.rawValue }
+                Task { @MainActor in
+                  try? await Task.sleep(for: .seconds(2.0))
+                  WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget")
+                }
               } catch let error as StateEngineError {
                 DokoLogging.shared.postLoggingResponse(.error(".tripStarting: \(error.errorDescription)"))
                 nextState = .tripStarting
@@ -194,6 +198,11 @@ public final class DokoStateEngine {
             }
             let nextState = dokoResponsePacket.nextState ?? .tripInProgress
             if nextState != self.vehicleState {
+//              $widgetSession.withLock { $0 = "" }
+//              Task { @MainActor in
+//                try? await Task.sleep(for: .seconds(2.0))
+//                WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget")
+//              }
               await CoreLocationManager.shared.stopPacketUpdates()
               $vehicleState.withLock { $0 = nextState }
             }
@@ -256,8 +265,11 @@ public final class DokoStateEngine {
                 )
                 self.tripInProgress = nil
                 $activeSession.withLock { $0 = nil }
-                UserDefaults.pankuzu.removeObject(forKey: "widget-session")
-                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
+                $widgetSession.withLock { $0 = "" }
+                Task { @MainActor in
+                  try? await Task.sleep(for: .seconds(2.0))
+                  WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget")
+                }
               } catch let error as StateEngineError {
                 DokoLogging.shared.postLoggingResponse(.error(".tripEnding: \(error.errorDescription)"))
                 nextState = .tripEnding
@@ -344,7 +356,7 @@ public final class DokoStateEngine {
                 await CoreLocationManager.shared.stopLocationUpdates()
                 await LiveActivityManager.shared.startCharge()
                 $activeSession.withLock { $0 = .acCharge }
-                UserDefaults.pankuzu.set(ActiveSession.acCharge.rawValue, forKey: "widget-session")
+                $widgetSession.withLock { $0 = ActiveSession.acCharge.rawValue }
                 Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".acChargeStarting: \(String(describing: error))"))
@@ -382,7 +394,7 @@ public final class DokoStateEngine {
                   )
                 )
                 $activeSession.withLock { $0 = nil }
-                UserDefaults.pankuzu.removeObject(forKey: "widget-session")
+                $widgetSession.withLock { $0 = "" }
                 Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".acChargeEnding: \(String(describing: error))"))
@@ -407,7 +419,7 @@ public final class DokoStateEngine {
                 await CoreLocationManager.shared.stopLocationUpdates()
                 await LiveActivityManager.shared.startCharge()
                 $activeSession.withLock { $0 = .dcCharge }
-                UserDefaults.pankuzu.set(ActiveSession.dcCharge.rawValue, forKey: "widget-session")
+                $widgetSession.withLock { $0 = ActiveSession.dcCharge.rawValue }
                 Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".dcChargeStarting: \(String(describing: error))"))
@@ -445,7 +457,7 @@ public final class DokoStateEngine {
                   )
                 )
                 $activeSession.withLock { $0 = nil }
-                UserDefaults.pankuzu.removeObject(forKey: "widget-session")
+                $widgetSession.withLock { $0 = "" }
                 Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".dcChargeEnding: \(String(describing: error))"))
@@ -508,6 +520,7 @@ extension DokoStateEngine {
   public func accessoryNameObservation() {
     @Shared(.connectedAccessoryName) var observedAccessoryName
     @Shared(.activeSession) var activeSession
+    @Shared(.widgetSession) var widgetSession
     DokoLogging.shared.postLoggingResponse(.info("SE.accessoryNameObservation"))
     Task { [weak self] in
       guard let self else { return }
@@ -526,7 +539,7 @@ extension DokoStateEngine {
           stopVehicleStateObservation()
           await stopStateEngine()
           $activeSession.withLock { $0 = nil }
-          UserDefaults.pankuzu.removeObject(forKey: "widget-session")
+          $widgetSession.withLock { $0 = "" }
           Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
           await DokoNotificationManager.shared.accessoryDisconnectedNotification(accessoryName: oldAccessoryName ?? "unknown")
         }
