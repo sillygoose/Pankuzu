@@ -7,6 +7,8 @@ import DokoLogging
 import DokoStateEngine
 import DokoVehicleManager
 
+import CommonUI
+
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var loggingExpanded: Self {
     Self[.appStorage("Debugging-loggingExpanded"), default: false]
@@ -107,11 +109,11 @@ class DebuggingModel {
     df.timeStyle = .medium
     df.doesRelativeDateFormatting = false
     let localTimestamp = df.string(from: Date())
-    let displayName = AboutModel.displayName ?? "???"
-    let version = AboutModel.version ?? "?.??"
-    let build = AboutModel.build ?? "?"
-    let shortHash = AboutModel.shortHash ?? "???"
-    let branchName = AboutModel.branchName ?? "???"
+    let displayName = AppBuildInfo.displayName
+    let version = AppBuildInfo.version
+    let build = AppBuildInfo.build
+    let shortHash = AppBuildInfo.shortHash
+    let branchName = AppBuildInfo.branchName
     UIPasteboard.general.string = "\(displayName) \(version).\(build) \(branchName)(\(shortHash))\n\(localTimestamp)\n\n\(historyText)"
     showCopyConfirmation = true
   }

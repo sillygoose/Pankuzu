@@ -5,6 +5,7 @@ import UniformTypeIdentifiers
 
 import DokoSchema
 import DokoSharing
+import CommonUI
 
 struct RestoreOptions {
   var includeTrips: Bool = true
@@ -44,7 +45,7 @@ struct BackupOptions {
 
 struct DatabaseBackup: Codable {
   var backupDate: Date = Date()
-  var version: String = ""
+  var version: String = String()
 
   var vehicles: [Vehicle] = []
   var locations: [Location] = []
@@ -59,6 +60,40 @@ struct DatabaseBackup: Codable {
   var chargeHistories: [ChargeHistory] = []
 
   var appSettings: AppSettings? = nil
+
+  init(
+    backupDate: Date = Date(), version: String = "",
+    vehicles: [Vehicle] = [], locations: [Location] = [],
+    trips: [Trip] = [], tripPositions: [TripPosition] = [],
+    tripElevations: [TripElevation] = [], tripData: [TripData] = [],
+    tripWeatherData: [TripWeather] = [],
+    charges: [Charge] = [], chargeHistories: [ChargeHistory] = [],
+    appSettings: AppSettings? = nil
+  ) {
+    self.backupDate = backupDate; self.version = version
+    self.vehicles = vehicles; self.locations = locations
+    self.trips = trips; self.tripPositions = tripPositions
+    self.tripElevations = tripElevations; self.tripData = tripData
+    self.tripWeatherData = tripWeatherData
+    self.charges = charges; self.chargeHistories = chargeHistories
+    self.appSettings = appSettings
+  }
+
+  init(from decoder: Decoder) throws {
+    let c = try decoder.container(keyedBy: CodingKeys.self)
+    backupDate = try c.decodeIfPresent(Date.self, forKey: .backupDate) ?? Date()
+    version = try c.decodeIfPresent(String.self, forKey: .version) ?? ""
+    vehicles = try c.decodeIfPresent([Vehicle].self, forKey: .vehicles) ?? []
+    locations = try c.decodeIfPresent([Location].self, forKey: .locations) ?? []
+    trips = try c.decodeIfPresent([Trip].self, forKey: .trips) ?? []
+    tripPositions = try c.decodeIfPresent([TripPosition].self, forKey: .tripPositions) ?? []
+    tripElevations = try c.decodeIfPresent([TripElevation].self, forKey: .tripElevations) ?? []
+    tripData = try c.decodeIfPresent([TripData].self, forKey: .tripData) ?? []
+    tripWeatherData = try c.decodeIfPresent([TripWeather].self, forKey: .tripWeatherData) ?? []
+    charges = try c.decodeIfPresent([Charge].self, forKey: .charges) ?? []
+    chargeHistories = try c.decodeIfPresent([ChargeHistory].self, forKey: .chargeHistories) ?? []
+    appSettings = try c.decodeIfPresent(AppSettings.self, forKey: .appSettings)
+  }
 }
 
 struct JSONDocument: FileDocument {
@@ -90,43 +125,6 @@ struct JSONDocument: FileDocument {
 }
 
 func backupDatabase(options: BackupOptions = BackupOptions()) throws -> DatabaseBackup {
-  var displayName: String {
-    guard
-      let displayName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String
-    else { return "???" }
-    return "\(displayName)"
-  }
-
-  var branchName: String {
-    guard let dictionaryPath = Bundle.main.path(forResource: "BuildInfo", ofType: "plist"),
-          let dictionary = NSDictionary(contentsOfFile: dictionaryPath)
-    else { return "???" }
-    guard let build =  dictionary["BranchName"] as? String else { return "???" }
-    return build == "main" ? "" : build
-  }
-
-  var shortHash: String {
-    guard let dictionaryPath = Bundle.main.path(forResource: "BuildInfo", ofType: "plist"),
-          let dictionary = NSDictionary(contentsOfFile: dictionaryPath)
-    else { return "???" }
-    guard let shortHash = dictionary["ShortVersion"] as? String else { return "???" }
-    return shortHash
-  }
-
-  var version: String {
-    guard
-      let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-    else { return "???" }
-    return "\(version)"
-  }
-
-  var build: String {
-    guard
-      let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
-    else { return "???" }
-    return "\(build)"
-  }
-
   @Dependency(\.date.now) var now
   @Shared(.appSettings) var appSettings
 
@@ -171,7 +169,7 @@ func backupDatabase(options: BackupOptions = BackupOptions()) throws -> Database
 
   return DatabaseBackup(
     backupDate: now,
-    version: "\(displayName) \(version).\(build) \(branchName)(\(shortHash))",
+    version: "\(AppBuildInfo.displayName) \(AppBuildInfo.version).\(AppBuildInfo.build) \(AppBuildInfo.branchName)(\(AppBuildInfo.shortHash))",
     vehicles: vehicles,
     locations: locations,
     trips: trips,

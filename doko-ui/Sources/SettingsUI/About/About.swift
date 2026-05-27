@@ -58,15 +58,9 @@ struct AboutView: View {
   @Bindable var model: AboutModel
   
   var body: some View {
-    let displayName = AboutModel.displayName ?? "???"
-    let version = AboutModel.version ?? "?.??"
-    let build = AboutModel.build ?? "?"
-    let shortHash = AboutModel.shortHash ?? "???"
-    let branchName = AboutModel.branchName ?? "???"
-
     let aboutText =
     """
-    \(displayName) is an EV utility application that records your trips and charges \
+    \(AppBuildInfo.displayName) is an EV utility application that records your trips and charges \
     and aggregates the data to let you make the most of your vehicle's performance \
     and history.
     """
@@ -74,7 +68,7 @@ struct AboutView: View {
     ScrollView {
       VStack(alignment: .leading) {
         Section {
-          Text("\(displayName) \(version).\(build) \(branchName)(\(shortHash))")
+          Text("\(AppBuildInfo.displayName) \(AppBuildInfo.version).\(AppBuildInfo.build) \(AppBuildInfo.branchName)(\(AppBuildInfo.shortHash))")
         }
         .padding([.bottom], 20)
 
