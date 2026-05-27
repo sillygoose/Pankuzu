@@ -44,6 +44,8 @@ struct BackupOptions {
 
 struct DatabaseBackup: Codable {
   var backupDate: Date = Date()
+  var version: String = ""
+
   var vehicles: [Vehicle] = []
   var locations: [Location] = []
 
@@ -88,6 +90,43 @@ struct JSONDocument: FileDocument {
 }
 
 func backupDatabase(options: BackupOptions = BackupOptions()) throws -> DatabaseBackup {
+  var displayName: String {
+    guard
+      let displayName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String
+    else { return "???" }
+    return "\(displayName)"
+  }
+
+  var branchName: String {
+    guard let dictionaryPath = Bundle.main.path(forResource: "BuildInfo", ofType: "plist"),
+          let dictionary = NSDictionary(contentsOfFile: dictionaryPath)
+    else { return "???" }
+    guard let build =  dictionary["BranchName"] as? String else { return "???" }
+    return build == "main" ? "" : build
+  }
+
+  var shortHash: String {
+    guard let dictionaryPath = Bundle.main.path(forResource: "BuildInfo", ofType: "plist"),
+          let dictionary = NSDictionary(contentsOfFile: dictionaryPath)
+    else { return "???" }
+    guard let shortHash = dictionary["ShortVersion"] as? String else { return "???" }
+    return shortHash
+  }
+
+  var version: String {
+    guard
+      let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    else { return "???" }
+    return "\(version)"
+  }
+
+  var build: String {
+    guard
+      let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
+    else { return "???" }
+    return "\(build)"
+  }
+
   @Dependency(\.date.now) var now
   @Shared(.appSettings) var appSettings
 
@@ -132,6 +171,7 @@ func backupDatabase(options: BackupOptions = BackupOptions()) throws -> Database
 
   return DatabaseBackup(
     backupDate: now,
+    version: "\(displayName) \(version).\(build) \(branchName)(\(shortHash))",
     vehicles: vehicles,
     locations: locations,
     trips: trips,
@@ -145,7 +185,10 @@ func backupDatabase(options: BackupOptions = BackupOptions()) throws -> Database
   )
 }
 
-func restoreDatabase(from databaseBackup: DatabaseBackup, options: RestoreOptions = RestoreOptions()) throws {
+func restoreDatabase(
+  from databaseBackup: DatabaseBackup,
+  options: RestoreOptions = RestoreOptions()
+) throws {
   @Dependency(\.defaultDatabase) var database
   @Shared(.appSettings) var appSettings
 
