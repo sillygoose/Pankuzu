@@ -335,6 +335,7 @@ struct DatabaseSettingsView: View {
         try restoreDatabase(from: self.jsonDocument.backupModel, options: restoreOptions)
         model.destination = .alert(.databaseRestore())
       } catch {
+        logger.error("Restore failed: \(String(reflecting: error))")
         model.destination = .alert(.databaseRestore(error.localizedDescription))
       }
     }
