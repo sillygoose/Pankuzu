@@ -9,10 +9,10 @@ struct PowerBin: Identifiable {
   let power_kW: Double
 }
 
-struct SoCBin: Identifiable {
+struct StateOfChargeBin: Identifiable {
   let id: Int
   let timestamp: Date
-  let soc: Double
+  let stateOfCharge: Double
 }
 
 @MainActor
@@ -24,9 +24,10 @@ public final class ChargeDetailPowerChartModel {
   @FetchOne(ChargeHistory.none) var chargeHistory
 
   var powerBins: [PowerBin] = []
-  var socBins: [SoCBin] = []
+  var socBins: [StateOfChargeBin] = []
   var selectedBin: PowerBin?
-  var selectedSoCBin: SoCBin?
+  var selectedSoCBin: StateOfChargeBin?
+  var minPower: Double = 0
   var maxPower: Double = 10
 
   public init(
@@ -45,14 +46,17 @@ public final class ChargeDetailPowerChartModel {
     powerBins = createPowerBins(from: chargeHistory.batteryPower, numberOfBins: 80)
     socBins = createSoCBins(from: chargeHistory.stateOfCharge, numberOfBins: 80)
 
-    var maxValue: Double = 0
+    var minValue: Double = 0
+    var maxValue: Double = 10
     for bin in powerBins {
+      minValue = min(minValue, bin.power_kW)
       maxValue = max(maxValue, bin.power_kW)
     }
+    minPower = floor(minValue)
     maxPower = ceil(maxValue)
   }
 
-  private func createSoCBins(from data: [DokoDataPoint], numberOfBins: Int) -> [SoCBin] {
+  private func createSoCBins(from data: [DokoDataPoint], numberOfBins: Int) -> [StateOfChargeBin] {
     guard !data.isEmpty,
           let first = data.first,
           let last = data.last else { return [] }
@@ -61,7 +65,7 @@ public final class ChargeDetailPowerChartModel {
     let endTime = last.timestamp.timeIntervalSince1970
     let binDuration = (endTime - startTime) / Double(numberOfBins)
 
-    var bins: [SoCBin] = []
+    var bins: [StateOfChargeBin] = []
     var previousSoC: Double = first.datapoint
 
     for i in 0..<numberOfBins {
@@ -82,10 +86,10 @@ public final class ChargeDetailPowerChartModel {
         previousSoC = meanSoC
       }
 
-      bins.append(SoCBin(
+      bins.append(StateOfChargeBin(
         id: i,
         timestamp: Date(timeIntervalSince1970: binCenter),
-        soc: meanSoC
+        stateOfCharge: meanSoC
       ))
     }
 
@@ -153,7 +157,7 @@ public struct ChargeDetailPowerChartView: View {
         ForEach(model.socBins) { bin in
           LineMark(
             x: .value("Time", bin.timestamp),
-            y: .value("SoC", (bin.soc / 100.0) * model.maxPower)
+            y: .value("SoC", (bin.stateOfCharge / 100.0) * model.maxPower)
           )
           .foregroundStyle(by: .value("Series", "State of Charge"))
           .interpolationMethod(.catmullRom)
@@ -179,7 +183,7 @@ public struct ChargeDetailPowerChartView: View {
                 .font(.caption)
                 .fontWeight(.semibold)
                 .foregroundStyle(.green)
-              if let soc = model.selectedSoCBin?.soc {
+              if let soc = model.selectedSoCBin?.stateOfCharge {
                 Text(String(format: "%.1f%%", soc))
                   .font(.caption)
                   .fontWeight(.semibold)
@@ -194,7 +198,7 @@ public struct ChargeDetailPowerChartView: View {
       }
       .chartForegroundStyleScale(["Power": Color.green, "State of Charge": Color.red])
       .chartLegend(position: .bottom, alignment: .center)
-      .chartYScale(domain: 0...model.maxPower)
+      .chartYScale(domain: model.minPower...model.maxPower)
       .chartYAxis {
         AxisMarks(position: .trailing) { value in
           if let kw = value.as(Double.self) {
