@@ -21,7 +21,26 @@ public final class DokoNotificationManager: NSObject, Sendable {
 
   private override init() {}
 
+  private enum CategoryID {
+    static let trips    = "com.unchan.pankuzu.trips"
+    static let charges  = "com.unchan.pankuzu.charges"
+    static let settings = "com.unchan.pankuzu.settings"
+    static let location = "com.unchan.pankuzu.location"
+  }
+
+  private func registerCategories() {
+    let options: UNNotificationCategoryOptions = [.allowInCarPlay]
+    let categories: Set<UNNotificationCategory> = [
+      UNNotificationCategory(identifier: CategoryID.trips,    actions: [], intentIdentifiers: [], options: options),
+      UNNotificationCategory(identifier: CategoryID.charges,  actions: [], intentIdentifiers: [], options: options),
+      UNNotificationCategory(identifier: CategoryID.settings, actions: [], intentIdentifiers: [], options: options),
+      UNNotificationCategory(identifier: CategoryID.location, actions: [], intentIdentifiers: [], options: options),
+    ]
+    UNUserNotificationCenter.current().setNotificationCategories(categories)
+  }
+
   public func requestAuthorization() async -> Bool {
+    registerCategories()
     do {
       let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound, .carPlay])
       if granted {
@@ -56,6 +75,7 @@ public final class DokoNotificationManager: NSObject, Sendable {
     content.title = "Location Permission Error"
     content.body = "Location permission must be Always in order to use background mode."
     content.sound = .default
+    content.categoryIdentifier = CategoryID.location
     content.userInfo = ["destination": "locationSettings"]
     await sendNotification(content: content)
   }
@@ -65,6 +85,7 @@ public final class DokoNotificationManager: NSObject, Sendable {
     content.title = "Scan Tool Connected"
     content.body = "Connected to the \(accessoryName) scan tool."
     content.sound = .default
+    content.categoryIdentifier = CategoryID.settings
     content.userInfo = ["destination": "settings"]
     await sendNotification(content: content)
   }
@@ -74,6 +95,7 @@ public final class DokoNotificationManager: NSObject, Sendable {
     content.title = "Scan Tool Disconnected"
     content.body = "No longer connected to the \(accessoryName) scan tool."
     content.sound = .default
+    content.categoryIdentifier = CategoryID.settings
     content.userInfo = ["destination": "settings"]
     await sendNotification(content: content)
   }
@@ -83,6 +105,7 @@ public final class DokoNotificationManager: NSObject, Sendable {
     content.title = "Unsupported Vehicle"
     content.body = "Connected to an unsupported vehicle, disconnecting."
     content.sound = .default
+    content.categoryIdentifier = CategoryID.settings
     content.userInfo = ["destination": "settings"]
     await sendNotification(content: content)
   }
@@ -92,6 +115,7 @@ public final class DokoNotificationManager: NSObject, Sendable {
     content.title = "Starting New Trip"
     content.body = "Starting a trip in your \(vehicle), tap to show Live Activities."
     content.sound = .default
+    content.categoryIdentifier = CategoryID.trips
     content.userInfo = ["destination": "trips"]
     await sendNotification(content: content)
   }
@@ -101,6 +125,7 @@ public final class DokoNotificationManager: NSObject, Sendable {
     content.title = "Starting New Charge"
     content.body = "Starting a charge in your \(vehicle), tap to show Live Activities."
     content.sound = .default
+    content.categoryIdentifier = CategoryID.charges
     content.userInfo = ["destination": "charges"]
     await sendNotification(content: content)
   }
