@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 @preconcurrency import ActivityKit
 
 import Dependencies
@@ -72,7 +73,7 @@ public final class LiveActivityManager {
 
   private func startForegroundObservation() {
     Task {
-      for await _ in NotificationCenter.default.notifications(named: Notification.Name("UIApplicationDidBecomeActiveNotification")) {
+      for await _ in NotificationCenter.default.notifications(named: UIApplication.didBecomeActiveNotification) {
         guard let pending = self.pendingActivity else { continue }
         self.pendingActivity = nil
         switch pending {
@@ -107,6 +108,11 @@ public final class LiveActivityManager {
     @Dependency(\.date.now) var now
     guard ActivityAuthorizationInfo().areActivitiesEnabled else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startTrip: Live Activities not enabled"))
+      return
+    }
+    guard UIApplication.shared.applicationState == .active else {
+      DokoLogging.shared.postLoggingResponse(.liveActivity("pending trip live activities (background)"))
+      pendingActivity = .trip
       return
     }
     if let currentActivity = managedActivity {
@@ -162,6 +168,11 @@ public final class LiveActivityManager {
     @Dependency(\.date.now) var now
     guard ActivityAuthorizationInfo().areActivitiesEnabled else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startCharge: Live Activities not enabled"))
+      return
+    }
+    guard UIApplication.shared.applicationState == .active else {
+      DokoLogging.shared.postLoggingResponse(.liveActivity("pending charge live activities (background)"))
+      pendingActivity = .charge
       return
     }
     if let currentActivity = managedActivity {
