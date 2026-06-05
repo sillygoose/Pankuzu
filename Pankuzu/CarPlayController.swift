@@ -1,12 +1,11 @@
 import CarPlay
 import Observation
-import UIKit
 import DokoSharing
 
 @MainActor
 final class CarPlayController {
   private let interfaceController: CPInterfaceController
-  private var listTemplate: CPListTemplate?
+  private var infoTemplate: CPInformationTemplate?
 
   @Shared(.appSettings) private var appSettings
   @Shared(.connectedAccessoryName) private var connectedAccessoryName
@@ -17,14 +16,19 @@ final class CarPlayController {
   }
 
   func connect() {
-    let template = CPListTemplate(title: "Scan Tool Status", sections: [makeSection()])
-    listTemplate = template
+    let template = CPInformationTemplate(
+      title: "Status",
+      layout: .leading,
+      items: makeItems(),
+      actions: makeActions()
+    )
+    infoTemplate = template
     interfaceController.setRootTemplate(template, animated: false, completion: nil)
     observe()
   }
 
   func disconnect() {
-    listTemplate = nil
+    infoTemplate = nil
   }
 
   private func observe() {
@@ -35,39 +39,29 @@ final class CarPlayController {
     } onChange: {
       Task { @MainActor [weak self] in
         guard let self else { return }
-        listTemplate?.updateSections([makeSection()])
+        infoTemplate?.items = makeItems()
+        infoTemplate?.actions = makeActions()
         observe()
       }
     }
   }
 
-  private func makeSection() -> CPListSection {
-    let enableItem = CPListItem(
-      text: "Enable",
-      detailText: appSettings.backgroundMode ? "On" : "Off",
-      image: UIImage(systemName: "power")
-    )
-    enableItem.handler = { [weak self] _, completion in
-      self?.$appSettings.backgroundMode.withLock { $0.toggle() }
-      completion()
-    }
+  private func makeItems() -> [CPInformationItem] {
+    [
+      CPInformationItem(title: "Bluetooth", detail: connectedAccessoryName ?? "Not Connected"),
+      CPInformationItem(title: "Activity", detail: activityDetail),
+    ]
+  }
 
-    let btSymbol = connectedAccessoryName != nil
-      ? "antenna.radiowaves.left.and.right"
-      : "antenna.radiowaves.left.and.right.slash"
-    let btItem = CPListItem(
-      text: "Bluetooth",
-      detailText: connectedAccessoryName ?? "Not Connected",
-      image: UIImage(systemName: btSymbol)
-    )
-
-    let sessionItem = CPListItem(
-      text: "Activity",
-      detailText: activityDetail,
-      image: activeSession.flatMap { UIImage(systemName: $0.symbol) }
-    )
-
-    return CPListSection(items: [enableItem, btItem, sessionItem])
+  private func makeActions() -> [CPTextButton] {
+    [
+      CPTextButton(
+        title: appSettings.backgroundMode ? "Disable" : "Enable",
+        textStyle: appSettings.backgroundMode ? .cancel : .confirm
+      ) { [weak self] _ in
+        self?.$appSettings.backgroundMode.withLock { $0.toggle() }
+      }
+    ]
   }
 
   private var activityDetail: String {
