@@ -5,8 +5,22 @@ import UserNotifications
 import CoreLocationManager
 import DokoNotificationManager
 import DokoLogging
+import CarPlay
 
 class AppDelegate: NSObject, UIApplicationDelegate {
+  func application(
+    _ application: UIApplication,
+    configurationForConnecting connectingSceneSession: UISceneSession,
+    options: UIScene.ConnectionOptions
+  ) -> UISceneConfiguration {
+    let config = UISceneConfiguration(name: "CarPlay", sessionRole: connectingSceneSession.role)
+    if connectingSceneSession.role == .carTemplateApplication {
+      config.sceneClass = CPTemplateApplicationScene.self
+      config.delegateClass = CarPlaySceneDelegate.self
+    }
+    return config
+  }
+
   func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
