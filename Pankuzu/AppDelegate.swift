@@ -13,12 +13,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     configurationForConnecting connectingSceneSession: UISceneSession,
     options: UIScene.ConnectionOptions
   ) -> UISceneConfiguration {
-    let config = UISceneConfiguration(name: "CarPlay", sessionRole: connectingSceneSession.role)
     if connectingSceneSession.role == .carTemplateApplication {
+      let config = UISceneConfiguration(name: "CarPlay", sessionRole: connectingSceneSession.role)
       config.sceneClass = CPTemplateApplicationScene.self
       config.delegateClass = CarPlaySceneDelegate.self
+      return config
     }
-    return config
+    return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
   }
 
   func application(
