@@ -215,17 +215,26 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case batteryStateOfCharge
   case batteryStateOfHealth
   case batteryTemperature
-  case batteryVoltage
-  case batteryCurrent
-  case batteryPower
-  case batteryEnergy
   case batteryEnergyToEmpty
   case batteryDistanceToEmpty
   case batteryOriginalCapacity
   case batteryCurrentCapacity
+  case batteryVoltage
+  case batteryCurrent
+  case batteryPower
+  case batteryEnergy
 
   case couplerTemperature
   
+  case chargerInputCurrent
+  case chargerInputVoltage
+  case chargerInputPower
+  case chargerInputEnergy
+  case chargerOutputCurrent
+  case chargerOutputVoltage
+  case chargerOutputPower
+  case chargerOutputEnergy
+
   public var description: String {
     return self.key
   }
@@ -310,14 +319,6 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".batteryStateOfHealth"
       case .batteryTemperature:
         return ".batteryTemperature"
-      case .batteryVoltage:
-        return ".batteryVoltage"
-      case .batteryCurrent:
-        return ".batteryCurrent"
-      case .batteryPower:
-        return ".batteryPower"
-      case .batteryEnergy:
-        return ".batteryEnergy"
       case .batteryEnergyToEmpty:
         return ".batteryEnergyToEmpty"
       case .batteryDistanceToEmpty:
@@ -326,9 +327,35 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".batteryOriginalCapacity"
       case .batteryCurrentCapacity:
         return ".batteryCurrentCapacity"
+      case .batteryVoltage:
+        return ".batteryVoltage"
+      case .batteryCurrent:
+        return ".batteryCurrent"
+      case .batteryPower:
+        return ".batteryPower"
+      case .batteryEnergy:
+        return ".batteryEnergy"
 
       case .couplerTemperature:
         return ".couplerTemperature"
+        
+      case .chargerInputCurrent:
+        return ".chargerInputCurrent"
+      case .chargerInputVoltage:
+        return ".chargerInputVoltage"
+      case .chargerInputPower:
+        return ".chargerInputPower"
+      case .chargerInputEnergy:
+        return ".chargerInputEnergy"
+
+      case .chargerOutputCurrent:
+        return ".chargerOutputCurrent"
+      case .chargerOutputVoltage:
+        return ".chargerOutputVoltage"
+      case .chargerOutputPower:
+        return ".chargerOutputPower"
+      case .chargerOutputEnergy:
+        return ".chargerOutputEnergy"
       }
     }
   }
@@ -361,16 +388,26 @@ public enum DokoResponse: Equatable, Sendable {
   case batteryStateOfCharge(Double)
   case batteryStateOfHealth(Double)
   case batteryTemperature(Double)
-  case batteryVoltage(Double)
-  case batteryCurrent(Double)
-  case batteryPower(Double)
-  case batteryEnergy(Double)
   case batteryEnergyToEmpty(Double)
   case batteryDistanceToEmpty(Double)
   case batteryOriginalCapacity(Double)
   case batteryCurrentCapacity(Double)
+  case batteryVoltage(Double)
+  case batteryCurrent(Double)
+  case batteryPower(Double)
+  case batteryEnergy(Double)
 
   case couplerTemperature(Double)
+
+  case chargerInputCurrent(Double)
+  case chargerInputVoltage(Double)
+  case chargerInputPower(Double)
+  case chargerInputEnergy(Double)
+
+  case chargerOutputCurrent(Double)
+  case chargerOutputVoltage(Double)
+  case chargerOutputPower(Double)
+  case chargerOutputEnergy(Double)
 
   public var description: String {
     get {
@@ -404,14 +441,6 @@ public enum DokoResponse: Equatable, Sendable {
         return String(format: ".batteryStateOfHealth(%.1f)", soh)
       case .batteryTemperature(let temp):
         return String(format: ".batteryTemperature(%.0f)", temp)
-      case .batteryVoltage(let voltage):
-        return String(format: ".batteryVoltage(%.1f)", voltage)
-      case .batteryCurrent(let current):
-        return String(format: ".batteryCurrent(%.1f)", current)
-      case .batteryPower(let power):
-        return String(format: ".batteryPower(%.1f)", power)
-      case .batteryEnergy(let energy):
-        return String(format: ".batteryEnergy(%.3f)", energy)
       case .batteryEnergyToEmpty(let ete):
         return String(format: ".batteryEnergyToEmpty(%.1f)", ete)
       case .batteryDistanceToEmpty(let dte):
@@ -421,8 +450,36 @@ public enum DokoResponse: Equatable, Sendable {
       case .batteryCurrentCapacity(let kwh):
         return String(format: ".batteryCurrentCapacity(%.1f)", kwh)
 
+      case .batteryVoltage(let voltage):
+        return String(format: ".batteryVoltage(%.1f)", voltage)
+      case .batteryCurrent(let current):
+        return String(format: ".batteryCurrent(%.1f)", current)
+      case .batteryPower(let power):
+        return String(format: ".batteryPower(%.1f)", power)
+      case .batteryEnergy(let energy):
+        return String(format: ".batteryEnergy(%.3f)", energy)
+
       case .couplerTemperature(let temp):
         return String(format: ".couplerTemperature(%.0f)", temp)
+        
+      case .chargerInputVoltage(let voltage):
+        return String(format: ".chargerInputVoltage(%.1f)", voltage)
+      case .chargerInputCurrent(let current):
+        return String(format: ".chargerInputCurrent(%.1f)", current)
+      case .chargerInputPower(let power):
+        return String(format: ".chargerInputPower(%.1f)", power)
+      case .chargerInputEnergy(let energy):
+        return String(format: ".chargerInputEnergy(%.3f)", energy)
+
+      case .chargerOutputVoltage(let voltage):
+        return String(format: ".chargerOutputVoltage(%.1f)", voltage)
+      case .chargerOutputCurrent(let current):
+        return String(format: ".chargerOutputCurrent(%.1f)", current)
+      case .chargerOutputPower(let power):
+        return String(format: ".chargerOutputPower(%.1f)", power)
+      case .chargerOutputEnergy(let energy):
+        return String(format: ".chargerOutputEnergy(%.3f)", energy)
+
       }
     }
   }

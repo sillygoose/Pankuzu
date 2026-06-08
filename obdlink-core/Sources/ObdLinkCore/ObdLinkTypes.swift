@@ -40,10 +40,16 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case batteryStateOfCharge
   case batteryStateOfHealth
   case batteryTemperature
-  case batteryVoltage
-  case batteryCurrent
   case batteryOriginalCapacity
   case batteryCurrentCapacity
+  
+  case batteryVoltage
+  case batteryCurrent
+
+  case chargerInputVoltage
+  case chargerInputCurrent
+  case chargerOutputVoltage
+  case chargerOutputCurrent
 
   case acChargerStatus
   case acChargerCouplerTemperature
@@ -126,14 +132,25 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".batteryStateOfHealth"
       case .batteryTemperature:
         return ".batteryTemperature"
-      case .batteryVoltage:
-        return ".batteryVoltage"
-      case .batteryCurrent:
-        return ".batteryCurrent"
       case .batteryOriginalCapacity:
         return ".batteryOriginalCapacity"
       case .batteryCurrentCapacity:
         return ".batteryCurrentCapacity"
+
+      case .batteryVoltage:
+        return ".batteryVoltage"
+      case .batteryCurrent:
+        return ".batteryCurrent"
+
+      case .chargerInputCurrent:
+        return ".chargerInputCurrent"
+      case .chargerInputVoltage:
+        return ".chargerInputVoltage"
+      case .chargerOutputCurrent:
+        return ".chargerOutputCurrent"
+      case .chargerOutputVoltage:
+        return ".chargerOutputVoltage"
+
       case .acChargerStatus:
         return ".acChargerStatus"
       case .acChargerCouplerTemperature:
@@ -263,10 +280,16 @@ public enum ObdResponse: Equatable, Sendable {
   case batteryStateOfCharge(Double)
   case batteryStateOfHealth(Double)
   case batteryTemperature(Double)
-  case batteryVoltage(Double)
-  case batteryCurrent(Double)
   case batteryOriginalCapacity(Double)
   case batteryCurrentCapacity(Double)
+
+  case batteryVoltage(Double)
+  case batteryCurrent(Double)
+
+  case chargerInputVoltage(Double)
+  case chargerInputCurrent(Double)
+  case chargerOutputVoltage(Double)
+  case chargerOutputCurrent(Double)
 
   case acChargerStatus(Bool)
   case acChargerCouplerTemperature(Double)
@@ -352,14 +375,24 @@ public enum ObdResponse: Equatable, Sendable {
         return String(format: ".batteryStateOfHealth(%.1f)", soh)
       case .batteryTemperature(let temperature):
         return String(format: ".batteryTemperature(%.0f℃)", temperature)
-      case .batteryVoltage(let voltage):
-        return String(format: ".batteryVoltage(%.1f)", voltage)
-      case .batteryCurrent(let current):
-        return String(format: ".batteryCurrent(%.1f)", current)
       case .batteryOriginalCapacity(let kwh):
         return String(format: ".batteryOriginalCapacity(%.1f)", kwh)
       case .batteryCurrentCapacity(let kwh):
         return String(format: ".batteryCurrentCapacity(%.1f)", kwh)
+
+      case .batteryVoltage(let voltage):
+        return String(format: ".batteryVoltage(%.1f)", voltage)
+      case .batteryCurrent(let current):
+        return String(format: ".batteryCurrent(%.1f)", current)
+
+      case .chargerInputVoltage(let voltage):
+        return String(format: ".chargerInputVoltage(%.1fV)", voltage)
+      case .chargerInputCurrent(let current):
+        return String(format: ".chargerInputCurrent(%.1fA)", current)
+      case .chargerOutputVoltage(let voltage):
+        return String(format: ".chargerOutputVoltage(%.1fV)", voltage)
+      case .chargerOutputCurrent(let current):
+        return String(format: ".chargerOutputCurrent(%.1fA)", current)
 
       case .acChargerStatus(let status):
         return ".acChargerStatus(\(status))"

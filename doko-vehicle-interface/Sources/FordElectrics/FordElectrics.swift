@@ -29,13 +29,22 @@ public actor FordElectrics: ConnectedVehicleInterface {
 
   public var batteryPower: Double?
   public var batteryEnergy: Double?
+  public var chargerInputPower: Double?
+  public var chargerInputEnergy: Double?
+  public var chargerOutputPower: Double?
+  public var chargerOutputEnergy: Double?
+
   public var lastEnergyUpdateTime: Date?
   public var lastBatteryPower: Double?
+  public var lastChargerInputPower: Double?
+  public var lastChargerOutputPower: Double?
 
   public var meanTemperatureSum: Double = 0.0
   public var meanTemperatureCount: Int = 0
 
-  public init(vehicle: Vehicle?) {
+  public init(
+    vehicle: Vehicle?
+  ) {
     self.vehicle = vehicle
   }
 
@@ -56,6 +65,11 @@ public actor FordElectrics: ConnectedVehicleInterface {
 
     case .acChargerStatus:              obdLinkCommand = "STPX h:7E4, d:22484F"
     case .dcChargerStatus:              obdLinkCommand = "STPX h:7E4, d:22489E"
+
+    case .chargerInputVoltage:          obdLinkCommand = "STPX h:7E4, d:22485E"
+    case .chargerInputCurrent:          obdLinkCommand = "STPX h:7E4, d:22485F"
+    case .chargerOutputVoltage:         obdLinkCommand = "STPX h:7E4, d:22484A"
+    case .chargerOutputCurrent:         obdLinkCommand = "STPX h:7E4, d:224850"
 
     case .odometer:                     obdLinkCommand = "01A6"
     case .speed:                        obdLinkCommand = "STPX h:7E0, d:221505"
@@ -149,6 +163,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
         packetType == .acChargeInProgress ? .acChargerStatus : .dcChargerStatus;
       }
 
+      //### power needed?
     case .acChargeUpdate, .dcChargeUpdate:
       return obdCommandPacket(packetType) {
         .batteryVoltage;
@@ -175,7 +190,23 @@ public actor FordElectrics: ConnectedVehicleInterface {
         packetType == .acChargeHistory ? .acChargerCouplerTemperature : .dcChargerCouplerTemperature;
       }
 
-    case .tripEnergy, .acChargeEnergy, .dcChargeEnergy:
+    case .tripEnergy:
+      return obdCommandPacket(packetType) {
+        .batteryVoltage;
+        .batteryCurrent;
+      }
+
+    case .acChargeEnergy:
+      return obdCommandPacket(packetType) {
+        .batteryVoltage;
+        .batteryCurrent;
+        .chargerInputVoltage;
+        .chargerInputCurrent;
+        .chargerOutputVoltage;
+        .chargerOutputCurrent;
+      }
+
+    case .dcChargeEnergy:
       return obdCommandPacket(packetType) {
         .batteryVoltage;
         .batteryCurrent;
