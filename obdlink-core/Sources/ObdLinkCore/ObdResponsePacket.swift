@@ -180,23 +180,23 @@ extension ObdResponsePacket {
     return v
   }
   
-  public var chargerInputCurrent: Double? {
-    guard case let .chargerInputCurrent(v)? = responses[.chargerInputCurrent]?.response else { return nil }
-    return v
-  }
-  
   public var chargerInputVoltage: Double? {
     guard case let .chargerInputVoltage(v)? = responses[.chargerInputVoltage]?.response else { return nil }
     return v
   }
   
-  public var chargerOutputCurrent: Double? {
+  public var chargerInputCurrent: Double? {
     guard case let .chargerInputCurrent(v)? = responses[.chargerInputCurrent]?.response else { return nil }
     return v
   }
   
   public var chargerOutputVoltage: Double? {
-    guard case let .chargerInputVoltage(v)? = responses[.chargerInputVoltage]?.response else { return nil }
+    guard case let .chargerOutputVoltage(v)? = responses[.chargerOutputVoltage]?.response else { return nil }
+    return v
+  }
+  
+  public var chargerOutputCurrent: Double? {
+    guard case let .chargerOutputCurrent(v)? = responses[.chargerOutputCurrent]?.response else { return nil }
     return v
   }
   

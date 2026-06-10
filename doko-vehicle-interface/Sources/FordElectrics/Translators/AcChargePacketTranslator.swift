@@ -64,6 +64,7 @@ extension FordElectrics {
 
   func acChargeUpdateResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
+    //###Not needed iin update, only energy
     if let batteryVoltage = responsePacket.batteryVoltage, let batteryCurrent = responsePacket.batteryCurrent {
       dokoResponses[.batteryVoltage] = DokoCommandResponse(command: .acChargeUpdate, response: .batteryVoltage(batteryVoltage))
       dokoResponses[.batteryCurrent] = DokoCommandResponse(command: .acChargeUpdate, response: .batteryCurrent(batteryCurrent))
@@ -143,45 +144,42 @@ extension FordElectrics {
     if let batteryVoltage = responsePacket.batteryVoltage, let batteryCurrent = responsePacket.batteryCurrent {
       let batteryPower = batteryVoltage * batteryCurrent * 0.001
       hvBatteryPower = batteryPower
-      previousHvBatteryPower = batteryPower
       dokoResponses[.batteryPower] = DokoCommandResponse(command: .acChargeEnergy, response: .batteryPower(batteryPower))
-
       if let previousTime = previousHvBatteryPowerUpdate, let previousHvBattryPower = previousHvBatteryPower {
         let deltaHours = responsePacket.completedAt.timeIntervalSince(previousTime) / 3600.0
         let batteryEnergy = (hvBatteryEnergy ?? 0.0) + (previousHvBattryPower + batteryPower) / 2.0 * deltaHours
         dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .acChargeEnergy, response: .batteryEnergy(batteryEnergy))
         hvBatteryEnergy = batteryEnergy
       }
+      previousHvBatteryPower = batteryPower
       previousHvBatteryPowerUpdate = responsePacket.completedAt
     }
 
     if let chargerInputVoltage = responsePacket.chargerInputVoltage, let chargerInputCurrent = responsePacket.chargerInputCurrent {
       let inputPower = chargerInputVoltage * chargerInputCurrent * 0.001
       chargerInputPower = inputPower
-      previousChargerInputPower = inputPower
       dokoResponses[.chargerInputPower] = DokoCommandResponse(command: .acChargeEnergy, response: .chargerInputPower(inputPower))
-
       if let previousUpdate = previousChargerInputPowerUpdate, let previousChargerInputPower = previousChargerInputPower {
         let deltaHours = responsePacket.completedAt.timeIntervalSince(previousUpdate) / 3600.0
         let inputEnergy = (chargerInputEnergy ?? 0.0) + (previousChargerInputPower + inputPower) / 2.0 * deltaHours
         dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: .acChargeEnergy, response: .chargerInputEnergy(inputEnergy))
         chargerInputEnergy = inputEnergy
       }
+      previousChargerInputPower = inputPower
       previousChargerInputPowerUpdate = responsePacket.completedAt
     }
 
     if let chargerOutputVoltage = responsePacket.chargerOutputVoltage, let chargerOutputCurrent = responsePacket.chargerOutputCurrent {
       let outputPower = chargerOutputVoltage * chargerOutputCurrent * 0.001
       chargerOutputPower = outputPower
-      previousChargerOutputPower = outputPower
       dokoResponses[.chargerOutputPower] = DokoCommandResponse(command: .acChargeEnergy, response: .chargerOutputPower(outputPower))
-
       if let previousUpdate = previousChargerOutputPowerUpdate, let previousChargerOutputPower = previousChargerOutputPower {
         let deltaHours = responsePacket.completedAt.timeIntervalSince(previousUpdate) / 3600.0
         let outputEnergy = (chargerOutputEnergy ?? 0.0) + (previousChargerOutputPower + outputPower) / 2.0 * deltaHours
         dokoResponses[.chargerOutputEnergy] = DokoCommandResponse(command: .acChargeEnergy, response: .chargerOutputEnergy(outputEnergy))
         chargerOutputEnergy = outputEnergy
       }
+      previousChargerOutputPower = outputPower
       previousChargerOutputPowerUpdate = responsePacket.completedAt
     }
 

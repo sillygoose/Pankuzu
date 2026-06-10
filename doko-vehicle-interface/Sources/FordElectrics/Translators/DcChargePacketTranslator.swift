@@ -64,6 +64,7 @@ extension FordElectrics {
   
   func dcChargeUpdateResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
+    //### not needed in Update, only Energy
     if let voltage = responsePacket.batteryVoltage, let current = responsePacket.batteryCurrent {
       dokoResponses[.batteryVoltage] = DokoCommandResponse(command: .dcChargeUpdate, response: .batteryVoltage(voltage))
       dokoResponses[.batteryCurrent] = DokoCommandResponse(command: .dcChargeUpdate, response: .batteryCurrent(current))

@@ -558,6 +558,21 @@ extension DokoResponsePacket {
     return v
   }
 
+  public var batteryOriginalCapacity: Double? {
+    guard case let .batteryOriginalCapacity(v)? = responses[.batteryOriginalCapacity]?.response else { return nil }
+    return v
+  }
+
+  public var batteryCurrentCapacity: Double? {
+    guard case let .batteryCurrentCapacity(v)? = responses[.batteryCurrentCapacity]?.response else { return nil }
+    return v
+  }
+
+  public var couplerTemperature: Double? {
+    guard case let .couplerTemperature(v)? = responses[.couplerTemperature]?.response else { return nil }
+    return v
+  }
+  
   public var batteryVoltage: Double? {
     guard case let .batteryVoltage(v)? = responses[.batteryVoltage]?.response else { return nil }
     return v
@@ -578,18 +593,5 @@ extension DokoResponsePacket {
     return v
   }
 
-  public var batteryOriginalCapacity: Double? {
-    guard case let .batteryOriginalCapacity(v)? = responses[.batteryOriginalCapacity]?.response else { return nil }
-    return v
-  }
-
-  public var batteryCurrentCapacity: Double? {
-    guard case let .batteryCurrentCapacity(v)? = responses[.batteryCurrentCapacity]?.response else { return nil }
-    return v
-  }
-
-  public var couplerTemperature: Double? {
-    guard case let .couplerTemperature(v)? = responses[.couplerTemperature]?.response else { return nil }
-    return v
-  }
+  //### inpput/output charging 
 }

@@ -69,8 +69,8 @@ public actor FordElectrics: ConnectedVehicleInterface {
     case .acChargerStatus:              obdLinkCommand = "STPX h:7E4, d:22484F"
     case .dcChargerStatus:              obdLinkCommand = "STPX h:7E4, d:22489E"
 
-    case .chargerInputVoltage:          obdLinkCommand = "STPX h:7E4, d:22485E"
-    case .chargerInputCurrent:          obdLinkCommand = "STPX h:7E4, d:22485F"
+    case .chargerInputVoltage:          obdLinkCommand = "STPX h:7E2, d:22485E"
+    case .chargerInputCurrent:          obdLinkCommand = "STPX h:7E2, d:22485F"
     case .chargerOutputVoltage:         obdLinkCommand = "STPX h:7E4, d:22484A"
     case .chargerOutputCurrent:         obdLinkCommand = "STPX h:7E4, d:224850"
 
