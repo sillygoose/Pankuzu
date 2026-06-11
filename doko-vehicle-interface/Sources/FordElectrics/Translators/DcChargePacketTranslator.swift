@@ -113,25 +113,21 @@ extension FordElectrics {
 
   func dcChargeEnergyResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     var dokoResponses: DokoResponseDictionary = [:]
-//    guard
-//      let batteryVoltage = responsePacket.batteryVoltage,
-//      let batteryCurrent = responsePacket.batteryCurrent
-//    else {
-//      dokoResponses[.error] = DokoCommandResponse(command: .dcChargeEnergy, response: .error("arguments"))
-//      return DokoResponsePacket(type: .dcChargeEnergy, responses: dokoResponses)
-//    }
-//    let power = batteryVoltage * batteryCurrent * 0.001
-//    hvBatteryPower = power
-//    if let lastTime = lastEnergyUpdateTime, let lastPower = previousHvBatteryPower {
-//      let deltaHours = responsePacket.completedAt.timeIntervalSince(lastTime) / 3600.0
-//      hvBatteryEnergy = (hvBatteryEnergy ?? 0.0) + (lastPower + power) / 2.0 * deltaHours
-//    }
-//    lastEnergyUpdateTime = responsePacket.completedAt
-//    previousHvBatteryPower = power
-//    dokoResponses[.batteryPower] = DokoCommandResponse(command: .dcChargeEnergy, response: .batteryPower(power))
-//    if let hvBatteryEnergy {
-//      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .dcChargeEnergy, response: .batteryEnergy(hvBatteryEnergy))
-//###    }
+
+    if let batteryVoltage = responsePacket.batteryVoltage, let batteryCurrent = responsePacket.batteryCurrent {
+      let batteryPower = batteryVoltage * batteryCurrent * 0.001
+      hvBatteryPower = batteryPower
+      dokoResponses[.batteryPower] = DokoCommandResponse(command: .dcChargeEnergy, response: .batteryPower(batteryPower))
+      if let previousTime = previousHvBatteryPowerUpdate, let previousHvBattryPower = previousHvBatteryPower {
+        let deltaHours = responsePacket.completedAt.timeIntervalSince(previousTime) / 3600.0
+        let batteryEnergy = (hvBatteryEnergy ?? 0.0) + (previousHvBattryPower + batteryPower) / 2.0 * deltaHours
+        dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .dcChargeEnergy, response: .batteryEnergy(batteryEnergy))
+        hvBatteryEnergy = batteryEnergy
+      }
+      previousHvBatteryPower = batteryPower
+      previousHvBatteryPowerUpdate = responsePacket.completedAt
+    }
+
     return DokoResponsePacket(type: .dcChargeEnergy, responses: dokoResponses)
   }
 
