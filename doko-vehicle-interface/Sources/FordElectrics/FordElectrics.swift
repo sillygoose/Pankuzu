@@ -5,6 +5,7 @@ import DokoLogging
 import VehicleInterface
 import ObdLinkCore
 import Vehicles
+import Shared
 
 private struct CommandGroup {
   let commands: [ObdCommand]
@@ -27,20 +28,9 @@ public actor FordElectrics: ConnectedVehicleInterface {
   nonisolated public let vehicle: Vehicle?
   nonisolated public let name: String = "FordElectrics"
 
-  public var hvBatteryPower: Double?
-  public var hvBatteryEnergy: Double?
-  public var previousHvBatteryPower: Double?
-  public var previousHvBatteryPowerUpdate: Date?
-
-  public var chargerInputPower: Double?
-  public var chargerInputEnergy: Double?
-  public var previousChargerInputPower: Double?
-  public var previousChargerInputPowerUpdate: Date?
-
-  public var chargerOutputPower: Double?
-  public var previousChargerOutputPower: Double?
-  public var chargerOutputEnergy: Double?
-  public var previousChargerOutputPowerUpdate: Date?
+  public var hvBatteryEnergy = PowerEnergyIntegrator()
+  public var chargerInputEnergy = PowerEnergyIntegrator()
+  public var chargerOutputEnergy = PowerEnergyIntegrator()
 
   public var meanTemperatureSum: Double = 0.0
   public var meanTemperatureCount: Int = 0
@@ -170,11 +160,8 @@ public actor FordElectrics: ConnectedVehicleInterface {
         packetType == .acChargeInProgress ? .acChargerStatus : .dcChargerStatus;
       }
 
-      //### power needed?
     case .acChargeUpdate, .dcChargeUpdate:
       return obdCommandPacket(packetType) {
-        .batteryVoltage;
-        .batteryCurrent;
         .batteryStateOfCharge;
         .batteryTemperature;
         packetType == .acChargeStarting ? acChargerCouplerTemperature : dcChargerCouplerTemperature;

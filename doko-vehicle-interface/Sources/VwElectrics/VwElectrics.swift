@@ -5,6 +5,7 @@ import DokoLogging
 import VehicleInterface
 import ObdLinkCore
 import Vehicles
+import Shared
 
 private struct CommandGroup {
   let commands: [ObdCommand]
@@ -27,10 +28,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
   nonisolated public let vehicle: Vehicle?
   nonisolated public let name: String = "VwElectrics"
 
-  public var batteryPower: Double?
-  public var batteryEnergy: Double?
-  public var lastEnergyUpdateTime: Date?
-  public var lastBatteryPower: Double?
+  public var hvBatteryEnergy = PowerEnergyIntegrator()
 
   public var meanTemperatureSum: Double = 0.0
   public var meanTemperatureCount: Int = 0
@@ -44,35 +42,35 @@ public actor VwElectrics: ConnectedVehicleInterface {
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
     let obdLinkCommand: String?
     switch command {
-    case .atcra(let pattern):           obdLinkCommand = "ATCRA\(pattern)"
-    case .atfcsh(let header):           obdLinkCommand = "ATFCSH\(header)"
-    case .atfcsd(let data):             obdLinkCommand = "ATFCSD\(data)"
-    case .atfcsm(let mode):             obdLinkCommand = "ATFCSM\(mode)"
+    case .atcra(let pattern):             obdLinkCommand = "ATCRA\(pattern)"
+    case .atfcsh(let header):             obdLinkCommand = "ATFCSH\(header)"
+    case .atfcsd(let data):               obdLinkCommand = "ATFCSD\(data)"
+    case .atfcsm(let mode):               obdLinkCommand = "ATFCSM\(mode)"
 
-    case .stpo:                         obdLinkCommand = "STPO"
-    case .stp(let canProtocol):         obdLinkCommand = "STP\(canProtocol)"
-    case .stpbr(let baudRate):          obdLinkCommand = "STPBR\(baudRate)"
+    case .stpo:                           obdLinkCommand = "STPO"
+    case .stp(let canProtocol):           obdLinkCommand = "STP\(canProtocol)"
+    case .stpbr(let baudRate):            obdLinkCommand = "STPBR\(baudRate)"
 
-    case .gearSelected:                 obdLinkCommand = "STPX h:17FC0076, d:22210E"
-    case .odometer:                     obdLinkCommand = "STPX h:17FC0076, d:22295A"
-    case .speed:                        obdLinkCommand = "STPX h:17FC007B, d:22F40D"
+    case .gearSelected:                   obdLinkCommand = "STPX h:17FC0076, d:22210E"
+    case .odometer:                       obdLinkCommand = "STPX h:17FC0076, d:22295A"
+    case .speed:                          obdLinkCommand = "STPX h:17FC007B, d:22F40D"
 
-    case .batteryVoltage:               obdLinkCommand = "STPX h:17FC007B, d:221E3B"
-    case .batteryCurrent:               obdLinkCommand = "STPX h:17FC007B, d:221E3D"
-    case .batteryStateOfCharge:         obdLinkCommand = "STPX h:17FC007B, d:22028C"
-    case .batteryTemperature:           obdLinkCommand = "STPX h:17FC007B, d:222A0B"
-    case .batteryOriginalCapacity:      obdLinkCommand = "STPX h:17FC007B, d:22F1B3"
+    case .batteryVoltage:                 obdLinkCommand = "STPX h:17FC007B, d:221E3B"
+    case .batteryCurrent:                 obdLinkCommand = "STPX h:17FC007B, d:221E3D"
+    case .batteryStateOfCharge:           obdLinkCommand = "STPX h:17FC007B, d:22028C"
+    case .batteryTemperature:             obdLinkCommand = "STPX h:17FC007B, d:222A0B"
+    case .batteryOriginalCapacity:        obdLinkCommand = "STPX h:17FC007B, d:22F1B3"
 
-    case .batteryCurrentCapacity:       obdLinkCommand = "STPX h:710, d:222AB2"
-    case .batteryDistanceToEmpty:       obdLinkCommand = "STPX h:710, d:222AB5"
+    case .batteryCurrentCapacity:         obdLinkCommand = "STPX h:710, d:222AB2"
+    case .batteryDistanceToEmpty:         obdLinkCommand = "STPX h:710, d:222AB5"
 
-    case .acChargerStatus:              obdLinkCommand = "STPX h:17FC007B, d:227448"
-    case .dcChargerStatus:              obdLinkCommand = "STPX h:17FC007B, d:227448"
+    case .acChargerStatus:                obdLinkCommand = "STPX h:17FC007B, d:227448"
+    case .dcChargerStatus:                obdLinkCommand = "STPX h:17FC007B, d:227448"
 
-    case .position:                     obdLinkCommand = ""
-    case .weather:                      obdLinkCommand = ""
+    case .position:                       obdLinkCommand = ""
+    case .weather:                        obdLinkCommand = ""
 
-    default:                            obdLinkCommand = nil
+    default:                              obdLinkCommand = nil
     }
     guard let obdLinkCommand else {
       DokoLogging.shared.postLoggingResponse(.error("VWE.vehicleObdCommand: \(command.description) not found"))
@@ -173,8 +171,6 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
     case .acChargeUpdate, .dcChargeUpdate:
       return obdCommandPacket(packetType) {
-        .batteryVoltage;
-        .batteryCurrent;
         .batteryStateOfCharge;
         .batteryTemperature;
         canbusNormalAddressing;

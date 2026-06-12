@@ -230,6 +230,7 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case chargerInputVoltage
   case chargerInputPower
   case chargerInputEnergy
+  
   case chargerOutputCurrent
   case chargerOutputVoltage
   case chargerOutputPower
