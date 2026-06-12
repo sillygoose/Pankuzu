@@ -57,6 +57,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
     case .gearSelected:                   obdLinkCommand = "STPX h:7E2, d:221E12"
     case .acChargerCouplerTemperature:    obdLinkCommand = "STPX h:7E2, d:224888"
     case .dcChargerCouplerTemperature:    obdLinkCommand = "STPX h:7E2, d:224897"
+//    case .dcChargerCouplerTemperature3:    obdLinkCommand = "STPX h:7E2, d:2248A4"
 
     case .batteryEnergyToEmpty:           obdLinkCommand = "STPX h:7E4, d:224848"
     case .batteryStateOfCharge:           obdLinkCommand = "STPX h:7E4, d:224845"
