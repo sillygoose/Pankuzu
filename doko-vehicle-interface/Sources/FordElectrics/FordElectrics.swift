@@ -54,33 +54,33 @@ public actor FordElectrics: ConnectedVehicleInterface {
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
     let obdLinkCommand: String?
     switch command {
-    case .gearSelected:                 obdLinkCommand = "STPX h:7E2, d:221E12"
-    case .acChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224888"
-    case .dcChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224897"
+    case .gearSelected:                   obdLinkCommand = "STPX h:7E2, d:221E12"
+    case .acChargerCouplerTemperature:    obdLinkCommand = "STPX h:7E2, d:224888"
+    case .dcChargerCouplerTemperature:    obdLinkCommand = "STPX h:7E2, d:224897"
 
-    case .batteryEnergyToEmpty:         obdLinkCommand = "STPX h:7E4, d:224848"
-    case .batteryStateOfCharge:         obdLinkCommand = "STPX h:7E4, d:224845"
-    case .batteryStateOfHealth:         obdLinkCommand = "STPX h:7E4, d:22490C"
-    case .batteryTemperature:           obdLinkCommand = "STPX h:7E4, d:224800"
-      
-    case .batteryVoltage:               obdLinkCommand = "STPX h:7E4, d:22480D"
-    case .batteryCurrent:               obdLinkCommand = "STPX h:7E4, d:2248F9"
+    case .batteryEnergyToEmpty:           obdLinkCommand = "STPX h:7E4, d:224848"
+    case .batteryStateOfCharge:           obdLinkCommand = "STPX h:7E4, d:224845"
+    case .batteryStateOfHealth:           obdLinkCommand = "STPX h:7E4, d:22490C"
+    case .batteryTemperature:             obdLinkCommand = "STPX h:7E4, d:224800"
 
-    case .acChargerStatus:              obdLinkCommand = "STPX h:7E4, d:22484F"
-    case .dcChargerStatus:              obdLinkCommand = "STPX h:7E4, d:22489E"
+    case .batteryVoltage:                 obdLinkCommand = "STPX h:7E4, d:22480D"
+    case .batteryCurrent:                 obdLinkCommand = "STPX h:7E4, d:2248F9"
 
-    case .chargerInputVoltage:          obdLinkCommand = "STPX h:7E2, d:22485E"
-    case .chargerInputCurrent:          obdLinkCommand = "STPX h:7E2, d:22485F"
-    case .chargerOutputVoltage:         obdLinkCommand = "STPX h:7E4, d:22484A"
-    case .chargerOutputCurrent:         obdLinkCommand = "STPX h:7E4, d:224850"
+    case .acChargerStatus:                obdLinkCommand = "STPX h:7E4, d:22484F"
+    case .dcChargerStatus:                obdLinkCommand = "STPX h:7E4, d:22489E"
 
-    case .odometer:                     obdLinkCommand = "01A6"
-    case .speed:                        obdLinkCommand = "STPX h:7E0, d:221505"
+    case .chargerInputVoltage:            obdLinkCommand = "STPX h:7E2, d:22485E"
+    case .chargerInputCurrent:            obdLinkCommand = "STPX h:7E2, d:22485F"
+    case .chargerOutputVoltage:           obdLinkCommand = "STPX h:7E4, d:22484A"
+    case .chargerOutputCurrent:           obdLinkCommand = "STPX h:7E4, d:224850"
 
-    case .position:                     obdLinkCommand = ""
-    case .weather:                      obdLinkCommand = ""
-      
-    default:                            obdLinkCommand = nil
+    case .odometer:                       obdLinkCommand = "01A6"
+    case .speed:                          obdLinkCommand = "STPX h:7E0, d:221505"
+
+    case .position:                       obdLinkCommand = ""
+    case .weather:                        obdLinkCommand = ""
+
+    default:                              obdLinkCommand = nil
     }
     guard let obdLinkCommand else {
       DokoLogging.shared.postLoggingResponse(.error("FE.vehicleObdCommand: \(command.description) not found"))
@@ -88,7 +88,10 @@ public actor FordElectrics: ConnectedVehicleInterface {
     }
     return obdLinkCommand
   }
-  
+
+  private let acChargerCouplerTemperature = CommandGroup(commands: [.acChargerCouplerTemperature])
+  private let dcChargerCouplerTemperature = CommandGroup(commands: [.dcChargerCouplerTemperature, .dcChargerCouplerTemperature])
+
   public func translateDokoCommandPacket(using packetType: DokoPacketType) async -> ObdCommandPacket? {
     switch packetType {
     case .vehicleCustomization:
@@ -158,7 +161,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
         .batteryEnergyToEmpty;
         .batteryTemperature;
         .batteryStateOfHealth;
-        packetType == .acChargeStarting ? .acChargerCouplerTemperature : .dcChargerCouplerTemperature;
+        packetType == .acChargeStarting ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
       
     case .acChargeInProgress, .dcChargeInProgress:
@@ -173,7 +176,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
         .batteryCurrent;
         .batteryStateOfCharge;
         .batteryTemperature;
-        packetType == .acChargeUpdate ? .acChargerCouplerTemperature : .dcChargerCouplerTemperature;
+        packetType == .acChargeStarting ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
 
     case .acChargeEnding, .dcChargeEnding:
@@ -182,7 +185,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
         .batteryEnergyToEmpty;
         .batteryTemperature;
         .batteryStateOfHealth;
-        packetType == .acChargeEnding ? .acChargerCouplerTemperature : .dcChargerCouplerTemperature;
+        packetType == .acChargeStarting ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
 
     case .acChargeHistory, .dcChargeHistory:
@@ -190,7 +193,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
         .batteryStateOfCharge;
         .batteryEnergyToEmpty;
         .batteryTemperature;
-        packetType == .acChargeHistory ? .acChargerCouplerTemperature : .dcChargerCouplerTemperature;
+        packetType == .acChargeStarting ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
 
     case .tripEnergy:

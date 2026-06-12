@@ -89,6 +89,9 @@ extension FordElectrics {
       case .dcChargerCouplerTemperature:
         let temperature = try parseDcChargerCouplerTemperature(response)
         commandResponse = .dcChargerCouplerTemperature(temperature)
+//      case .dcChargerCouplerTemperature3:
+//        let temperature = try parseDcChargerCouplerTemperature3(response)
+//        commandResponse = .dcChargerCouplerTemperature3(temperature)
 
       default:
         throw ParsedResponseError.unexpectedCommand(command, response)

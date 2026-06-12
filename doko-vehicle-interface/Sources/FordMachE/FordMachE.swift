@@ -42,32 +42,32 @@ public actor FordMachE: ConnectedVehicleInterface {
   public func vehicleObdCommand(_ command: ObdCommand) async -> String? {
     let obdLinkCommand: String?
     switch command {
-    case .stpo:                         obdLinkCommand = "STPO"
-    case .stp(let canProtocol):         obdLinkCommand = "STP\(canProtocol)"
-    case .stpbr(let baudRate):          obdLinkCommand = "STPBR\(baudRate)"
+    case .stpo:                           obdLinkCommand = "STPO"
+    case .stp(let canProtocol):           obdLinkCommand = "STP\(canProtocol)"
+    case .stpbr(let baudRate):            obdLinkCommand = "STPBR\(baudRate)"
 
-    case .gearSelected:                 obdLinkCommand = "STPX h:7E2, d:221E12"
-    case .acChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224888"
-    case .dcChargerCouplerTemperature:  obdLinkCommand = "STPX h:7E2, d:224897"
+    case .gearSelected:                   obdLinkCommand = "STPX h:7E2, d:221E12"
+    case .acChargerCouplerTemperature:    obdLinkCommand = "STPX h:7E2, d:224888"
+    case .dcChargerCouplerTemperature:    obdLinkCommand = "STPX h:7E2, d:224897"
 
-    case .batteryEnergyToEmpty:         obdLinkCommand = "STPX h:7E4, d:224848"
-    case .batteryStateOfCharge:         obdLinkCommand = "STPX h:7E4, d:224845"
-    case .batteryStateOfHealth:         obdLinkCommand = "STPX h:7E4, d:22490C"
-    case .batteryTemperature:           obdLinkCommand = "STPX h:7E4, d:224800"
-      
-    case .batteryVoltage:               obdLinkCommand = "STPX h:7E4, d:22480D"
-    case .batteryCurrent:               obdLinkCommand = "STPX h:7E4, d:2248F9"
+    case .batteryEnergyToEmpty:           obdLinkCommand = "STPX h:7E4, d:224848"
+    case .batteryStateOfCharge:           obdLinkCommand = "STPX h:7E4, d:224845"
+    case .batteryStateOfHealth:           obdLinkCommand = "STPX h:7E4, d:22490C"
+    case .batteryTemperature:             obdLinkCommand = "STPX h:7E4, d:224800"
 
-    case .acChargerStatus:              obdLinkCommand = "STPX h:7E4, d:22484F"
-    case .dcChargerStatus:              obdLinkCommand = "STPX h:7E4, d:22489E"
+    case .batteryVoltage:                 obdLinkCommand = "STPX h:7E4, d:22480D"
+    case .batteryCurrent:                 obdLinkCommand = "STPX h:7E4, d:2248F9"
 
-    case .odometer:                     obdLinkCommand = "STPX h:720, d:22404C"
-    case .speed:                        obdLinkCommand = "STPX h:7E4, d:22F40D"
+    case .acChargerStatus:                obdLinkCommand = "STPX h:7E4, d:22484F"
+    case .dcChargerStatus:                obdLinkCommand = "STPX h:7E4, d:22489E"
 
-    case .position:                     obdLinkCommand = ""
-    case .weather:                      obdLinkCommand = ""
-      
-    default:                            obdLinkCommand = nil
+    case .odometer:                       obdLinkCommand = "STPX h:720, d:22404C"
+    case .speed:                          obdLinkCommand = "STPX h:7E4, d:22F40D"
+
+    case .position:                       obdLinkCommand = ""
+    case .weather:                        obdLinkCommand = ""
+
+    default:                              obdLinkCommand = nil
     }
     guard let obdLinkCommand else {
       DokoLogging.shared.postLoggingResponse(.error("FME.vehicleObdCommand: \(command.description) not found"))
