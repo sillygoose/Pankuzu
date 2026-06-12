@@ -233,6 +233,7 @@ public final class DokoStateEngine {
                   tripState: .active,
                   duration: .seconds(tripDraft.duration),
                   distance: tripDraft.distance,
+                  energy: tripDraft.energy,
                   elevation: tripDraft.elevationEnd,
                   rangeConsumed: tripDraft.range.map { $0 },
                   windSock: windSock

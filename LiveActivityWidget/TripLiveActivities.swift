@@ -59,25 +59,27 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
     @Shared(.appSettings) var appSettings
 
     var body: some View {
-      let duration = context.state.duration
+      //let duration = context.state.duration
       let distance = context.state.distance
       let elevation = context.state.elevation
+      let energy = context.state.energy
       let windSock = context.state.windSock
 
       HStack(alignment: .center) {
         DokoWidgetIcon(height: laIconFrame)
         Spacer()
         Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
-          GridRow(alignment: .lastTextBaseline) {
-            Image(systemName: "clock")
-              .font(laSymbol)
-              .foregroundStyle(DesignTokens.Color.duration)
-              .gridColumnAlignment(.leading)
-            Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
-              .font(laValue.monospacedDigit())
-              .foregroundStyle(DesignTokens.Color.duration)
-              .gridColumnAlignment(.trailing)
-          }
+//          GridRow(alignment: .lastTextBaseline) {
+//            Image(systemName: "clock")
+//              .font(laSymbol)
+//              .foregroundStyle(DesignTokens.Color.duration)
+//              .gridColumnAlignment(.leading)
+//            Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
+//              .font(laValue.monospacedDigit())
+//              .foregroundStyle(DesignTokens.Color.duration)
+//              .gridColumnAlignment(.trailing)
+//          }
+          
           GridRow(alignment: .lastTextBaseline) {
             let distance = Measurement(value: distance, unit: UnitLength.kilometers)
               .converted(to: appSettings.metric ? .kilometers : .miles)
@@ -92,6 +94,30 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
               .gridColumnAlignment(.leading)
           }
           .foregroundStyle(DesignTokens.Color.distance)
+
+          if let energy {
+            let rawDistance = Measurement(value: distance, unit: UnitLength.kilometers)
+            let energyUsed = Measurement(value: energy, unit: UnitEnergy.kilowattHours)
+            let metricEfficiency = Measurement(
+              value: energyUsed.value == 0.0 ? 0.0 : rawDistance.value / energyUsed.value,
+              unit: UnitEnergyEfficiency.kilometersPerKilowattHour
+            )
+            let efficiency = metricEfficiency.converted(
+              to: appSettings.metric ? appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
+            )
+            GridRow(alignment: .lastTextBaseline) {
+              Image(systemName: "ev.charger")
+                .font(laSymbol)
+                .gridColumnAlignment(.leading)
+              Text(String(format: "%.2f", efficiency.value))
+                .font(laValue.monospacedDigit())
+                .gridColumnAlignment(.trailing)
+              Text(efficiency.unit.symbol)
+                .font(laUnit)
+                .gridColumnAlignment(.leading)
+            }
+            .foregroundStyle(DesignTokens.Color.tripping)
+          }
 
           if let elevation {
             let elevation = Measurement(value: elevation, unit: UnitLength.meters)
@@ -284,6 +310,7 @@ extension TripActivityAttributes.ContentState {
       tripState: .active,
       duration: .seconds(1000),
       distance: 22.0,
+      energy: 4.5,
       elevation: 322.5,
       rangeConsumed: 26.4,
       windSock: WindSock(
@@ -302,7 +329,7 @@ extension TripActivityAttributes.ContentState {
       tripState: .active,
       duration: .seconds(1000),
       distance: 22.0,
-      elevation: 322.5,
+      elevation: 4322.5,
       rangeConsumed: 20.4,
       windSock: WindSock(
         course: 180,
