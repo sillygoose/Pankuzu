@@ -51,6 +51,7 @@ public struct TripActivityAttributes: ActivityAttributes, Sendable {
     public let duration: Duration
     public let distance: Double
     public let energy: Double?
+    public let efficiency: Double?
     public let elevation: Double?
     public let rangeConsumed: Double?
     public let windSock: WindSock?
@@ -60,6 +61,7 @@ public struct TripActivityAttributes: ActivityAttributes, Sendable {
       duration: Duration = .seconds(0),
       distance: Double = 0.0,
       energy: Double? = nil,
+      efficiency: Double? = nil,
       elevation: Double? = nil,
       rangeConsumed: Double? = nil,
       windSock: WindSock? = nil
@@ -68,6 +70,7 @@ public struct TripActivityAttributes: ActivityAttributes, Sendable {
       self.duration = duration
       self.distance = distance
       self.energy = energy
+      self.efficiency = efficiency
       self.elevation = elevation
       self.rangeConsumed = rangeConsumed
       self.windSock = windSock
