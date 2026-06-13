@@ -11,8 +11,7 @@ import CommonUI
 public final class TripDetailEnergyModel {
   var trip: Trip
 
-  @ObservationIgnored
-  @FetchOne(TripData.none) var tripData
+  @ObservationIgnored @FetchOne(TripData.none) var tripData
 
   var energyToEmpty: [DokoDataPoint] = []
   var calculatedEnergy: [DokoDataPoint] = []

@@ -66,8 +66,8 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
       let windSock = context.state.windSock
 
       HStack(alignment: .center) {
-        DokoWidgetIcon(height: laIconFrame)
-        Spacer()
+//        DokoWidgetIcon(height: laIconFrame)
+//        Spacer()
         Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
 //          GridRow(alignment: .lastTextBaseline) {
 //            Image(systemName: "clock")
@@ -96,10 +96,8 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
           .foregroundStyle(DesignTokens.Color.distance)
 
           if let energy {
-            let rawDistance = Measurement(value: distance, unit: UnitLength.kilometers)
-            let energyUsed = Measurement(value: energy, unit: UnitEnergy.kilowattHours)
             let metricEfficiency = Measurement(
-              value: energyUsed.value == 0.0 ? 0.0 : rawDistance.value / energyUsed.value,
+              value: energy,
               unit: UnitEnergyEfficiency.kilometersPerKilowattHour
             )
             let efficiency = metricEfficiency.converted(
