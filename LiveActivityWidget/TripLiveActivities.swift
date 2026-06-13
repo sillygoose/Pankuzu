@@ -62,12 +62,12 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
       //let duration = context.state.duration
       let distance = context.state.distance
       let elevation = context.state.elevation
-      let energy = context.state.energy
+      let efficiency = context.state.efficiency
       let windSock = context.state.windSock
 
       HStack(alignment: .center) {
-        DokoWidgetIcon(height: laIconFrame)
-        Spacer()
+//        DokoWidgetIcon(height: laIconFrame)
+//        Spacer()
         Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
 //          GridRow(alignment: .lastTextBaseline) {
 //            Image(systemName: "clock")
@@ -95,11 +95,9 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
           }
           .foregroundStyle(DesignTokens.Color.distance)
 
-          if let energy {
-            let rawDistance = Measurement(value: distance, unit: UnitLength.kilometers)
-            let energyUsed = Measurement(value: energy, unit: UnitEnergy.kilowattHours)
+          if let efficiency {
             let metricEfficiency = Measurement(
-              value: energyUsed.value == 0.0 ? 0.0 : rawDistance.value / energyUsed.value,
+              value: efficiency,
               unit: UnitEnergyEfficiency.kilometersPerKilowattHour
             )
             let efficiency = metricEfficiency.converted(
@@ -164,7 +162,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
     var body: some View {
       let duration = context.state.duration
       let distance = context.state.distance
-      let energy = context.state.energy
+      let energy = context.state.efficiency
 
       HStack(alignment: .center) {
         VStack {
@@ -310,7 +308,7 @@ extension TripActivityAttributes.ContentState {
       tripState: .active,
       duration: .seconds(1000),
       distance: 22.0,
-      energy: 4.5,
+      efficiency: 4.5,
       elevation: 322.5,
       rangeConsumed: 26.4,
       windSock: WindSock(
@@ -347,7 +345,7 @@ extension TripActivityAttributes.ContentState {
       tripState: .ended,
       duration: .seconds(1000),
       distance: 22.0,
-      energy: 7.5,
+      efficiency: 5.5,
       rangeConsumed: 20.4,
     )
   }

@@ -78,7 +78,7 @@ extension FordElectrics {
       packetType: .tripUpdate
     ),
     StateEngineDokoCommandPacket(
-      schedulerType: .delaysThenFires(30),
+      schedulerType: .delaysThenFires(10),
       packetType: .tripData
     ),
     StateEngineDokoCommandPacket(

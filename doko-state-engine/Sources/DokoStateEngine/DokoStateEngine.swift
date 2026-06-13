@@ -5,6 +5,7 @@ import WidgetKit
 
 import DokoTypes
 import DokoSharing
+import DokoSchema
 import DokoLogging
 import DokoABRP
 import CoreLocationManager
@@ -14,9 +15,9 @@ import DokoNotificationManager
 import DokoLiveActivityManager
 import ObdLinkManager
 
-import Trips
-import Charges
-import Vehicles
+//import Trips
+//import Charges
+//import Vehicles
 
 @DokoEngineActor
 public final class DokoStateEngine {
@@ -101,12 +102,24 @@ public final class DokoStateEngine {
     }
   }
 
+  private func fetchTripData(tripID: Trip.ID?) -> (DokoDataPoint?, DokoDataPoint?) {
+    guard let tripID else { return (nil, nil) }
+    @FetchOne(TripData.find(tripID)) var tripData
+    guard let tripData else { return (nil, nil) }
+    let cutoff = Date.now.addingTimeInterval(-15 * 60)
+    let odometer = tripData.odometer.first { $0.timestamp >= cutoff }
+    let energy = tripData.batteryEnergy.first { $0.timestamp >= cutoff }
+    DokoLogging.shared.postLoggingResponse(.info(".fetchTripData: cutoff \(odometer?.timestamp.description ?? ""))"))
+    return (odometer, energy)
+  }
+
   private func dokoResponseProcessing() -> Task<Void, Never> {
     Task {
       @Shared(.connectedVehicleInterface) var connectedVehicle
       @Shared(.activeSession) var activeSession
       @Shared(.appSettings) var appSettings
       @Shared(.widgetSession) var widgetSession
+
       self.logger.info("\(timestamp()) SE.obdResponseProcessing() started")
       while !Task.isCancelled {
         guard let dokoResponsePacket = await DokoPacketManager.shared.removeDokoResponsePacket() else {
@@ -198,11 +211,6 @@ public final class DokoStateEngine {
             }
             let nextState = dokoResponsePacket.nextState ?? .tripInProgress
             if nextState != self.vehicleState {
-//              $widgetSession.withLock { $0 = "" }
-//              Task { @MainActor in
-//                try? await Task.sleep(for: .seconds(2.0))
-//                WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget")
-//              }
               await CoreLocationManager.shared.stopPacketUpdates()
               $vehicleState.withLock { $0 = nextState }
             }
@@ -228,12 +236,20 @@ public final class DokoStateEngine {
                   windCompassDirection: weather.windCompassDirection
                 )
               } else { nil }
+              let efficiency: Double? = {
+                let (pastOdometer, pastEnergy) = fetchTripData(tripID: tripDraft.id)
+                guard let pastOdometer, let pastEnergy, let currentEnergy = tripDraft.energy else { return nil }
+                let distance = tripDraft.odometerEnd - pastOdometer.datapoint
+                let energy = currentEnergy - pastEnergy.datapoint
+                let efficiency = energy == 0.0 ? 0.0 : distance / energy
+                return efficiency
+              }()
               await LiveActivityManager.shared.updateTrip(
                 state: TripActivityAttributes.ContentState(
                   tripState: .active,
                   duration: .seconds(tripDraft.duration),
                   distance: tripDraft.distance,
-                  energy: tripDraft.energy,
+                  efficiency: efficiency,
                   elevation: tripDraft.elevationEnd,
                   rangeConsumed: tripDraft.range.map { $0 },
                   windSock: windSock
@@ -334,7 +350,6 @@ public final class DokoStateEngine {
                 tripDraft.weatherConditionsStart = dokoResponsePacket.weather?.conditionSymbol
                 tripDraft.weatherConditionsEnd = dokoResponsePacket.weather?.conditionSymbol
                 DokoLogging.shared.postLoggingResponse(.info(".tripWeather updated tripDraft"))
-
               }
               try Trip.postTripWeatherRecord(tripID: tripID, tripWeatherPacket: dokoResponsePacket)
             } catch {
