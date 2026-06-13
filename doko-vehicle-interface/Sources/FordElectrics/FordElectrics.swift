@@ -164,7 +164,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
       return obdCommandPacket(packetType) {
         .batteryStateOfCharge;
         .batteryTemperature;
-        packetType == .acChargeStarting ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
+        packetType == .acChargeUpdate ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
 
     case .acChargeEnding, .dcChargeEnding:
@@ -173,7 +173,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
         .batteryEnergyToEmpty;
         .batteryTemperature;
         .batteryStateOfHealth;
-        packetType == .acChargeStarting ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
+        packetType == .acChargeEnding ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
 
     case .acChargeHistory, .dcChargeHistory:
@@ -181,7 +181,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
         .batteryStateOfCharge;
         .batteryEnergyToEmpty;
         .batteryTemperature;
-        packetType == .acChargeStarting ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
+        packetType == .acChargeHistory ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
 
     case .tripEnergy:
@@ -204,6 +204,8 @@ public actor FordElectrics: ConnectedVehicleInterface {
       return obdCommandPacket(packetType) {
         .batteryVoltage;
         .batteryCurrent;
+        .chargerOutputVoltage;
+        .chargerOutputCurrent;
       }
 
     default:

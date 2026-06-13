@@ -77,6 +77,8 @@ public actor FordMachE: ConnectedVehicleInterface {
   }
  
   private let canbusInitialization = CommandGroup(commands: [.stp(53), .stpbr(500000), .stpo])
+  private let acChargerCouplerTemperature = CommandGroup(commands: [.acChargerCouplerTemperature])
+  private let dcChargerCouplerTemperature = CommandGroup(commands: [.dcChargerCouplerTemperature, .dcChargerCouplerTemperature])
 
   public func translateDokoCommandPacket(using packetType: DokoPacketType) async -> ObdCommandPacket? {
     switch packetType {
@@ -148,7 +150,7 @@ public actor FordMachE: ConnectedVehicleInterface {
         .batteryEnergyToEmpty;
         .batteryTemperature;
         .batteryStateOfHealth;
-        packetType == .acChargeStarting ? .acChargerCouplerTemperature : .dcChargerCouplerTemperature;
+        packetType == .acChargeStarting ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
       
     case .acChargeInProgress, .dcChargeInProgress:
@@ -160,7 +162,7 @@ public actor FordMachE: ConnectedVehicleInterface {
       return obdCommandPacket(packetType) {
         .batteryStateOfCharge;
         .batteryTemperature;
-        packetType == .acChargeUpdate ? .acChargerCouplerTemperature : .dcChargerCouplerTemperature;
+        packetType == .acChargeUpdate ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
 
     case .acChargeEnding, .dcChargeEnding:
@@ -169,7 +171,7 @@ public actor FordMachE: ConnectedVehicleInterface {
         .batteryEnergyToEmpty;
         .batteryTemperature;
         .batteryStateOfHealth;
-        packetType == .acChargeEnding ? .acChargerCouplerTemperature : .dcChargerCouplerTemperature;
+        packetType == .acChargeEnding ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
 
     case .acChargeHistory, .dcChargeHistory:
@@ -177,15 +179,33 @@ public actor FordMachE: ConnectedVehicleInterface {
         .batteryStateOfCharge;
         .batteryEnergyToEmpty;
         .batteryTemperature;
-        packetType == .acChargeHistory ? .acChargerCouplerTemperature : .dcChargerCouplerTemperature;
+        packetType == .acChargeHistory ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
 
-    case .tripEnergy, .acChargeEnergy, .dcChargeEnergy:
+    case .tripEnergy:
       return obdCommandPacket(packetType) {
         .batteryVoltage;
         .batteryCurrent;
       }
 
+    case .acChargeEnergy:
+      return obdCommandPacket(packetType) {
+        .batteryVoltage;
+        .batteryCurrent;
+        .chargerInputVoltage;
+        .chargerInputCurrent;
+        .chargerOutputVoltage;
+        .chargerOutputCurrent;
+      }
+
+    case .dcChargeEnergy:
+      return obdCommandPacket(packetType) {
+        .batteryVoltage;
+        .batteryCurrent;
+        .chargerOutputVoltage;
+        .chargerOutputCurrent;
+      }
+      
     default:
       DokoLogging.shared.postLoggingResponse(.error("FME.translateDokoCommandPacket: no packet translation for '\(packetType.description)'"))
       return nil

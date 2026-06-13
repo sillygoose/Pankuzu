@@ -432,54 +432,54 @@ public enum DokoResponse: Equatable, Sendable {
       case let .meanTemperature(temp):
         return ".meanTemperature(\(String(format: "%.0f℃", temp)))"
       case .odometer(let odometer):
-        return String(format: ".odometer(%.1f)", odometer)
+        return String(format: ".odometer(%.1fkm)", odometer)
       case .speed(let speed):
-        return String(format: ".speed(%.1f)", speed)
+        return String(format: ".speed(%.1fkph)", speed)
         
       case .batteryStateOfCharge(let soc):
-        return String(format: ".batteryStateOfCharge(%.1f)", soc)
+        return String(format: ".batteryStateOfCharge(%.1f%)", soc)
       case .batteryStateOfHealth(let soh):
-        return String(format: ".batteryStateOfHealth(%.1f)", soh)
+        return String(format: ".batteryStateOfHealth(%.1f%)", soh)
       case .batteryTemperature(let temp):
-        return String(format: ".batteryTemperature(%.0f)", temp)
+        return String(format: ".batteryTemperature(%.0f℃)", temp)
       case .batteryEnergyToEmpty(let ete):
-        return String(format: ".batteryEnergyToEmpty(%.1f)", ete)
+        return String(format: ".batteryEnergyToEmpty(%.1fkWh)", ete)
       case .batteryDistanceToEmpty(let dte):
-        return String(format: ".batteryDistanceToEmpty(%.0f)", dte)
+        return String(format: ".batteryDistanceToEmpty(%.0fkm)", dte)
       case .batteryOriginalCapacity(let kwh):
-        return String(format: ".batteryOriginalCapacity(%.1f)", kwh)
+        return String(format: ".batteryOriginalCapacity(%.1fkWh)", kwh)
       case .batteryCurrentCapacity(let kwh):
-        return String(format: ".batteryCurrentCapacity(%.1f)", kwh)
+        return String(format: ".batteryCurrentCapacity(%.1fkWh)", kwh)
 
       case .batteryVoltage(let voltage):
-        return String(format: ".batteryVoltage(%.1f)", voltage)
+        return String(format: ".batteryVoltage(%.1fV)", voltage)
       case .batteryCurrent(let current):
-        return String(format: ".batteryCurrent(%.1f)", current)
+        return String(format: ".batteryCurrent(%.1fA)", current)
       case .batteryPower(let power):
-        return String(format: ".batteryPower(%.1f)", power)
+        return String(format: ".batteryPower(%.1fkW)", power)
       case .batteryEnergy(let energy):
-        return String(format: ".batteryEnergy(%.3f)", energy)
+        return String(format: ".batteryEnergy(%.3fkWh)", energy)
 
       case .couplerTemperature(let temp):
-        return String(format: ".couplerTemperature(%.0f)", temp)
+        return String(format: ".couplerTemperature(%.0f℃)", temp)
         
       case .chargerInputVoltage(let voltage):
-        return String(format: ".chargerInputVoltage(%.1f)", voltage)
+        return String(format: ".chargerInputVoltage(%.1fV)", voltage)
       case .chargerInputCurrent(let current):
-        return String(format: ".chargerInputCurrent(%.1f)", current)
+        return String(format: ".chargerInputCurrent(%.1fA)", current)
       case .chargerInputPower(let power):
-        return String(format: ".chargerInputPower(%.1f)", power)
+        return String(format: ".chargerInputPower(%.1fkW)", power)
       case .chargerInputEnergy(let energy):
-        return String(format: ".chargerInputEnergy(%.3f)", energy)
+        return String(format: ".chargerInputEnergy(%.3fkWh)", energy)
 
       case .chargerOutputVoltage(let voltage):
-        return String(format: ".chargerOutputVoltage(%.1f)", voltage)
+        return String(format: ".chargerOutputVoltage(%.1fV)", voltage)
       case .chargerOutputCurrent(let current):
-        return String(format: ".chargerOutputCurrent(%.1f)", current)
+        return String(format: ".chargerOutputCurrent(%.1fA)", current)
       case .chargerOutputPower(let power):
-        return String(format: ".chargerOutputPower(%.1f)", power)
+        return String(format: ".chargerOutputPower(%.1fkW)", power)
       case .chargerOutputEnergy(let energy):
-        return String(format: ".chargerOutputEnergy(%.3f)", energy)
+        return String(format: ".chargerOutputEnergy(%.3fkWh)", energy)
 
       }
     }
