@@ -110,7 +110,6 @@ public final class DokoStateEngine {
     let cutoff = Date.now.addingTimeInterval(-Double(appSettings.tripEfficiencyAverageDuration * 60))
     let odometer = tripData.odometer.first { $0.timestamp >= cutoff }
     let energy = tripData.batteryEnergy.first { $0.timestamp >= cutoff }
-    DokoLogging.shared.postLoggingResponse(.info(".fetchTripData: cutoff \(odometer?.timestamp.description ?? ""))"))
     return (odometer, energy)
   }
 
