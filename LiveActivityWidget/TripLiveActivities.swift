@@ -59,27 +59,13 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
     @Shared(.appSettings) var appSettings
 
     var body: some View {
-      //let duration = context.state.duration
       let distance = context.state.distance
       let elevation = context.state.elevation
       let efficiency = context.state.efficiency
       let windSock = context.state.windSock
 
       HStack(alignment: .center) {
-//        DokoWidgetIcon(height: laIconFrame)
-//        Spacer()
         Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
-//          GridRow(alignment: .lastTextBaseline) {
-//            Image(systemName: "clock")
-//              .font(laSymbol)
-//              .foregroundStyle(DesignTokens.Color.duration)
-//              .gridColumnAlignment(.leading)
-//            Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
-//              .font(laValue.monospacedDigit())
-//              .foregroundStyle(DesignTokens.Color.duration)
-//              .gridColumnAlignment(.trailing)
-//          }
-          
           GridRow(alignment: .lastTextBaseline) {
             let distance = Measurement(value: distance, unit: UnitLength.kilometers)
               .converted(to: appSettings.metric ? .kilometers : .miles)
@@ -309,7 +295,7 @@ extension TripActivityAttributes.ContentState {
       duration: .seconds(1000),
       distance: 22.0,
       efficiency: 4.5,
-      elevation: 322.5,
+      elevation: 2322.5,
       rangeConsumed: 26.4,
       windSock: WindSock(
         course: 90,
