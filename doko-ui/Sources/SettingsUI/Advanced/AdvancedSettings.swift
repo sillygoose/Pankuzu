@@ -28,6 +28,12 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
   }
 }
 
+extension SharedKey where Self == AppStorageKey<Bool>.Default {
+  static var tripSettingsExpanded: Self {
+    Self[.appStorage("AdvancedSettings-tripSettingsExpanded"), default: false]
+  }
+}
+
 @MainActor
 @Observable
 class AdvancedSettingsModel {
@@ -72,6 +78,10 @@ class AdvancedSettingsModel {
   func setDeletedRecordRetentionDays(_ days: Int) {
     $appSettings.deletedRecordRetentionDays.withLock { $0 = days }
   }
+
+  func setTripEfficiencyAverageDuration(_ duration: Int) {
+    $appSettings.tripEfficiencyAverageDuration.withLock { $0 = duration }
+  }
 }
 
 
@@ -83,6 +93,7 @@ struct AdvancedSettingsView: View {
   @Shared(.debuggingExpanded) var debuggingExpanded
   @Shared(.tripPositionExpanded) var tripPositionExpanded
   @Shared(.tripElevationExpanded) var tripElevationExpanded
+  @Shared(.tripSettingsExpanded) var tripSettingsExpanded
 
   let PoiThresholdSliderRangeMetric = 30.0...100.0
   let PoiThresholdSliderRange = 100.0...300.0
@@ -173,6 +184,27 @@ struct AdvancedSettingsView: View {
         }
       } label: {
         Text("Thresholds")
+      }
+
+      DisclosureGroup(
+        isExpanded: Binding(
+          get: { tripSettingsExpanded },
+          set: { newValue in $tripSettingsExpanded.withLock { $0 = newValue } }
+        )
+      ) {
+        Picker(
+          "Efficiency Average Duration",
+          selection: Binding(
+            get: { model.appSettings.tripEfficiencyAverageDuration },
+            set: { model.setTripEfficiencyAverageDuration($0) }
+          )
+        ) {
+          Text("5 min").tag(5)
+          Text("10 min").tag(10)
+          Text("15 min").tag(15)
+        }
+      } label: {
+        Text("Trip Settings")
       }
 
 #if DEBUG

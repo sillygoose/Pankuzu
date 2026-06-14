@@ -33,6 +33,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
   public var maximumTripElevationDistance: Double = 100
   public var minimumTripElevationChange: Double = 2
   public var deletedRecordRetentionDays: Int = 30
+  public var tripEfficiencyAverageDuration: Int = 15
   
   public var abrpEnabled: Bool = false
   public var abrpUserToken: String = ""
@@ -51,6 +52,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     case identicalTripPositionDistance, tripPositionCourseDeviation
     case maximumTripPositionDistance, maximumTripElevationDistance, minimumTripElevationChange
     case deletedRecordRetentionDays
+    case tripEfficiencyAverageDuration
     case abrpEnabled, abrpUserToken, abrpVehicleTokens
     case abrpSendTripUpdates, abrpSendChargeUpdates
   }
@@ -76,6 +78,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     try c.encode(maximumTripElevationDistance, forKey: .maximumTripElevationDistance)
     try c.encode(minimumTripElevationChange, forKey: .minimumTripElevationChange)
     try c.encode(deletedRecordRetentionDays, forKey: .deletedRecordRetentionDays)
+    try c.encode(tripEfficiencyAverageDuration, forKey: .tripEfficiencyAverageDuration)
     try c.encode(abrpEnabled, forKey: .abrpEnabled)
     try c.encode(abrpUserToken, forKey: .abrpUserToken)
     try c.encode(abrpVehicleTokens, forKey: .abrpVehicleTokens)
@@ -106,6 +109,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     maximumTripElevationDistance = try c.decodeIfPresent(Double.self, forKey: .maximumTripElevationDistance) ?? 100
     minimumTripElevationChange = try c.decodeIfPresent(Double.self, forKey: .minimumTripElevationChange) ?? 2
     deletedRecordRetentionDays = try c.decodeIfPresent(Int.self, forKey: .deletedRecordRetentionDays) ?? 30
+    tripEfficiencyAverageDuration = try c.decodeIfPresent(Int.self, forKey: .tripEfficiencyAverageDuration) ?? 15
     abrpEnabled = try c.decodeIfPresent(Bool.self, forKey: .abrpEnabled) ?? false
     abrpUserToken = try c.decodeIfPresent(String.self, forKey: .abrpUserToken) ?? ""
     abrpVehicleTokens = try c.decodeIfPresent([String: String].self, forKey: .abrpVehicleTokens) ?? [:]

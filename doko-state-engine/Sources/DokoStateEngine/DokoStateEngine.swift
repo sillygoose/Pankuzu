@@ -106,7 +106,8 @@ public final class DokoStateEngine {
     guard let tripID else { return (nil, nil) }
     @FetchOne(TripData.find(tripID)) var tripData
     guard let tripData else { return (nil, nil) }
-    let cutoff = Date.now.addingTimeInterval(-15 * 60)
+    @Shared(.appSettings) var appSettings
+    let cutoff = Date.now.addingTimeInterval(-Double(appSettings.tripEfficiencyAverageDuration * 60))
     let odometer = tripData.odometer.first { $0.timestamp >= cutoff }
     let energy = tripData.batteryEnergy.first { $0.timestamp >= cutoff }
     DokoLogging.shared.postLoggingResponse(.info(".fetchTripData: cutoff \(odometer?.timestamp.description ?? ""))"))
