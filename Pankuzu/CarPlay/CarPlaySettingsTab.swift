@@ -8,6 +8,7 @@ extension CarPlayController {
       self?.interfaceController.pushTemplate(infoTemplate, animated: true, completion: nil)
       completion()
     }
+    
     let template = CPListTemplate(title: "Settings", sections: [CPListSection(items: [statusItem])])
     template.tabTitle = "Settings"
     template.tabImage = UIImage(systemName: "gear")

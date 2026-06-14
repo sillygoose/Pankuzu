@@ -119,6 +119,7 @@ public final class DokoStateEngine {
       @Shared(.activeSession) var activeSession
       @Shared(.appSettings) var appSettings
       @Shared(.widgetSession) var widgetSession
+      @Shared(.chargeResponses) var chargeResponses
 
       self.logger.info("\(timestamp()) SE.obdResponseProcessing() started")
       while !Task.isCancelled {
@@ -411,6 +412,7 @@ public final class DokoStateEngine {
                 )
                 $activeSession.withLock { $0 = nil }
                 $widgetSession.withLock { $0 = "" }
+                $chargeResponses.withLock { $0 = [:] }
                 Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".acChargeEnding: \(String(describing: error))"))
@@ -474,6 +476,7 @@ public final class DokoStateEngine {
                 )
                 $activeSession.withLock { $0 = nil }
                 $widgetSession.withLock { $0 = "" }
+                $chargeResponses.withLock { $0 = [:] }
                 Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".dcChargeEnding: \(String(describing: error))"))
@@ -495,12 +498,13 @@ public final class DokoStateEngine {
             )
             do {
               self.chargeInProgress = try Charge.postChargeUpdateRecord(chargeDraft: chargeDraft, chargeUpdateResponse: dokoResponsePacket)
-              if let chargeDraft = self.chargeInProgress, let stateOfCharge = chargeDraft.stateOfChargeEnd {
+              $chargeResponses.withLock { $0 = dokoResponsePacket.responses }
+              if let chargeDraft = self.chargeInProgress {
                 await LiveActivityManager.shared.updateCharge(
                   state: ChargeActivityAttributes.ContentState(
                     chargeState: .active,
                     duration: .seconds(chargeDraft.duration),
-                    stateOfCharge: stateOfCharge,
+                    stateOfCharge: chargeDraft.stateOfChargeEnd,
                     rangeAdded: nil,
                     measuredPower: dokoResponsePacket.batteryPower.map { $0 },
                     batteryVoltage: dokoResponsePacket.batteryVoltage.map { $0 },
