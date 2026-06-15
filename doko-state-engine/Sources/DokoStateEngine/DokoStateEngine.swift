@@ -216,6 +216,7 @@ public final class DokoStateEngine {
               $vehicleState.withLock { $0 = nextState }
             }
 
+          //### dom't update draft since packet going away
           case .tripUpdate:
             guard case .tripInProgress = vehicleState else {
               throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
@@ -324,6 +325,7 @@ public final class DokoStateEngine {
               DokoLogging.shared.postLoggingResponse(.error(".tripCoreElevation: \(String(describing: error))"))
             }
 
+            //### update tripDraft
           case .tripData:
             guard case .tripInProgress = vehicleState else {
               throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)

@@ -209,7 +209,7 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
 
   case position
   case weather, meanTemperature
-  case odometer
+  case odometer, distance
   case speed
 
   case batteryStateOfCharge
@@ -313,6 +313,8 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".meanTemperature"
       case .odometer:
         return ".odometer"
+      case .distance:
+        return ".distance"
       case .speed:
         return ".speed"
 
@@ -390,6 +392,7 @@ public enum DokoResponse: Equatable, Sendable {
   case weather(DokoCurrentWeather)
   case meanTemperature(Double)
   case odometer(Double)
+  case distance(Double)
   case speed(Double)
 
   case batteryStateOfCharge(Double)
@@ -441,6 +444,8 @@ public enum DokoResponse: Equatable, Sendable {
         return ".meanTemperature(\(String(format: "%.0f℃", temp)))"
       case .odometer(let odometer):
         return String(format: ".odometer(%.1fkm)", odometer)
+      case .distance(let distance):
+        return String(format: ".distance(%.1fkm)", distance)
       case .speed(let speed):
         return String(format: ".speed(%.1fkph)", speed)
         
@@ -492,7 +497,6 @@ public enum DokoResponse: Equatable, Sendable {
         return String(format: ".chargerOutputPower(%.1fkW)", power)
       case .chargerOutputEnergy(let energy):
         return String(format: ".chargerOutputEnergy(%.3fkWh)", energy)
-
       }
     }
   }

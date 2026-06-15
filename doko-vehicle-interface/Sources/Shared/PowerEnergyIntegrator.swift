@@ -1,6 +1,5 @@
 import Foundation
 
-/// Trapezoidal integration of power samples into accumulated energy (kWh).
 public struct PowerEnergyIntegrator: Sendable {
   public private(set) var voltage: Double?
   public private(set) var current: Double?
@@ -37,5 +36,26 @@ public struct PowerEnergyIntegrator: Sendable {
     voltage = newVoltage
     current = newCurrent
     return integrate(power: newVoltage * newCurrent * 0.001, at: date)
+  }
+}
+
+public struct TripOdometer: Sendable {
+  public private(set) var initialOdometer: Double = 0
+  public private(set) var odometer: Double = 0
+  public private(set) var distance: Double = 0
+
+  public init() {}
+
+  public mutating func reset(odometer newOdometer: Double) {
+    initialOdometer = newOdometer
+    odometer = newOdometer
+    distance = 0
+  }
+
+  @discardableResult
+  public mutating func update(odometer newOdometer: Double) -> Double {
+    odometer = newOdometer
+    distance += newOdometer - initialOdometer
+    return distance
   }
 }

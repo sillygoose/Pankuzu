@@ -32,6 +32,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
   public var hvBatteryEnergy = PowerEnergyIntegrator()
   public var chargerInputEnergy = PowerEnergyIntegrator()
   public var chargerOutputEnergy = PowerEnergyIntegrator()
+  public var tripOdometer = TripOdometer()
 
   public var meanTemperatureSum: Double = 0.0
   public var meanTemperatureCount: Int = 0
@@ -115,7 +116,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
     case .tripUpdate:
       return obdCommandPacket(packetType) {
         .position;
-        .odometer;
+//        .odometer;
         .batteryStateOfCharge;
         .batteryTemperature;
       }

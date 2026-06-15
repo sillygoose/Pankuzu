@@ -23,7 +23,8 @@ extension FordElectrics {
     hvBatteryEnergy.reset()
     chargerInputEnergy.reset()
     chargerOutputEnergy.reset()
-    
+    tripOdometer.reset(odometer: odometer)
+
     dokoResponses[.nextState] = DokoCommandResponse(command: .acChargeStarting, response: .nextState(.acChargeInProgress))
     dokoResponses[.position] = DokoCommandResponse(command: .acChargeStarting, response: .position(position))
     dokoResponses[.odometer] = DokoCommandResponse(command: .acChargeStarting, response: .odometer(odometer))
