@@ -19,6 +19,7 @@ extension FordMachE {
       return DokoResponsePacket(type: .acChargeStarting, responses: dokoResponses)
     }
 
+    responseCache = [:]
     hvBatteryEnergy.reset()
     chargerInputEnergy.reset()
     chargerOutputEnergy.reset()

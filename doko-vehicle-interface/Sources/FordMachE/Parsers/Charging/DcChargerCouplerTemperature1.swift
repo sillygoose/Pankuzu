@@ -8,7 +8,7 @@ private struct stpxParser: Parser {
   }
 }
 
-func parseDcChargerCouplerTemperature(_ input: String) throws -> Double {
+func parseDcChargerCouplerTemperature1(_ input: String) throws -> Double {
 #if DEBUG
   @Shared(.simIdle) var simIdle
   @Shared(.simDcCharge) var simDcCharge

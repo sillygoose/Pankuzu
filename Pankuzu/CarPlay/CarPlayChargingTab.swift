@@ -1,6 +1,7 @@
 import CarPlay
 import UIKit
 
+import DokoSharing
 import DokoTypes
 
 extension CarPlayController {
@@ -40,12 +41,18 @@ extension CarPlayController {
     return template
   }
 
+  private func formatTemperature(_ celsius: Double) -> String {
+    appSettings.metric
+      ? String(format: "%.0f℃", celsius)
+      : String(format: "%.0f°F", celsius * 9 / 5 + 32)
+  }
+
   func makeChargeSessionItems(from responses: DokoResponseDictionary) -> [CPInformationItem] {
     var items: [CPInformationItem] = []
-    if case let .batteryStateOfCharge(v)? = responses[.batteryStateOfCharge]?.response { items.append(.init(title: "State of Charge",  detail: String(format: "%.0f%%", v))) }
-    if case let .batteryTemperature(v)?   = responses[.batteryTemperature]?.response   { items.append(.init(title: "Battery Temp",     detail: String(format: "%.0f℃", v))) }
-    //###battery SoH
-    if case let .batteryEnergy(v)?   = responses[.batteryEnergy]?.response   { items.append(.init(title: "Energy",  detail: String(format: "%.3f kWh", v))) }
+    if case let .chargerInputPower(v)? = responses[.chargerInputPower]?.response       { items.append(.init(title: "Charger Power",   detail: String(format: "%.1f kW", v))) }
+    if case let .batteryStateOfCharge(v)? = responses[.batteryStateOfCharge]?.response { items.append(.init(title: "State of Charge",   detail: String(format: "%.0f%%", v))) }
+    if case let .batteryStateOfHealth(v)? = responses[.batteryStateOfHealth]?.response { items.append(.init(title: "State of Heallth",  detail: String(format: "%.0f%%", v))) }
+    if case let .batteryEnergy(v)?   = responses[.batteryEnergy]?.response             { items.append(.init(title: "Energy Added",      detail: String(format: "%.3f kWh", v))) }
     if case let .chargerInputEnergy(inputEnergy)? = responses[.chargerInputEnergy]?.response,
        case let .batteryEnergy(batteryEnergy)? = responses[.batteryEnergy]?.response,
        inputEnergy > 0 {
@@ -56,11 +63,12 @@ extension CarPlayController {
 
   func makeChargeInputItems(from responses: DokoResponseDictionary) -> [CPInformationItem] {
     var items: [CPInformationItem] = []
-    if case let .chargerInputVoltage(v)? = responses[.chargerInputVoltage]?.response { items.append(.init(title: "Voltage",       detail: String(format: "%.1f V",   v))) }
-    if case let .chargerInputCurrent(v)? = responses[.chargerInputCurrent]?.response { items.append(.init(title: "Current",       detail: String(format: "%.1f A",   v))) }
-    if case let .chargerInputPower(v)?   = responses[.chargerInputPower]?.response   { items.append(.init(title: "Power",         detail: String(format: "%.1f kW",  v))) }
-    if case let .chargerInputEnergy(v)?  = responses[.chargerInputEnergy]?.response  { items.append(.init(title: "Energy",        detail: String(format: "%.3f kWh", v))) }
-    if case let .couplerTemperature(v)?  = responses[.couplerTemperature]?.response  { items.append(.init(title: "Coupler Temp",  detail: String(format: "%.0f℃",    v))) }
+    if case let .chargerInputVoltage(v)?          = responses[.chargerInputVoltage]?.response          { items.append(.init(title: "Voltage",       detail: String(format: "%.1f V",   v))) }
+    if case let .chargerInputCurrent(v)?          = responses[.chargerInputCurrent]?.response          { items.append(.init(title: "Current",       detail: String(format: "%.1f A",   v))) }
+    if case let .chargerInputPower(v)?            = responses[.chargerInputPower]?.response            { items.append(.init(title: "Power",         detail: String(format: "%.1f kW",  v))) }
+    if case let .chargerInputEnergy(v)?           = responses[.chargerInputEnergy]?.response           { items.append(.init(title: "Energy",        detail: String(format: "%.3f kWh", v))) }
+    if case let .couplerTemperature(v)?           = responses[.couplerTemperature]?.response           { items.append(.init(title: "Coupler Temp",  detail: formatTemperature(v))) }
+    if case let .secondaryCouplerTemperature(v)?  = responses[.secondaryCouplerTemperature]?.response  { items.append(.init(title: "Coupler Temp2", detail: formatTemperature(v))) }
     return items
   }
 
@@ -75,11 +83,12 @@ extension CarPlayController {
 
   func makeChargeBatteryItems(from responses: DokoResponseDictionary) -> [CPInformationItem] {
     var items: [CPInformationItem] = []
-    if case let .batteryVoltage(v)?     = responses[.batteryVoltage]?.response      { items.append(.init(title: "Voltage",      detail: String(format: "%.1f V",   v))) }
-    if case let .batteryCurrent(v)?     = responses[.batteryCurrent]?.response      { items.append(.init(title: "Current",      detail: String(format: "%.1f A",   v))) }
-    if case let .batteryPower(v)?       = responses[.batteryPower]?.response        { items.append(.init(title: "Power",        detail: String(format: "%.1f kW",  v))) }
-    if case let .batteryEnergy(v)?      = responses[.batteryEnergy]?.response       { items.append(.init(title: "Energy",       detail: String(format: "%.3f kWh", v))) }
-    if case let .batteryTemperature(v)? = responses[.batteryTemperature]?.response  { items.append(.init(title: "Battery Temp", detail: String(format: "%.0f℃",    v))) }
+    if case let .batteryVoltage(v)?     = responses[.batteryVoltage]?.response          { items.append(.init(title: "Voltage",          detail: String(format: "%.1f V",   v))) }
+    if case let .batteryCurrent(v)?     = responses[.batteryCurrent]?.response          { items.append(.init(title: "Current",          detail: String(format: "%.1f A",   v))) }
+    if case let .batteryPower(v)?       = responses[.batteryPower]?.response            { items.append(.init(title: "Power",            detail: String(format: "%.1f kW",  v))) }
+    if case let .batteryEnergy(v)?      = responses[.batteryEnergy]?.response           { items.append(.init(title: "Energy",           detail: String(format: "%.3f kWh", v))) }
+    if case let .batteryTemperature(v)? = responses[.batteryTemperature]?.response      { items.append(.init(title: "Temperature",      detail: formatTemperature(v))) }
+    if case let .batteryStateOfHealth(v)? = responses[.batteryStateOfHealth]?.response  { items.append(.init(title: "State of Heallth", detail: String(format: "%.0f%%", v))) }
     return items
   }
 }

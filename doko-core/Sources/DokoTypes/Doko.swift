@@ -225,7 +225,9 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case batteryEnergy
 
   case couplerTemperature
-  
+  case primaryCouplerTemperature
+  case secondaryCouplerTemperature
+
   case chargerInputCurrent
   case chargerInputVoltage
   case chargerInputPower
@@ -339,7 +341,11 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
 
       case .couplerTemperature:
         return ".couplerTemperature"
-        
+      case .primaryCouplerTemperature:
+        return ".primaryCouplerTemperature"
+      case .secondaryCouplerTemperature:
+        return ".secondaryCouplerTemperature"
+
       case .chargerInputCurrent:
         return ".chargerInputCurrent"
       case .chargerInputVoltage:
@@ -399,6 +405,8 @@ public enum DokoResponse: Equatable, Sendable {
   case batteryEnergy(Double)
 
   case couplerTemperature(Double)
+  case primaryCouplerTemperature(Double)
+  case secondaryCouplerTemperature(Double)
 
   case chargerInputCurrent(Double)
   case chargerInputVoltage(Double)
@@ -462,7 +470,11 @@ public enum DokoResponse: Equatable, Sendable {
 
       case .couplerTemperature(let temp):
         return String(format: ".couplerTemperature(%.0f℃)", temp)
-        
+      case .primaryCouplerTemperature(let temp):
+        return String(format: ".primaryCouplerTemperature(%.0f℃)", temp)
+      case .secondaryCouplerTemperature(let temp):
+        return String(format: ".secondaryCouplerTemperature(%.0f℃)", temp)
+
       case .chargerInputVoltage(let voltage):
         return String(format: ".chargerInputVoltage(%.1fV)", voltage)
       case .chargerInputCurrent(let current):

@@ -13,7 +13,7 @@ func parseAcChargerInputCurrent(_ input: String) throws -> Double {
   @Shared(.simIdle) var simIdle
   @Shared(.simAcCharge) var simAcCharge
   if simIdle {
-    return simAcCharge ? 28 : 0
+    return simAcCharge ? 48 : 0
   }
 #endif
   var input = input[...].utf8

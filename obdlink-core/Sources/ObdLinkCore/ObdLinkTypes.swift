@@ -55,7 +55,8 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   case acChargerCouplerTemperature
 
   case dcChargerStatus
-  case dcChargerCouplerTemperature
+  case dcChargerCouplerTemperature1
+  case dcChargerCouplerTemperature3
 
   /* Non-OBDLink macros */
   case position
@@ -157,8 +158,10 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".acChargerCouplerTemperature"
       case .dcChargerStatus:
         return ".dcChargerStatus"
-      case .dcChargerCouplerTemperature:
-        return ".dcChargerCouplerTemperature"
+      case .dcChargerCouplerTemperature1:
+        return ".dcChargerCouplerTemperature1"
+      case .dcChargerCouplerTemperature3:
+        return ".dcChargerCouplerTemperature3"
       case .position:
         return ".position"
       case .weather:
@@ -295,7 +298,8 @@ public enum ObdResponse: Equatable, Sendable {
   case acChargerCouplerTemperature(Double)
 
   case dcChargerStatus(Bool)
-  case dcChargerCouplerTemperature(Double)
+  case dcChargerCouplerTemperature1(Double)
+  case dcChargerCouplerTemperature3(Double)
 
   case position(DokoPosition)
   case weather(DokoCurrentWeather)
@@ -401,7 +405,9 @@ public enum ObdResponse: Equatable, Sendable {
 
       case let .dcChargerStatus(status):
         return ".dcChargerStatus(\(status))"
-      case let .dcChargerCouplerTemperature(temperature):
+      case let .dcChargerCouplerTemperature1(temperature):
+        return String(format: ".dcChargerCouplerTemperature1(%.0f℃)", temperature)
+      case let .dcChargerCouplerTemperature3(temperature):
         return String(format: ".dcChargerCouplerTemperature(%.0f℃)", temperature)
 
       case let .position(position):

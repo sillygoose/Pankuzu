@@ -8,11 +8,11 @@ private struct stpxParser: Parser {
   }
 }
 
-func parseDcChargerCouplerTemperature(_ input: String) throws -> Double {
+func parseDcChargerCouplerTemperature1(_ input: String) throws -> Double {
 #if DEBUG
   @Shared(.simIdle) var simIdle
   @Shared(.simDcCharge) var simDcCharge
-  if simIdle { return 50 }
+  if simIdle { return 53 }
 #endif
   var input = input[...].utf8
   let temp = try stpxParser().parse(&input)

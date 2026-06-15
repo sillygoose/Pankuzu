@@ -12,7 +12,7 @@ final class CarPlayController {
   var chargeOutputTemplate: CPInformationTemplate?
   var chargeBatteryTemplate: CPInformationTemplate?
 
-  @Shared(.appSettings) private var appSettings
+  @Shared(.appSettings) var appSettings
   @Shared(.connectedAccessoryName) private var connectedAccessoryName
   @Shared(.activeSession) private var activeSession
   @Shared(.chargeResponses) private var chargeResponses

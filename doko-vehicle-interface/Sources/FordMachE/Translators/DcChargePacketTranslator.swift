@@ -13,7 +13,7 @@ extension FordMachE {
       let stateOfCharge = responsePacket.batteryStateOfCharge,
       let stateOfHealth = responsePacket.batteryStateOfHealth,
       let batteryTemperature = responsePacket.batteryTemperature,
-      let couplerTemperature = responsePacket.dcChargerCouplerTemperature
+      let couplerTemperature = responsePacket.dcChargerCouplerTemperature1
     else {
       dokoResponses[.error] = DokoCommandResponse(command: .dcChargeStarting, response: .error("arguments"))
       return DokoResponsePacket(type: .dcChargeStarting, responses: dokoResponses)
@@ -76,7 +76,7 @@ extension FordMachE {
     if let batteryTemperature = responsePacket.batteryTemperature {
       dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .dcChargeUpdate, response: .batteryTemperature(batteryTemperature))
     }
-    if let couplerTemperature = responsePacket.dcChargerCouplerTemperature {
+    if let couplerTemperature = responsePacket.dcChargerCouplerTemperature1 {
       dokoResponses[.couplerTemperature] = DokoCommandResponse(command: .dcChargeUpdate, response: .couplerTemperature(couplerTemperature))
     }
     return DokoResponsePacket(type: .dcChargeUpdate, responses: dokoResponses)
@@ -89,7 +89,7 @@ extension FordMachE {
       let stateOfCharge = responsePacket.batteryStateOfCharge,
       let stateOfHealth = responsePacket.batteryStateOfHealth,
       let batteryTemperature = responsePacket.batteryTemperature,
-      let couplerTemperature = responsePacket.dcChargerCouplerTemperature
+      let couplerTemperature = responsePacket.dcChargerCouplerTemperature1
     else {
       dokoResponses[.error] = DokoCommandResponse(command: .dcChargeEnding, response: .error("arguments"))
       return DokoResponsePacket(type: .dcChargeEnding, responses: dokoResponses)
@@ -137,7 +137,7 @@ extension FordMachE {
       let energyToEmpty = responsePacket.batteryEnergyToEmpty,
       let stateOfCharge = responsePacket.batteryStateOfCharge,
       let batteryTemperature = responsePacket.batteryTemperature,
-      let couplerTemperature = responsePacket.dcChargerCouplerTemperature
+      let couplerTemperature = responsePacket.dcChargerCouplerTemperature1
     else {
       dokoResponses[.error] = DokoCommandResponse(command: .dcChargeHistory, response: .error("arguments"))
       return DokoResponsePacket(type: .dcChargeHistory, responses: dokoResponses)

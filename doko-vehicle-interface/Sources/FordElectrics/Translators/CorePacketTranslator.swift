@@ -81,5 +81,4 @@ extension FordElectrics {
     dokoResponses[.nextState] = DokoCommandResponse(command: .idle, response: .nextState(nextState))
     return DokoResponsePacket(type: .idle, responses: dokoResponses)
   }
- 
-}
+ }

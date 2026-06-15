@@ -81,9 +81,12 @@ extension FordMachE {
       case .dcChargerStatus:
         let status = try parseDcChargerStatus(response)
         commandResponse = .dcChargerStatus(status)
-      case .dcChargerCouplerTemperature:
-        let temperature = try parseDcChargerCouplerTemperature(response)
-        commandResponse = .dcChargerCouplerTemperature(temperature)
+      case .dcChargerCouplerTemperature1:
+        let temperature = try parseDcChargerCouplerTemperature1(response)
+        commandResponse = .dcChargerCouplerTemperature1(temperature)
+      case .dcChargerCouplerTemperature3:
+        let temperature = try parseDcChargerCouplerTemperature3(response)
+        commandResponse = .dcChargerCouplerTemperature3(temperature)
 
       default:
         throw ParsedResponseError.unexpectedCommand(command, response)

@@ -28,6 +28,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
   nonisolated public let vehicle: Vehicle?
   nonisolated public let name: String = "FordElectrics"
 
+  public var responseCache: DokoResponseDictionary = [:]
   public var hvBatteryEnergy = PowerEnergyIntegrator()
   public var chargerInputEnergy = PowerEnergyIntegrator()
   public var chargerOutputEnergy = PowerEnergyIntegrator()
@@ -46,8 +47,8 @@ public actor FordElectrics: ConnectedVehicleInterface {
     switch command {
     case .gearSelected:                   obdLinkCommand = "STPX h:7E2, d:221E12"
     case .acChargerCouplerTemperature:    obdLinkCommand = "STPX h:7E2, d:224888"
-    case .dcChargerCouplerTemperature:    obdLinkCommand = "STPX h:7E2, d:224897"
-//    case .dcChargerCouplerTemperature3:    obdLinkCommand = "STPX h:7E2, d:2248A4"
+    case .dcChargerCouplerTemperature1:   obdLinkCommand = "STPX h:7E2, d:224897"
+    case .dcChargerCouplerTemperature3:   obdLinkCommand = "STPX h:7E2, d:2248A4"
 
     case .batteryEnergyToEmpty:           obdLinkCommand = "STPX h:7E4, d:224848"
     case .batteryStateOfCharge:           obdLinkCommand = "STPX h:7E4, d:224845"
@@ -81,7 +82,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
   }
 
   private let acChargerCouplerTemperature = CommandGroup(commands: [.acChargerCouplerTemperature])
-  private let dcChargerCouplerTemperature = CommandGroup(commands: [.dcChargerCouplerTemperature, .dcChargerCouplerTemperature])
+  private let dcChargerCouplerTemperature = CommandGroup(commands: [.dcChargerCouplerTemperature1, .dcChargerCouplerTemperature3])
 
   public func translateDokoCommandPacket(using packetType: DokoPacketType) async -> ObdCommandPacket? {
     switch packetType {
@@ -162,9 +163,9 @@ public actor FordElectrics: ConnectedVehicleInterface {
 
     case .acChargeUpdate, .dcChargeUpdate:
       return obdCommandPacket(packetType) {
-        .batteryStateOfCharge;
-        .batteryTemperature;
-        packetType == .acChargeUpdate ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
+//        .batteryStateOfCharge;
+//        .batteryTemperature;
+//        packetType == .acChargeUpdate ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
 
     case .acChargeEnding, .dcChargeEnding:

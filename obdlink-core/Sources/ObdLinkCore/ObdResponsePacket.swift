@@ -205,11 +205,16 @@ extension ObdResponsePacket {
     return v
   }
   
-  public var dcChargerCouplerTemperature: Double? {
-    guard case let .dcChargerCouplerTemperature(v)? = responses[.dcChargerCouplerTemperature]?.response else { return nil }
+  public var dcChargerCouplerTemperature1: Double? {
+    guard case let .dcChargerCouplerTemperature1(v)? = responses[.dcChargerCouplerTemperature1]?.response else { return nil }
     return v
   }
   
+  public var dcChargerCouplerTemperature3: Double? {
+    guard case let .dcChargerCouplerTemperature3(v)? = responses[.dcChargerCouplerTemperature3]?.response else { return nil }
+    return v
+  }
+
   public var position: DokoPosition? {
     guard case let .position(v)? = responses[.position]?.response else { return nil }
     return v
