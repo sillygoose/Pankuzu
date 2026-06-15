@@ -17,7 +17,7 @@ func parseHvbCurrent(_ input: String) throws -> Double {
   if simIdle {
     if simTrip { return -80 }
     if simAcCharge { return 28 }
-    if simDcCharge { return 400 }
+    if simDcCharge { return 300 }
     return -4
   }
 #endif

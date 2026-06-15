@@ -14,12 +14,8 @@ func parseChargerOutputVoltage(_ input: String) throws -> Double {
   @Shared(.simAcCharge) var simAcCharge
   @Shared(.simDcCharge) var simDcCharge
   if simIdle {
-    if simAcCharge {
-      return 240
-    }
-    if simDcCharge {
-      return 240
-    }
+    if simAcCharge { return 240 }
+    if simDcCharge { return 350 }
     return 0
   }
 #endif

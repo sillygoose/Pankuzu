@@ -12,8 +12,10 @@ func parseChargerOutputCurrent(_ input: String) throws -> Double {
 #if DEBUG
   @Shared(.simIdle) var simIdle
   @Shared(.simAcCharge) var simAcCharge
+  @Shared(.simDcCharge) var simDcCharge
   if simIdle {
     if simAcCharge { return 28 }
+    if simDcCharge { return 200 }
     return 0
   }
 #endif

@@ -7,7 +7,7 @@ import DokoSharing
 final class CarPlayController {
   let interfaceController: CPInterfaceController
   private var statusInfoTemplate: CPInformationTemplate?
-  private var chargeTabTemplate: CPListTemplate?
+  private var chargeTabTemplate: CPInformationTemplate?
 
   @Shared(.appSettings) private var appSettings
   @Shared(.connectedAccessoryName) private var connectedAccessoryName
@@ -59,7 +59,7 @@ final class CarPlayController {
         guard let self else { return }
         statusInfoTemplate?.items = makeStatusItems()
         statusInfoTemplate?.actions = makeStatusActions()
-        chargeTabTemplate?.updateSections(makeChargeSections(from: chargeResponses))
+        chargeTabTemplate?.items = makeChargeItems(from: chargeResponses)
         observe()
       }
     }
