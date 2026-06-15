@@ -7,7 +7,10 @@ import DokoSharing
 final class CarPlayController {
   let interfaceController: CPInterfaceController
   private var statusInfoTemplate: CPInformationTemplate?
-  private var chargeTabTemplate: CPInformationTemplate?
+  var chargeSessionTemplate: CPInformationTemplate?
+  var chargeInputTemplate: CPInformationTemplate?
+  var chargeOutputTemplate: CPInformationTemplate?
+  var chargeBatteryTemplate: CPInformationTemplate?
 
   @Shared(.appSettings) private var appSettings
   @Shared(.connectedAccessoryName) private var connectedAccessoryName
@@ -25,7 +28,6 @@ final class CarPlayController {
     let settingsTab = makeSettingsTab(pushing: infoTemplate)
     let tripTab = makeTripTab()
     let chargeTab = makeChargeTab()
-    chargeTabTemplate = chargeTab
 
     let tabBar = CPTabBarTemplate(templates: [settingsTab, tripTab, chargeTab])
     interfaceController.setRootTemplate(tabBar, animated: false, completion: nil)
@@ -34,7 +36,10 @@ final class CarPlayController {
 
   func disconnect() {
     statusInfoTemplate = nil
-    chargeTabTemplate = nil
+    chargeSessionTemplate = nil
+    chargeInputTemplate = nil
+    chargeOutputTemplate = nil
+    chargeBatteryTemplate = nil
   }
 
   // MARK: - Status info template
@@ -59,7 +64,10 @@ final class CarPlayController {
         guard let self else { return }
         statusInfoTemplate?.items = makeStatusItems()
         statusInfoTemplate?.actions = makeStatusActions()
-        chargeTabTemplate?.items = makeChargeItems(from: chargeResponses)
+        chargeSessionTemplate?.items = makeChargeSessionItems(from: chargeResponses)
+        chargeInputTemplate?.items   = makeChargeInputItems(from: chargeResponses)
+        chargeOutputTemplate?.items  = makeChargeOutputItems(from: chargeResponses)
+        chargeBatteryTemplate?.items = makeChargeBatteryItems(from: chargeResponses)
         observe()
       }
     }
