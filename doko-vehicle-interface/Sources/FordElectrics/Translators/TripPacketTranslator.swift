@@ -10,14 +10,15 @@ extension FordElectrics {
     guard
       let position = responsePacket.position,
       let odometer = responsePacket.odometer,
-      let energyToEmpty = responsePacket.batteryEnergyToEmpty,
-      let stateOfCharge = responsePacket.batteryStateOfCharge,
+      let batteryEnergyToEmpty = responsePacket.batteryEnergyToEmpty,
+      let batteryStateOfCharge = responsePacket.batteryStateOfCharge,
       let batteryTemperature = responsePacket.batteryTemperature
     else {
       dokoResponses[.error] = DokoCommandResponse(command: .tripStarting, response: .error("arguments"))
       return DokoResponsePacket(type: .tripStarting, responses: dokoResponses)
     }
-
+    defer { responseCache = dokoResponses }
+    
     hvBatteryEnergy.reset()
     meanTemperatureSum = 0.0
     meanTemperatureCount = 0
@@ -27,8 +28,8 @@ extension FordElectrics {
     dokoResponses[.position] = DokoCommandResponse(command: .tripStarting, response: .position(position))
     dokoResponses[.odometer] = DokoCommandResponse(command: .tripStarting, response: .odometer(tripOdometer.odometer))
     dokoResponses[.distance] = DokoCommandResponse(command: .tripStarting, response: .odometer(tripOdometer.distance))
-    dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: .tripStarting, response: .batteryEnergyToEmpty(energyToEmpty))
-    dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .tripStarting, response: .batteryStateOfCharge(stateOfCharge))
+    dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: .tripStarting, response: .batteryEnergyToEmpty(batteryEnergyToEmpty))
+    dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .tripStarting, response: .batteryStateOfCharge(batteryStateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripStarting, response: .batteryTemperature(batteryTemperature))
 
     if let batteryStateOfHealth = responsePacket.batteryStateOfHealth {
@@ -62,21 +63,22 @@ extension FordElectrics {
     guard
       let position = responsePacket.position,
       let odometer = responsePacket.odometer,
-      let energyToEmpty = responsePacket.batteryEnergyToEmpty,
-      let stateOfCharge = responsePacket.batteryStateOfCharge,
+      let batteryEnergyToEmpty = responsePacket.batteryEnergyToEmpty,
+      let batteryStateOfCharge = responsePacket.batteryStateOfCharge,
       let batteryTemperature = responsePacket.batteryTemperature
     else {
       dokoResponses[.error] = DokoCommandResponse(command: .tripEnding, response: .error("arguments"))
       return DokoResponsePacket(type: .tripEnding, responses: dokoResponses)
     }
+    defer { responseCache.merge(dokoResponses) { _, new in new } }
     tripOdometer.update(odometer: odometer)
 
     dokoResponses[.nextState] = DokoCommandResponse(command: .tripEnding, response: .nextState(.idle))
     dokoResponses[.position] = DokoCommandResponse(command: .tripEnding, response: .position(position))
-    dokoResponses[.odometer] = DokoCommandResponse(command: .tripEnding, response: .odometer(odometer))
+    dokoResponses[.odometer] = DokoCommandResponse(command: .tripEnding, response: .odometer(tripOdometer.odometer))
     dokoResponses[.distance] = DokoCommandResponse(command: .tripEnding, response: .distance(tripOdometer.distance))
-    dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: .tripEnding, response: .batteryEnergyToEmpty(energyToEmpty))
-    dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .tripEnding, response: .batteryStateOfCharge(stateOfCharge))
+    dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: .tripEnding, response: .batteryEnergyToEmpty(batteryEnergyToEmpty))
+    dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .tripEnding, response: .batteryStateOfCharge(batteryStateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripEnding, response: .batteryTemperature(batteryTemperature))
 
     if let hvBatteryEnergy = hvBatteryEnergy.energy {
@@ -106,31 +108,31 @@ extension FordElectrics {
   }
 
   func tripUpdateResponsePacket(_ responsePacket: ObdResponsePacket) async -> DokoResponsePacket {
-    var dokoResponses: DokoResponseDictionary = [:]
-    guard
-      let position = responsePacket.position,
-//      let odometer = responsePacket.odometer,
-      let batteryStateOfCharge = responsePacket.batteryStateOfCharge,
-      let batteryTemperature = responsePacket.batteryTemperature
-    else {
-      dokoResponses[.error] = DokoCommandResponse(command: .tripUpdate, response: .error("arguments"))
-      return DokoResponsePacket(type: .tripUpdate, responses: dokoResponses)
-    }
-    dokoResponses[.odometer] = DokoCommandResponse(command: .tripUpdate, response: .odometer(tripOdometer.odometer))
-    dokoResponses[.distance] = DokoCommandResponse(command: .tripUpdate, response: .distance(tripOdometer.distance))
-    //###
-    dokoResponses[.position] = DokoCommandResponse(command: .tripUpdate, response: .position(position))
-    dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .tripUpdate, response: .batteryStateOfCharge(batteryStateOfCharge))
-    dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripUpdate, response: .batteryTemperature(batteryTemperature))
-
-    if let hvBatteryEnergy = hvBatteryEnergy.energy {
-      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripUpdate, response: .batteryEnergy(hvBatteryEnergy))
-    }
-    if let latestWeather = await DokoWeatherManager.shared.latestWeather {
-      dokoResponses[.weather] = DokoCommandResponse(command: .tripUpdate, response: .weather(latestWeather))
-    }
-    //###
-    return DokoResponsePacket(type: .tripUpdate, responses: dokoResponses)
+//    var dokoResponses: DokoResponseDictionary = [:]
+//    guard
+//      let position = responsePacket.position,
+////      let odometer = responsePacket.odometer,
+//      let batteryStateOfCharge = responsePacket.batteryStateOfCharge,
+//      let batteryTemperature = responsePacket.batteryTemperature
+//    else {
+//      dokoResponses[.error] = DokoCommandResponse(command: .tripUpdate, response: .error("arguments"))
+//      return DokoResponsePacket(type: .tripUpdate, responses: dokoResponses)
+//    }
+//    dokoResponses[.odometer] = DokoCommandResponse(command: .tripUpdate, response: .odometer(tripOdometer.odometer))
+//    dokoResponses[.distance] = DokoCommandResponse(command: .tripUpdate, response: .distance(tripOdometer.distance))
+//    //###
+//    dokoResponses[.position] = DokoCommandResponse(command: .tripUpdate, response: .position(position))
+//    dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .tripUpdate, response: .batteryStateOfCharge(batteryStateOfCharge))
+//    dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripUpdate, response: .batteryTemperature(batteryTemperature))
+//
+//    if let hvBatteryEnergy = hvBatteryEnergy.energy {
+//      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripUpdate, response: .batteryEnergy(hvBatteryEnergy))
+//    }
+//    if let latestWeather = await DokoWeatherManager.shared.latestWeather {
+//      dokoResponses[.weather] = DokoCommandResponse(command: .tripUpdate, response: .weather(latestWeather))
+//    }
+//    //###
+    return DokoResponsePacket(type: .tripUpdate, responses: responseCache)
   }
 
   func tripEnergyResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
@@ -142,9 +144,12 @@ extension FordElectrics {
       dokoResponses[.error] = DokoCommandResponse(command: .tripEnergy, response: .error("arguments"))
       return DokoResponsePacket(type: .tripEnergy, responses: dokoResponses)
     }
+    defer { responseCache.merge(dokoResponses) { _, new in new } }
 
     if let batteryEnergy = hvBatteryEnergy.integrate(voltage: batteryVoltage, current: batteryCurrent, at: responsePacket.completedAt), let batteryPower = hvBatteryEnergy.power {
     dokoResponses[.batteryPower] = DokoCommandResponse(command: .tripEnergy, response: .batteryPower(batteryPower))
+      dokoResponses[.batteryVoltage] = DokoCommandResponse(command: .tripEnergy, response: .batteryVoltage(batteryVoltage))
+      dokoResponses[.batteryCurrent] = DokoCommandResponse(command: .tripEnergy, response: .batteryCurrent(batteryCurrent))
       dokoResponses[.batteryPower] = DokoCommandResponse(command: .tripEnergy, response: .batteryPower(batteryPower))
       dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripEnergy, response: .batteryEnergy(batteryEnergy))
     }
@@ -162,8 +167,9 @@ extension FordElectrics {
       dokoResponses[.error] = DokoCommandResponse(command: .tripData, response: .error("arguments"))
       return DokoResponsePacket(type: .tripData, responses: dokoResponses)
     }
-    tripOdometer.update(odometer: odometer)
+    defer { responseCache.merge(dokoResponses) { _, new in new } }
 
+    tripOdometer.update(odometer: odometer)
     dokoResponses[.odometer] = DokoCommandResponse(command: .tripData, response: .odometer(tripOdometer.odometer))
     dokoResponses[.distance] = DokoCommandResponse(command: .tripData, response: .distance(tripOdometer.distance))
     dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: .tripData, response: .batteryEnergyToEmpty(energyToEmpty))
@@ -176,7 +182,6 @@ extension FordElectrics {
     if let hvBatteryEnergy = hvBatteryEnergy.energy {
       dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripData, response: .batteryEnergy(hvBatteryEnergy))
     }
-
     return DokoResponsePacket(type: .tripData, responses: dokoResponses)
   }
   
@@ -188,6 +193,8 @@ extension FordElectrics {
       dokoResponses[.error] = DokoCommandResponse(command: .tripWeather, response: .error("arguments"))
       return DokoResponsePacket(type: .tripWeather, responses: dokoResponses)
     }
+    defer { responseCache.merge(dokoResponses) { _, new in new } }
+
     meanTemperatureSum += weather.temperature
     meanTemperatureCount += 1
     dokoResponses[.weather] = DokoCommandResponse(command: .tripWeather, response: .weather(weather))

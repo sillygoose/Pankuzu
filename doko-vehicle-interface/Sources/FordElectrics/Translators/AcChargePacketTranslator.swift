@@ -152,7 +152,6 @@ extension FordElectrics {
         dokoResponses[.chargerOutputEnergy] = DokoCommandResponse(command: .acChargeEnergy, response: .chargerOutputEnergy(outputEnergy))
       }
     }
-
     return DokoResponsePacket(type: .acChargeEnergy, responses: dokoResponses)
   }
 
@@ -174,7 +173,6 @@ extension FordElectrics {
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .acChargeHistory, response: .batteryTemperature(batteryTemperature))
     dokoResponses[.couplerTemperature] = DokoCommandResponse(command: .acChargeHistory, response: .couplerTemperature(couplerTemperature))
     dokoResponses[.primaryCouplerTemperature] = DokoCommandResponse(command: .acChargeHistory, response: .primaryCouplerTemperature(couplerTemperature))
-
 //    if let hvBatteryPower = hvBatteryEnergy.power, let hvBatteryEnergy = hvBatteryEnergy.energy {
 //      dokoResponses[.batteryPower] = DokoCommandResponse(command: .acChargeHistory, response: .batteryPower(hvBatteryPower))
 //      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .batteryEnergy(hvBatteryEnergy))
@@ -187,7 +185,6 @@ extension FordElectrics {
 //      dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .chargerInputEnergy(chargerOutputPower))
 //      dokoResponses[.chargerOutputEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .chargerOutputEnergy(chargerOutputEnergy))
 //    }
-
     return DokoResponsePacket(type: .acChargeHistory, responses: dokoResponses)
   }
 }

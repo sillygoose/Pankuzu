@@ -116,7 +116,14 @@ final class TripEfficiencyChartModel {
     return max(a, b)
   }
 
-  var efficiencyFormat: String {
+  var efficiencyAnnotationFormat: String {
+    switch efficiencyUnit {
+    case .kmPerKWh, .milesPerKWh: return "%.2f"
+    case .kWhPer100km: return "%.1f"
+    }
+  }
+  
+  var efficiencyAxisFormat: String {
     switch efficiencyUnit {
     case .kmPerKWh, .milesPerKWh: return "%.1f"
     case .kWhPer100km: return "%.1f"
@@ -312,7 +319,7 @@ struct TripEfficiencyChartView: View {
           Text(selected.monthDate, format: .dateTime.month(.wide).year())
             .font(.caption2)
           if let eff {
-            Text(String(format: "\(model.efficiencyFormat) \(model.efficiencyUnit.rawValue)", eff))
+            Text(String(format: "\(model.efficiencyAnnotationFormat) \(model.efficiencyUnit.rawValue)", eff))
               .font(.caption).fontWeight(.semibold).foregroundStyle(Color.green)
           }
           let temp = selected.temperature.converted(to: model.temperatureConversionUnit).value
@@ -390,7 +397,7 @@ struct TripEfficiencyChartView: View {
         }
         .chartYAxis {
           AxisMarks(position: .leading) { value in
-            AxisValueLabel(String(format: "\(model.efficiencyFormat)", value.as(Double.self) ?? 0))
+            AxisValueLabel(String(format: "\(model.efficiencyAxisFormat)", value.as(Double.self) ?? 0))
             AxisGridLine()
           }
           AxisMarks(position: .trailing, values: model.temperatureAxisTicks) { value in

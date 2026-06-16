@@ -115,10 +115,10 @@ public actor FordElectrics: ConnectedVehicleInterface {
 
     case .tripUpdate:
       return obdCommandPacket(packetType) {
-        .position;
+//        .position;
 //        .odometer;
-        .batteryStateOfCharge;
-        .batteryTemperature;
+//        .batteryStateOfCharge;
+//        .batteryTemperature;
       }
 
     case .tripEnding:

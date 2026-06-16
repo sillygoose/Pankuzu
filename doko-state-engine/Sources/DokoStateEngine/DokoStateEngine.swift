@@ -192,10 +192,10 @@ public final class DokoStateEngine {
                 await LiveActivityManager.shared.startTrip()
                 $activeSession.withLock { $0 = .trip }
                 $widgetSession.withLock { $0 = ActiveSession.trip.rawValue }
-                Task { @MainActor in
-                  try? await Task.sleep(for: .seconds(2.0))
-                  WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget")
-                }
+//                Task { @MainActor in
+//                  try? await Task.sleep(for: .seconds(2.0))
+//                  WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget")
+//                }
               } catch let error as StateEngineError {
                 DokoLogging.shared.postLoggingResponse(.error(".tripStarting: \(error.errorDescription)"))
                 nextState = .tripStarting
@@ -225,9 +225,9 @@ public final class DokoStateEngine {
               throw StateEngineError.tripDraftError
             }
             ABRPManager.shared.sendTripTelemetry(packet: dokoResponsePacket)
-            do {
-              let tripDraft = try Trip.postTripUpdateRecord(tripDraft: tripDraft, tripUpdateResponse: dokoResponsePacket)
-              self.tripInProgress = tripDraft
+//            do {
+//              let tripDraft = try Trip.postTripUpdateRecord(tripDraft: tripDraft, tripUpdateResponse: dokoResponsePacket)
+//              self.tripInProgress = tripDraft
               let windSock: WindSock? = if let course = dokoResponsePacket.position?.course, let weather = dokoResponsePacket.weather {
                 WindSock(
                   course: course,
@@ -257,16 +257,14 @@ public final class DokoStateEngine {
                   windSock: windSock
                 )
               )
-            } catch let error as StateEngineError {
-              DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(error.errorDescription)"))
-            } catch {
-              DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(String(describing: error)))"))
-            }
+//            } catch let error as StateEngineError {
+//              DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(error.errorDescription)"))
+//            } catch {
+//              DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(String(describing: error)))"))
+//            }
 
           case .tripEnding:
-            guard case .tripEnding = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
+            guard case .tripEnding = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)}
             guard let tripDraft = self.tripInProgress else { throw StateEngineError.tripDraftError }
             var nextState = dokoResponsePacket.nextState ?? .tripEnding
             if nextState == .idle {
@@ -285,10 +283,10 @@ public final class DokoStateEngine {
                 self.tripInProgress = nil
                 $activeSession.withLock { $0 = nil }
                 $widgetSession.withLock { $0 = "" }
-                Task { @MainActor in
-                  try? await Task.sleep(for: .seconds(2.0))
-                  WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget")
-                }
+//                Task { @MainActor in
+//                  try? await Task.sleep(for: .seconds(2.0))
+//                  WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget")
+//                }
               } catch let error as StateEngineError {
                 DokoLogging.shared.postLoggingResponse(.error(".tripEnding: \(error.errorDescription)"))
                 nextState = .tripEnding
@@ -300,12 +298,8 @@ public final class DokoStateEngine {
             $vehicleState.withLock { $0 = nextState }
 
           case .tripCorePosition:
-            guard case .tripInProgress = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
-            guard let tripID = tripInProgress?.id else {
-              throw StateEngineError.missingTripID
-            }
+            guard case .tripInProgress = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
+            guard let tripID = tripInProgress?.id else { throw StateEngineError.missingTripID }
             do {
               try Trip.postTripPositionRecord(tripID: tripID, tripPositionPacket: dokoResponsePacket)
             } catch {
@@ -313,38 +307,30 @@ public final class DokoStateEngine {
             }
 
           case .tripCoreElevation:
-            guard case .tripInProgress = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
-            guard let tripID = tripInProgress?.id else {
-              throw StateEngineError.missingTripID
-            }
+            guard case .tripInProgress = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
+            guard let tripID = tripInProgress?.id else { throw StateEngineError.missingTripID }
             do {
               try Trip.postTripElevationRecord(tripID: tripID, tripElevationPacket: dokoResponsePacket)
             } catch {
               DokoLogging.shared.postLoggingResponse(.error(".tripCoreElevation: \(String(describing: error))"))
             }
 
-            //### update tripDraft
           case .tripData:
-            guard case .tripInProgress = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
+            guard case .tripInProgress = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
             guard let tripID = self.tripInProgress?.id else { throw StateEngineError.missingTripID }
+            guard let tripDraft = self.tripInProgress else { throw StateEngineError.tripDraftError }
             do {
               try Trip.postTripData(tripID: tripID, tripDataPacket: dokoResponsePacket)
+              let tripDraft = try Trip.updateTripRecord(tripDraft: tripDraft, tripDataResponse: dokoResponsePacket)
+              self.tripInProgress = tripDraft
             } catch {
               DokoLogging.shared.postLoggingResponse(.error(".tripData: \(String(describing: error))"))
             }
 
           case .tripWeather:
-            guard case .tripInProgress = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
+            guard case .tripInProgress = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
             guard let tripID = self.tripInProgress?.id else { throw StateEngineError.missingTripID }
-            guard var tripDraft = self.tripInProgress else {
-              throw StateEngineError.tripDraftError
-            }
+            guard var tripDraft = self.tripInProgress else { throw StateEngineError.tripDraftError }
             do {
               if tripDraft.weatherTempStart == nil {
                 tripDraft.weatherTempStart = dokoResponsePacket.weather?.temperature
@@ -360,9 +346,7 @@ public final class DokoStateEngine {
             }
 
           case .acChargeStarting:
-            guard case .acChargeStarting = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
+            guard case .acChargeStarting = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
             var nextState = dokoResponsePacket.nextState ?? .acChargeStarting
             if nextState == .acChargeInProgress {
               do {
@@ -376,7 +360,7 @@ public final class DokoStateEngine {
                 await LiveActivityManager.shared.startCharge()
                 $activeSession.withLock { $0 = .acCharge }
                 $widgetSession.withLock { $0 = ActiveSession.acCharge.rawValue }
-                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
+//                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".acChargeStarting: \(String(describing: error))"))
                 nextState = .acChargeStarting
@@ -415,7 +399,7 @@ public final class DokoStateEngine {
                 $activeSession.withLock { $0 = nil }
                 $widgetSession.withLock { $0 = "" }
                 $chargeResponses.withLock { $0 = [:] }
-                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
+//                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".acChargeEnding: \(String(describing: error))"))
                 nextState = .acChargeEnding
@@ -440,7 +424,7 @@ public final class DokoStateEngine {
                 await LiveActivityManager.shared.startCharge()
                 $activeSession.withLock { $0 = .dcCharge }
                 $widgetSession.withLock { $0 = ActiveSession.dcCharge.rawValue }
-                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
+//                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".dcChargeStarting: \(String(describing: error))"))
                 nextState = .dcChargeStarting
@@ -479,7 +463,7 @@ public final class DokoStateEngine {
                 $activeSession.withLock { $0 = nil }
                 $widgetSession.withLock { $0 = "" }
                 $chargeResponses.withLock { $0 = [:] }
-                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
+//                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".dcChargeEnding: \(String(describing: error))"))
                 nextState = .dcChargeEnding
@@ -562,7 +546,7 @@ extension DokoStateEngine {
           await stopStateEngine()
           $activeSession.withLock { $0 = nil }
           $widgetSession.withLock { $0 = "" }
-          Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
+//          Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
           await DokoNotificationManager.shared.accessoryDisconnectedNotification(accessoryName: oldAccessoryName ?? "unknown")
         }
         oldAccessoryName = newAccessoryName

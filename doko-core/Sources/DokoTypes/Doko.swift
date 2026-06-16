@@ -530,6 +530,11 @@ extension DokoResponsePacket {
     return v
   }
 
+  public var distance: Double? {
+    guard case let .distance(v)? = responses[.distance]?.response else { return nil }
+    return v
+  }
+
   public var speed: Double? {
     guard case let .speed(v)? = responses[.speed]?.response else { return nil }
     return v
