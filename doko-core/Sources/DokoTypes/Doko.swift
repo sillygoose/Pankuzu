@@ -207,10 +207,13 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case dcChargeStarting, dcChargeInProgress, dcChargeEnding
   case dcChargeUpdate, dcChargeEnergy, dcChargeHistory
 
+  case duration
   case position
   case weather, meanTemperature
   case odometer, distance
   case speed
+  case tripEfficiency
+  case tripEfficiency5Minute, tripEfficiency10Minute, tripEfficiency15Minute
 
   case batteryStateOfCharge
   case batteryStateOfHealth
@@ -305,6 +308,8 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
       case .dcChargeHistory:
         return ".dcChargeHistory"
 
+      case .duration:
+        return ".duration"
       case .position:
         return ".position"
       case .weather:
@@ -317,6 +322,14 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".distance"
       case .speed:
         return ".speed"
+      case .tripEfficiency:
+        return ".tripEfficiency"
+      case .tripEfficiency5Minute:
+        return ".tripEfficiency5Minute"
+      case .tripEfficiency10Minute:
+        return ".tripEfficiency10Minute"
+      case .tripEfficiency15Minute:
+        return ".tripEfficiency15Minute"
 
       case .batteryStateOfCharge:
         return ".batteryStateOfCharge"
@@ -388,12 +401,15 @@ public enum DokoResponse: Equatable, Sendable {
   case stprs(String)
   case vin(String)
 
+  case duration(Double)
   case position(DokoPosition)
   case weather(DokoCurrentWeather)
   case meanTemperature(Double)
   case odometer(Double)
   case distance(Double)
   case speed(Double)
+  case tripEfficiency(Double)
+  case tripEfficiency5Minute(Double), tripEfficiency10Minute(Double), tripEfficiency15Minute(Double)
 
   case batteryStateOfCharge(Double)
   case batteryStateOfHealth(Double)
@@ -436,6 +452,8 @@ public enum DokoResponse: Equatable, Sendable {
       case .vin(let vin):
         return ".vin(\(vin))"
 
+      case let .duration(duration):
+        return String(format: ".duration(%.0fs)", duration)
       case let .position(position):
         return String(format: ".position(%.5f, %.5f, %.0f)", position.latitude, position.longitude, position.elevation)
       case let .weather(weather):
@@ -448,7 +466,15 @@ public enum DokoResponse: Equatable, Sendable {
         return String(format: ".distance(%.1fkm)", distance)
       case .speed(let speed):
         return String(format: ".speed(%.1fkph)", speed)
-        
+      case .tripEfficiency(let efficiency):
+        return String(format: ".tripEfficiency(%.1fkm/kWh)", efficiency)
+      case .tripEfficiency5Minute(let efficiency):
+        return String(format: ".tripEfficiency5Minute(%.1fkm/kWh)", efficiency)
+      case .tripEfficiency10Minute(let efficiency):
+        return String(format: ".tripEfficiency10Minute(%.1fkm/kWh)", efficiency)
+      case .tripEfficiency15Minute(let efficiency):
+        return String(format: ".tripEfficiency15Minute(%.1fkm/kWh)", efficiency)
+
       case .batteryStateOfCharge(let soc):
         return String(format: ".batteryStateOfCharge(%.1f%)", soc)
       case .batteryStateOfHealth(let soh):
@@ -525,6 +551,11 @@ extension DokoResponsePacket {
     return v
   }
 
+  public var duration: Double? {
+    guard case let .duration(v)? = responses[.duration]?.response else { return nil }
+    return v
+  }
+
   public var odometer: Double? {
     guard case let .odometer(v)? = responses[.odometer]?.response else { return nil }
     return v
@@ -537,6 +568,26 @@ extension DokoResponsePacket {
 
   public var speed: Double? {
     guard case let .speed(v)? = responses[.speed]?.response else { return nil }
+    return v
+  }
+
+  public var tripEfficiency: Double? {
+    guard case let .tripEfficiency(v)? = responses[.tripEfficiency]?.response else { return nil }
+    return v
+  }
+
+  public var tripEfficiency5Minute: Double? {
+    guard case let .tripEfficiency5Minute(v)? = responses[.tripEfficiency5Minute]?.response else { return nil }
+    return v
+  }
+
+  public var tripEfficiency10Minute: Double? {
+    guard case let .tripEfficiency10Minute(v)? = responses[.tripEfficiency10Minute]?.response else { return nil }
+    return v
+  }
+
+  public var tripEfficiency15Minute: Double? {
+    guard case let .tripEfficiency15Minute(v)? = responses[.tripEfficiency15Minute]?.response else { return nil }
     return v
   }
 
