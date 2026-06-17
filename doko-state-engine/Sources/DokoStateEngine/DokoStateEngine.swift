@@ -101,41 +101,6 @@ public final class DokoStateEngine {
       }
     }
   }
-//
-//  private func fetchTripData(tripID: Trip.ID?) -> (DokoDataPoint?, DokoDataPoint?) {
-//    guard let tripID else { return (nil, nil) }
-//    @FetchOne(TripData.find(tripID)) var tripData
-//    guard let tripData else { return (nil, nil) }
-//    @Shared(.appSettings) var appSettings
-//    let cutoff = Date.now.addingTimeInterval(-Double(appSettings.tripEfficiencyAverageDuration * 60))
-//    let odometer = tripData.odometer.first { $0.timestamp >= cutoff }
-//    let energy = tripData.batteryEnergy.first { $0.timestamp >= cutoff }
-//    return (odometer, energy)
-//  }
-
-//  private func fetchTripData1(tripID: Trip.ID?) -> (Double, Double, Double) {
-//    var fiveMinuteEfficiency: Double = 0
-//    var tenMinuteEfficiency: Double = 0
-//    var fifteenMinuteEfficiency: Double = 0
-//    guard let tripID else { return (fiveMinuteEfficiency, tenMinuteEfficiency, fifteenMinuteEfficiency) }
-//    @FetchOne(TripData.find(tripID)) var tripData
-//    guard let tripData else { return (fiveMinuteEfficiency, tenMinuteEfficiency, fifteenMinuteEfficiency) }
-//
-//    @Shared(.appSettings) var appSettings
-//    let fiveMinuteCutoff = Date.now.addingTimeInterval(-5 * 60)
-//    let fiveMinuteOOdometer = tripData.odometer.first { $0.timestamp >= fiveMinuteCutoff }
-//    let fiveMinuteEnergy = tripData.batteryEnergy.first { $0.timestamp >= fiveMinuteCutoff }
-//
-//    let tenMinuteCutoff = Date.now.addingTimeInterval(-10 * 60)
-//    let tenMinuteOOdometer = tripData.odometer.first { $0.timestamp >= fiveMinuteCutoff }
-//    let tenMinuteEnergy = tripData.batteryEnergy.first { $0.timestamp >= fiveMinuteCutoff }
-//
-//    let fifteenMinuteCutoff = Date.now.addingTimeInterval(-15 * 60)
-//    let fifteenMinuteOOdometer = tripData.odometer.first { $0.timestamp >= fiveMinuteCutoff }
-//    let fifteenMinuteEnergy = tripData.batteryEnergy.first { $0.timestamp >= fiveMinuteCutoff }
-//
-//    return (fiveMinuteEfficiency, tenMinuteEfficiency, fifteenMinuteEfficiency)
-//  }
 
   private func dokoResponseProcessing() -> Task<Void, Never> {
     Task {
@@ -216,10 +181,6 @@ public final class DokoStateEngine {
                 await LiveActivityManager.shared.startTrip()
                 $activeSession.withLock { $0 = .trip }
                 $widgetSession.withLock { $0 = ActiveSession.trip.rawValue }
-//                Task { @MainActor in
-//                  try? await Task.sleep(for: .seconds(2.0))
-//                  WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget")
-//                }
               } catch let error as StateEngineError {
                 DokoLogging.shared.postLoggingResponse(.error(".tripStarting: \(error.errorDescription)"))
                 nextState = .tripStarting
@@ -404,7 +365,6 @@ public final class DokoStateEngine {
                 $activeSession.withLock { $0 = nil }
                 $widgetSession.withLock { $0 = "" }
                 $chargeResponses.withLock { $0 = [:] }
-//                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".acChargeEnding: \(String(describing: error))"))
                 nextState = .acChargeEnding

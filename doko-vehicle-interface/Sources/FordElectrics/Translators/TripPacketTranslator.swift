@@ -27,9 +27,6 @@ extension FordElectrics {
     meanTemperature.reset()
 
     tripEfficiency.reset()
-    tripEfficiency5MinuteAverage.reset()
-    tripEfficiency10MinuteAverage.reset()
-    tripEfficiency15MinuteAverage.reset()
 
     dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(.tripInProgress))
     dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(duration.duration))
@@ -178,10 +175,11 @@ extension FordElectrics {
     dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: dokoCommand, response: .batteryStateOfCharge(stateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: dokoCommand, response: .batteryTemperature(batteryTemperature))
 
-      //### fix me
-    let energy = hvBatteryEnergy.energy ?? 0
-    let tripEfficiency = energy > 0 ? tripOdometer.distance / energy : 0
-    dokoResponses[.tripEfficiency] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency(tripEfficiency))
+    tripEfficiency.updateEfficiency(tripOdometer.distance, hvBatteryEnergy.energy ?? 0)
+    dokoResponses[.tripEfficiency] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency(tripEfficiency.efficiency))
+    dokoResponses[.tripEfficiency5Minute] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency5Minute(tripEfficiency.efficiency5min))
+    dokoResponses[.tripEfficiency10Minute] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency10Minute(tripEfficiency.efficiency10min))
+    dokoResponses[.tripEfficiency15Minute] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency15Minute(tripEfficiency.efficiency15min))
 
     if let batteryDistanceToEmpty = responsePacket.batteryDistanceToEmpty {
       dokoResponses[.batteryDistanceToEmpty] = DokoCommandResponse(command: dokoCommand, response: .batteryDistanceToEmpty(batteryDistanceToEmpty))

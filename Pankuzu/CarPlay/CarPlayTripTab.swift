@@ -59,6 +59,9 @@ extension CarPlayController {
   func makeTripEfficiencyItems(from responses: DokoResponseDictionary) -> [CPInformationItem] {
     var items: [CPInformationItem] = []
     if case let .tripEfficiency(v)?               = responses[.tripEfficiency]?.response            { items.append(.init(title: "Trip Efficiency",     detail: formatEfficiency(v))) }
+    if case let .tripEfficiency5Minute(v)?        = responses[.tripEfficiency5Minute]?.response     { items.append(.init(title: "Past 5 Minutes",      detail: formatEfficiency(v))) }
+    if case let .tripEfficiency10Minute(v)?       = responses[.tripEfficiency5Minute]?.response     { items.append(.init(title: "Past 10 Minutes",     detail: formatEfficiency(v))) }
+    if case let .tripEfficiency15Minute(v)?       = responses[.tripEfficiency5Minute]?.response     { items.append(.init(title: "Past 15 Minutes",     detail: formatEfficiency(v))) }
     return items
   }
 }
