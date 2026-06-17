@@ -20,7 +20,7 @@ final class CarPlayController {
   @Shared(.appSettings) var appSettings
   @Shared(.connectedAccessoryName) private var connectedAccessoryName
   @Shared(.activeSession) private var activeSession
-  @Shared(.chargeResponses) private var chargeResponses
+  @Shared(.updateResponses) private var chargeResponses
 
   init(interfaceController: CPInterfaceController) {
     self.interfaceController = interfaceController
