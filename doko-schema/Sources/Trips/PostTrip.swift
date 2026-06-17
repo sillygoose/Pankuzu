@@ -201,40 +201,57 @@ extension Trip {
     tripDraft: Trip.Draft,
     tripDataResponse: DokoResponsePacket
   ) throws -> Trip.Draft {
-    guard
-      let position = tripDataResponse.position,
-      let odometer = tripDataResponse.odometer,
-      let distance = tripDataResponse.distance
-    else {
-      throw TripError.tripArgumentError
-    }
+//    guard
+//      let position = tripDataResponse.position,
+//      let odometer = tripDataResponse.odometer,
+//      let distance = tripDataResponse.distance
+//    else {
+//      throw TripError.tripArgumentError
+//    }
     var tripDraft = tripDraft
 
-    tripDraft.destinationID = DokoLocationManager.shared.updateLocation(
-      id: tripDraft.destinationID,
-      latitude: position.latitude, longitude: position.longitude, elevation: position.elevation,
-      sharedLocation: false
-    )
+    if let position = tripDataResponse.position {
+      tripDraft.destinationID = DokoLocationManager.shared.updateLocation(
+        id: tripDraft.destinationID,
+        latitude: position.latitude, longitude: position.longitude, elevation: position.elevation,
+        sharedLocation: false
+      )
 
-    tripDraft.latitudeEnd = position.latitude
-    tripDraft.longitudeEnd = position.longitude
-    tripDraft.elevationEnd = position.elevation
+      tripDraft.latitudeEnd = position.latitude
+      tripDraft.longitudeEnd = position.longitude
+      tripDraft.elevationEnd = position.elevation
+    }
 
     tripDraft.timeEnd = tripDataResponse.completedAt
     tripDraft.duration = tripDataResponse.completedAt.timeIntervalSince(tripDraft.timeStart)
     
-    tripDraft.odometerEnd = odometer
-    tripDraft.distance = distance
+    if let odometer = tripDataResponse.odometer {
+      tripDraft.odometerEnd = odometer
+    }
+    if let distance = tripDataResponse.distance {
+      tripDraft.distance = distance
+    }
 
-    tripDraft.energyToEmptyEnd = tripDataResponse.batteryEnergyToEmpty
-    tripDraft.energy = tripDataResponse.batteryEnergy.map { -$0 }
+    if let batteryEnergyToEmpty = tripDataResponse.batteryEnergyToEmpty {
+      tripDraft.energyToEmptyEnd = batteryEnergyToEmpty
+    }
 
-    tripDraft.distanceToEmptyEnd = tripDataResponse.batteryDistanceToEmpty
-    tripDraft.range = tripDraft.distanceToEmptyStart.flatMap { start in tripDataResponse.batteryDistanceToEmpty.map { end in start - end } }
+    if let batteryEnergy = tripDataResponse.batteryEnergy {
+      tripDraft.energy = -batteryEnergy
+    }
+
+    if let batteryDistanceToEmpty = tripDataResponse.batteryDistanceToEmpty {
+      tripDraft.distanceToEmptyEnd = batteryDistanceToEmpty
+    }
     
-    tripDraft.stateOfChargeEnd = tripDataResponse.batteryStateOfCharge
-    tripDraft.batteryTempEnd = tripDataResponse.batteryTemperature
+    if let batteryStateOfCharge = tripDataResponse.batteryStateOfCharge {
+      tripDraft.stateOfChargeEnd = batteryStateOfCharge
+    }
+    if let batteryTemperature = tripDataResponse.batteryTemperature {
+      tripDraft.batteryTempEnd = batteryTemperature
+    }
 
+    //### check the rest
     if let weather = tripDataResponse.weather {
       tripDraft.weatherTempEnd = weather.temperature
       tripDraft.weatherConditionsEnd = weather.conditionSymbol

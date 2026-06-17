@@ -14,7 +14,7 @@ public struct MeanTemperature: Sendable {
   }
 
   @discardableResult
-  public mutating func update(temperature newTemperature: Double) -> Double {
+  public mutating func updateMeanTemperature(with newTemperature: Double) -> Double {
     total += newTemperature
     samples += 1
     mean = total / Double(samples)

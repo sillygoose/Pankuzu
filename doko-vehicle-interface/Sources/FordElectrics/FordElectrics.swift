@@ -37,8 +37,10 @@ public actor FordElectrics: ConnectedVehicleInterface {
   public var duration = DurationTracker()
   public var meanTemperature = MeanTemperature()
 
-//  public var meanTemperatureSum: Double = 0.0
-//  public var meanTemperatureCount: Int = 0
+  public var tripEfficiency = TripEfficiency()
+  public var tripEfficiency5MinuteAverage = TripEfficiency()
+  public var tripEfficiency10MinuteAverage = TripEfficiency()
+  public var tripEfficiency15MinuteAverage = TripEfficiency()
 
   public init(
     vehicle: Vehicle?

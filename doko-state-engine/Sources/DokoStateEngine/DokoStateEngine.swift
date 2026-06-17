@@ -240,18 +240,13 @@ public final class DokoStateEngine {
               $vehicleState.withLock { $0 = nextState }
             }
 
-          //### dom't update draft since packet going away
           case .tripUpdate:
-            guard case .tripInProgress = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
-            guard let tripDraft = self.tripInProgress else {
-              throw StateEngineError.tripDraftError
-            }
+            guard case .tripInProgress = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
+            guard let tripDraft = self.tripInProgress else { throw StateEngineError.tripDraftError }
             ABRPManager.shared.sendTripTelemetry(packet: dokoResponsePacket)
-//            do {
-//              let tripDraft = try Trip.postTripUpdateRecord(tripDraft: tripDraft, tripUpdateResponse: dokoResponsePacket)
-//              self.tripInProgress = tripDraft
+            do {
+              self.tripInProgress = try Trip.updateTripRecord(tripDraft: tripDraft, tripDataResponse: dokoResponsePacket)
+              $chargeResponses.withLock { $0 = dokoResponsePacket.responses }
               let windSock: WindSock? = if let course = dokoResponsePacket.position?.course, let weather = dokoResponsePacket.weather {
                 WindSock(
                   course: course,
@@ -262,14 +257,6 @@ public final class DokoStateEngine {
                   windCompassDirection: weather.windCompassDirection
                 )
               } else { nil }
-//              let efficiency: Double? = {
-//                let (pastOdometer, pastEnergy) = fetchTripData(tripID: tripDraft.id)
-//                guard let pastOdometer, let pastEnergy, let currentEnergy = tripDraft.energy else { return nil }
-//                let distance = tripDraft.odometerEnd - pastOdometer.datapoint
-//                let energy = currentEnergy - pastEnergy.datapoint
-//                let efficiency = energy == 0.0 ? 0.0 : distance / energy
-//                return efficiency
-//              }()
               await LiveActivityManager.shared.updateTrip(
                 state: TripActivityAttributes.ContentState(
                   tripState: .active,
@@ -281,11 +268,11 @@ public final class DokoStateEngine {
                   windSock: windSock
                 )
               )
-//            } catch let error as StateEngineError {
-//              DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(error.errorDescription)"))
-//            } catch {
-//              DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(String(describing: error)))"))
-//            }
+            } catch let error as StateEngineError {
+              DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(error.errorDescription)"))
+            } catch {
+              DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(String(describing: error)))"))
+            }
 
           case .tripEnding:
             guard case .tripEnding = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)}
@@ -307,10 +294,6 @@ public final class DokoStateEngine {
                 self.tripInProgress = nil
                 $activeSession.withLock { $0 = nil }
                 $widgetSession.withLock { $0 = "" }
-//                Task { @MainActor in
-//                  try? await Task.sleep(for: .seconds(2.0))
-//                  WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget")
-//                }
               } catch let error as StateEngineError {
                 DokoLogging.shared.postLoggingResponse(.error(".tripEnding: \(error.errorDescription)"))
                 nextState = .tripEnding
@@ -342,11 +325,8 @@ public final class DokoStateEngine {
           case .tripData:
             guard case .tripInProgress = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
             guard let tripID = self.tripInProgress?.id else { throw StateEngineError.missingTripID }
-            guard let tripDraft = self.tripInProgress else { throw StateEngineError.tripDraftError }
             do {
               try Trip.postTripData(tripID: tripID, tripDataPacket: dokoResponsePacket)
-              let tripDraft = try Trip.updateTripRecord(tripDraft: tripDraft, tripDataResponse: dokoResponsePacket)
-              self.tripInProgress = tripDraft
             } catch {
               DokoLogging.shared.postLoggingResponse(.error(".tripData: \(String(describing: error))"))
             }
@@ -365,6 +345,7 @@ public final class DokoStateEngine {
                 DokoLogging.shared.postLoggingResponse(.info(".tripWeather updated tripDraft"))
               }
               try Trip.postTripWeatherRecord(tripID: tripID, tripWeatherPacket: dokoResponsePacket)
+              self.tripInProgress = try Trip.updateTripRecord(tripDraft: tripDraft, tripDataResponse: dokoResponsePacket)
             } catch {
               DokoLogging.shared.postLoggingResponse(.error(".tripWeather: \(String(describing: error))"))
             }
@@ -495,9 +476,12 @@ public final class DokoStateEngine {
             }
             $vehicleState.withLock { $0 = nextState }
 
-          case .tripEnergy, .acChargeEnergy, .dcChargeEnergy:
+          case .tripEnergy:
             break
 
+          case .acChargeEnergy, .dcChargeEnergy:
+            break
+            
           case .acChargeUpdate, .dcChargeUpdate:
             guard let chargeDraft = self.chargeInProgress else {
               throw StateEngineError.chargeDraftError

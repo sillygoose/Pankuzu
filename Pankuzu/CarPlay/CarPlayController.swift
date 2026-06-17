@@ -6,7 +6,12 @@ import DokoSharing
 @MainActor
 final class CarPlayController {
   let interfaceController: CPInterfaceController
+
   private var statusInfoTemplate: CPInformationTemplate?
+
+  var tripOverviewTemplate: CPInformationTemplate?
+  var tripEfficiencyTemplate: CPInformationTemplate?
+
   var chargeSessionTemplate: CPInformationTemplate?
   var chargeInputTemplate: CPInformationTemplate?
   var chargeOutputTemplate: CPInformationTemplate?
@@ -64,6 +69,10 @@ final class CarPlayController {
         guard let self else { return }
         statusInfoTemplate?.items = makeStatusItems()
         statusInfoTemplate?.actions = makeStatusActions()
+
+        tripOverviewTemplate?.items = makeTripOverviewItems(from: chargeResponses)
+        tripEfficiencyTemplate?.items = makeTripEfficiencyItems(from: chargeResponses)
+
         chargeSessionTemplate?.items = makeChargeSessionItems(from: chargeResponses)
         chargeInputTemplate?.items   = makeChargeInputItems(from: chargeResponses)
         chargeOutputTemplate?.items  = makeChargeOutputItems(from: chargeResponses)

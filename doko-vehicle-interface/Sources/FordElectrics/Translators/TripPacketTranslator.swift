@@ -19,16 +19,18 @@ extension FordElectrics {
     }
     defer { responseCache.merge(dokoResponses) { _, new in new } }
 
+    duration.reset()
+    tripOdometer.setOdometer(with: odometer)
     hvBatteryEnergy.reset()
     meanTemperature.reset()
-//    meanTemperatureSum = 0.0 //### fix this
-//    meanTemperatureCount = 0
 
-    tripOdometer.reset(odometer: odometer)
-    duration.reset()
+    tripEfficiency.reset()
+    tripEfficiency5MinuteAverage.reset()
+    tripEfficiency10MinuteAverage.reset()
+    tripEfficiency15MinuteAverage.reset()
 
     dokoResponses[.nextState] = DokoCommandResponse(command: .tripStarting, response: .nextState(.tripInProgress))
-    dokoResponses[.duration] = DokoCommandResponse(command: .acChargeStarting, response: .duration(duration.duration))
+    dokoResponses[.duration] = DokoCommandResponse(command: .tripStarting, response: .duration(duration.duration))
     dokoResponses[.position] = DokoCommandResponse(command: .tripStarting, response: .position(position))
     dokoResponses[.odometer] = DokoCommandResponse(command: .tripStarting, response: .odometer(tripOdometer.odometer))
     dokoResponses[.distance] = DokoCommandResponse(command: .tripStarting, response: .odometer(tripOdometer.distance))
@@ -60,7 +62,7 @@ extension FordElectrics {
     defer { responseCache.merge(dokoResponses) { _, new in new } }
 
     duration.update()
-    dokoResponses[.duration] = DokoCommandResponse(command: .acChargeInProgress, response: .duration(duration.duration))
+    dokoResponses[.duration] = DokoCommandResponse(command: .tripInProgress, response: .duration(duration.duration))
 
     let nextState: VehicleState = gearSelected ? .tripInProgress: .tripEnding
     dokoResponses[.nextState] = DokoCommandResponse(command: .tripInProgress, response: .nextState(nextState))
@@ -82,10 +84,10 @@ extension FordElectrics {
     defer { responseCache.merge(dokoResponses) { _, new in new } }
 
     duration.update()
-    tripOdometer.update(odometer: odometer)
+    tripOdometer.updateOdometer(with: odometer)
 
     dokoResponses[.nextState] = DokoCommandResponse(command: .tripEnding, response: .nextState(.idle))
-    dokoResponses[.duration] = DokoCommandResponse(command: .acChargeInProgress, response: .duration(duration.duration))
+    dokoResponses[.duration] = DokoCommandResponse(command: .tripEnding, response: .duration(duration.duration))
     dokoResponses[.position] = DokoCommandResponse(command: .tripEnding, response: .position(position))
     dokoResponses[.odometer] = DokoCommandResponse(command: .tripEnding, response: .odometer(tripOdometer.odometer))
     dokoResponses[.distance] = DokoCommandResponse(command: .tripEnding, response: .distance(tripOdometer.distance))
@@ -103,13 +105,13 @@ extension FordElectrics {
       dokoResponses[.batteryDistanceToEmpty] = DokoCommandResponse(command: .tripEnding, response: .batteryDistanceToEmpty(batteryDistanceToEmpty))
     }
     if let weather = responsePacket.weather {
-      meanTemperature.update(temperature: weather.temperature)
+      meanTemperature.updateMeanTemperature(with: weather.temperature)
 //      meanTemperatureSum += weather.temperature
 //      meanTemperatureCount += 1
       dokoResponses[.weather] = DokoCommandResponse(command: .tripEnding, response: .weather(weather))
     }
     else if let latestWeather = await DokoWeatherManager.shared.latestWeather {
-      meanTemperature.update(temperature: latestWeather.temperature)
+      meanTemperature.updateMeanTemperature(with: latestWeather.temperature)
 //      meanTemperatureSum += latestWeather.temperature
 //      meanTemperatureCount += 1
       dokoResponses[.weather] = DokoCommandResponse(command: .tripEnding, response: .weather(latestWeather))
@@ -161,10 +163,9 @@ extension FordElectrics {
     defer { responseCache.merge(dokoResponses) { _, new in new } }
 
     duration.update()
-    dokoResponses[.duration] = DokoCommandResponse(command: .acChargeInProgress, response: .duration(duration.duration))
+    dokoResponses[.duration] = DokoCommandResponse(command: .tripEnergy, response: .duration(duration.duration))
 
     if let batteryEnergy = hvBatteryEnergy.integrate(voltage: batteryVoltage, current: batteryCurrent, at: responsePacket.completedAt), let batteryPower = hvBatteryEnergy.power {
-    dokoResponses[.batteryPower] = DokoCommandResponse(command: .tripEnergy, response: .batteryPower(batteryPower))
       dokoResponses[.batteryVoltage] = DokoCommandResponse(command: .tripEnergy, response: .batteryVoltage(batteryVoltage))
       dokoResponses[.batteryCurrent] = DokoCommandResponse(command: .tripEnergy, response: .batteryCurrent(batteryCurrent))
       dokoResponses[.batteryPower] = DokoCommandResponse(command: .tripEnergy, response: .batteryPower(batteryPower))
@@ -187,9 +188,9 @@ extension FordElectrics {
     defer { responseCache.merge(dokoResponses) { _, new in new } }
 
     duration.update()
-    dokoResponses[.duration] = DokoCommandResponse(command: .acChargeInProgress, response: .duration(duration.duration))
+    dokoResponses[.duration] = DokoCommandResponse(command: .tripData, response: .duration(duration.duration))
 
-    tripOdometer.update(odometer: odometer)
+    tripOdometer.updateOdometer(with: odometer)
     dokoResponses[.odometer] = DokoCommandResponse(command: .tripData, response: .odometer(tripOdometer.odometer))
     dokoResponses[.distance] = DokoCommandResponse(command: .tripData, response: .distance(tripOdometer.distance))
 
@@ -222,9 +223,9 @@ extension FordElectrics {
     defer { responseCache.merge(dokoResponses) { _, new in new } }
 
     duration.update()
-    dokoResponses[.duration] = DokoCommandResponse(command: .acChargeInProgress, response: .duration(duration.duration))
+    dokoResponses[.duration] = DokoCommandResponse(command: .tripWeather, response: .duration(duration.duration))
 
-    let newMeanTemperature = meanTemperature.update(temperature: weather.temperature)
+    let newMeanTemperature = meanTemperature.updateMeanTemperature(with: weather.temperature)
 //    meanTemperatureSum += weather.temperature
 //    meanTemperatureCount += 1
     dokoResponses[.weather] = DokoCommandResponse(command: .tripWeather, response: .weather(weather))

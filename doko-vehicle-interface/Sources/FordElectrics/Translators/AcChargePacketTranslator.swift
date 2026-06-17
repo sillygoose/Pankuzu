@@ -24,7 +24,7 @@ extension FordElectrics {
     chargerInputEnergy.reset()
     chargerOutputEnergy.reset()
 
-    tripOdometer.reset(odometer: odometer)
+    tripOdometer.setOdometer(with: odometer)
     dokoResponses[.odometer] = DokoCommandResponse(command: .acChargeStarting, response: .odometer(odometer))
 
     duration.reset()
@@ -154,6 +154,7 @@ extension FordElectrics {
         dokoResponses[.chargerInputVoltage] = DokoCommandResponse(command: .acChargeEnergy, response: .chargerInputVoltage(inputVoltage))
         dokoResponses[.chargerInputCurrent] = DokoCommandResponse(command: .acChargeEnergy, response: .chargerInputCurrent(inputCurrent))
         dokoResponses[.chargerInputPower] = DokoCommandResponse(command: .acChargeEnergy, response: .chargerInputPower(inputPower))
+        dokoResponses[.peakPower] = DokoCommandResponse(command: .acChargeEnergy, response: .peakPower(chargerInputEnergy.peakPower))
         dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: .acChargeEnergy, response: .chargerInputEnergy(inputEnergy))
       }
     }
@@ -190,18 +191,18 @@ extension FordElectrics {
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .acChargeHistory, response: .batteryTemperature(batteryTemperature))
     dokoResponses[.couplerTemperature] = DokoCommandResponse(command: .acChargeHistory, response: .couplerTemperature(couplerTemperature))
     dokoResponses[.primaryCouplerTemperature] = DokoCommandResponse(command: .acChargeHistory, response: .primaryCouplerTemperature(couplerTemperature))
-//    if let hvBatteryPower = hvBatteryEnergy.power, let hvBatteryEnergy = hvBatteryEnergy.energy {
-//      dokoResponses[.batteryPower] = DokoCommandResponse(command: .acChargeHistory, response: .batteryPower(hvBatteryPower))
-//      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .batteryEnergy(hvBatteryEnergy))
-//    }
-//    if let chargerInputPower = chargerInputEnergy.power, let chargerInputEnergy = chargerInputEnergy.energy {
-//      dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .chargerInputEnergy(chargerInputPower))
-//      dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .chargerInputEnergy(chargerInputEnergy))
-//    }
-//    if let chargerOutputPower = chargerOutputEnergy.power, let chargerOutputEnergy = chargerOutputEnergy.energy {
-//      dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .chargerInputEnergy(chargerOutputPower))
-//      dokoResponses[.chargerOutputEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .chargerOutputEnergy(chargerOutputEnergy))
-//    }
+    if let hvBatteryPower = hvBatteryEnergy.power, let hvBatteryEnergy = hvBatteryEnergy.energy {
+      dokoResponses[.batteryPower] = DokoCommandResponse(command: .acChargeHistory, response: .batteryPower(hvBatteryPower))
+      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .batteryEnergy(hvBatteryEnergy))
+    }
+    if let chargerInputPower = chargerInputEnergy.power, let chargerInputEnergy = chargerInputEnergy.energy {
+      dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .chargerInputEnergy(chargerInputPower))
+      dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .chargerInputEnergy(chargerInputEnergy))
+    }
+    if let chargerOutputPower = chargerOutputEnergy.power, let chargerOutputEnergy = chargerOutputEnergy.energy {
+      dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .chargerInputEnergy(chargerOutputPower))
+      dokoResponses[.chargerOutputEnergy] = DokoCommandResponse(command: .acChargeHistory, response: .chargerOutputEnergy(chargerOutputEnergy))
+    }
     return DokoResponsePacket(type: .acChargeHistory, responses: dokoResponses)
   }
 }

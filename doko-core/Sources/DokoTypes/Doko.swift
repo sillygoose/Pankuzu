@@ -212,6 +212,8 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case weather, meanTemperature
   case odometer, distance
   case speed
+  
+  case peakPower
   case tripEfficiency
   case tripEfficiency5Minute, tripEfficiency10Minute, tripEfficiency15Minute
 
@@ -222,22 +224,23 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case batteryDistanceToEmpty
   case batteryOriginalCapacity
   case batteryCurrentCapacity
+  
+  case couplerTemperature
+  case primaryCouplerTemperature
+  case secondaryCouplerTemperature
+
   case batteryVoltage
   case batteryCurrent
   case batteryPower
   case batteryEnergy
 
-  case couplerTemperature
-  case primaryCouplerTemperature
-  case secondaryCouplerTemperature
-
-  case chargerInputCurrent
   case chargerInputVoltage
+  case chargerInputCurrent
   case chargerInputPower
   case chargerInputEnergy
   
-  case chargerOutputCurrent
   case chargerOutputVoltage
+  case chargerOutputCurrent
   case chargerOutputPower
   case chargerOutputEnergy
 
@@ -322,6 +325,9 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".distance"
       case .speed:
         return ".speed"
+
+      case .peakPower:
+        return ".peakPower"
       case .tripEfficiency:
         return ".tripEfficiency"
       case .tripEfficiency5Minute:
@@ -366,7 +372,7 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
       case .chargerInputVoltage:
         return ".chargerInputVoltage"
       case .chargerInputPower:
-        return ".chargerInputPower"
+        return ".chargerInputPeakPower"
       case .chargerInputEnergy:
         return ".chargerInputEnergy"
 
@@ -408,6 +414,8 @@ public enum DokoResponse: Equatable, Sendable {
   case odometer(Double)
   case distance(Double)
   case speed(Double)
+  
+  case peakPower(Double)
   case tripEfficiency(Double)
   case tripEfficiency5Minute(Double), tripEfficiency10Minute(Double), tripEfficiency15Minute(Double)
 
@@ -418,22 +426,23 @@ public enum DokoResponse: Equatable, Sendable {
   case batteryDistanceToEmpty(Double)
   case batteryOriginalCapacity(Double)
   case batteryCurrentCapacity(Double)
-  case batteryVoltage(Double)
-  case batteryCurrent(Double)
-  case batteryPower(Double)
-  case batteryEnergy(Double)
 
   case couplerTemperature(Double)
   case primaryCouplerTemperature(Double)
   case secondaryCouplerTemperature(Double)
 
-  case chargerInputCurrent(Double)
+  case batteryVoltage(Double)
+  case batteryCurrent(Double)
+  case batteryPower(Double)
+  case batteryEnergy(Double)
+
   case chargerInputVoltage(Double)
+  case chargerInputCurrent(Double)
   case chargerInputPower(Double)
   case chargerInputEnergy(Double)
 
-  case chargerOutputCurrent(Double)
   case chargerOutputVoltage(Double)
+  case chargerOutputCurrent(Double)
   case chargerOutputPower(Double)
   case chargerOutputEnergy(Double)
 
@@ -466,6 +475,9 @@ public enum DokoResponse: Equatable, Sendable {
         return String(format: ".distance(%.1fkm)", distance)
       case .speed(let speed):
         return String(format: ".speed(%.1fkph)", speed)
+        
+      case .peakPower(let power):
+        return String(format: ".peakPower(%.1fkW)", power)
       case .tripEfficiency(let efficiency):
         return String(format: ".tripEfficiency(%.1fkm/kWh)", efficiency)
       case .tripEfficiency5Minute(let efficiency):
