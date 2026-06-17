@@ -48,7 +48,7 @@ extension FordElectrics {
     case .dcChargeEnergy:
       return dcChargeEnergyResponsePacket(responsePacket)
     case .dcChargeHistory:
-      return dcChargeHistoryPacket(responsePacket)
+      return dcChargeHistoryResponsePacket(responsePacket)
     case .dcChargeEnding:
       return dcChargeEndingResponsePacket(responsePacket)
 
