@@ -22,14 +22,14 @@ extension SharedKey where Self == InMemoryKey<ActiveSession?>.Default {
   }
 }
 
-//extension SharedKey where Self == AppStorageKey<String>.Default {
-//  public static var widgetSession: Self {
-//    Self[.appStorage("widget-session", store: .pankuzu), default: ""]
-//  }
-//}
+extension SharedKey where Self == InMemoryKey<DokoResponseDictionary>.Default {
+  public static var chargeUpdateResponses: Self {
+    Self[.inMemory("DokoUI-ChargeUpdateResponses"), default: [:]]
+  }
+}
 
 extension SharedKey where Self == InMemoryKey<DokoResponseDictionary>.Default {
-  public static var updateResponses: Self {
-    Self[.inMemory("DokoUI-UpdateResponses"), default: [:]]
+  public static var tripUpdateResponses: Self {
+    Self[.inMemory("DokoUI-TripUpdateResponses"), default: [:]]
   }
 }

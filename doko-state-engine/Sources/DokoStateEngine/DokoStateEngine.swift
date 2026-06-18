@@ -15,10 +15,6 @@ import DokoNotificationManager
 import DokoLiveActivityManager
 import ObdLinkManager
 
-//import Trips
-//import Charges
-//import Vehicles
-
 @DokoEngineActor
 public final class DokoStateEngine {
   let logger = Logger(subsystem: "com.unchan.doko", category: "StateEngine")
@@ -107,8 +103,8 @@ public final class DokoStateEngine {
       @Shared(.connectedVehicleInterface) var connectedVehicle
       @Shared(.activeSession) var activeSession
       @Shared(.appSettings) var appSettings
-//      @Shared(.widgetSession) var widgetSession
-      @Shared(.updateResponses) var updateResponses
+      @Shared(.chargeUpdateResponses) var chargeUpdateResponses
+      @Shared(.tripUpdateResponses) var tripUpdateResponses
 
       self.logger.info("\(timestamp()) SE.obdResponseProcessing() started")
       while !Task.isCancelled {
@@ -149,9 +145,11 @@ public final class DokoStateEngine {
             guard case .idle = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
             let nextState = dokoResponsePacket.nextState ?? .idle
             if nextState == .tripStarting {
+              $tripUpdateResponses.withLock { $0 = [:] }
               await CoreLocationManager.shared.startLocationUpdates()
               await DokoNotificationManager.shared.startTripNotification(vehicle: connectedVehicle.vehicle?.makeModel ?? "Unknown")
             } else if nextState == .acChargeStarting || nextState == .dcChargeStarting {
+              $chargeUpdateResponses.withLock { $0 = [:] }
               await CoreLocationManager.shared.startLocationUpdates()
               await DokoNotificationManager.shared.startChargeNotification(vehicle: connectedVehicle.vehicle?.makeModel ?? "Unknown")
             }
@@ -170,7 +168,6 @@ public final class DokoStateEngine {
                 await CoreLocationManager.shared.startPacketUpdates()
                 await LiveActivityManager.shared.startTrip()
                 $activeSession.withLock { $0 = .trip }
-//                $widgetSession.withLock { $0 = ActiveSession.trip.rawValue }
               } catch let error as StateEngineError {
                 DokoLogging.shared.postLoggingResponse(.error(".tripStarting: \(error.errorDescription)"))
                 nextState = .tripStarting
@@ -195,7 +192,7 @@ public final class DokoStateEngine {
             ABRPManager.shared.sendTripTelemetry(packet: dokoResponsePacket)
             do {
               self.tripInProgress = try Trip.updateTripRecord(tripDraft: tripDraft, tripDataResponse: dokoResponsePacket)
-              $updateResponses.withLock { $0 = dokoResponsePacket.responses }
+              $tripUpdateResponses.withLock { $0 = dokoResponsePacket.responses }
               let windSock: WindSock? = if let course = dokoResponsePacket.position?.course, let weather = dokoResponsePacket.weather {
                 WindSock(
                   course: course,
@@ -242,7 +239,6 @@ public final class DokoStateEngine {
                 )
                 self.tripInProgress = nil
                 $activeSession.withLock { $0 = nil }
-//                $widgetSession.withLock { $0 = "" }
               } catch let error as StateEngineError {
                 DokoLogging.shared.postLoggingResponse(.error(".tripEnding: \(error.errorDescription)"))
                 nextState = .tripEnding
@@ -313,8 +309,6 @@ public final class DokoStateEngine {
                 await CoreLocationManager.shared.stopLocationUpdates()
                 await LiveActivityManager.shared.startCharge()
                 $activeSession.withLock { $0 = .acCharge }
-//                $widgetSession.withLock { $0 = ActiveSession.acCharge.rawValue }
-//                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".acChargeStarting: \(String(describing: error))"))
                 nextState = .acChargeStarting
@@ -351,8 +345,6 @@ public final class DokoStateEngine {
                   )
                 )
                 $activeSession.withLock { $0 = nil }
-//                $widgetSession.withLock { $0 = "" }
-//                $updateResponses.withLock { $0 = [:] }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".acChargeEnding: \(String(describing: error))"))
                 nextState = .acChargeEnding
@@ -361,9 +353,7 @@ public final class DokoStateEngine {
             $vehicleState.withLock { $0 = nextState }
 
           case .dcChargeStarting:
-            guard case .dcChargeStarting = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
+            guard case .dcChargeStarting = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
             var nextState = dokoResponsePacket.nextState ?? .dcChargeStarting
             if nextState == .dcChargeInProgress {
               do {
@@ -376,8 +366,6 @@ public final class DokoStateEngine {
                 await CoreLocationManager.shared.stopLocationUpdates()
                 await LiveActivityManager.shared.startCharge()
                 $activeSession.withLock { $0 = .dcCharge }
-//                $widgetSession.withLock { $0 = ActiveSession.dcCharge.rawValue }
-//                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".dcChargeStarting: \(String(describing: error))"))
                 nextState = .dcChargeStarting
@@ -414,9 +402,6 @@ public final class DokoStateEngine {
                   )
                 )
                 $activeSession.withLock { $0 = nil }
-//                $widgetSession.withLock { $0 = "" }
-//                $updateResponses.withLock { $0 = [:] }
-//                Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".dcChargeEnding: \(String(describing: error))"))
                 nextState = .dcChargeEnding
@@ -440,7 +425,7 @@ public final class DokoStateEngine {
             )
             do {
               self.chargeInProgress = try Charge.postChargeUpdateRecord(chargeDraft: chargeDraft, chargeUpdateResponse: dokoResponsePacket)
-              $updateResponses.withLock { $0 = dokoResponsePacket.responses }
+              $chargeUpdateResponses.withLock { $0 = dokoResponsePacket.responses }
               if let chargeDraft = self.chargeInProgress {
                 await LiveActivityManager.shared.updateCharge(
                   state: ChargeActivityAttributes.ContentState(
@@ -482,7 +467,6 @@ extension DokoStateEngine {
   public func accessoryNameObservation() {
     @Shared(.connectedAccessoryName) var observedAccessoryName
     @Shared(.activeSession) var activeSession
-//    @Shared(.widgetSession) var widgetSession
     DokoLogging.shared.postLoggingResponse(.info("SE.accessoryNameObservation"))
     Task { [weak self] in
       guard let self else { return }
@@ -501,8 +485,6 @@ extension DokoStateEngine {
           stopVehicleStateObservation()
           await stopStateEngine()
           $activeSession.withLock { $0 = nil }
-//          $widgetSession.withLock { $0 = "" }
-//          Task { @MainActor in WidgetCenter.shared.reloadTimelines(ofKind: "PankuzuWidget") }
           await DokoNotificationManager.shared.accessoryDisconnectedNotification(accessoryName: oldAccessoryName ?? "unknown")
         }
         oldAccessoryName = newAccessoryName

@@ -22,7 +22,8 @@ final class CarPlayController {
   @Shared(.appSettings) var appSettings
   @Shared(.connectedAccessoryName) private var connectedAccessoryName
   @Shared(.activeSession) private var activeSession
-  @Shared(.updateResponses) private var chargeResponses
+  @Shared(.chargeUpdateResponses) private var chargeResponses
+  @Shared(.tripUpdateResponses) private var tripResponses
 
   init(interfaceController: CPInterfaceController) {
     self.interfaceController = interfaceController
@@ -66,14 +67,15 @@ final class CarPlayController {
       _ = connectedAccessoryName
       _ = activeSession
       _ = chargeResponses
+      _ = tripResponses
     } onChange: {
       Task { @MainActor [weak self] in
         guard let self else { return }
         statusInfoTemplate?.items = makeStatusItems()
         statusInfoTemplate?.actions = makeStatusActions()
 
-        tripOverviewTemplate?.items = makeTripOverviewItems(from: chargeResponses)
-        tripEfficiencyTemplate?.items = makeTripEfficiencyItems(from: chargeResponses)
+        tripOverviewTemplate?.items = makeTripOverviewItems(from: tripResponses)
+        tripEfficiencyTemplate?.items = makeTripEfficiencyItems(from: tripResponses)
 
         chargeSessionTemplate?.items = makeChargeSessionItems(from: chargeResponses)
         chargeInputTemplate?.items   = makeChargeInputItems(from: chargeResponses)
