@@ -41,7 +41,7 @@ extension CarPlayController {
   private func formatEfficiency(_ efficiency: Double) -> String {
     let e = Measurement(value: efficiency, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
       .converted(to: appSettings.metric ? .kilometersPerKilowattHour : .milesPerKilowattHour)
-    return String(format: "%.1f %@", e.value, e.unit.symbol)
+    return String(format: "%.2f %@", e.value, e.unit.symbol)
   }
 
   private func formatDuration(_ duration: Double) -> String {
@@ -49,22 +49,28 @@ extension CarPlayController {
     return "\(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 2))))"
   }
 
+  private func formatDurationSeconds(_ duration: Double) -> String {
+    let duration: Duration = .seconds(duration)
+    return "\(duration.formatted(.time(pattern: .hourMinuteSecond(padHourToLength: 2))))"
+  }
+
   func makeTripOverviewItems(from responses: DokoResponseDictionary) -> [CPInformationItem] {
     var items: [CPInformationItem] = []
     if case let .duration(v)?                       = responses[.duration]?.response                { items.append(.init(title: "Duration",           detail: formatDuration(v))) }
     if case let .distance(v)?                       = responses[.distance]?.response                { items.append(.init(title: "Distance",           detail: formatDistance(v))) }
     if case let .batteryStateOfCharge(v)?           = responses[.batteryStateOfCharge]?.response    { items.append(.init(title: "State of Charge",    detail: String(format: "%.0f%%", v))) }
-    if case let .batteryEnergy(v)?                  = responses[.batteryEnergy]?.response           { items.append(.init(title: "Energy Used",        detail: String(format: "%.1f kWh", v))) }
-    if case let .tripEfficiency(v)?                 = responses[.tripEfficiency]?.response          { items.append(.init(title: "Trip Efficiency",     detail: formatEfficiency(v))) }
+    if case let .batteryEnergy(v)?                  = responses[.batteryEnergy]?.response           { items.append(.init(title: "Energy Used",        detail: String(format: "%.1f kWh", -v))) }
+    if case let .tripEfficiency(v)?                 = responses[.tripEfficiency]?.response          { items.append(.init(title: "Trip Efficiency",    detail: formatEfficiency(v))) }
     return items
   }
 
   func makeTripEfficiencyItems(from responses: DokoResponseDictionary) -> [CPInformationItem] {
     var items: [CPInformationItem] = []
-    if case let .tripEfficiency(v)?               = responses[.tripEfficiency]?.response            { items.append(.init(title: "Trip Efficiency",     detail: formatEfficiency(v))) }
-    if case let .tripEfficiency5Minute(v)?        = responses[.tripEfficiency5Minute]?.response     { items.append(.init(title: "Past 5 Minutes",      detail: formatEfficiency(v))) }
-    if case let .tripEfficiency10Minute(v)?       = responses[.tripEfficiency10Minute]?.response    { items.append(.init(title: "Past 10 Minutes",     detail: formatEfficiency(v))) }
-    if case let .tripEfficiency15Minute(v)?       = responses[.tripEfficiency15Minute]?.response    { items.append(.init(title: "Past 15 Minutes",     detail: formatEfficiency(v))) }
+    if case let .duration(v)?                       = responses[.duration]?.response                { items.append(.init(title: "",                   detail: formatDurationSeconds(v))) }
+    if case let .tripEfficiency(v)?                 = responses[.tripEfficiency]?.response          { items.append(.init(title: "Trip Efficiency",    detail: formatEfficiency(v))) }
+    if case let .tripEfficiency5Minute(v)?          = responses[.tripEfficiency5Minute]?.response   { items.append(.init(title: "Past 5 Minutes",     detail: formatEfficiency(v))) }
+    if case let .tripEfficiency10Minute(v)?         = responses[.tripEfficiency10Minute]?.response  { items.append(.init(title: "Past 10 Minutes",    detail: formatEfficiency(v))) }
+    if case let .tripEfficiency15Minute(v)?         = responses[.tripEfficiency15Minute]?.response  { items.append(.init(title: "Past 15 Minutes",    detail: formatEfficiency(v))) }
     return items
   }
 }
