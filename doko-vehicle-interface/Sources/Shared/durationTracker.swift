@@ -7,10 +7,12 @@ public struct DurationTracker: Sendable {
 
   public init() {}
 
-  public mutating func reset() {
+  @discardableResult
+  public mutating func reset() -> Double {
     start = Date.now
     current = Date.now
     duration = 0
+    return duration
   }
 
   @discardableResult

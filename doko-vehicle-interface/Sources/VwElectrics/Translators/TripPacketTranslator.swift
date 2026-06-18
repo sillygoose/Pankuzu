@@ -33,9 +33,7 @@ extension VwElectrics {
     if let batteryStateOfHealth = responsePacket.batteryStateOfHealth {
       dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .tripStarting, response: .batteryStateOfHealth(batteryStateOfHealth))
     }
-    if let hvBatteryEnergy = hvBatteryEnergy.energy {
-      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripStarting, response: .batteryEnergy(hvBatteryEnergy))
-    }
+    dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripStarting, response: .batteryEnergy(hvBatteryEnergy.energy))
     return DokoResponsePacket(type: .tripStarting, responses: dokoResponses)
   }
   
@@ -68,9 +66,8 @@ extension VwElectrics {
     dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .tripUpdate, response: .batteryStateOfCharge(batteryStateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: .tripUpdate, response: .batteryTemperature(batteryTemperature))
 
-    if let hvBatteryEnergy = hvBatteryEnergy.energy {
-      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripUpdate, response: .batteryEnergy(hvBatteryEnergy))
-    }
+    dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripUpdate, response: .batteryEnergy(hvBatteryEnergy.energy))
+
     if let latestWeather = await DokoWeatherManager.shared.latestWeather {
       dokoResponses[.weather] = DokoCommandResponse(command: .tripUpdate, response: .weather(latestWeather))
     }
@@ -97,9 +94,8 @@ extension VwElectrics {
     if let batteryDistanceToEmpty = responsePacket.batteryDistanceToEmpty {
       dokoResponses[.batteryDistanceToEmpty] = DokoCommandResponse(command: .tripEnding, response: .batteryDistanceToEmpty(batteryDistanceToEmpty))
     }
-    if let hvBatteryEnergy = hvBatteryEnergy.energy {
-      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripEnding, response: .batteryEnergy(hvBatteryEnergy))
-    }
+    dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripEnding, response: .batteryEnergy(hvBatteryEnergy.energy))
+
     if let batteryCurrentCapacity = responsePacket.batteryCurrentCapacity, let batteryOriginalCapacity = responsePacket.batteryOriginalCapacity, batteryOriginalCapacity > 0 {
       let batteryStateOfHealth = 100 * batteryCurrentCapacity / batteryOriginalCapacity
       dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .tripEnding, response: .batteryStateOfHealth(batteryStateOfHealth))
@@ -149,9 +145,8 @@ extension VwElectrics {
     }
     dokoResponses[.odometer] = DokoCommandResponse(command: .tripData, response: .odometer(odometer))
 
-    if let hvBatteryEnergy = hvBatteryEnergy.energy {
-      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripData, response: .batteryEnergy(hvBatteryEnergy))
-    }
+    dokoResponses[.batteryEnergy] = DokoCommandResponse(command: .tripData, response: .batteryEnergy(hvBatteryEnergy.energy))
+
     if let batteryStateOfCharge = responsePacket.batteryStateOfCharge {
       dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: .tripData, response: .batteryStateOfCharge(batteryStateOfCharge))
     }

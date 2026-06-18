@@ -33,11 +33,10 @@ public actor FordElectrics: ConnectedVehicleInterface {
   public var chargerInputEnergy = PowerEnergyIntegrator()
   public var chargerOutputEnergy = PowerEnergyIntegrator()
 
-  public var tripOdometer = TripOdometer()
-  public var duration = DurationTracker()
-  public var meanTemperature = MeanTemperature()
-
-  public var tripEfficiency = TripEfficiency()
+  public var vehicleOdometer = TripOdometer()
+  public var vehicleDuration = DurationTracker()
+  public var vehicleMeanTemperature = MeanTemperature()
+  public var vehicleEfficiency = TripEfficiency()
 
   public init(
     vehicle: Vehicle?

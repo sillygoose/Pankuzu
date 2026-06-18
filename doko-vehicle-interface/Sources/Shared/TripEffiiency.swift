@@ -16,15 +16,18 @@ public struct TripEfficiency: Sendable {
 
   public init() {}
 
-  public mutating func reset() {
+  @discardableResult
+  public mutating func reset() -> Double {
     samples = []
     efficiency = 0
     efficiency5min = 0
     efficiency10min = 0
     efficiency15min = 0
+    return efficiency
   }
 
-  public mutating func updateEfficiency(_ distance: Double, _ energy: Double) {
+  @discardableResult
+  public mutating func updateEfficiency(_ distance: Double, _ energy: Double) -> Double {
     let now = Date()
     samples.append(Sample(timestamp: now, distance: distance, energy: energy))
 
@@ -34,15 +37,17 @@ public struct TripEfficiency: Sendable {
       samples.removeFirst()
     }
 
-    efficiency = energy > 0 ? distance / energy : 0
+    efficiency = energy == 0 ? 0 : distance / energy
     efficiency5min  = windowEfficiency(seconds: 5  * 60, distance: distance, energy: energy, now: now)
     efficiency10min = windowEfficiency(seconds: 10 * 60, distance: distance, energy: energy, now: now)
     efficiency15min = windowEfficiency(seconds: 15 * 60, distance: distance, energy: energy, now: now)
+    return efficiency
   }
 
   private func windowEfficiency(seconds: TimeInterval, distance: Double, energy: Double, now: Date) -> Double {
     let cutoff = now.addingTimeInterval(-seconds)
-    guard let baseline = samples.last(where: { $0.timestamp <= cutoff }) else { return 0 }
+    let baseline = samples.last(where: { $0.timestamp <= cutoff }) ?? samples.first
+    guard let baseline else { return 0 }
     let deltaEnergy = energy - baseline.energy
     guard deltaEnergy > 0 else { return 0 }
     return (distance - baseline.distance) / deltaEnergy

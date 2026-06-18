@@ -48,7 +48,8 @@ extension CarPlayController {
   }
 
   private func formatDuration(_ duration: Double) -> String {
-    "hh:mm"
+    let duration: Duration = .seconds(duration)
+    return "\(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 2))))"
   }
 
   func makeChargeSessionItems(from responses: DokoResponseDictionary) -> [CPInformationItem] {

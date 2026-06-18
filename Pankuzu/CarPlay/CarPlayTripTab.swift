@@ -16,11 +16,11 @@ extension CarPlayController {
     }
 
     let buttons = [
-      CPGridButton(titleVariants: ["Overview"], image: symbol("gauge.medium")) { [weak self] _ in
+      CPGridButton(titleVariants: ["Overview"], image: symbol("bolt.car")) { [weak self] _ in
         guard let self else { return }
         interfaceController.pushTemplate(tripOverviewTemplate!, animated: true, completion: nil)
       },
-      CPGridButton(titleVariants: ["Efficiency"], image: symbol("powerplug.portrait.fill")) { [weak self] _ in
+      CPGridButton(titleVariants: ["Efficiency"], image: symbol("ev.charger.fill")) { [weak self] _ in
         guard let self else { return }
         interfaceController.pushTemplate(tripEfficiencyTemplate!, animated: true, completion: nil)
       },
@@ -33,7 +33,7 @@ extension CarPlayController {
   }
 
   private func formatDistance(_ distance: Double) -> String {
-    let d = Measurement(value: distance, unit: UnitLength.meters)
+    let d = Measurement(value: distance, unit: UnitLength.kilometers)
       .converted(to: appSettings.metric ? .kilometers : .miles)
     return String(format: "%.1f %@", d.value, d.unit.symbol)
   }
@@ -53,6 +53,9 @@ extension CarPlayController {
     var items: [CPInformationItem] = []
     if case let .duration(v)?                       = responses[.duration]?.response                { items.append(.init(title: "Duration",           detail: formatDuration(v))) }
     if case let .distance(v)?                       = responses[.distance]?.response                { items.append(.init(title: "Distance",           detail: formatDistance(v))) }
+    if case let .batteryStateOfCharge(v)?           = responses[.batteryStateOfCharge]?.response    { items.append(.init(title: "State of Charge",    detail: String(format: "%.0f%%", v))) }
+    if case let .batteryEnergy(v)?                  = responses[.batteryEnergy]?.response           { items.append(.init(title: "Energy Used",        detail: String(format: "%.1f kWh", v))) }
+    if case let .tripEfficiency(v)?                 = responses[.tripEfficiency]?.response          { items.append(.init(title: "Trip Efficiency",     detail: formatEfficiency(v))) }
     return items
   }
 
@@ -60,8 +63,8 @@ extension CarPlayController {
     var items: [CPInformationItem] = []
     if case let .tripEfficiency(v)?               = responses[.tripEfficiency]?.response            { items.append(.init(title: "Trip Efficiency",     detail: formatEfficiency(v))) }
     if case let .tripEfficiency5Minute(v)?        = responses[.tripEfficiency5Minute]?.response     { items.append(.init(title: "Past 5 Minutes",      detail: formatEfficiency(v))) }
-    if case let .tripEfficiency10Minute(v)?       = responses[.tripEfficiency5Minute]?.response     { items.append(.init(title: "Past 10 Minutes",     detail: formatEfficiency(v))) }
-    if case let .tripEfficiency15Minute(v)?       = responses[.tripEfficiency5Minute]?.response     { items.append(.init(title: "Past 15 Minutes",     detail: formatEfficiency(v))) }
+    if case let .tripEfficiency10Minute(v)?       = responses[.tripEfficiency10Minute]?.response    { items.append(.init(title: "Past 10 Minutes",     detail: formatEfficiency(v))) }
+    if case let .tripEfficiency15Minute(v)?       = responses[.tripEfficiency15Minute]?.response    { items.append(.init(title: "Past 15 Minutes",     detail: formatEfficiency(v))) }
     return items
   }
 }

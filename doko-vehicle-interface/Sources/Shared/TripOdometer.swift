@@ -7,16 +7,18 @@ public struct TripOdometer: Sendable {
 
   public init() {}
 
-  public mutating func setOdometer(with newOdometer: Double) {
+  @discardableResult
+  public mutating func setOdometer(with newOdometer: Double) -> Double {
     initialOdometer = newOdometer
     odometer = newOdometer
     distance = 0
+    return distance
   }
 
   @discardableResult
   public mutating func updateOdometer(with newOdometer: Double) -> Double {
     odometer = newOdometer
-    distance += newOdometer - initialOdometer
+    distance = newOdometer - initialOdometer
     return distance
   }
 }
