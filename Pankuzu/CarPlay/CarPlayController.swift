@@ -1,6 +1,8 @@
 import CarPlay
 import Observation
 import UIKit
+
+import DokoExtensions
 import DokoSharing
 
 @MainActor
@@ -107,5 +109,40 @@ final class CarPlayController {
     case .dcCharge: return "DC Charging"
     case nil:       return "None"
     }
+  }
+}
+
+extension CarPlayController {
+  func chargingEfficiency(inputEnergy: Double?, batteryEnergy: Double?) -> Double? {
+    guard let input = inputEnergy, let output = batteryEnergy, input > 0 else { return nil }
+    return output / input * 100
+  }
+
+  func formatDistance(_ distance: Double) -> String {
+    let d = Measurement(value: distance, unit: UnitLength.kilometers)
+      .converted(to: appSettings.metric ? .kilometers : .miles)
+    return String(format: "%.1f %@", d.value, d.unit.symbol)
+  }
+
+  func formatTripEfficiency(_ efficiency: Double) -> String {
+    let e = Measurement(value: efficiency, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
+      .converted(to: appSettings.metric ? .kilometersPerKilowattHour : .milesPerKilowattHour)
+    return String(format: "%.2f %@", e.value, e.unit.symbol)
+  }
+
+  func formatDuration(_ duration: Double) -> String {
+    let duration: Duration = .seconds(duration)
+    return "\(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 2))))"
+  }
+
+  func formatDurationSeconds(_ duration: Double) -> String {
+    let duration: Duration = .seconds(duration)
+    return "\(duration.formatted(.time(pattern: .hourMinuteSecond(padHourToLength: 2))))"
+  }
+
+  func formatTemperature(_ celsius: Double) -> String {
+    let t = Measurement(value: celsius, unit: UnitTemperature.celsius)
+      .converted(to: appSettings.metric ? .celsius : .fahrenheit)
+    return String(format: "%.0f%@", t.value, t.unit.symbol)
   }
 }

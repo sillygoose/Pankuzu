@@ -41,16 +41,16 @@ extension CarPlayController {
     return template
   }
 
-  private func formatTemperature(_ celsius: Double) -> String {
-    let t = Measurement(value: celsius, unit: UnitTemperature.celsius)
-      .converted(to: appSettings.metric ? .celsius : .fahrenheit)
-    return String(format: "%.0f%@", t.value, t.unit.symbol)
-  }
+//  private func formatTemperature(_ celsius: Double) -> String {
+//    let t = Measurement(value: celsius, unit: UnitTemperature.celsius)
+//      .converted(to: appSettings.metric ? .celsius : .fahrenheit)
+//    return String(format: "%.0f%@", t.value, t.unit.symbol)
+//  }
 
-  private func formatDuration(_ duration: Double) -> String {
-    let duration: Duration = .seconds(duration)
-    return "\(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 2))))"
-  }
+//  private func formatDuration(_ duration: Double) -> String {
+//    let duration: Duration = .seconds(duration)
+//    return "\(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 2))))"
+//  }
 
   func makeChargeSessionItems(from responses: DokoResponseDictionary) -> [CPInformationItem] {
     var items: [CPInformationItem] = []
@@ -60,10 +60,10 @@ extension CarPlayController {
     if case let .batteryStateOfCharge(v)?           = responses[.batteryStateOfCharge]?.response    { items.append(.init(title: "State of Charge",    detail: String(format: "%.0f%%", v))) }
     if case let .batteryStateOfHealth(v)?           = responses[.batteryStateOfHealth]?.response    { items.append(.init(title: "State of Heallth",   detail: String(format: "%.0f%%", v))) }
     if case let .batteryEnergy(v)?                  = responses[.batteryEnergy]?.response           { items.append(.init(title: "Energy Added",       detail: String(format: "%.3f kWh", v))) }
-    if case let .chargerInputEnergy(inputEnergy)?   = responses[.chargerInputEnergy]?.response,
-       case let .batteryEnergy(batteryEnergy)?      = responses[.batteryEnergy]?.response,
-       inputEnergy > 0 {
-      items.append(.init(title: "Charging Efficiency", detail: String(format: "%.1f%%", (batteryEnergy / inputEnergy) * 100)))
+    if case let .chargerInputEnergy(inputEnergy)? = responses[.chargerInputEnergy]?.response, case let .batteryEnergy(batteryEnergy)? = responses[.batteryEnergy]?.response {
+      if let chargingEfficiency = chargingEfficiency(inputEnergy: inputEnergy, batteryEnergy: batteryEnergy) {
+        items.append(.init(title: "Charging Efficiency", detail: String(format: "%.1f%%", chargingEfficiency)))
+      }
     }
     return items
   }
