@@ -71,11 +71,6 @@ extension FordElectrics {
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
 
-  func dcChargeUpdateResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
-    let dokoPacket: DokoPacketType = .dcChargeUpdate
-    return DokoResponsePacket(type: dokoPacket, responses: responseCache)
-  }
-
   func dcChargeEndingResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     let dokoPacket: DokoPacketType = .dcChargeEnding
     let dokoCommand: DokoCommand = .dcChargeEnding
@@ -109,6 +104,11 @@ extension FordElectrics {
 
     dokoResponses[.batteryEnergy] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergy(hvBatteryEnergy.energy))
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
+  }
+
+  func dcChargeUpdateResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+    let dokoPacket: DokoPacketType = .dcChargeUpdate
+    return DokoResponsePacket(type: dokoPacket, responses: responseCache)
   }
 
   func dcChargeEnergyResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {

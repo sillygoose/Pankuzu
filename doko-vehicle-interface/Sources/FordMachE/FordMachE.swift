@@ -33,8 +33,10 @@ public actor FordMachE: ConnectedVehicleInterface {
   public var chargerInputEnergy = PowerEnergyIntegrator()
   public var chargerOutputEnergy = PowerEnergyIntegrator()
 
-  public var meanTemperatureSum: Double = 0.0
-  public var meanTemperatureCount: Int = 0
+  public var vehicleOdometer = TripOdometer()
+  public var vehicleDuration = DurationTracker()
+  public var vehicleMeanTemperature = MeanTemperature()
+  public var vehicleEfficiency = TripEfficiency()
 
   public init(vehicle: Vehicle?) {
     self.vehicle = vehicle
@@ -113,10 +115,6 @@ public actor FordMachE: ConnectedVehicleInterface {
 
     case .tripUpdate:
       return obdCommandPacket(packetType) {
-        .position;
-        .odometer;
-        .batteryStateOfCharge;
-        .batteryTemperature;
       }
 
     case .tripEnding:
@@ -162,9 +160,6 @@ public actor FordMachE: ConnectedVehicleInterface {
 
     case .acChargeUpdate, .dcChargeUpdate:
       return obdCommandPacket(packetType) {
-        .batteryStateOfCharge;
-        .batteryTemperature;
-        packetType == .acChargeUpdate ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
 
     case .acChargeEnding, .dcChargeEnding:

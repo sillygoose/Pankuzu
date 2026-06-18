@@ -116,10 +116,6 @@ public actor FordElectrics: ConnectedVehicleInterface {
 
     case .tripUpdate:
       return obdCommandPacket(packetType) {
-//        .position;
-//        .odometer;
-//        .batteryStateOfCharge;
-//        .batteryTemperature;
       }
 
     case .tripEnding:
@@ -165,9 +161,6 @@ public actor FordElectrics: ConnectedVehicleInterface {
 
     case .acChargeUpdate, .dcChargeUpdate:
       return obdCommandPacket(packetType) {
-//        .batteryStateOfCharge;
-//        .batteryTemperature;
-//        packetType == .acChargeUpdate ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
 
     case .acChargeEnding, .dcChargeEnding:
