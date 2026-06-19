@@ -180,9 +180,15 @@ extension FordMachE {
 
     let efficieency = vehicleEfficiency.updateEfficiency(distance, -hvBatteryEnergy.energy)
     dokoResponses[.tripEfficiency] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency(efficieency))
-    dokoResponses[.tripEfficiency5Minute] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency5Minute(vehicleEfficiency.efficiency5min))
-    dokoResponses[.tripEfficiency10Minute] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency10Minute(vehicleEfficiency.efficiency10min))
-    dokoResponses[.tripEfficiency15Minute] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency15Minute(vehicleEfficiency.efficiency15min))
+    if let efficiency5min = vehicleEfficiency.efficiency5min {
+      dokoResponses[.tripEfficiency5Minute] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency5Minute(efficiency5min))
+    }
+    if let efficiency10min = vehicleEfficiency.efficiency10min {
+      dokoResponses[.tripEfficiency10Minute] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency10Minute(efficiency10min))
+    }
+    if let efficiency15min = vehicleEfficiency.efficiency15min {
+      dokoResponses[.tripEfficiency15Minute] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency15Minute(efficiency15min))
+    }
 
     if let batteryDistanceToEmpty = responsePacket.batteryDistanceToEmpty {
       dokoResponses[.batteryDistanceToEmpty] = DokoCommandResponse(command: dokoCommand, response: .batteryDistanceToEmpty(batteryDistanceToEmpty))

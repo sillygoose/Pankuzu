@@ -32,28 +32,6 @@ extension CarPlayController {
     return template
   }
 
-//  private func formatDistance(_ distance: Double) -> String {
-//    let d = Measurement(value: distance, unit: UnitLength.kilometers)
-//      .converted(to: appSettings.metric ? .kilometers : .miles)
-//    return String(format: "%.1f %@", d.value, d.unit.symbol)
-//  }
-//
-//  private func formatTripEfficiency(_ efficiency: Double) -> String {
-//    let e = Measurement(value: efficiency, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
-//      .converted(to: appSettings.metric ? .kilometersPerKilowattHour : .milesPerKilowattHour)
-//    return String(format: "%.2f %@", e.value, e.unit.symbol)
-//  }
-//
-//  private func formatDuration(_ duration: Double) -> String {
-//    let duration: Duration = .seconds(duration)
-//    return "\(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 2))))"
-//  }
-//
-//  private func formatDurationSeconds(_ duration: Double) -> String {
-//    let duration: Duration = .seconds(duration)
-//    return "\(duration.formatted(.time(pattern: .hourMinuteSecond(padHourToLength: 2))))"
-//  }
-
   func makeTripOverviewItems(from responses: DokoResponseDictionary) -> [CPInformationItem] {
     var items: [CPInformationItem] = []
     if case let .duration(v)?                       = responses[.duration]?.response                { items.append(.init(title: "Duration",           detail: formatDuration(v))) }

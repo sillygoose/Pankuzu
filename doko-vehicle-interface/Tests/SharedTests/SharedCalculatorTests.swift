@@ -2,6 +2,22 @@ import Testing
 import Foundation
 import Shared
 
+// Minimal controllable clock for tests. A class so that advancing it is
+// visible through the reference stored inside TripEfficiency.
+private final class ManualClock: Clock, @unchecked Sendable {
+  typealias Duration = Swift.Duration
+  struct Instant: InstantProtocol {
+    var offset: Duration = .zero
+    func advanced(by duration: Duration) -> Self { .init(offset: offset + duration) }
+    func duration(to other: Self) -> Duration { other.offset - offset }
+    static func < (lhs: Self, rhs: Self) -> Bool { lhs.offset < rhs.offset }
+  }
+  var now = Instant()
+  var minimumResolution: Duration { .nanoseconds(1) }
+  func sleep(until deadline: Instant, tolerance: Duration?) async throws {}
+  func advance(by duration: Duration) { now = now.advanced(by: duration) }
+}
+
 // MARK: - TripOdometer
 
 @Suite("TripOdometer")
@@ -64,9 +80,9 @@ struct TripEfficiencyTests {
   @Test func initialState() {
     let e = TripEfficiency()
     #expect(e.efficiency == 0)
-    #expect(e.efficiency5min == 0)
-    #expect(e.efficiency10min == 0)
-    #expect(e.efficiency15min == 0)
+    #expect(e.efficiency5min == nil)
+    #expect(e.efficiency10min == nil)
+    #expect(e.efficiency15min == nil)
   }
 
   @Test func resetClearsAll() {
@@ -74,9 +90,9 @@ struct TripEfficiencyTests {
     e.updateEfficiency(10, 2)
     e.reset()
     #expect(e.efficiency == 0)
-    #expect(e.efficiency5min == 0)
-    #expect(e.efficiency10min == 0)
-    #expect(e.efficiency15min == 0)
+    #expect(e.efficiency5min == nil)
+    #expect(e.efficiency10min == nil)
+    #expect(e.efficiency15min == nil)
   }
 
   @Test func overallEfficiencyIsDistanceOverEnergy() {
@@ -93,16 +109,71 @@ struct TripEfficiencyTests {
     #expect(e.efficiency == 0)
   }
 
-  @Test func windowEfficienciesFallBackToOverallWhenInsufficientHistory() {
-    // All samples are recent (< 5 min old), so the window baseline falls back
-    // to samples.first and each window efficiency equals the overall efficiency.
-    var e = TripEfficiency()
-    e.updateEfficiency(10, 2)   // overall = 5 km/kWh
-    #expect(e.efficiency5min == 0)   // only one sample — delta energy is 0
-    e.updateEfficiency(20, 4)   // overall = 5 km/kWh; delta from first = 10/2 = 5
-    #expect(e.efficiency5min == 5)
-    #expect(e.efficiency10min == 5)
-    #expect(e.efficiency15min == 5)
+  @Test func windowEfficienciesAreNilWithoutOldEnoughSamples() {
+    // Both updates happen at the same instant — no window has a baseline.
+    let clock = ManualClock()
+    var e = TripEfficiency(clock: clock)
+    e.updateEfficiency(10, 2)
+    e.updateEfficiency(20, 4)
+    #expect(e.efficiency5min == nil)
+    #expect(e.efficiency10min == nil)
+    #expect(e.efficiency15min == nil)
+  }
+
+  @Test func efficiency5minAppearsAfter5Minutes() throws {
+    let clock = ManualClock()
+    var e = TripEfficiency(clock: clock)
+    e.updateEfficiency(10, 2)                        // t = 0
+    clock.advance(by: .seconds(5 * 60 + 1))         // t = 5:01
+    e.updateEfficiency(20, 4)
+    // baseline: distance=10, energy=2 → delta 10km / 2kWh = 5 km/kWh
+    let eff5 = try #require(e.efficiency5min)
+    #expect(eff5 == 5)
+    #expect(e.efficiency10min == nil)
+    #expect(e.efficiency15min == nil)
+  }
+
+  @Test func efficiency10minAppearsAfter10Minutes() throws {
+    let clock = ManualClock()
+    var e = TripEfficiency(clock: clock)
+    e.updateEfficiency(10, 2)                        // t = 0
+    clock.advance(by: .seconds(10 * 60 + 1))        // t = 10:01
+    e.updateEfficiency(20, 4)
+    let eff5  = try #require(e.efficiency5min)
+    let eff10 = try #require(e.efficiency10min)
+    #expect(eff5  == 5)
+    #expect(eff10 == 5)
+    #expect(e.efficiency15min == nil)
+  }
+
+  @Test func efficiency15minAppearsAfter15Minutes() throws {
+    let clock = ManualClock()
+    var e = TripEfficiency(clock: clock)
+    e.updateEfficiency(10, 2)                        // t = 0
+    clock.advance(by: .seconds(15 * 60 + 1))        // t = 15:01
+    e.updateEfficiency(20, 4)
+    let eff5  = try #require(e.efficiency5min)
+    let eff10 = try #require(e.efficiency10min)
+    let eff15 = try #require(e.efficiency15min)
+    #expect(eff5  == 5)
+    #expect(eff10 == 5)
+    #expect(eff15 == 5)
+  }
+
+  @Test func windowUsesNearestBaselineNotOldest() throws {
+    // Samples at t=0, t=3min, t=8:01 (current).
+    // 5-min baseline should be the t=3 sample, not t=0.
+    let clock = ManualClock()
+    var e = TripEfficiency(clock: clock)
+    e.updateEfficiency(10, 2)                        // t = 0:    10km, 2kWh
+    clock.advance(by: .seconds(3 * 60))
+    e.updateEfficiency(16, 3)                        // t = 3:00: 16km, 3kWh
+    clock.advance(by: .seconds(5 * 60 + 1))
+    e.updateEfficiency(22, 4)                        // t = 8:01: 22km, 4kWh
+    // 5-min cutoff = t=3:01 → baseline is t=3 sample
+    // delta: (22-16)/(4-3) = 6 km/kWh
+    let eff5 = try #require(e.efficiency5min)
+    #expect(eff5 == 6)
   }
 
   @Test func resetReturnValue() {
