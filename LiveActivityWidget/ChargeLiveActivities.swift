@@ -15,7 +15,7 @@ extension ChargeLiveActivityFonts {
   var laUnit: Font   { activityFamily == .small ? DesignTokens.Font.slaUnit   : DesignTokens.Font.mlaUnit   }
   var laTitle: Font  { activityFamily == .small ? DesignTokens.Font.slaTitle  : DesignTokens.Font.mlaTitle  }
   var laLabel: Font  { activityFamily == .small ? DesignTokens.Font.slaLabel  : DesignTokens.Font.mlaLabel  }
-  var laIconFrame: Double  { activityFamily == .small ? 36 : 60 }
+  var laIconFrame: Double  { activityFamily == .small ? 16 : 36 }
 }
 
 struct ChargeLiveActivities: View, ChargeLiveActivityFonts {

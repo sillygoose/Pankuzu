@@ -19,4 +19,11 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
     carPlayController?.disconnect()
     carPlayController = nil
   }
+
+  func templateApplicationScene(
+    _ templateApplicationScene: CPTemplateApplicationScene,
+    openURL url: URL
+  ) {
+    // Bring the CarPlay interface to the foreground when a Live Activity is tapped.
+  }
 }

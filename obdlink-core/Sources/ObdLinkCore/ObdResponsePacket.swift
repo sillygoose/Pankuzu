@@ -160,6 +160,16 @@ extension ObdResponsePacket {
     return v
   }
   
+  public var batteryChargeVoltageRequested: Double? {
+    guard case let .batteryChargeVoltageRequested(v)? = responses[.batteryChargeVoltageRequested]?.response else { return nil }
+    return v
+  }
+
+  public var batteryChargeCurrentRequested: Double? {
+    guard case let .batteryChargeCurrentRequested(v)? = responses[.batteryChargeCurrentRequested]?.response else { return nil }
+    return v
+  }
+  
   public var batteryDistanceToEmpty: Double? {
     guard case let .batteryDistanceToEmpty(v)? = responses[.batteryDistanceToEmpty]?.response else { return nil }
     return v

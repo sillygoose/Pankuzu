@@ -49,7 +49,7 @@ extension VwElectrics {
     case .dcChargeEnergy:
       return dcChargeEnergyResponsePacket(responsePacket)
     case .dcChargeHistory:
-      return dcChargeHistoryPacket(responsePacket)
+      return dcChargeHistoryResponsePacket(responsePacket)
     case .dcChargeEnding:
       return dcChargeEndingResponsePacket(responsePacket)
 
@@ -59,26 +59,30 @@ extension VwElectrics {
   }
 
   private func vehicleCustomizationResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+    let dokoPacket: DokoPacketType = .vehicleCustomization
+    let dokoCommand: DokoCommand = .vehicleCustomization
     var dokoResponses: DokoResponseDictionary = [:]
-    dokoResponses[.nextState] = DokoCommandResponse(command: .vehicleCustomization, response: .nextState(.idle))
-    if let batteryCurrentCapacity = responsePacket.batteryCurrentCapacity,
-       let batteryOriginalCapacity = responsePacket.batteryOriginalCapacity,
-       batteryOriginalCapacity > 0
-    {
-      let batteryStateOfHealth = 100 * batteryCurrentCapacity / batteryOriginalCapacity
-      dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .vehicleCustomization, response: .batteryStateOfHealth(batteryStateOfHealth))
-    }
-    return DokoResponsePacket(type: .vehicleCustomization, responses: dokoResponses)
+    dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(.idle))
+//    if let batteryCurrentCapacity = responsePacket.batteryCurrentCapacity,
+//       let batteryOriginalCapacity = responsePacket.batteryOriginalCapacity,
+//       batteryOriginalCapacity > 0
+//    {
+//      let batteryStateOfHealth = 100 * batteryCurrentCapacity / batteryOriginalCapacity
+//      dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: .vehicleCustomization, response: .batteryStateOfHealth(batteryStateOfHealth))
+//    }
+    return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
 
   func idleResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+    let dokoPacket: DokoPacketType = .idle
+    let dokoCommand: DokoCommand = .idle
     var dokoResponses: DokoResponseDictionary = [:]
     guard
       let gearSelected = responsePacket.gearSelected,
       let acChargerStatus = responsePacket.acChargerStatus,
       let dcChargerStatus = responsePacket.dcChargerStatus
     else {
-      return DokoResponsePacket(type: .idle, responses: dokoResponses)
+      return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
     }
     var nextState: VehicleState {
       if gearSelected { return .tripStarting }
@@ -86,7 +90,7 @@ extension VwElectrics {
       if dcChargerStatus { return .dcChargeStarting }
       return .idle
     }
-    dokoResponses[.nextState] = DokoCommandResponse(command: .idle, response: .nextState(nextState))
-    return DokoResponsePacket(type: .idle, responses: dokoResponses)
+    dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(nextState))
+    return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
 }

@@ -21,11 +21,11 @@ extension CarPlayController {
         guard let self else { return }
         interfaceController.pushTemplate(chargeSessionTemplate!, animated: true, completion: nil)
       },
-      CPGridButton(titleVariants: ["Charger Input"], image: symbol("powerplug.portrait.fill")) { [weak self] _ in
+      CPGridButton(titleVariants: ["Charger Input"], image: symbol("alternatingcurrent")) { [weak self] _ in
         guard let self else { return }
         interfaceController.pushTemplate(chargeInputTemplate!, animated: true, completion: nil)
       },
-      CPGridButton(titleVariants: ["Charger Output"], image: symbol("ev.charger.fill")) { [weak self] _ in
+      CPGridButton(titleVariants: ["Charger Output"], image: symbol("directcurrent")) { [weak self] _ in
         guard let self else { return }
         interfaceController.pushTemplate(chargeOutputTemplate!, animated: true, completion: nil)
       },
@@ -40,17 +40,6 @@ extension CarPlayController {
     template.tabImage = UIImage(systemName: "bolt.car")
     return template
   }
-
-//  private func formatTemperature(_ celsius: Double) -> String {
-//    let t = Measurement(value: celsius, unit: UnitTemperature.celsius)
-//      .converted(to: appSettings.metric ? .celsius : .fahrenheit)
-//    return String(format: "%.0f%@", t.value, t.unit.symbol)
-//  }
-
-//  private func formatDuration(_ duration: Double) -> String {
-//    let duration: Duration = .seconds(duration)
-//    return "\(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 2))))"
-//  }
 
   func makeChargeSessionItems(from responses: DokoResponseDictionary) -> [CPInformationItem] {
     var items: [CPInformationItem] = []

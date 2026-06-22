@@ -50,7 +50,7 @@ extension FordElectrics {
     }
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
-  
+
   func tripInProgressResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     let dokoPacket: DokoPacketType = .tripInProgress
     let dokoCommand: DokoCommand = .tripInProgress
@@ -70,7 +70,7 @@ extension FordElectrics {
     dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(nextState))
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
-  
+
   func tripEndingResponsePacket(_ responsePacket: ObdResponsePacket) async -> DokoResponsePacket {
     let dokoPacket: DokoPacketType = .tripEnding
     let dokoCommand: DokoCommand = .tripEnding
@@ -124,6 +124,17 @@ extension FordElectrics {
 
   func tripUpdateResponsePacket(_ responsePacket: ObdResponsePacket) async -> DokoResponsePacket {
     let dokoPacket: DokoPacketType = .tripUpdate
+    let dokoCommand: DokoCommand = .tripUpdate
+    var dokoResponses: DokoResponseDictionary = [:]
+    guard
+      let position = responsePacket.position
+    else {
+      dokoResponses[.error] = DokoCommandResponse(command: dokoCommand, response: .error("arguments"))
+      return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
+    }
+    defer { responseCache.merge(dokoResponses) { _, new in new } }
+    
+    dokoResponses[.position] = DokoCommandResponse(command: dokoCommand, response: .position(position))
     return DokoResponsePacket(type: dokoPacket, responses: responseCache)
   }
 
@@ -158,8 +169,8 @@ extension FordElectrics {
     var dokoResponses: DokoResponseDictionary = [:]
     guard
       let odometer = responsePacket.odometer,
-      let energyToEmpty = responsePacket.batteryEnergyToEmpty,
-      let stateOfCharge = responsePacket.batteryStateOfCharge,
+      let batteryEnergyToEmpty = responsePacket.batteryEnergyToEmpty,
+      let batteryStateOfCharge = responsePacket.batteryStateOfCharge,
       let batteryTemperature = responsePacket.batteryTemperature
     else {
       dokoResponses[.error] = DokoCommandResponse(command: dokoCommand, response: .error("arguments"))
@@ -174,8 +185,8 @@ extension FordElectrics {
     dokoResponses[.odometer] = DokoCommandResponse(command: dokoCommand, response: .odometer(odometer))
     dokoResponses[.distance] = DokoCommandResponse(command: dokoCommand, response: .distance(distance))
 
-    dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergyToEmpty(energyToEmpty))
-    dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: dokoCommand, response: .batteryStateOfCharge(stateOfCharge))
+    dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergyToEmpty(batteryEnergyToEmpty))
+    dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: dokoCommand, response: .batteryStateOfCharge(batteryStateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: dokoCommand, response: .batteryTemperature(batteryTemperature))
 
     let efficieency = vehicleEfficiency.updateEfficiency(distance, -hvBatteryEnergy.energy)
@@ -196,7 +207,7 @@ extension FordElectrics {
     dokoResponses[.batteryEnergy] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergy(hvBatteryEnergy.energy))
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
-  
+
   func tripWeatherResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     let dokoPacket: DokoPacketType = .tripWeather
     let dokoCommand: DokoCommand = .tripWeather
@@ -213,8 +224,9 @@ extension FordElectrics {
     dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
 
     let newMeanTemperature = vehicleMeanTemperature.updateMeanTemperature(with: weather.temperature)
-    dokoResponses[.weather] = DokoCommandResponse(command: dokoCommand, response: .weather(weather))
     dokoResponses[.meanTemperature] = DokoCommandResponse(command: dokoCommand, response: .meanTemperature(newMeanTemperature))
+
+    dokoResponses[.weather] = DokoCommandResponse(command: dokoCommand, response: .weather(weather))
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
 }

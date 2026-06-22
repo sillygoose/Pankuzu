@@ -45,7 +45,9 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
   
   case batteryVoltage
   case batteryCurrent
-
+  case batteryChargeVoltageRequested
+  case batteryChargeCurrentRequested
+  
   case chargerInputVoltage
   case chargerInputCurrent
   case chargerOutputVoltage
@@ -142,6 +144,10 @@ public enum ObdCommand: Equatable, Hashable, Sendable {
         return ".batteryVoltage"
       case .batteryCurrent:
         return ".batteryCurrent"
+      case .batteryChargeVoltageRequested:
+        return ".batteryChargeVoltageRequested"
+      case .batteryChargeCurrentRequested:
+        return ".batteryChargeCurrentRequested"
 
       case .chargerInputCurrent:
         return ".chargerInputCurrent"
@@ -280,7 +286,7 @@ public enum ObdResponse: Equatable, Sendable {
 
   case batteryDistanceToEmpty(Double)
   case batteryEnergyToEmpty(Double)
-  case batteryStateOfCharge(Double)
+    case batteryStateOfCharge(Double)
   case batteryStateOfHealth(Double)
   case batteryTemperature(Double)
   case batteryOriginalCapacity(Double)
@@ -288,6 +294,8 @@ public enum ObdResponse: Equatable, Sendable {
 
   case batteryVoltage(Double)
   case batteryCurrent(Double)
+  case batteryChargeVoltageRequested(Double)
+  case batteryChargeCurrentRequested(Double)
 
   case chargerInputVoltage(Double)
   case chargerInputCurrent(Double)
@@ -388,6 +396,10 @@ public enum ObdResponse: Equatable, Sendable {
         return String(format: ".batteryVoltage(%.1f)", voltage)
       case .batteryCurrent(let current):
         return String(format: ".batteryCurrent(%.1f)", current)
+      case .batteryChargeVoltageRequested(let voltage):
+        return String(format: ".batteryChargeVoltageRequested(%.1f)", voltage)
+      case .batteryChargeCurrentRequested(let current):
+        return String(format: ".batteryChargeCurrentRequested(%.1f)", current)
 
       case .chargerInputVoltage(let voltage):
         return String(format: ".chargerInputVoltage(%.1fV)", voltage)

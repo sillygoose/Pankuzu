@@ -58,6 +58,8 @@ extension FordMachE {
   }
 
   private func vehicleCustomizationResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+    let dokoPacket: DokoPacketType = .vehicleCustomization
+    let dokoCommand: DokoCommand = .vehicleCustomization
     var dokoResponses: DokoResponseDictionary = [:]
     guard
       let _ = responsePacket.stp,
@@ -66,18 +68,20 @@ extension FordMachE {
     else {
       return DokoResponsePacket(type: .vehicleCustomization, responses: dokoResponses)
     }
-    dokoResponses[.nextState] = DokoCommandResponse(command: .vehicleCustomization, response: .nextState(.idle))
-    return DokoResponsePacket(type: .vehicleCustomization, responses: dokoResponses)
+    dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(.idle))
+    return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
 
   func idleResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+    let dokoPacket: DokoPacketType = .idle
+    let dokoCommand: DokoCommand = .idle
     var dokoResponses: DokoResponseDictionary = [:]
     guard
       let gearSelected = responsePacket.gearSelected,
       let acChargerStatus = responsePacket.acChargerStatus,
       let dcChargerStatus = responsePacket.dcChargerStatus
     else {
-      return DokoResponsePacket(type: .idle, responses: dokoResponses)
+      return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
     }
     var nextState: VehicleState {
       if gearSelected { return .tripStarting }
@@ -85,8 +89,8 @@ extension FordMachE {
       if dcChargerStatus { return .dcChargeStarting }
       return .idle
     }
-    dokoResponses[.nextState] = DokoCommandResponse(command: .idle, response: .nextState(nextState))
-    return DokoResponsePacket(type: .idle, responses: dokoResponses)
+    dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(nextState))
+    return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
  
 }

@@ -28,10 +28,13 @@ public actor VwElectrics: ConnectedVehicleInterface {
   nonisolated public let vehicle: Vehicle?
   nonisolated public let name: String = "VwElectrics"
 
+  public var responseCache: DokoResponseDictionary = [:]
   public var hvBatteryEnergy = PowerEnergyIntegrator()
 
-  public var meanTemperatureSum: Double = 0.0
-  public var meanTemperatureCount: Int = 0
+  public var vehicleOdometer = TripOdometer()
+  public var vehicleDuration = DurationTracker()
+  public var vehicleMeanTemperature = MeanTemperature()
+  public var vehicleEfficiency = TripEfficiency()
 
   public init(
     vehicle: Vehicle?
@@ -116,9 +119,6 @@ public actor VwElectrics: ConnectedVehicleInterface {
     case .tripUpdate:
       return obdCommandPacket(.tripUpdate) {
         .position;
-        .odometer;
-        .batteryStateOfCharge;
-        .batteryTemperature;
       }
 
     case .tripEnding:

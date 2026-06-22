@@ -62,8 +62,16 @@ public actor FordMachE: ConnectedVehicleInterface {
     case .batteryVoltage:                 obdLinkCommand = "STPX h:7E4, d:22480D"
     case .batteryCurrent:                 obdLinkCommand = "STPX h:7E4, d:2248F9"
 
+    case .batteryChargeVoltageRequested:  obdLinkCommand = "STPX h:7E4, d:224844"
+    case .batteryChargeCurrentRequested:  obdLinkCommand = "STPX h:7E4, d:224842"
+
     case .acChargerStatus:                obdLinkCommand = "STPX h:7E4, d:22484F"
     case .dcChargerStatus:                obdLinkCommand = "STPX h:7E4, d:22489E"
+
+    case .chargerInputVoltage:            obdLinkCommand = "STPX h:7E2, d:22485E"
+    case .chargerInputCurrent:            obdLinkCommand = "STPX h:7E2, d:22485F"
+    case .chargerOutputVoltage:           obdLinkCommand = "STPX h:7E4, d:22484A"
+    case .chargerOutputCurrent:           obdLinkCommand = "STPX h:7E4, d:224850"
 
     case .odometer:                       obdLinkCommand = "STPX h:720, d:22404C"
     case .speed:                          obdLinkCommand = "STPX h:7E4, d:22F40D"
@@ -82,7 +90,7 @@ public actor FordMachE: ConnectedVehicleInterface {
  
   private let canbusInitialization = CommandGroup(commands: [.stp(53), .stpbr(500000), .stpo])
   private let acChargerCouplerTemperature = CommandGroup(commands: [.acChargerCouplerTemperature])
-  private let dcChargerCouplerTemperature = CommandGroup(commands: [.dcChargerCouplerTemperature1, .dcChargerCouplerTemperature1])
+  private let dcChargerCouplerTemperature = CommandGroup(commands: [.dcChargerCouplerTemperature1, .dcChargerCouplerTemperature3])
 
   public func translateDokoCommandPacket(using packetType: DokoPacketType) async -> ObdCommandPacket? {
     switch packetType {
@@ -115,6 +123,7 @@ public actor FordMachE: ConnectedVehicleInterface {
 
     case .tripUpdate:
       return obdCommandPacket(packetType) {
+        .position;
       }
 
     case .tripEnding:

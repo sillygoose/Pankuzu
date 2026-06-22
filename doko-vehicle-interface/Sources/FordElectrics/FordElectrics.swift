@@ -59,6 +59,9 @@ public actor FordElectrics: ConnectedVehicleInterface {
 
     case .batteryVoltage:                 obdLinkCommand = "STPX h:7E4, d:22480D"
     case .batteryCurrent:                 obdLinkCommand = "STPX h:7E4, d:2248F9"
+      
+    case .batteryChargeVoltageRequested:  obdLinkCommand = "STPX h:7E4, d:224844"
+    case .batteryChargeCurrentRequested:  obdLinkCommand = "STPX h:7E4, d:224842"
 
     case .acChargerStatus:                obdLinkCommand = "STPX h:7E4, d:22484F"
     case .dcChargerStatus:                obdLinkCommand = "STPX h:7E4, d:22489E"
@@ -116,6 +119,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
 
     case .tripUpdate:
       return obdCommandPacket(packetType) {
+        .position;
       }
 
     case .tripEnding:

@@ -15,7 +15,7 @@ extension TripLiveActivityFonts {
   var laUnit: Font   { activityFamily == .small ? DesignTokens.Font.slaUnit   : DesignTokens.Font.mlaUnit   }
   var laTitle: Font  { activityFamily == .small ? DesignTokens.Font.slaTitle  : DesignTokens.Font.mlaTitle  }
   var laLabel: Font  { activityFamily == .small ? DesignTokens.Font.slaLabel  : DesignTokens.Font.mlaLabel  }
-  var laIconFrame: Double  { activityFamily == .small ? 24 : 45 }
+  var laIconFrame: Double  { activityFamily == .small ? 16 : 36 }
   var laArrowFrame: Double  { activityFamily == .small ? 36 : 60 }
 }
 
@@ -24,14 +24,17 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
   @Environment(\.activityFamily) var activityFamily
 
   var body: some View {
-    switch context.state.tripState {
-    case .starting:
-      StartingView(context: context)
-    case .active:
-      ActiveView(context: context)
-    case .ended:
-      EndedView(context: context)
+    Group {
+      switch context.state.tripState {
+      case .starting:
+        StartingView(context: context)
+      case .active:
+        ActiveView(context: context)
+      case .ended:
+        EndedView(context: context)
+      }
     }
+    .widgetURL(URL(string: "pankuzu://trip")!)
   }
 
   private struct StartingView: View, TripLiveActivityFonts {
@@ -345,4 +348,3 @@ extension TripActivityAttributes.ContentState {
   TripActivityAttributes.ContentState.headWind
   TripActivityAttributes.ContentState.ended
 }
-

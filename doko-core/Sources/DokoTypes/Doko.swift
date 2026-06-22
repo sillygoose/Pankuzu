@@ -233,6 +233,8 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case batteryCurrent
   case batteryPower
   case batteryEnergy
+  case batteryChargeVoltageRequested
+  case batteryChargeCurrentRequested
 
   case chargerInputVoltage
   case chargerInputCurrent
@@ -351,6 +353,7 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".batteryOriginalCapacity"
       case .batteryCurrentCapacity:
         return ".batteryCurrentCapacity"
+        
       case .batteryVoltage:
         return ".batteryVoltage"
       case .batteryCurrent:
@@ -359,6 +362,10 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".batteryPower"
       case .batteryEnergy:
         return ".batteryEnergy"
+      case .batteryChargeVoltageRequested:
+        return ".batteryChargeVoltageRequested"
+      case .batteryChargeCurrentRequested:
+        return ".batteryChargeCurrentRequested"
 
       case .couplerTemperature:
         return ".couplerTemperature"
@@ -435,6 +442,8 @@ public enum DokoResponse: Equatable, Sendable {
   case batteryCurrent(Double)
   case batteryPower(Double)
   case batteryEnergy(Double)
+  case batteryChargeVoltageRequested(Double)
+  case batteryChargeCurrentRequested(Double)
 
   case chargerInputVoltage(Double)
   case chargerInputCurrent(Double)
@@ -510,6 +519,10 @@ public enum DokoResponse: Equatable, Sendable {
         return String(format: ".batteryPower(%.1fkW)", power)
       case .batteryEnergy(let energy):
         return String(format: ".batteryEnergy(%.3fkWh)", energy)
+      case .batteryChargeVoltageRequested(let voltage):
+        return String(format: ".batteryChargeVoltageRequested(%.1fV)", voltage)
+      case .batteryChargeCurrentRequested(let current):
+        return String(format: ".batteryChargeCurrentRequested(%.1fA)", current)
 
       case .couplerTemperature(let temp):
         return String(format: ".couplerTemperature(%.0f℃)", temp)

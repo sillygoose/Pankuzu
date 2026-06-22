@@ -6,6 +6,7 @@ import Dependencies
 @_exported import DokoDesignTokens
 @_exported import DokoExtensions
 
+import DokoTypes
 import DokoLogging
 import DokoSharing
 
@@ -135,32 +136,67 @@ public final class LiveActivityManager {
     DokoLogging.shared.postLoggingResponse(.liveActivity(".startTrip"))
   }
 
-  public func updateTrip(state: TripActivityAttributes.ContentState, staleAfter seconds: TimeInterval = 60) async {
-    @Dependency(\.date.now) var now
+  public func updateTrip(tripData: DokoResponsePacket) async {
     if pendingActivity == .trip { return }
     guard case .trip(let activity)? = managedActivity else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.updateTrip: no activity"))
       return
     }
-    let content = ActivityContent(state: state, staleDate: now.addingTimeInterval(seconds))
+    guard let duration = tripData.duration, let distance = tripData.distance else { return }
+
+    let windSock: WindSock? = if let course = tripData.position?.course, let weather = tripData.weather {
+      WindSock(
+        course: course,
+        temperature: weather.temperature,
+        conditions: weather.conditionSymbol,
+        windSpeed: weather.windSpeed,
+        windDirection: weather.windDirection,
+        windCompassDirection: weather.windCompassDirection
+      )
+    } else { nil }
+    
+    let state = TripActivityAttributes.ContentState(
+      tripState: .active,
+      duration: .seconds(duration),
+      distance: distance,
+      efficiency: tripData.tripEfficiency,
+      elevation: tripData.position?.elevation,
+      rangeConsumed: tripData.batteryDistanceToEmpty,
+      windSock: windSock
+    )
+
+    @Dependency(\.date.now) var now
+    let staleAfter: TimeInterval = 60
+    let content = ActivityContent(state: state, staleDate: now.addingTimeInterval(staleAfter))
     await activity.update(content)
     DokoLogging.shared.postLoggingResponse(.liveActivity(".updateTrip"))
   }
 
-  public func endTrip(state: TripActivityAttributes.ContentState, removeAfter seconds: TimeInterval = 15) async {
-    @Dependency(\.date.now) var now
-    if pendingActivity == .trip { pendingActivity = nil; return }
+  public func endTrip(tripEnd: DokoResponsePacket) async {
+    if pendingActivity == .trip { return }
     guard case .trip(let activity)? = managedActivity else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.endTrip: no activity"))
       return
     }
+    guard let duration = tripEnd.duration, let distance = tripEnd.distance else { return }
+
+    let state = TripActivityAttributes.ContentState(
+      tripState: .ended,
+      duration: .seconds(duration),
+      distance: distance,
+      energy: tripEnd.batteryEnergy.map { $0 },
+      rangeConsumed: tripEnd.batteryDistanceToEmpty.map { $0 },
+    )
+    
+    @Dependency(\.date.now) var now
+    let staleAfter: TimeInterval = 60
     self.managedActivity = nil
     self.pendingActivity = nil
-    await activity.update(ActivityContent(state: state, staleDate: now.addingTimeInterval(seconds)))
+    await activity.update(ActivityContent(state: state, staleDate: now.addingTimeInterval(staleAfter)))
     DokoLogging.shared.postLoggingResponse(.liveActivity(".endTrip"))
     Task {
       try? await Task.sleep(for: .seconds(30))
-      await activity.end(ActivityContent(state: state, staleDate: nil), dismissalPolicy: .after(now.addingTimeInterval(seconds)))
+      await activity.end(ActivityContent(state: state, staleDate: nil), dismissalPolicy: .after(now.addingTimeInterval(staleAfter)))
     }
   }
 
@@ -195,33 +231,63 @@ public final class LiveActivityManager {
     DokoLogging.shared.postLoggingResponse(.liveActivity(".startCharge"))
   }
 
-  public func updateCharge(state: ChargeActivityAttributes.ContentState, staleAfter seconds: TimeInterval = 60) async {
-    @Dependency(\.date.now) var now
+  public func updateCharge(chargeData: DokoResponsePacket) async {
     if pendingActivity == .charge { return }
     guard case .charge(let activity)? = managedActivity else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.updateCharge: no activity"))
       return
     }
-    let content = ActivityContent(state: state, staleDate: now.addingTimeInterval(seconds))
+    guard let duration = chargeData.duration else { return }
+
+    let state = ChargeActivityAttributes.ContentState(
+      chargeState: .active,
+      duration: .seconds(duration),
+      stateOfCharge: chargeData.batteryStateOfCharge,
+      rangeAdded: nil,
+      measuredPower: chargeData.batteryPower.map { $0 },
+      batteryVoltage: chargeData.batteryVoltage.map { $0 },
+      batteryCurrent: chargeData.batteryCurrent.map { $0 },
+      batteryTemperature: chargeData.batteryTemperature.map { $0 },
+      couplerTemperature: chargeData.couplerTemperature.map { $0 },
+    )
+
+    @Dependency(\.date.now) var now
+    let staleAfter: TimeInterval = 60
+    let content = ActivityContent(state: state, staleDate: now.addingTimeInterval(staleAfter))
     await activity.update(content)
     DokoLogging.shared.postLoggingResponse(.liveActivity(".updateCharge"))
   }
 
-  public func endCharge(state: ChargeActivityAttributes.ContentState, removeAfter seconds: TimeInterval = 15) async {
+  public func endCharge(chargeData: DokoResponsePacket) async {
     if pendingActivity == .charge { pendingActivity = nil; return }
     guard case .charge(let activity)? = managedActivity else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.endCharge: no activity"))
       return
     }
+    guard let duration = chargeData.duration else { return }
+
+    let state = ChargeActivityAttributes.ContentState(
+      chargeState: .active,
+      duration: .seconds(duration),
+      stateOfCharge: chargeData.batteryStateOfCharge,
+      rangeAdded: nil,
+      measuredPower: chargeData.batteryPower.map { $0 },
+      batteryVoltage: chargeData.batteryVoltage.map { $0 },
+      batteryCurrent: chargeData.batteryCurrent.map { $0 },
+      batteryTemperature: chargeData.batteryTemperature.map { $0 },
+      couplerTemperature: chargeData.couplerTemperature.map { $0 },
+    )
+    
     @Dependency(\.date.now) var now
+    let staleAfter: TimeInterval = 60
     self.managedActivity = nil
     self.pendingActivity = nil
     let endedState = ChargeActivityAttributes.ContentState(chargeState: .ended)
-    await activity.update(ActivityContent(state: state, staleDate: now.addingTimeInterval(seconds)))
+    await activity.update(ActivityContent(state: state, staleDate: now.addingTimeInterval(staleAfter)))
     DokoLogging.shared.postLoggingResponse(.liveActivity(".endCharge"))
     Task {
       try? await Task.sleep(for: .seconds(30))
-      await activity.end(ActivityContent(state: endedState, staleDate: nil), dismissalPolicy: .after(now.addingTimeInterval(seconds)))
+      await activity.end(ActivityContent(state: endedState, staleDate: nil), dismissalPolicy: .after(now.addingTimeInterval(staleAfter)))
     }
   }
 }

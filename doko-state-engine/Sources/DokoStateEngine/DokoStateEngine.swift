@@ -193,27 +193,7 @@ public final class DokoStateEngine {
             do {
               self.tripInProgress = try Trip.updateTripRecord(tripDraft: tripDraft, tripDataResponse: dokoResponsePacket)
               $tripUpdateResponses.withLock { $0 = dokoResponsePacket.responses }
-              let windSock: WindSock? = if let course = dokoResponsePacket.position?.course, let weather = dokoResponsePacket.weather {
-                WindSock(
-                  course: course,
-                  temperature: weather.temperature,
-                  conditions: weather.conditionSymbol,
-                  windSpeed: weather.windSpeed,
-                  windDirection: weather.windDirection,
-                  windCompassDirection: weather.windCompassDirection
-                )
-              } else { nil }
-              await LiveActivityManager.shared.updateTrip(
-                state: TripActivityAttributes.ContentState(
-                  tripState: .active,
-                  duration: .seconds(tripDraft.duration),
-                  distance: tripDraft.distance,
-                  efficiency: dokoResponsePacket.tripEfficiency,
-                  elevation: tripDraft.elevationEnd,
-                  rangeConsumed: tripDraft.range.map { $0 },
-                  windSock: windSock
-                )
-              )
+              await LiveActivityManager.shared.updateTrip(tripData: dokoResponsePacket)
             } catch let error as StateEngineError {
               DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(error.errorDescription)"))
             } catch {
@@ -226,17 +206,9 @@ public final class DokoStateEngine {
             var nextState = dokoResponsePacket.nextState ?? .tripEnding
             if nextState == .idle {
               do {
-                let finalizedTrip = try Trip.postTripEndRecord(tripDraft: tripDraft, tripEndResponse: dokoResponsePacket)
+                let _ = try Trip.postTripEndRecord(tripDraft: tripDraft, tripEndResponse: dokoResponsePacket)
                 await CoreLocationManager.shared.stopLocationUpdates()
-                await LiveActivityManager.shared.endTrip(
-                  state: TripActivityAttributes.ContentState(
-                    tripState: .ended,
-                    duration: .seconds(finalizedTrip.duration),
-                    distance: finalizedTrip.distance,
-                    energy: finalizedTrip.energy.map { $0 },
-                    rangeConsumed: finalizedTrip.range.map { $0 },
-                  )
-                )
+                await LiveActivityManager.shared.endTrip(tripEnd: dokoResponsePacket)
                 self.tripInProgress = nil
                 $activeSession.withLock { $0 = nil }
               } catch let error as StateEngineError {
@@ -317,33 +289,19 @@ public final class DokoStateEngine {
             $vehicleState.withLock { $0 = nextState }
 
           case .acChargeInProgress:
-            guard case .acChargeInProgress = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
+            guard case .acChargeInProgress = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
             let nextState = dokoResponsePacket.nextState ?? .acChargeInProgress
             if nextState != self.vehicleState { $vehicleState.withLock { $0 = nextState } }
 
           case .acChargeEnding:
-            guard case .acChargeEnding = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
-            guard let chargeDraft = self.chargeInProgress else {
-              throw StateEngineError.chargeArgumentError
-            }
+            guard case .acChargeEnding = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
+            guard let chargeDraft = self.chargeInProgress else { throw StateEngineError.chargeArgumentError }
             var nextState = dokoResponsePacket.nextState ?? .acChargeEnding
             if nextState == .idle {
               do {
-                let finalizedCharge = try Charge.postChargeEndRecord(chargeDraft: chargeDraft, chargeEndResponse: dokoResponsePacket)
+                let _ = try Charge.postChargeEndRecord(chargeDraft: chargeDraft, chargeEndResponse: dokoResponsePacket)
                 self.chargeInProgress = nil
-                await LiveActivityManager.shared.endCharge(
-                  state: ChargeActivityAttributes.ContentState(
-                    chargeState: .ended,
-                    duration: .seconds(finalizedCharge.duration),
-                    stateOfCharge: finalizedCharge.stateOfChargeStart.flatMap { start in finalizedCharge.stateOfChargeEnd.map { end in end - start } },
-                    energy: finalizedCharge.energy.map { $0 },
-                    rangeAdded: finalizedCharge.range.map { $0 },
-                  )
-                )
+                await LiveActivityManager.shared.endCharge(chargeData: dokoResponsePacket)
                 $activeSession.withLock { $0 = nil }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".acChargeEnding: \(String(describing: error))"))
@@ -374,33 +332,19 @@ public final class DokoStateEngine {
             $vehicleState.withLock { $0 = nextState }
 
           case .dcChargeInProgress:
-            guard case .dcChargeInProgress = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
+            guard case .dcChargeInProgress = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
             let nextState = dokoResponsePacket.nextState ?? .dcChargeInProgress
             if nextState != self.vehicleState { $vehicleState.withLock { $0 = nextState } }
 
           case .dcChargeEnding:
-            guard case .dcChargeEnding = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
-            guard let chargeDraft = self.chargeInProgress else {
-              throw StateEngineError.chargeArgumentError
-            }
+            guard case .dcChargeEnding = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
+            guard let chargeDraft = self.chargeInProgress else {  throw StateEngineError.chargeArgumentError }
             var nextState = dokoResponsePacket.nextState ?? .dcChargeEnding
             if nextState == .idle {
               do {
-                let finalizedCharge = try Charge.postChargeEndRecord(chargeDraft: chargeDraft, chargeEndResponse: dokoResponsePacket)
+                let _ = try Charge.postChargeEndRecord(chargeDraft: chargeDraft, chargeEndResponse: dokoResponsePacket)
                 self.chargeInProgress = nil
-                await LiveActivityManager.shared.endCharge(
-                  state: ChargeActivityAttributes.ContentState(
-                    chargeState: .ended,
-                    duration: .seconds(finalizedCharge.duration),
-                    stateOfCharge: finalizedCharge.stateOfChargeStart.flatMap { start in finalizedCharge.stateOfChargeEnd.map { end in end - start } },
-                    energy: finalizedCharge.energy.map { $0 },
-                    rangeAdded: finalizedCharge.range.map { $0 },
-                  )
-                )
+                await LiveActivityManager.shared.endCharge(chargeData: dokoResponsePacket)
                 $activeSession.withLock { $0 = nil }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".dcChargeEnding: \(String(describing: error))"))
@@ -416,31 +360,12 @@ public final class DokoStateEngine {
             break
             
           case .acChargeUpdate, .dcChargeUpdate:
-            guard let chargeDraft = self.chargeInProgress else {
-              throw StateEngineError.chargeDraftError
-            }
-            ABRPManager.shared.sendChargeTelemetry(
-              packet: dokoResponsePacket,
-              isDCFC: dokoResponsePacket.type == .dcChargeUpdate
-            )
+            guard let chargeDraft = self.chargeInProgress else { throw StateEngineError.chargeDraftError }
+            ABRPManager.shared.sendChargeTelemetry( packet: dokoResponsePacket, isDCFC: dokoResponsePacket.type == .dcChargeUpdate )
             do {
               self.chargeInProgress = try Charge.postChargeUpdateRecord(chargeDraft: chargeDraft, chargeUpdateResponse: dokoResponsePacket)
               $chargeUpdateResponses.withLock { $0 = dokoResponsePacket.responses }
-              if let chargeDraft = self.chargeInProgress {
-                await LiveActivityManager.shared.updateCharge(
-                  state: ChargeActivityAttributes.ContentState(
-                    chargeState: .active,
-                    duration: .seconds(chargeDraft.duration),
-                    stateOfCharge: chargeDraft.stateOfChargeEnd,
-                    rangeAdded: nil,
-                    measuredPower: dokoResponsePacket.batteryPower.map { $0 },
-                    batteryVoltage: dokoResponsePacket.batteryVoltage.map { $0 },
-                    batteryCurrent: dokoResponsePacket.batteryCurrent.map { $0 },
-                    batteryTemperature: dokoResponsePacket.batteryTemperature.map { $0 },
-                    couplerTemperature: dokoResponsePacket.couplerTemperature.map { $0 },
-                  )
-                )
-              }
+              await LiveActivityManager.shared.updateCharge(chargeData: dokoResponsePacket)
             } catch {
               DokoLogging.shared.postLoggingResponse(.error(".chargeUpdate: \(String(describing: error))"))
             }

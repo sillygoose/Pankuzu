@@ -47,7 +47,6 @@ extension FordMachE {
       case .speed:
         let speed = try parseSpeed(response)
         commandResponse = .speed(speed)
-
       case .gearSelected:
         let gearSelected = try parseGearSelected(response)
         commandResponse = .gearSelected(gearSelected)
@@ -64,12 +63,32 @@ extension FordMachE {
       case .batteryTemperature:
         let temperature = try parseHvbTemperature(response)
         commandResponse = .batteryTemperature(temperature)
+        
       case .batteryVoltage:
         let voltage = try parseHvbVoltage(response)
         commandResponse = .batteryVoltage(voltage)
       case .batteryCurrent:
         let current = try parseHvbCurrent(response)
         commandResponse = .batteryCurrent(current)
+      case .batteryChargeVoltageRequested:
+        let voltage = try parseHvbChargeVoltageRequested(response)
+        commandResponse = .batteryChargeVoltageRequested(voltage)
+      case .batteryChargeCurrentRequested:
+        let current = try parseHvbChargeCurrentRequested(response)
+        commandResponse = .batteryChargeCurrentRequested(current)
+
+      case .chargerInputVoltage:
+        let voltage = try parseAcChargerInputVoltage(response)
+        commandResponse = .chargerInputVoltage(voltage)
+      case .chargerInputCurrent:
+        let current = try parseAcChargerInputCurrent(response)
+        commandResponse = .chargerInputCurrent(current)
+      case .chargerOutputVoltage:
+        let voltage = try parseChargerOutputVoltage(response)
+        commandResponse = .chargerOutputVoltage(voltage)
+      case .chargerOutputCurrent:
+        let current = try parseChargerOutputCurrent(response)
+        commandResponse = .chargerOutputCurrent(current)
 
       case .acChargerStatus:
         let status = try parseAcChargerStatus(response)
