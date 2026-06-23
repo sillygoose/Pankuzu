@@ -114,9 +114,7 @@ public final class DokoStateEngine {
           DokoLogging.shared.postDokoResponsePacket(responsePacket: dokoResponsePacket)
           switch dokoResponsePacket.type {
           case .reset:
-            guard case .reset = vehicleState else {
-              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
-            }
+            guard case .reset = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
             let nextState = dokoResponsePacket.nextState ?? .reset
             $vehicleState.withLock { $0 = nextState }
 

@@ -10,6 +10,10 @@ final class CarPlayController {
   let interfaceController: CPInterfaceController
 
   private var statusInfoTemplate: CPInformationTemplate?
+  private var tabBarTemplate: CPTabBarTemplate?
+  private var settingsTabTemplate: CPListTemplate?
+  private var tripTabTemplate: CPGridTemplate?
+  private var lastChargeSession: ActiveSession?
 
   var tripOverviewTemplate: CPInformationTemplate?
   var tripEfficiencyTemplate: CPInformationTemplate?
@@ -35,15 +39,22 @@ final class CarPlayController {
 
     let settingsTab = makeSettingsTab(pushing: infoTemplate)
     let tripTab = makeTripTab()
-    let chargeTab = makeChargeTab()
+    let chargeTab = makeChargeTab(for: activeSession)
+    settingsTabTemplate = settingsTab
+    tripTabTemplate = tripTab
 
     let tabBar = CPTabBarTemplate(templates: [settingsTab, tripTab, chargeTab])
+    tabBarTemplate = tabBar
     interfaceController.setRootTemplate(tabBar, animated: false, completion: nil)
     observe()
   }
 
   func disconnect() {
     statusInfoTemplate = nil
+    tabBarTemplate = nil
+    settingsTabTemplate = nil
+    tripTabTemplate = nil
+    lastChargeSession = nil
     chargeSessionTemplate = nil
     chargeInputTemplate = nil
     chargeOutputTemplate = nil
@@ -76,6 +87,15 @@ final class CarPlayController {
 
         tripOverviewTemplate?.items = makeTripOverviewItems(from: tripResponses)
         tripEfficiencyTemplate?.items = makeTripEfficiencyItems(from: tripResponses)
+
+        let chargeSession: ActiveSession? = (activeSession == .acCharge || activeSession == .dcCharge) ? activeSession : nil
+        if chargeSession != lastChargeSession {
+          lastChargeSession = chargeSession
+          if let settings = settingsTabTemplate, let trip = tripTabTemplate {
+            let chargeTab = makeChargeTab(for: chargeSession)
+            tabBarTemplate?.updateTemplates([settings, trip, chargeTab])
+          }
+        }
 
         chargeSessionTemplate?.items = makeChargeSessionItems(from: chargeResponses)
         chargeInputTemplate?.items   = makeChargeInputItems(from: chargeResponses)

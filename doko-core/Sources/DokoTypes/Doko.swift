@@ -213,7 +213,6 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case odometer, distance
   case speed
   
-  case peakPower
   case tripEfficiency
   case tripEfficiency5Minute, tripEfficiency10Minute, tripEfficiency15Minute
 
@@ -240,7 +239,8 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case chargerInputCurrent
   case chargerInputPower
   case chargerInputEnergy
-  
+  case chargerInputPeakPower
+
   case chargerOutputVoltage
   case chargerOutputCurrent
   case chargerOutputPower
@@ -328,8 +328,6 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
       case .speed:
         return ".speed"
 
-      case .peakPower:
-        return ".peakPower"
       case .tripEfficiency:
         return ".tripEfficiency"
       case .tripEfficiency5Minute:
@@ -382,6 +380,8 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".chargerInputPeakPower"
       case .chargerInputEnergy:
         return ".chargerInputEnergy"
+      case .chargerInputPeakPower:
+        return ".chargerInputPeakPower"
 
       case .chargerOutputCurrent:
         return ".chargerOutputCurrent"
@@ -422,7 +422,6 @@ public enum DokoResponse: Equatable, Sendable {
   case distance(Double)
   case speed(Double)
   
-  case peakPower(Double)
   case tripEfficiency(Double)
   case tripEfficiency5Minute(Double), tripEfficiency10Minute(Double), tripEfficiency15Minute(Double)
 
@@ -449,6 +448,7 @@ public enum DokoResponse: Equatable, Sendable {
   case chargerInputCurrent(Double)
   case chargerInputPower(Double)
   case chargerInputEnergy(Double)
+  case chargerInputPeakPower(Double)
 
   case chargerOutputVoltage(Double)
   case chargerOutputCurrent(Double)
@@ -485,8 +485,6 @@ public enum DokoResponse: Equatable, Sendable {
       case .speed(let speed):
         return String(format: ".speed(%.1fkph)", speed)
         
-      case .peakPower(let power):
-        return String(format: ".peakPower(%.1fkW)", power)
       case .tripEfficiency(let efficiency):
         return String(format: ".tripEfficiency(%.1fkm/kWh)", efficiency)
       case .tripEfficiency5Minute(let efficiency):
@@ -539,6 +537,8 @@ public enum DokoResponse: Equatable, Sendable {
         return String(format: ".chargerInputPower(%.1fkW)", power)
       case .chargerInputEnergy(let energy):
         return String(format: ".chargerInputEnergy(%.3fkWh)", energy)
+      case .chargerInputPeakPower(let power):
+        return String(format: ".chargerInputPeakPower(%.1fkW)", power)
 
       case .chargerOutputVoltage(let voltage):
         return String(format: ".chargerOutputVoltage(%.1fV)", voltage)
@@ -690,6 +690,4 @@ extension DokoResponsePacket {
     guard case let .batteryEnergy(v)? = responses[.batteryEnergy]?.response else { return nil }
     return v
   }
-
-  //### inpput/output charging 
 }

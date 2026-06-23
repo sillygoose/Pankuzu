@@ -190,10 +190,10 @@ extension FordMachE {
     }
     dokoResponses[.batteryEnergy] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergy(hvBatteryEnergy.energy))
 
-    if let chargerInputPower = chargerInputEnergy.power {
-      dokoResponses[.chargerInputPower] = DokoCommandResponse(command: dokoCommand, response: .chargerInputPower(chargerInputPower))
-    }
-    dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: dokoCommand, response: .chargerInputEnergy(chargerInputEnergy.energy))
+//    if let chargerInputPower = chargerInputEnergy.power {
+//      dokoResponses[.chargerInputPower] = DokoCommandResponse(command: dokoCommand, response: .chargerInputPower(chargerInputPower))
+//    }
+//    dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: dokoCommand, response: .chargerInputEnergy(chargerInputEnergy.energy))
 
     if let chargerOutputPower = chargerOutputEnergy.power {
       dokoResponses[.chargerOutputPower] = DokoCommandResponse(command: dokoCommand, response: .chargerOutputPower(chargerOutputPower))

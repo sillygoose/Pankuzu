@@ -5,10 +5,10 @@ import DokoSharing
 import DokoTypes
 
 extension CarPlayController {
-  func makeChargeTab() -> CPGridTemplate {
-    chargeSessionTemplate = CPInformationTemplate(title: "Session", layout: .leading, items: [], actions: [])
-    chargeInputTemplate   = CPInformationTemplate(title: "Charger Input",   layout: .leading, items: [], actions: [])
-    chargeOutputTemplate  = CPInformationTemplate(title: "Charger Output",  layout: .leading, items: [], actions: [])
+  func makeChargeTab(for session: ActiveSession?) -> CPGridTemplate {
+    chargeSessionTemplate = CPInformationTemplate(title: "Session",            layout: .leading, items: [], actions: [])
+    chargeInputTemplate   = CPInformationTemplate(title: "Charger Input",      layout: .leading, items: [], actions: [])
+    chargeOutputTemplate  = CPInformationTemplate(title: "Charger Output",     layout: .leading, items: [], actions: [])
     chargeBatteryTemplate = CPInformationTemplate(title: "High Voltage Battery", layout: .leading, items: [], actions: [])
 
     let symbolConfig = UIImage.SymbolConfiguration(pointSize: 44, weight: .regular)
@@ -16,15 +16,31 @@ extension CarPlayController {
       UIImage(systemName: name, withConfiguration: symbolConfig)!.withRenderingMode(.alwaysTemplate)
     }
 
-    let buttons = [
+    var buttons: [CPGridButton] = [
       CPGridButton(titleVariants: ["Session"], image: symbol("gauge.medium")) { [weak self] _ in
         guard let self else { return }
         interfaceController.pushTemplate(chargeSessionTemplate!, animated: true, completion: nil)
       },
-      CPGridButton(titleVariants: ["Charger Input"], image: symbol("alternatingcurrent")) { [weak self] _ in
-        guard let self else { return }
-        interfaceController.pushTemplate(chargeInputTemplate!, animated: true, completion: nil)
-      },
+    ]
+
+    // AC charging has an onboard charger with measurable input; DC bypasses it.
+    if session == .acCharge {
+      buttons.append(
+        CPGridButton(titleVariants: ["Charger Input"], image: symbol("ev.plug.ac.type.2")) { [weak self] _ in
+          guard let self else { return }
+          interfaceController.pushTemplate(chargeInputTemplate!, animated: true, completion: nil)
+        }
+      )
+    } else {
+      buttons.append(
+        CPGridButton(titleVariants: ["Charger Input"], image: symbol("ev.plug.dc.ccs2")) { [weak self] _ in
+          guard let self else { return }
+          interfaceController.pushTemplate(chargeInputTemplate!, animated: true, completion: nil)
+        }
+      )
+    }
+
+    buttons += [
       CPGridButton(titleVariants: ["Charger Output"], image: symbol("directcurrent")) { [weak self] _ in
         guard let self else { return }
         interfaceController.pushTemplate(chargeOutputTemplate!, animated: true, completion: nil)
@@ -45,7 +61,7 @@ extension CarPlayController {
     var items: [CPInformationItem] = []
     if case let .duration(v)?                       = responses[.duration]?.response                { items.append(.init(title: "Duration",           detail: formatDuration(v))) }
     if case let .chargerInputPower(v)?              = responses[.chargerInputPower]?.response       { items.append(.init(title: "Charger Power",      detail: String(format: "%.1f kW", v))) }
-    if case let .peakPower(v)?                      = responses[.peakPower]?.response               { items.append(.init(title: "Peak Power",         detail: String(format: "%.1f kW",  v))) }
+    if case let .chargerInputPeakPower(v)?                      = responses[.chargerInputPeakPower]?.response               { items.append(.init(title: "Peak Power",         detail: String(format: "%.1f kW",  v))) }
     if case let .batteryStateOfCharge(v)?           = responses[.batteryStateOfCharge]?.response    { items.append(.init(title: "State of Charge",    detail: String(format: "%.0f%%", v))) }
     if case let .batteryStateOfHealth(v)?           = responses[.batteryStateOfHealth]?.response    { items.append(.init(title: "State of Heallth",   detail: String(format: "%.0f%%", v))) }
     if case let .batteryEnergy(v)?                  = responses[.batteryEnergy]?.response           { items.append(.init(title: "Energy Added",       detail: String(format: "%.3f kWh", v))) }
@@ -62,7 +78,7 @@ extension CarPlayController {
     if case let .chargerInputVoltage(v)?          = responses[.chargerInputVoltage]?.response          { items.append(.init(title: "Voltage",       detail: String(format: "%.1f V",   v))) }
     if case let .chargerInputCurrent(v)?          = responses[.chargerInputCurrent]?.response          { items.append(.init(title: "Current",       detail: String(format: "%.1f A",   v))) }
     if case let .chargerInputPower(v)?            = responses[.chargerInputPower]?.response            { items.append(.init(title: "Power",         detail: String(format: "%.1f kW",  v))) }
-    if case let .peakPower(v)?                    = responses[.peakPower]?.response                    { items.append(.init(title: "Peak Power",    detail: String(format: "%.1f kW",  v))) }
+    if case let .chargerInputPeakPower(v)?        = responses[.chargerInputPeakPower]?.response        { items.append(.init(title: "Peak Power",    detail: String(format: "%.1f kW",  v))) }
     if case let .chargerInputEnergy(v)?           = responses[.chargerInputEnergy]?.response           { items.append(.init(title: "Energy",        detail: String(format: "%.3f kWh", v))) }
     if case let .couplerTemperature(v)?           = responses[.couplerTemperature]?.response           { items.append(.init(title: "Coupler Temp",  detail: formatTemperature(v))) }
     if case let .secondaryCouplerTemperature(v)?  = responses[.secondaryCouplerTemperature]?.response  { items.append(.init(title: "Coupler Temp2", detail: formatTemperature(v))) }

@@ -128,7 +128,7 @@ extension FordElectrics {
         dokoResponses[.chargerInputVoltage] = DokoCommandResponse(command: dokoCommand, response: .chargerInputVoltage(inputVoltage))
         dokoResponses[.chargerInputCurrent] = DokoCommandResponse(command: dokoCommand, response: .chargerInputCurrent(inputCurrent))
         dokoResponses[.chargerInputPower] = DokoCommandResponse(command: dokoCommand, response: .chargerInputPower(inputPower))
-        dokoResponses[.peakPower] = DokoCommandResponse(command: dokoCommand, response: .peakPower(chargerInputEnergy.peakPower))
+        dokoResponses[.chargerInputPeakPower] = DokoCommandResponse(command: dokoCommand, response: .chargerInputPeakPower(chargerInputEnergy.peakPower))
         dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: dokoCommand, response: .chargerInputEnergy(inputEnergy))
       }
     }

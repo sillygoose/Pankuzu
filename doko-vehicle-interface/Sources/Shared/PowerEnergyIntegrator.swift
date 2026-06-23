@@ -11,8 +11,7 @@ public struct PowerEnergyIntegrator: Sendable {
 
   public init() {}
 
-  @discardableResult
-  public mutating func reset() -> Double {
+  public mutating func reset() {
     voltage = nil
     current = nil
     power = nil
@@ -20,7 +19,6 @@ public struct PowerEnergyIntegrator: Sendable {
     energy = 0
     previousPower = nil
     previousUpdate = nil
-    return energy
   }
 
   @discardableResult

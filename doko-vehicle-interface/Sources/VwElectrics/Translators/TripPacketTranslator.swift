@@ -21,9 +21,7 @@ extension VwElectrics {
     defer { responseCache = [:]; responseCache.merge(dokoResponses) { _, new in new } }
 
     vehicleMeanTemperature.reset()
-
-    let energy = hvBatteryEnergy.reset()
-    dokoResponses[.batteryEnergy] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergy(energy))
+    hvBatteryEnergy.reset()
 
     let duration = vehicleDuration.reset()
     dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(duration))
