@@ -5,7 +5,7 @@ public struct PowerEnergyIntegrator: Sendable {
   public private(set) var current: Double?
   public private(set) var power: Double?
   public private(set) var peakPower: Double = 0
-  public private(set) var energy: Double = 0
+  public private(set) var energy: Double?
   private var previousPower: Double?
   private var previousUpdate: Date?
 
@@ -16,7 +16,7 @@ public struct PowerEnergyIntegrator: Sendable {
     current = nil
     power = nil
     peakPower = 0
-    energy = 0
+    energy = nil
     previousPower = nil
     previousUpdate = nil
   }
@@ -27,7 +27,7 @@ public struct PowerEnergyIntegrator: Sendable {
     peakPower = max(peakPower, newPower)
     if let lastTime = previousUpdate, let lastPower = previousPower {
       let deltaHours = date.timeIntervalSince(lastTime) / 3600.0
-      energy += (lastPower + newPower) / 2.0 * deltaHours
+      energy = (energy ?? 0) + (lastPower + newPower) / 2.0 * deltaHours
     }
     previousPower = newPower
     previousUpdate = date

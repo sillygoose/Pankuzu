@@ -195,7 +195,7 @@ struct PowerEnergyIntegratorTests {
     #expect(i.current == nil)
     #expect(i.power == nil)
     #expect(i.peakPower == 0)
-    #expect(i.energy == 0)
+    #expect(i.energy == nil)
   }
 
   @Test func resetClearsAll() {
@@ -206,43 +206,43 @@ struct PowerEnergyIntegratorTests {
     i.reset()
     #expect(i.power == nil)
     #expect(i.peakPower == 0)
-    #expect(i.energy == 0)
+    #expect(i.energy == nil)
   }
 
   @Test func firstCallStoresPowerButNoEnergy() {
     var i = PowerEnergyIntegrator()
     let result = i.integrate(power: 10, at: Date())
     #expect(i.power == 10)
-    #expect(result == 0)   // no previous time → no energy yet
-    #expect(i.energy == 0)
+    #expect(result == nil)   // no previous time → no energy yet
+    #expect(i.energy == nil)
   }
 
-  @Test func trapezoidalIntegrationConstantPower() {
+  @Test func trapezoidalIntegrationConstantPower() throws {
     // 2 kW constant over 1 hour → 2 kWh
     var i = PowerEnergyIntegrator()
     let t0 = Date()
     i.integrate(power: 2, at: t0)
-    let result = i.integrate(power: 2, at: t0.addingTimeInterval(3600))
+    let result = #require(i.integrate(power: 2, at: t0.addingTimeInterval(3600)))
     #expect(result == 2)
     #expect(i.energy == 2)
   }
 
-  @Test func trapezoidalIntegrationRampingPower() {
+  @Test func trapezoidalIntegrationRampingPower() throws {
     // 0 kW → 4 kW over 1 hour → average 2 kW → 2 kWh
     var i = PowerEnergyIntegrator()
     let t0 = Date()
     i.integrate(power: 0, at: t0)
-    let result = i.integrate(power: 4, at: t0.addingTimeInterval(3600))
+    let result = #require(i.integrate(power: 4, at: t0.addingTimeInterval(3600)))
     #expect(result == 2)
   }
 
-  @Test func energyAccumulatesAcrossMultipleCalls() {
+  @Test func energyAccumulatesAcrossMultipleCalls() throws {
     // Hour 1: 2 kW constant → 2 kWh; Hour 2: 2→4 kW → 3 kWh; total 5 kWh
     var i = PowerEnergyIntegrator()
     let t0 = Date()
     i.integrate(power: 2, at: t0)
     i.integrate(power: 2, at: t0.addingTimeInterval(3600))
-    let result = i.integrate(power: 4, at: t0.addingTimeInterval(7200))
+    let result = #require(i.integrate(power: 4, at: t0.addingTimeInterval(7200)))
     #expect(result == 5)
   }
 
@@ -255,12 +255,12 @@ struct PowerEnergyIntegratorTests {
     #expect(i.peakPower == 7)
   }
 
-  @Test func voltageCurrentIntegration() {
+  @Test func voltageCurrentIntegration() throws {
     // 100 V × 10 A = 1000 W = 1.0 kW; over 1 hour = 1.0 kWh
     var i = PowerEnergyIntegrator()
     let t0 = Date()
     i.integrate(voltage: 100, current: 10, at: t0)
-    let result = i.integrate(voltage: 100, current: 10, at: t0.addingTimeInterval(3600))
+    let result = #require(i.integrate(voltage: 100, current: 10, at: t0.addingTimeInterval(3600)))
     #expect(i.voltage == 100)
     #expect(i.current == 10)
     #expect(i.power == 1.0)
