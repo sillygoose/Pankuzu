@@ -3,17 +3,17 @@ import DokoDebug
 
 private struct stpxParser: Parser {
   var body: some Parser<Substring.UTF8View, Double> {
-    "624848".utf8
-    UInt16ToDouble()
+    "62490C".utf8
+    UInt8ToDouble()
   }
 }
 
-func parseHvbEnergyToEmpty(_ input: String) throws -> Double {
+public func parseHvbStateOfHealth(_ input: String) throws -> Double {
 #if DEBUG
   @Shared(.simIdle) var simIdle
-  if simIdle { return 75.0 }
+  if simIdle { return 95 }
 #endif
   var input = input[...].utf8
-  let ete = try stpxParser().parse(&input)
-  return ete * 2.0 * 0.001
+  let soh = try stpxParser().parse(&input)
+  return soh * 0.5
 }

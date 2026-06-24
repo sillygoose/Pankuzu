@@ -8,7 +8,7 @@ private struct stpxParser: Parser {
   }
 }
 
-func parseHvbEnergyToEmpty(_ input: String) throws -> Double {
+public func parseHvbEnergyToEmpty(_ input: String) throws -> Double {
 #if DEBUG
   @Shared(.simIdle) var simIdle
   if simIdle { return 75.0 }

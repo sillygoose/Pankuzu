@@ -7,6 +7,7 @@ import DokoWeatherManager
 import CoreLocationManager
 
 import VehicleCommon
+import FordCommon
 
 extension FordElectrics {
   public func vehicleObdCommandResponse(_ command: ObdCommand, _ response: String, rawCommand: String) async -> ObdCommandResponse {

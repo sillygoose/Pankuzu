@@ -36,7 +36,7 @@ private struct stpxParser: Parser {
   }
 }
 
-func parseDcChargerStatus(_ input: String) throws -> Bool {
+public func parseDcChargerStatus(_ input: String) throws -> Bool {
 #if DEBUG
   @Shared(.simIdle) var simIdle
   @Shared(.simDcCharge) var simDcCharge

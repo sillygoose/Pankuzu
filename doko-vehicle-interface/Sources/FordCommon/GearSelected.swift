@@ -34,7 +34,7 @@ private struct stpxParser: Parser {
   }
 }
 
-func parseGearSelected(_ input: String) throws -> Bool {
+public func parseGearSelected(_ input: String) throws -> Bool {
 #if DEBUG
   @Shared(.simIdle) var simIdle
   @Shared(.simTrip) var simTrip

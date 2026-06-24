@@ -3,20 +3,17 @@ import DokoDebug
 
 private struct stpxParser: Parser {
   var body: some Parser<Substring.UTF8View, Double> {
-    "62485E".utf8
-    Int16ToDouble()
+    "624844".utf8
+    UInt8ToDouble()
   }
 }
 
-func parseAcChargerInputVoltage(_ input: String) throws -> Double {
+public func parseHvbChargeVoltageRequested(_ input: String) throws -> Double {
 #if DEBUG
   @Shared(.simIdle) var simIdle
-  @Shared(.simAcCharge) var simAcCharge
-  if simIdle {
-    return simAcCharge ? 240 : 0
-  }
+  if simIdle { return 350 }
 #endif
   var input = input[...].utf8
   let voltage = try stpxParser().parse(&input)
-  return voltage * 0.01
+  return voltage * 2
 }

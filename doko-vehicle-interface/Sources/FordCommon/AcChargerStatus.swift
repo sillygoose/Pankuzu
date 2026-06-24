@@ -1,19 +1,17 @@
 import VehicleCommon
 import DokoDebug
 
-private enum DcChargerStatus: Int {
+private enum AcChargerStatus: Int {
   case unknown = 255
   case notReady = 0
-  case initializing = 1
-  case ready = 2
+  case ready = 1
+  case fault = 2
   case wchk = 3
   case preC = 4
   case charging = 5
   case done = 6
-  case wait = 8
-  case ncap = 9
-  case fault = 10
-  case cchk = 11
+  case extC = 7
+  case initializing = 8
 }
 
 private struct chargerStatus: Parser {
@@ -24,23 +22,23 @@ private struct chargerStatus: Parser {
       let byte = UInt8(String(decoding: prefix, as: UTF8.self), radix: 16)
     else { throw ParsingError() }
     input.removeFirst(2)
-    let chargerStatus = DcChargerStatus(rawValue: Int(byte)) ?? .unknown
+    let chargerStatus = AcChargerStatus(rawValue: Int(byte)) ?? .unknown
     return chargerStatus == .charging
   }
 }
 
 private struct stpxParser: Parser {
   var body: some Parser<Substring.UTF8View, Bool> {
-    "62489E".utf8
+    "62484F".utf8
     chargerStatus()
   }
 }
 
-func parseDcChargerStatus(_ input: String) throws -> Bool {
+public func parseAcChargerStatus(_ input: String) throws -> Bool {
 #if DEBUG
   @Shared(.simIdle) var simIdle
-  @Shared(.simDcCharge) var simDcCharge
-  if simIdle { return simDcCharge }
+  @Shared(.simAcCharge) var simAcCharge
+  if simIdle { return simAcCharge }
 #endif
   var input = input[...].utf8
   let status = try stpxParser().parse(&input)

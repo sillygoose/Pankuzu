@@ -14,6 +14,7 @@ let package = Package(
     .library(name: "FordMachE", targets: ["FordMachE"]),
     .library(name: "VwElectrics", targets: ["VwElectrics"]),
     .library(name: "VehicleCommon", targets: ["VehicleCommon"]),
+    .library(name: "FordCommon", targets: ["FordCommon"]),
   ],
   dependencies: [
     .package(path: "../doko-core"),
@@ -53,6 +54,7 @@ let package = Package(
       dependencies: [
         "VehicleInterface",
         "VehicleCommon",
+        "FordCommon",
         .product(name: "ObdLinkCore", package: "obdlink-core"),
         .product(name: "Vehicles", package: "doko-schema"),
         .product(name: "DokoTypes", package: "doko-core"),
@@ -68,6 +70,7 @@ let package = Package(
       dependencies: [
         "VehicleInterface",
         "VehicleCommon",
+        "FordCommon",
         .product(name: "ObdLinkCore", package: "obdlink-core"),
         .product(name: "Vehicles", package: "doko-schema"),
         .product(name: "DokoTypes", package: "doko-core"),
@@ -99,8 +102,15 @@ let package = Package(
         .product(name: "Parsing", package: "swift-parsing"),
       ]
     ),
+    .target(
+      name: "FordCommon",
+      dependencies: [
+        "VehicleCommon",
+        .product(name: "DokoDebug", package: "doko-debug"),
+      ]
+    ),
     .testTarget(
-      name: "SharedTests",
+      name: "VehicleCommonTests",
       dependencies: [
         "VehicleCommon",
       ]

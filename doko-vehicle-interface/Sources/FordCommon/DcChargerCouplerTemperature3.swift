@@ -3,16 +3,16 @@ import DokoDebug
 
 private struct stpxParser: Parser {
   var body: some Parser<Substring.UTF8View, Double> {
-    "624888".utf8
+    "6248A4".utf8
     UInt8ToDouble()
   }
 }
 
-func parseAcChargerCouplerTemperature(_ input: String) throws -> Double {
+public func parseDcChargerCouplerTemperature3(_ input: String) throws -> Double {
 #if DEBUG
   @Shared(.simIdle) var simIdle
-  @Shared(.simAcCharge) var simAcCharge
-  if simIdle { return 50 }
+  @Shared(.simDcCharge) var simDcCharge
+  if simIdle { return 60 }
 #endif
   var input = input[...].utf8
   let temp = try stpxParser().parse(&input)

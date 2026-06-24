@@ -3,23 +3,25 @@ import DokoDebug
 
 private struct stpxParser: Parser {
   var body: some Parser<Substring.UTF8View, Double> {
-    "624850".utf8
+    "6248F9".utf8
     Int16ToDouble()
   }
 }
 
-func parseChargerOutputCurrent(_ input: String) throws -> Double {
+public func parseHvbCurrent(_ input: String) throws -> Double {
 #if DEBUG
   @Shared(.simIdle) var simIdle
+  @Shared(.simTrip) var simTrip
   @Shared(.simAcCharge) var simAcCharge
   @Shared(.simDcCharge) var simDcCharge
   if simIdle {
-    if simAcCharge { return 26 }
-    if simDcCharge { return 200 }
-    return 0
+    if simTrip { return -80 }
+    if simAcCharge { return 28 }
+    if simDcCharge { return 300 }
+    return -4
   }
 #endif
   var input = input[...].utf8
   let current = try stpxParser().parse(&input)
-  return current * 0.01
+  return current * -0.1
 }
