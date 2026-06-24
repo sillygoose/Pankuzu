@@ -4,7 +4,6 @@ import SwiftUI
 @main
 struct LiveActivityWidgetBundle: WidgetBundle {
   var body: some Widget {
-    //###PankuzuWidget()
     TripLiveActivityWidget()
     ChargeLiveActivityWidget()
   }

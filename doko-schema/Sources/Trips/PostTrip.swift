@@ -140,74 +140,10 @@ extension Trip {
     return tripDraft
   }
 
-//  public static func postTripUpdateRecord( //### delete
-//    tripDraft: Trip.Draft,
-//    tripUpdateResponse: DokoResponsePacket
-//  ) throws -> Trip.Draft {
-//    guard
-//      let position = tripUpdateResponse.position,
-//      let odometer = tripUpdateResponse.odometer
-//    else {
-//      throw TripError.tripArgumentError
-//    }
-//    var tripDraft = tripDraft
-//
-//    tripDraft.destinationID = DokoLocationManager.shared.updateLocation(
-//      id: tripDraft.destinationID,
-//      latitude: position.latitude, longitude: position.longitude, elevation: position.elevation,
-//      sharedLocation: false
-//    )
-//
-//    tripDraft.latitudeEnd = position.latitude
-//    tripDraft.longitudeEnd = position.longitude
-//    tripDraft.elevationEnd = position.elevation
-//
-//    tripDraft.timeEnd = tripUpdateResponse.completedAt
-//    tripDraft.duration = tripUpdateResponse.completedAt.timeIntervalSince(tripDraft.timeStart)
-//    
-//    tripDraft.odometerEnd = odometer
-//    tripDraft.distance = odometer - tripDraft.odometerStart
-//
-//    tripDraft.energyToEmptyEnd = tripUpdateResponse.batteryEnergyToEmpty
-//    tripDraft.energy = tripUpdateResponse.batteryEnergy.map { -$0 }
-//
-//    tripDraft.distanceToEmptyEnd = tripUpdateResponse.batteryDistanceToEmpty
-//    tripDraft.range = tripDraft.distanceToEmptyStart.flatMap { start in tripUpdateResponse.batteryDistanceToEmpty.map { end in start - end } }
-//    
-//    tripDraft.stateOfChargeEnd = tripUpdateResponse.batteryStateOfCharge
-//    tripDraft.batteryTempEnd = tripUpdateResponse.batteryTemperature
-//
-//    if let weather = tripUpdateResponse.weather {
-//      tripDraft.weatherTempEnd = weather.temperature
-//      tripDraft.weatherConditionsEnd = weather.conditionSymbol
-//      if tripDraft.weatherTempStart == nil {
-//        tripDraft.weatherTempStart = weather.temperature
-//      }
-//      if tripDraft.weatherConditionsStart == nil {
-//        tripDraft.weatherConditionsStart = weather.conditionSymbol
-//      }
-//    }
-//
-//    @Dependency(\.defaultDatabase) var database
-//    withErrorReporting {
-//      try database.write { db in
-//        try Trip.upsert { tripDraft }.fetchOne(db)
-//      }
-//    }
-//    return tripDraft
-//  }
-  
   public static func updateTripRecord(
     tripDraft: Trip.Draft,
     tripDataResponse: DokoResponsePacket
   ) throws -> Trip.Draft {
-//    guard
-//      let position = tripDataResponse.position,
-//      let odometer = tripDataResponse.odometer,
-//      let distance = tripDataResponse.distance
-//    else {
-//      throw TripError.tripArgumentError
-//    }
     var tripDraft = tripDraft
 
     if let position = tripDataResponse.position {
@@ -251,7 +187,6 @@ extension Trip {
       tripDraft.batteryTempEnd = batteryTemperature
     }
 
-    //### check the rest
     if let weather = tripDataResponse.weather {
       tripDraft.weatherTempEnd = weather.temperature
       tripDraft.weatherConditionsEnd = weather.conditionSymbol
