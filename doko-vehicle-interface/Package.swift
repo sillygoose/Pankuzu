@@ -13,7 +13,7 @@ let package = Package(
     .library(name: "FordElectrics", targets: ["FordElectrics"]),
     .library(name: "FordMachE", targets: ["FordMachE"]),
     .library(name: "VwElectrics", targets: ["VwElectrics"]),
-    .library(name: "Shared", targets: ["Shared"]),
+    .library(name: "VehicleCommon", targets: ["VehicleCommon"]),
   ],
   dependencies: [
     .package(path: "../doko-core"),
@@ -39,7 +39,7 @@ let package = Package(
       name: "UndeterminedVehicle",
       dependencies: [
         "VehicleInterface",
-        "Shared",
+        "VehicleCommon",
         .product(name: "ObdLinkCore", package: "obdlink-core"),
         .product(name: "DokoTypes", package: "doko-core"),
         .product(name: "Vehicles", package: "doko-schema"),
@@ -52,7 +52,7 @@ let package = Package(
       name: "FordElectrics",
       dependencies: [
         "VehicleInterface",
-        "Shared",
+        "VehicleCommon",
         .product(name: "ObdLinkCore", package: "obdlink-core"),
         .product(name: "Vehicles", package: "doko-schema"),
         .product(name: "DokoTypes", package: "doko-core"),
@@ -67,7 +67,7 @@ let package = Package(
       name: "FordMachE",
       dependencies: [
         "VehicleInterface",
-        "Shared",
+        "VehicleCommon",
         .product(name: "ObdLinkCore", package: "obdlink-core"),
         .product(name: "Vehicles", package: "doko-schema"),
         .product(name: "DokoTypes", package: "doko-core"),
@@ -82,7 +82,7 @@ let package = Package(
       name: "VwElectrics",
       dependencies: [
         "VehicleInterface",
-        "Shared",
+        "VehicleCommon",
         .product(name: "ObdLinkCore", package: "obdlink-core"),
         .product(name: "Vehicles", package: "doko-schema"),
         .product(name: "DokoTypes", package: "doko-core"),
@@ -94,7 +94,7 @@ let package = Package(
       ]
     ),
     .target(
-      name: "Shared",
+      name: "VehicleCommon",
       dependencies: [
         .product(name: "Parsing", package: "swift-parsing"),
       ]
@@ -102,7 +102,7 @@ let package = Package(
     .testTarget(
       name: "SharedTests",
       dependencies: [
-        "Shared",
+        "VehicleCommon",
       ]
     ),
   ],

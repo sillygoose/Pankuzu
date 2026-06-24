@@ -1,6 +1,6 @@
 import Testing
 import Foundation
-import Shared
+import VehicleCommon
 
 // Minimal controllable clock for tests. A class so that advancing it is
 // visible through the reference stored inside TripEfficiency.

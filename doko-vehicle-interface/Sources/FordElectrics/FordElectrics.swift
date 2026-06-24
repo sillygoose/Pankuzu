@@ -5,7 +5,7 @@ import DokoLogging
 import VehicleInterface
 import ObdLinkCore
 import Vehicles
-import Shared
+import VehicleCommon
 
 private struct CommandGroup {
   let commands: [ObdCommand]

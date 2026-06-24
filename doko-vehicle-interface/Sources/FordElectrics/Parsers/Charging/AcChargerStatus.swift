@@ -1,4 +1,4 @@
-import Shared
+import VehicleCommon
 import DokoDebug
 
 private enum AcChargerStatus: Int {

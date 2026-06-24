@@ -1,5 +1,5 @@
 import Testing
-import Shared
+import VehicleCommon
 
 @Suite("OBD-Link Parsers")
 struct ObdLinkParserTests {

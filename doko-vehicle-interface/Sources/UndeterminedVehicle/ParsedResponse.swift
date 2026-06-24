@@ -3,7 +3,7 @@ import OSLog
 import DokoLogging
 import ObdLinkCore
 
-import Shared
+import VehicleCommon
 
 extension UndeterminedVehicle {
   public func vehicleObdCommandResponse(_ command: ObdCommand, _ response: String, rawCommand: String) async -> ObdCommandResponse {
