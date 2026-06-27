@@ -12,7 +12,7 @@ private struct odometerParser: Parser {
   }
 }
 
-func parseOdometer(_ input: String) throws -> Double {
+public func parseOdometer(_ input: String) throws -> Double {
 #if DEBUG
   @Shared(.simIdle) var simIdle
   if simIdle {

@@ -6,6 +6,7 @@ import VehicleInterface
 import ObdLinkCore
 import Vehicles
 import VehicleCommon
+import FordCommon
 
 private struct CommandGroup {
   let commands: [ObdCommand]

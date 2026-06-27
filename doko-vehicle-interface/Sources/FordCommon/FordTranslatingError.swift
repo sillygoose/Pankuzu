@@ -3,8 +3,7 @@ import Foundation
 import DokoTypes
 import ObdLinkCore
 
-extension FordMachE {
-  public enum ParsedResponseError: Error, LocalizedError {
+public enum ParsedResponseError: Error, LocalizedError {
     case unexpectedCommand(ObdCommand, String)
     case unexpectedState(VehicleState)
     case locationUnavailable
@@ -22,5 +21,4 @@ extension FordMachE {
         "Request for weather failed"
       }
     }
-  }
 }

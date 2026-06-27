@@ -8,7 +8,7 @@ private struct speedParser: Parser {
   }
 }
 
-func parseSpeed(_ input: String) throws -> Double {
+public func parseSpeed(_ input: String) throws -> Double {
 #if DEBUG
   @Shared(.simIdle) var simIdle
   @Shared(.simTrip) var simTrip

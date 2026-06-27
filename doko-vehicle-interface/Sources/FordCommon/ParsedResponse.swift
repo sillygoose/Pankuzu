@@ -7,14 +7,23 @@ import DokoWeatherManager
 import CoreLocationManager
 
 import VehicleCommon
-import FordCommon
 
-extension FordElectrics {
+extension FordTranslating {
   public func vehicleObdCommandResponse(_ command: ObdCommand, _ response: String, rawCommand: String) async -> ObdCommandResponse {
     let result: ObdResult = .ok
     do {
       var commandResponse: ObdResponse
       switch command {
+      case .stp(let canProtocol):
+        try parseSTP(response)
+        commandResponse = .stp(canProtocol)
+      case .stpbr(let baudRate):
+        try parseSTPBR(response)
+        commandResponse = .stpbr(baudRate)
+      case .stpo:
+        try parseSTPO(response)
+        commandResponse = .stpo(response)
+
       case .position:
         guard let position = await CoreLocationManager.shared.currentLocation else {
           throw ParsedResponseError.locationUnavailable
@@ -33,10 +42,10 @@ extension FordElectrics {
         commandResponse = .weather(currentWeather)
 
       case .odometer:
-        let odometer = try parseOdometer(response)
+        let odometer = try parseVehicleOdometer(response)
         commandResponse = .odometer(odometer)
       case .speed:
-        let speed = try parseSpeed(response)
+        let speed = try parseVehicleSpeed(response)
         commandResponse = .speed(speed)
       case .gearSelected:
         let gearSelected = try parseGearSelected(response)
@@ -54,7 +63,7 @@ extension FordElectrics {
       case .batteryTemperature:
         let temperature = try parseHvbTemperature(response)
         commandResponse = .batteryTemperature(temperature)
-        
+
       case .batteryVoltage:
         let voltage = try parseHvbVoltage(response)
         commandResponse = .batteryVoltage(voltage)

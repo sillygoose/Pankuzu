@@ -106,6 +106,11 @@ let package = Package(
       name: "FordCommon",
       dependencies: [
         "VehicleCommon",
+        .product(name: "DokoTypes", package: "doko-core"),
+        .product(name: "ObdLinkCore", package: "obdlink-core"),
+        .product(name: "CoreLocationManager", package: "doko-managers"),
+        .product(name: "DokoWeatherManager", package: "doko-managers"),
+        .product(name: "DokoLogging", package: "doko-logging"),
         .product(name: "DokoDebug", package: "doko-debug"),
       ]
     ),
