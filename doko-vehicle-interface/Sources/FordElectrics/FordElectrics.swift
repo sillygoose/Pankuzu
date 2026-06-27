@@ -24,7 +24,7 @@ private func obdCommandPacket(_ type: DokoPacketType, @ObdCommandsBuilder _ comm
 }
 
 public actor FordElectrics: ConnectedVehicleInterface {
-  let logger = Logger(subsystem: "com.unchan.doko", category: "FordElectrics")
+  public let logger = Logger(subsystem: "com.unchan.doko", category: "FordElectrics")
 
   nonisolated public let vehicle: Vehicle?
   nonisolated public let name: String = "FordElectrics"

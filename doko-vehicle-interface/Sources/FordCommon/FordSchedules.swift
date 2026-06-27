@@ -63,7 +63,7 @@ let dcChargeEndingDokoCommandSchedule: StateEngineDokoSchedule = [
 
 extension FordTranslating {
   public func createStateScheduler(for state: VehicleState) async -> StateEngineDokoSchedule? {
-    logger.info("\(timestamp()) \(logName).createStateScheduler(\(state.description))")
+    logger.info("\(timestamp()) \(self.logName).createStateScheduler(\(state.description))")
     switch state {
     case .vehicleCustomization: return vehicleCustomizationDokoCommandSchedule
     case .idle:                 return idleDokoCommandSchedule
@@ -77,8 +77,8 @@ extension FordTranslating {
     case .dcChargeInProgress:   return dcChargeInProgressDokoCommandSchedule
     case .dcChargeEnding:       return dcChargeEndingDokoCommandSchedule
     default:
-      logger.error("\(timestamp()) \(logName).createStateScheduler: No scheduler for state '\(state.description)'")
-      DokoLogging.shared.postLoggingResponse(.error("\(logName).createStateScheduler: No scheduler for state '\(state.description)'"))
+      logger.error("\(timestamp()) \(self.logName).createStateScheduler: No scheduler for state '\(state.description)'")
+      DokoLogging.shared.postLoggingResponse(.error("\(self.logName).createStateScheduler: No scheduler for state '\(state.description)'"))
       return nil
     }
   }
