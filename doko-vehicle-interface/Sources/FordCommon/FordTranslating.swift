@@ -1,7 +1,10 @@
+import OSLog
 import DokoTypes
 import VehicleCommon
 
 public protocol FordTranslating: Actor {
+  var logger: Logger { get }
+  var logName: String { get }
   var responseCache: DokoResponseDictionary { get set }
   var hvBatteryEnergy: PowerEnergyIntegrator { get set }
   var chargerInputEnergy: PowerEnergyIntegrator { get set }
