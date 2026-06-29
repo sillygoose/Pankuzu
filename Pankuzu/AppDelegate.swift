@@ -3,8 +3,6 @@ import UIKit
 import UserNotifications
 import CarPlay
 
-import PushNotifications
-
 import CoreLocationManager
 import DokoNotificationManager
 import DokoLogging
@@ -30,20 +28,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
   ) -> Bool {
     UNUserNotificationCenter.current().delegate = DokoNotificationManager.shared
 
-    let locationsHandler = CoreLocationManager.shared
-    locationsHandler.restoreBackgroundSession()
-    /*
-     Bug — line 35: self-assignment no-op
-       if locationsHandler.backgroundActivity {
-           locationsHandler.backgroundActivity = true  // sets true when already true
-       }
-       This only sets the property when it's already true, doing nothing. The intent looks like it should restart background
-       activity on launch — probably should be locationsHandler.startBackgroundActivity() or unconditionally set, depending
-       on what the API expects.
-     */
-
-    PushNotifications.shared.start(instanceId: "###")
-    PushNotifications.shared.registerForRemoteNotifications()
+    CoreLocationManager.shared.restoreBackgroundSession()
     return true
   }
   
@@ -51,7 +36,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     _ application: UIApplication,
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
   ) {
-    PushNotifications.shared.registerDeviceToken(deviceToken)
     let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
     DokoLogging.shared.postLoggingResponse(.info("Device token: \(tokenString)"))
   }
