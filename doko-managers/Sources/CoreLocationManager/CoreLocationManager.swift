@@ -21,6 +21,11 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
     }
   }
 
+  public func restoreBackgroundSession() {
+    guard backgroundActivity else { return }
+    background = CLBackgroundActivitySession()
+  }
+
   public var authorizationStatus: CLAuthorizationStatus = .notDetermined
 
   private var authorizationContinuation: CheckedContinuation<CLAuthorizationStatus, Never>?
