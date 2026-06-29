@@ -164,7 +164,7 @@ public final class DokoStateEngine {
                   tripStartResponse: dokoResponsePacket
                 )
                 await CoreLocationManager.shared.startPacketUpdates()
-                await LiveActivityManager.shared.startTrip()
+                Task { await LiveActivityManager.shared.startTrip() }
                 $activeSession.withLock { $0 = .trip }
               } catch let error as StateEngineError {
                 DokoLogging.shared.postLoggingResponse(.error(".tripStarting: \(error.errorDescription)"))
@@ -191,7 +191,7 @@ public final class DokoStateEngine {
             do {
               self.tripInProgress = try Trip.updateTripRecord(tripDraft: tripDraft, tripDataResponse: dokoResponsePacket)
               $tripUpdateResponses.withLock { $0 = dokoResponsePacket.responses }
-              await LiveActivityManager.shared.updateTrip(tripData: dokoResponsePacket)
+              Task { await LiveActivityManager.shared.updateTrip(tripData: dokoResponsePacket) }
             } catch let error as StateEngineError {
               DokoLogging.shared.postLoggingResponse(.error(".tripUpdate: \(error.errorDescription)"))
             } catch {
@@ -206,7 +206,7 @@ public final class DokoStateEngine {
               do {
                 let _ = try Trip.postTripEndRecord(tripDraft: tripDraft, tripEndResponse: dokoResponsePacket)
                 await CoreLocationManager.shared.stopLocationUpdates()
-                await LiveActivityManager.shared.endTrip(tripEnd: dokoResponsePacket)
+                Task { await LiveActivityManager.shared.endTrip(tripEnd: dokoResponsePacket) }
                 self.tripInProgress = nil
                 $activeSession.withLock { $0 = nil }
               } catch let error as StateEngineError {
@@ -277,7 +277,7 @@ public final class DokoStateEngine {
                   chargeStartResponse: dokoResponsePacket
                 )
                 await CoreLocationManager.shared.stopLocationUpdates()
-                await LiveActivityManager.shared.startCharge()
+                Task { await LiveActivityManager.shared.startCharge() }
                 $activeSession.withLock { $0 = .acCharge }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".acChargeStarting: \(String(describing: error))"))
@@ -299,7 +299,7 @@ public final class DokoStateEngine {
               do {
                 let _ = try Charge.postChargeEndRecord(chargeDraft: chargeDraft, chargeEndResponse: dokoResponsePacket)
                 self.chargeInProgress = nil
-                await LiveActivityManager.shared.endCharge(chargeData: dokoResponsePacket)
+                Task { await LiveActivityManager.shared.endCharge(chargeData: dokoResponsePacket) }
                 $activeSession.withLock { $0 = nil }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".acChargeEnding: \(String(describing: error))"))
@@ -320,7 +320,7 @@ public final class DokoStateEngine {
                   chargeStartResponse: dokoResponsePacket
                 )
                 await CoreLocationManager.shared.stopLocationUpdates()
-                await LiveActivityManager.shared.startCharge()
+                Task { await LiveActivityManager.shared.startCharge() }
                 $activeSession.withLock { $0 = .dcCharge }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".dcChargeStarting: \(String(describing: error))"))
@@ -342,7 +342,7 @@ public final class DokoStateEngine {
               do {
                 let _ = try Charge.postChargeEndRecord(chargeDraft: chargeDraft, chargeEndResponse: dokoResponsePacket)
                 self.chargeInProgress = nil
-                await LiveActivityManager.shared.endCharge(chargeData: dokoResponsePacket)
+                Task { await LiveActivityManager.shared.endCharge(chargeData: dokoResponsePacket) }
                 $activeSession.withLock { $0 = nil }
               } catch {
                 DokoLogging.shared.postLoggingResponse(.error(".dcChargeEnding: \(String(describing: error))"))
@@ -363,7 +363,7 @@ public final class DokoStateEngine {
             do {
               self.chargeInProgress = try Charge.postChargeUpdateRecord(chargeDraft: chargeDraft, chargeUpdateResponse: dokoResponsePacket)
               $chargeUpdateResponses.withLock { $0 = dokoResponsePacket.responses }
-              await LiveActivityManager.shared.updateCharge(chargeData: dokoResponsePacket)
+              Task { await LiveActivityManager.shared.updateCharge(chargeData: dokoResponsePacket) }
             } catch {
               DokoLogging.shared.postLoggingResponse(.error(".chargeUpdate: \(String(describing: error))"))
             }
