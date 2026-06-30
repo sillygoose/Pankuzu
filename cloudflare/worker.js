@@ -34,13 +34,14 @@ async function handleTripStart(body, env) {
     )
   }
   const deviceToken = pushToken
-  const apnsHost = apnsEnvironment === "production"
-    ? "api.push.apple.com"
-    : "api.development.push.apple.com"
+  const isProd = apnsEnvironment === "production"
+  const apnsHost = isProd ? "api.push.apple.com" : "api.development.push.apple.com"
+  const apnsKey = isProd ? env.APNS_KEY_PROD : env.APNS_KEY_SANDBOX
+  const apnsKeyId = isProd ? env.APNS_KEY_ID_PROD : env.APNS_KEY_ID_SANDBOX
 
   let jwt
   try {
-    jwt = await makeApnsJwt(env.APNS_KEY, env.APNS_KEY_ID, env.APNS_TEAM_ID)
+    jwt = await makeApnsJwt(apnsKey, apnsKeyId, env.APNS_TEAM_ID)
   } catch (e) {
     return new Response("JWT signing failed: " + e.message, { status: 500 })
   }

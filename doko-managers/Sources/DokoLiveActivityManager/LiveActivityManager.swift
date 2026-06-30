@@ -353,6 +353,7 @@ public final class LiveActivityManager {
 
   private func sendWorkerRequest(path: String, body: [String: String]) async {
     let base = Bundle.main.object(forInfoDictionaryKey: "WorkerBaseURL") as? String ?? ""
+    logger.info("WorkerBaseURL: '\(base)'")
     guard let url = URL(string: "\(base)/\(path)") else { return }
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
