@@ -4,6 +4,8 @@
 <dict>
 	<key>ABRPAPIKey</key>
 	<string>$(ABRP_API_KEY)</string>
+	<key>WorkerBaseURL</key>
+	<string>$(WORKER_BASE_URL)</string>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.unchan.pankuzu.daily-pruning</string>

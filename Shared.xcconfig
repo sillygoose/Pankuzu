@@ -1,4 +1,7 @@
 // Shared build configuration
-// Local overrides (like DEVELOPMENT_TEAM) go in Local.xcconfig
+// Local overrides go in Local.xcconfig (gitignored). Required keys:
+//   DEVELOPMENT_TEAM       = <your Apple team ID>
+//   ABRP_API_KEY           = <your ABRP API key>
+//   WORKER_BASE_URL        = <your Cloudflare Worker URL for Live Activity push-to-start>
 
 #include? "Local.xcconfig"

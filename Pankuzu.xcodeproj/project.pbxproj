@@ -629,6 +629,7 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "'Always' location permission is required to record trips and charge sessions when this app is not in the foreground. Location information is only used in Pankuzu and is not shared.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to record your trips and charge sessions and is required for use. Location data is collected only when recording an activity and is never shared.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -671,6 +672,7 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "'Always' location permission is required to record trips and charge sessions when this app is not in the foreground. Location information is only used in Pankuzu and is not shared.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to record your trips and charge sessions and is required for use. Location data is collected only when recording an activity and is never shared.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;

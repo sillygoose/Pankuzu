@@ -29,15 +29,16 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     UNUserNotificationCenter.current().delegate = DokoNotificationManager.shared
 
     CoreLocationManager.shared.restoreBackgroundSession()
+    UIApplication.shared.registerForRemoteNotifications()
     return true
   }
-  
+
   func application(
     _ application: UIApplication,
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
   ) {
-    let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-    DokoLogging.shared.postLoggingResponse(.info("Device token: \(tokenString)"))
+    let tokenString = deviceToken.map { String(format: "%02x", $0) }.joined()
+    DokoLogging.shared.postLoggingResponse(.connect("Device token: \(tokenString)"))
   }
 
   func application(
