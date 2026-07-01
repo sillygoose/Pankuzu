@@ -112,6 +112,7 @@ public final class StateOfHealthHistoryModel {
 
 public struct StateOfHealthHistoryView: View {
   @Bindable var model: StateOfHealthHistoryModel
+  @State private var selectedDate: Date?
 
   @Environment(\.dismiss) var dismiss
 
@@ -124,6 +125,11 @@ public struct StateOfHealthHistoryView: View {
   var yMin: Double {
     guard let min = model.points.map(\.soh).min() else { return 0 }
     return floor((min - 10) / 10) * 10
+  }
+
+  var selectedPoint: StateOfHealthPoint? {
+    guard let date = selectedDate else { return nil }
+    return model.points.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) })
   }
 
   public var body: some View {
@@ -164,6 +170,11 @@ public struct StateOfHealthHistoryView: View {
             }
           }
         }
+
+        if let point = selectedPoint {
+          RuleMark(x: .value("Date", point.date))
+            .foregroundStyle(Color.primary.opacity(0.3))
+        }
       }
       .chartYScale(domain: yMin...102)
       .chartYAxis {
@@ -186,7 +197,25 @@ public struct StateOfHealthHistoryView: View {
           AxisValueLabel(format: model.displayPeriod.axisFormat)
         }
       }
+      .chartXSelection(value: $selectedDate)
       .chartLegend(.hidden)
+      .overlay(alignment: .topLeading) {
+        if let point = selectedPoint {
+          VStack(alignment: .leading, spacing: 2) {
+            Text(String(format: "%.1f%%", point.soh))
+              .font(.caption.bold())
+            Text(point.date, format: .dateTime.month(.abbreviated).day().year(.twoDigits))
+              .font(.caption2)
+              .foregroundStyle(.secondary)
+          }
+          .padding(.horizontal, 8)
+          .padding(.vertical, 5)
+          .background(Color(.systemBackground).opacity(0.95))
+          .clipShape(RoundedRectangle(cornerRadius: 6))
+          .shadow(radius: 2)
+          .padding(8)
+        }
+      }
       .frame(maxHeight: .infinity)
       .padding(.horizontal)
 

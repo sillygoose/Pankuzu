@@ -13,6 +13,7 @@ public struct ExploreView: View {
   @Bindable var model: ExploreModel
 
   @State private var isAddingCharge = false
+  @State private var isShowingStateOfHealth = false
   @State private var path = NavigationPath()
 
   public init(model: ExploreModel) {
@@ -55,6 +56,14 @@ public struct ExploreView: View {
           ) {
             path.append(Destination.tripEfficiency)
           }
+
+          GridButton(
+            color: .teal,
+            symbolName: "waveform.path.ecg",
+            title: "Battery State of Health"
+          ) {
+            isShowingStateOfHealth = true
+          }
         }
         .buttonStyle(.plain)
         .listRowBackground(Color.clear)
@@ -72,6 +81,12 @@ public struct ExploreView: View {
           .navigationBarTitleDisplayMode(.inline)
           .presentationDetents([.large])
         }
+      }
+      .sheet(isPresented: $isShowingStateOfHealth) {
+        NavigationStack {
+          StateOfHealthExploreView()
+        }
+        .presentationDetents([.medium])
       }
       .navigationDestination(for: Destination.self) { destination in
         switch destination {
