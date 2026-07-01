@@ -6,7 +6,7 @@ import DokoLiveActivityManager
 
 struct TripLiveActivityWidget: Widget {
   var body: some WidgetConfiguration {
-    ActivityConfiguration(for: TripActivityAttributes.self) { context in
+    ActivityConfiguration(for: WindSockActivityAttributes.self) { context in
       TripLiveActivities(context: context)
     } dynamicIsland: { context in
       DynamicIsland {
@@ -33,15 +33,15 @@ struct TripLiveActivityWidget: Widget {
   }
 }
 
-extension TripActivityAttributes {
-  fileprivate static var preview: TripActivityAttributes {
-    TripActivityAttributes()
+extension WindSockActivityAttributes {
+  fileprivate static var preview: WindSockActivityAttributes {
+    WindSockActivityAttributes()
   }
 }
 
-extension TripActivityAttributes.ContentState {
-  fileprivate static var starting: TripActivityAttributes.ContentState {
-    TripActivityAttributes.ContentState(
+extension WindSockActivityAttributes.ContentState {
+  fileprivate static var starting: WindSockActivityAttributes.ContentState {
+    WindSockActivityAttributes.ContentState(
       tripState: .starting,
       duration: .seconds(0),
       distance: 0,
@@ -57,8 +57,8 @@ extension TripActivityAttributes.ContentState {
     )
   }
 
-  fileprivate static var active: TripActivityAttributes.ContentState {
-    TripActivityAttributes.ContentState(
+  fileprivate static var active: WindSockActivityAttributes.ContentState {
+    WindSockActivityAttributes.ContentState(
       tripState: .active,
       duration: .seconds(3661),
       distance: 42.5,
@@ -74,8 +74,8 @@ extension TripActivityAttributes.ContentState {
     )
   }
 
-  fileprivate static var ended: TripActivityAttributes.ContentState {
-    TripActivityAttributes.ContentState(
+  fileprivate static var ended: WindSockActivityAttributes.ContentState {
+    WindSockActivityAttributes.ContentState(
       tripState: .ended,
       duration: .seconds(7200),
       distance: 85.0,
@@ -84,26 +84,26 @@ extension TripActivityAttributes.ContentState {
   }
 }
 
-#Preview("Dynamic Island: Minimal", as: .dynamicIsland(.minimal), using: TripActivityAttributes.preview) {
+#Preview("Dynamic Island: Minimal", as: .dynamicIsland(.minimal), using: WindSockActivityAttributes.preview) {
   TripLiveActivityWidget()
 } contentStates: {
-  TripActivityAttributes.ContentState.starting
-  TripActivityAttributes.ContentState.active
-  TripActivityAttributes.ContentState.ended
+  WindSockActivityAttributes.ContentState.starting
+  WindSockActivityAttributes.ContentState.active
+  WindSockActivityAttributes.ContentState.ended
 }
 
-#Preview("Dynamic Island: Compact", as: .dynamicIsland(.compact), using: TripActivityAttributes.preview) {
+#Preview("Dynamic Island: Compact", as: .dynamicIsland(.compact), using: WindSockActivityAttributes.preview) {
   TripLiveActivityWidget()
 } contentStates: {
-  TripActivityAttributes.ContentState.starting
-  TripActivityAttributes.ContentState.active
-  TripActivityAttributes.ContentState.ended
+  WindSockActivityAttributes.ContentState.starting
+  WindSockActivityAttributes.ContentState.active
+  WindSockActivityAttributes.ContentState.ended
 }
 
-#Preview("Dynamic Island: Expanded", as: .dynamicIsland(.expanded), using: TripActivityAttributes.preview) {
+#Preview("Dynamic Island: Expanded", as: .dynamicIsland(.expanded), using: WindSockActivityAttributes.preview) {
   TripLiveActivityWidget()
 } contentStates: {
-  TripActivityAttributes.ContentState.starting
-  TripActivityAttributes.ContentState.active
-  TripActivityAttributes.ContentState.ended
+  WindSockActivityAttributes.ContentState.starting
+  WindSockActivityAttributes.ContentState.active
+  WindSockActivityAttributes.ContentState.ended
 }

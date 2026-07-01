@@ -20,7 +20,7 @@ extension TripLiveActivityFonts {
 }
 
 struct TripLiveActivities: View, TripLiveActivityFonts {
-  let context: ActivityViewContext<TripActivityAttributes>
+  let context: ActivityViewContext<WindSockActivityAttributes>
   @Environment(\.activityFamily) var activityFamily
 
   var body: some View {
@@ -38,7 +38,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
   }
 
   private struct StartingView: View, TripLiveActivityFonts {
-    let context: ActivityViewContext<TripActivityAttributes>
+    let context: ActivityViewContext<WindSockActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily
 
@@ -55,7 +55,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
   }
 
   private struct ActiveView: View, TripLiveActivityFonts {
-    let context: ActivityViewContext<TripActivityAttributes>
+    let context: ActivityViewContext<WindSockActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily
     
@@ -142,7 +142,7 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
   }
 
   private struct EndedView : View, TripLiveActivityFonts {
-    let context: ActivityViewContext<TripActivityAttributes>
+    let context: ActivityViewContext<WindSockActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily
     
@@ -281,19 +281,19 @@ struct TripLiveActivities: View, TripLiveActivityFonts {
   }
 }
 
-extension TripActivityAttributes {
-  fileprivate static var preview: TripActivityAttributes {
-    TripActivityAttributes()
+extension WindSockActivityAttributes {
+  fileprivate static var preview: WindSockActivityAttributes {
+    WindSockActivityAttributes()
   }
 }
 
-extension TripActivityAttributes.ContentState {
-  fileprivate static var starting: TripActivityAttributes.ContentState {
-    TripActivityAttributes.ContentState(tripState: .starting)
+extension WindSockActivityAttributes.ContentState {
+  fileprivate static var starting: WindSockActivityAttributes.ContentState {
+    WindSockActivityAttributes.ContentState(tripState: .starting)
   }
 
-  fileprivate static var headWind: TripActivityAttributes.ContentState {
-    TripActivityAttributes.ContentState(
+  fileprivate static var headWind: WindSockActivityAttributes.ContentState {
+    WindSockActivityAttributes.ContentState(
       tripState: .active,
       duration: .seconds(1000),
       distance: 22.0,
@@ -311,8 +311,8 @@ extension TripActivityAttributes.ContentState {
     )
   }
 
-  fileprivate static var tailWind: TripActivityAttributes.ContentState {
-    TripActivityAttributes.ContentState(
+  fileprivate static var tailWind: WindSockActivityAttributes.ContentState {
+    WindSockActivityAttributes.ContentState(
       tripState: .active,
       duration: .seconds(1000),
       distance: 22.0,
@@ -329,8 +329,8 @@ extension TripActivityAttributes.ContentState {
     )
   }
 
-  fileprivate static var ended: TripActivityAttributes.ContentState {
-    TripActivityAttributes.ContentState(
+  fileprivate static var ended: WindSockActivityAttributes.ContentState {
+    WindSockActivityAttributes.ContentState(
       tripState: .ended,
       duration: .seconds(1000),
       distance: 22.0,
@@ -340,11 +340,11 @@ extension TripActivityAttributes.ContentState {
   }
 }
 
-#Preview("Trip Live Activity", as: .content, using: TripActivityAttributes.preview) {
+#Preview("Trip Live Activity", as: .content, using: WindSockActivityAttributes.preview) {
   TripLiveActivityWidget()
 } contentStates: {
-  TripActivityAttributes.ContentState.starting
-  TripActivityAttributes.ContentState.tailWind
-  TripActivityAttributes.ContentState.headWind
-  TripActivityAttributes.ContentState.ended
+  WindSockActivityAttributes.ContentState.starting
+  WindSockActivityAttributes.ContentState.tailWind
+  WindSockActivityAttributes.ContentState.headWind
+  WindSockActivityAttributes.ContentState.ended
 }
