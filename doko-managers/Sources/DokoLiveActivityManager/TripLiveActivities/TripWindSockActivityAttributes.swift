@@ -27,7 +27,7 @@ public struct WindSock: Codable, Hashable, Sendable {
   }
 }
 
-public struct WindSockActivityAttributes: ActivityAttributes, Sendable {
+public struct TripWindSockActivityAttributes: ActivityAttributes, Sendable {
   public let tripID: UUID
 
   public init(tripID: UUID = UUID()) {

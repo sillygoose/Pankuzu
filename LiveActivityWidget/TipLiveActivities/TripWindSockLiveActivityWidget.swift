@@ -4,10 +4,10 @@ import WidgetKit
 
 import DokoLiveActivityManager
 
-struct TripLiveActivityWidget: Widget {
+struct TripWindSockLiveActivityWidget: Widget {
   var body: some WidgetConfiguration {
-    ActivityConfiguration(for: WindSockActivityAttributes.self) { context in
-      TripLiveActivities(context: context)
+    ActivityConfiguration(for: TripWindSockActivityAttributes.self) { context in
+      TripWindSockLiveActivity(context: context)
     } dynamicIsland: { context in
       DynamicIsland {
         DynamicIslandExpandedRegion(.leading) {
@@ -33,15 +33,15 @@ struct TripLiveActivityWidget: Widget {
   }
 }
 
-extension WindSockActivityAttributes {
-  fileprivate static var preview: WindSockActivityAttributes {
-    WindSockActivityAttributes()
+extension TripWindSockActivityAttributes {
+  fileprivate static var preview: TripWindSockActivityAttributes {
+    TripWindSockActivityAttributes()
   }
 }
 
-extension WindSockActivityAttributes.ContentState {
-  fileprivate static var starting: WindSockActivityAttributes.ContentState {
-    WindSockActivityAttributes.ContentState(
+extension TripWindSockActivityAttributes.ContentState {
+  fileprivate static var starting: TripWindSockActivityAttributes.ContentState {
+    TripWindSockActivityAttributes.ContentState(
       tripState: .starting,
       duration: .seconds(0),
       distance: 0,
@@ -57,8 +57,8 @@ extension WindSockActivityAttributes.ContentState {
     )
   }
 
-  fileprivate static var active: WindSockActivityAttributes.ContentState {
-    WindSockActivityAttributes.ContentState(
+  fileprivate static var active: TripWindSockActivityAttributes.ContentState {
+    TripWindSockActivityAttributes.ContentState(
       tripState: .active,
       duration: .seconds(3661),
       distance: 42.5,
@@ -74,8 +74,8 @@ extension WindSockActivityAttributes.ContentState {
     )
   }
 
-  fileprivate static var ended: WindSockActivityAttributes.ContentState {
-    WindSockActivityAttributes.ContentState(
+  fileprivate static var ended: TripWindSockActivityAttributes.ContentState {
+    TripWindSockActivityAttributes.ContentState(
       tripState: .ended,
       duration: .seconds(7200),
       distance: 85.0,
@@ -84,26 +84,26 @@ extension WindSockActivityAttributes.ContentState {
   }
 }
 
-#Preview("Dynamic Island: Minimal", as: .dynamicIsland(.minimal), using: WindSockActivityAttributes.preview) {
-  TripLiveActivityWidget()
+#Preview("Dynamic Island: Minimal", as: .dynamicIsland(.minimal), using: TripWindSockActivityAttributes.preview) {
+  TripWindSockLiveActivityWidget()
 } contentStates: {
-  WindSockActivityAttributes.ContentState.starting
-  WindSockActivityAttributes.ContentState.active
-  WindSockActivityAttributes.ContentState.ended
+  TripWindSockActivityAttributes.ContentState.starting
+  TripWindSockActivityAttributes.ContentState.active
+  TripWindSockActivityAttributes.ContentState.ended
 }
 
-#Preview("Dynamic Island: Compact", as: .dynamicIsland(.compact), using: WindSockActivityAttributes.preview) {
-  TripLiveActivityWidget()
+#Preview("Dynamic Island: Compact", as: .dynamicIsland(.compact), using: TripWindSockActivityAttributes.preview) {
+  TripWindSockLiveActivityWidget()
 } contentStates: {
-  WindSockActivityAttributes.ContentState.starting
-  WindSockActivityAttributes.ContentState.active
-  WindSockActivityAttributes.ContentState.ended
+  TripWindSockActivityAttributes.ContentState.starting
+  TripWindSockActivityAttributes.ContentState.active
+  TripWindSockActivityAttributes.ContentState.ended
 }
 
-#Preview("Dynamic Island: Expanded", as: .dynamicIsland(.expanded), using: WindSockActivityAttributes.preview) {
-  TripLiveActivityWidget()
+#Preview("Dynamic Island: Expanded", as: .dynamicIsland(.expanded), using: TripWindSockActivityAttributes.preview) {
+  TripWindSockLiveActivityWidget()
 } contentStates: {
-  WindSockActivityAttributes.ContentState.starting
-  WindSockActivityAttributes.ContentState.active
-  WindSockActivityAttributes.ContentState.ended
+  TripWindSockActivityAttributes.ContentState.starting
+  TripWindSockActivityAttributes.ContentState.active
+  TripWindSockActivityAttributes.ContentState.ended
 }

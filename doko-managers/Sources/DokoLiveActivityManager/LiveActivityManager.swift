@@ -26,14 +26,14 @@ public final class LiveActivityManager {
 
   private func endOrphanedActivities() {
     Task {
-      for activity in Activity<WindSockActivityAttributes>.activities {
-        let final = WindSockActivityAttributes.ContentState(tripState: .ended)
+      for activity in Activity<TripWindSockActivityAttributes>.activities {
+        let final = TripWindSockActivityAttributes.ContentState(tripState: .ended)
         let content = ActivityContent(state: final, staleDate: nil)
         await activity.end(content, dismissalPolicy: .immediate)
         DokoLogging.shared.postLoggingResponse(.liveActivity("ended orphaned trip activity \(activity.id)"))
       }
-      for activity in Activity<ChargeActivityAttributes>.activities {
-        let final = ChargeActivityAttributes.ContentState(chargeState: .ended)
+      for activity in Activity<ChargeSessionActivityAttributes>.activities {
+        let final = ChargeSessionActivityAttributes.ContentState(chargeState: .ended)
         let content = ActivityContent(state: final, staleDate: nil)
         await activity.end(content, dismissalPolicy: .immediate)
         DokoLogging.shared.postLoggingResponse(.liveActivity("ended orphaned charge activity \(activity.id)"))
@@ -42,8 +42,8 @@ public final class LiveActivityManager {
   }
 
   private enum AnyManagedActivity {
-    case trip(Activity<WindSockActivityAttributes>)
-    case charge(Activity<ChargeActivityAttributes>)
+    case trip(Activity<TripWindSockActivityAttributes>)
+    case charge(Activity<ChargeSessionActivityAttributes>)
 
     var id: String {
       switch self {
@@ -55,12 +55,12 @@ public final class LiveActivityManager {
     func endImmediately() async {
       switch self {
       case .trip(let activity):
-        let final = WindSockActivityAttributes.ContentState(tripState: .ended)
+        let final = TripWindSockActivityAttributes.ContentState(tripState: .ended)
         let content = ActivityContent(state: final, staleDate: nil)
         await activity.end(content, dismissalPolicy: .immediate)
 
       case .charge(let activity):
-        let final = ChargeActivityAttributes.ContentState(chargeState: .ended)
+        let final = ChargeSessionActivityAttributes.ContentState(chargeState: .ended)
         let content = ActivityContent(state: final, staleDate: nil)
         await activity.end(content, dismissalPolicy: .immediate)
       }
@@ -79,7 +79,7 @@ public final class LiveActivityManager {
 
   private func startPushToStartTokenObservation() {
     Task {
-      for await token in Activity<WindSockActivityAttributes>.pushToStartTokenUpdates {
+      for await token in Activity<TripWindSockActivityAttributes>.pushToStartTokenUpdates {
         tripPushToStartToken = token
         DokoLogging.shared.postLoggingResponse(.liveActivity("tripPushToStartToken updated"))
       }
@@ -142,7 +142,7 @@ public final class LiveActivityManager {
     if !hasActiveScene, let token = tripPushToStartToken {
       await pushToStartTrip(token: token)
       Task {
-        for await activity in Activity<WindSockActivityAttributes>.activityUpdates {
+        for await activity in Activity<TripWindSockActivityAttributes>.activityUpdates {
           guard case .trip(_) = self.managedActivity else {
             self.managedActivity = .trip(activity)
             DokoLogging.shared.postLoggingResponse(.liveActivity(".startTrip via push-to-start"))
@@ -159,12 +159,12 @@ public final class LiveActivityManager {
       return
     }
 
-    let initial = WindSockActivityAttributes.ContentState(tripState: .starting)
-    let activity: Activity<WindSockActivityAttributes>
+    let initial = TripWindSockActivityAttributes.ContentState(tripState: .starting)
+    let activity: Activity<TripWindSockActivityAttributes>
     let staleDate: Double = 5
     do {
       activity = try Activity.request(
-        attributes: WindSockActivityAttributes(),
+        attributes: TripWindSockActivityAttributes(),
         content: ActivityContent(state: initial, staleDate: now.addingTimeInterval(staleDate)),
         pushType: .token
       )
@@ -195,7 +195,7 @@ public final class LiveActivityManager {
       )
     } else { nil }
     
-    let state = WindSockActivityAttributes.ContentState(
+    let state = TripWindSockActivityAttributes.ContentState(
       tripState: .active,
       duration: .seconds(duration),
       distance: distance,
@@ -220,7 +220,7 @@ public final class LiveActivityManager {
     }
     guard let duration = tripEnd.duration, let distance = tripEnd.distance else { return }
 
-    let state = WindSockActivityAttributes.ContentState(
+    let state = TripWindSockActivityAttributes.ContentState(
       tripState: .ended,
       duration: .seconds(duration),
       distance: distance,
@@ -255,11 +255,11 @@ public final class LiveActivityManager {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startCharge: already managing an activity"))
       await currentActivity.endImmediately()
     }
-    let initial = ChargeActivityAttributes.ContentState(chargeState: .starting)
-    let activity: Activity<ChargeActivityAttributes>
+    let initial = ChargeSessionActivityAttributes.ContentState(chargeState: .starting)
+    let activity: Activity<ChargeSessionActivityAttributes>
     do {
       activity = try Activity.request(
-        attributes: ChargeActivityAttributes(),
+        attributes: ChargeSessionActivityAttributes(),
         content: ActivityContent(state: initial, staleDate: now.addingTimeInterval(15))
       )
     } catch {
@@ -279,7 +279,7 @@ public final class LiveActivityManager {
     }
     guard let duration = chargeData.duration else { return }
 
-    let state = ChargeActivityAttributes.ContentState(
+    let state = ChargeSessionActivityAttributes.ContentState(
       chargeState: .active,
       duration: .seconds(duration),
       stateOfCharge: chargeData.batteryStateOfCharge,
@@ -306,7 +306,7 @@ public final class LiveActivityManager {
     }
     guard let duration = chargeData.duration else { return }
 
-    let state = ChargeActivityAttributes.ContentState(
+    let state = ChargeSessionActivityAttributes.ContentState(
       chargeState: .active,
       duration: .seconds(duration),
       stateOfCharge: chargeData.batteryStateOfCharge,
@@ -322,7 +322,7 @@ public final class LiveActivityManager {
     let staleAfter: TimeInterval = 60
     self.managedActivity = nil
     self.pendingActivity = nil
-    let endedState = ChargeActivityAttributes.ContentState(chargeState: .ended)
+    let endedState = ChargeSessionActivityAttributes.ContentState(chargeState: .ended)
     await activity.update(ActivityContent(state: state, staleDate: now.addingTimeInterval(staleAfter)))
     DokoLogging.shared.postLoggingResponse(.liveActivity(".endCharge"))
     Task {

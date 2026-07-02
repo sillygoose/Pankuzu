@@ -18,8 +18,8 @@ extension ChargeLiveActivityFonts {
   var laIconFrame: Double  { activityFamily == .small ? 16 : 36 }
 }
 
-struct ChargeLiveActivities: View, ChargeLiveActivityFonts {
-  let context: ActivityViewContext<ChargeActivityAttributes>
+struct ChargeSessionLiveActivity: View, ChargeLiveActivityFonts {
+  let context: ActivityViewContext<ChargeSessionActivityAttributes>
   
   @Environment(\.activityFamily) var activityFamily
   
@@ -35,7 +35,7 @@ struct ChargeLiveActivities: View, ChargeLiveActivityFonts {
   }
   
   private struct StartingView: View, ChargeLiveActivityFonts {
-    let context: ActivityViewContext<ChargeActivityAttributes>
+    let context: ActivityViewContext<ChargeSessionActivityAttributes>
     @Environment(\.activityFamily) var activityFamily
     
     var body: some View {
@@ -51,7 +51,7 @@ struct ChargeLiveActivities: View, ChargeLiveActivityFonts {
   }
   
   private struct ActiveView: View, ChargeLiveActivityFonts {
-    let context: ActivityViewContext<ChargeActivityAttributes>
+    let context: ActivityViewContext<ChargeSessionActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily
     
@@ -160,7 +160,7 @@ struct ChargeLiveActivities: View, ChargeLiveActivityFonts {
   }
   
   private struct EndedView: View, ChargeLiveActivityFonts {
-    let context: ActivityViewContext<ChargeActivityAttributes>
+    let context: ActivityViewContext<ChargeSessionActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily
     
@@ -254,19 +254,19 @@ struct ChargeLiveActivities: View, ChargeLiveActivityFonts {
   }
 }
 
-extension ChargeActivityAttributes {
-  fileprivate static var preview: ChargeActivityAttributes {
-    ChargeActivityAttributes()
+extension ChargeSessionActivityAttributes {
+  fileprivate static var preview: ChargeSessionActivityAttributes {
+    ChargeSessionActivityAttributes()
   }
 }
 
-extension ChargeActivityAttributes.ContentState {
-  fileprivate static var starting: ChargeActivityAttributes.ContentState {
-    ChargeActivityAttributes.ContentState(chargeState: .starting)
+extension ChargeSessionActivityAttributes.ContentState {
+  fileprivate static var starting: ChargeSessionActivityAttributes.ContentState {
+    ChargeSessionActivityAttributes.ContentState(chargeState: .starting)
   }
   
-  fileprivate static var active: ChargeActivityAttributes.ContentState {
-    ChargeActivityAttributes.ContentState(
+  fileprivate static var active: ChargeSessionActivityAttributes.ContentState {
+    ChargeSessionActivityAttributes.ContentState(
       chargeState: .active,
       duration: .seconds(1200),
       measuredPower: 10.4,
@@ -277,8 +277,8 @@ extension ChargeActivityAttributes.ContentState {
     )
   }
   
-  fileprivate static var ended: ChargeActivityAttributes.ContentState {
-    ChargeActivityAttributes.ContentState(
+  fileprivate static var ended: ChargeSessionActivityAttributes.ContentState {
+    ChargeSessionActivityAttributes.ContentState(
       chargeState: .ended,
       duration: .seconds(1200),
       stateOfCharge: 47.5,
@@ -288,11 +288,11 @@ extension ChargeActivityAttributes.ContentState {
   }
 }
 
-#Preview("Charge Live Activity", as: .content, using: ChargeActivityAttributes.preview) {
-  ChargeLiveActivityWidget()
+#Preview("Charge Live Activity", as: .content, using: ChargeSessionActivityAttributes.preview) {
+  ChargeSessionLiveActivityWidget()
 } contentStates: {
-  ChargeActivityAttributes.ContentState.starting
-  ChargeActivityAttributes.ContentState.active
-  ChargeActivityAttributes.ContentState.ended
+  ChargeSessionActivityAttributes.ContentState.starting
+  ChargeSessionActivityAttributes.ContentState.active
+  ChargeSessionActivityAttributes.ContentState.ended
 }
 

@@ -2,7 +2,7 @@ import ActivityKit
 import WeatherKit
 import Foundation
 
-public struct ChargeActivityAttributes: ActivityAttributes, Sendable {
+public struct ChargeSessionActivityAttributes: ActivityAttributes, Sendable {
   public let chargeID: UUID
 
   public init(chargeID: UUID = UUID()) {
