@@ -56,7 +56,7 @@ async function handleTripStart(body, env) {
         duration: [0, 0],
         distance: 0
       },
-      "attributes-type": "TripActivityAttributes",
+      "attributes-type": "TripWindSockActivityAttributes",
       attributes: {
         tripID: crypto.randomUUID().toUpperCase()
       },
