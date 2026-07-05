@@ -5,20 +5,7 @@ import WidgetKit
 import DokoSharing
 import DokoLiveActivityManager
 
-private protocol ChargeLiveActivityFonts: View {
-  var activityFamily: ActivityFamily { get }
-}
-
-extension ChargeLiveActivityFonts {
-  var laSymbol: Font { activityFamily == .small ? DesignTokens.Font.slaSymbol : DesignTokens.Font.mlaSymbol }
-  var laValue: Font  { activityFamily == .small ? DesignTokens.Font.slaValue  : DesignTokens.Font.mlaValue  }
-  var laUnit: Font   { activityFamily == .small ? DesignTokens.Font.slaUnit   : DesignTokens.Font.mlaUnit   }
-  var laTitle: Font  { activityFamily == .small ? DesignTokens.Font.slaTitle  : DesignTokens.Font.mlaTitle  }
-  var laLabel: Font  { activityFamily == .small ? DesignTokens.Font.slaLabel  : DesignTokens.Font.mlaLabel  }
-  var laIconFrame: Double  { activityFamily == .small ? 16 : 36 }
-}
-
-struct ChargeSessionLiveActivity: View, ChargeLiveActivityFonts {
+struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
   let context: ActivityViewContext<ChargeSessionActivityAttributes>
   
   @Environment(\.activityFamily) var activityFamily
@@ -34,7 +21,7 @@ struct ChargeSessionLiveActivity: View, ChargeLiveActivityFonts {
     }
   }
   
-  private struct StartingView: View, ChargeLiveActivityFonts {
+  private struct StartingView: View, DokoLiveActivityFonts {
     let context: ActivityViewContext<ChargeSessionActivityAttributes>
     @Environment(\.activityFamily) var activityFamily
     
@@ -50,7 +37,7 @@ struct ChargeSessionLiveActivity: View, ChargeLiveActivityFonts {
     }
   }
   
-  private struct ActiveView: View, ChargeLiveActivityFonts {
+  private struct ActiveView: View, DokoLiveActivityFonts {
     let context: ActivityViewContext<ChargeSessionActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily
@@ -159,7 +146,7 @@ struct ChargeSessionLiveActivity: View, ChargeLiveActivityFonts {
     }
   }
   
-  private struct EndedView: View, ChargeLiveActivityFonts {
+  private struct EndedView: View, DokoLiveActivityFonts {
     let context: ActivityViewContext<ChargeSessionActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily

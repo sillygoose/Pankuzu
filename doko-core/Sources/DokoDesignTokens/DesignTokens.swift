@@ -69,10 +69,10 @@ public enum DesignTokens {
     public static let mlaLabel = SwiftUI.Font.system(size: 20)
 
     // Small Live Activity (Dynamic Island compact / minimal)
-    public static let slaSymbol = SwiftUI.Font.system(size: 9)
-    public static let slaValue = SwiftUI.Font.system(size: 16)
-    public static let slaUnit = SwiftUI.Font.system(size: 8)
-    public static let slaTitle = SwiftUI.Font.system(size: 24)
+    public static let slaSymbol = SwiftUI.Font.system(size: 8)
+    public static let slaValue = SwiftUI.Font.system(size: 13)
+    public static let slaUnit = SwiftUI.Font.system(size: 7)
+    public static let slaTitle = SwiftUI.Font.system(size: 18)
     public static let slaLabel = SwiftUI.Font.system(size: 10)
   }
 

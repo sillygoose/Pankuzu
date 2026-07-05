@@ -38,7 +38,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
   ) {
     let tokenString = deviceToken.map { String(format: "%02x", $0) }.joined()
-    DokoLogging.shared.postLoggingResponse(.connect("Device token: \(tokenString)"))
+    DokoLogging.shared.postLoggingResponse(.info("Device token: \(tokenString)"))
   }
 
   func application(

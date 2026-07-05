@@ -145,11 +145,13 @@ public final class LiveActivityManager {
         for await activity in Activity<TripWindSockActivityAttributes>.activityUpdates {
           guard case .trip(_) = self.managedActivity else {
             self.managedActivity = .trip(activity)
+            self.pendingActivity = nil
             DokoLogging.shared.postLoggingResponse(.liveActivity(".startTrip via push-to-start"))
             break
           }
         }
       }
+      pendingActivity = .trip
       return
     }
 
@@ -177,13 +179,31 @@ public final class LiveActivityManager {
   }
 
   public func updateTrip(tripData: DokoResponsePacket) async {
-    if pendingActivity == .trip { return }
+    if pendingActivity == .trip {
+      return
+    }
     guard case .trip(let activity)? = managedActivity else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.updateTrip: no activity"))
       return
     }
-    guard let duration = tripData.duration, let distance = tripData.distance else { return }
+    let duration = tripData.duration ?? 0
+    let distance = tripData.distance ?? 0
 
+#if DEBUG
+    let course = tripData.position?.course ?? 0
+    let windSock: WindSock? = if let weather = tripData.weather {
+      WindSock(
+        course: course,
+        temperature: weather.temperature,
+        conditions: weather.conditionSymbol,
+        windSpeed: weather.windSpeed,
+        windDirection: weather.windDirection,
+        windCompassDirection: weather.windCompassDirection
+      )
+    } else {
+      nil
+    }
+#else
     let windSock: WindSock? = if let course = tripData.position?.course, let weather = tripData.weather {
       WindSock(
         course: course,
@@ -193,7 +213,10 @@ public final class LiveActivityManager {
         windDirection: weather.windDirection,
         windCompassDirection: weather.windCompassDirection
       )
-    } else { nil }
+    } else {
+      nil
+    }
+#endif
     
     let state = TripWindSockActivityAttributes.ContentState(
       tripState: .active,
@@ -206,7 +229,7 @@ public final class LiveActivityManager {
     )
 
     @Dependency(\.date.now) var now
-    let staleAfter: TimeInterval = 60
+    let staleAfter: TimeInterval = 30
     let content = ActivityContent(state: state, staleDate: now.addingTimeInterval(staleAfter))
     await activity.update(content)
     DokoLogging.shared.postLoggingResponse(.liveActivity(".updateTrip"))
