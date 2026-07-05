@@ -17,7 +17,7 @@ public struct ChargeSessionActivityAttributes: ActivityAttributes, Sendable {
         switch self {
         case .starting: return "Starting charge"
         case .active: return "Charge in progress"
-        case .ended: return "Charge ended"
+        case .ended: return "Charge complete"
         }
       }
     }

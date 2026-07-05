@@ -27,12 +27,11 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
     
     var body: some View {
       HStack(alignment: .center) {
-        DokoWidgetIcon(height: laIconFrame)
-        Spacer()
         Text("Charge Starting")
           .foregroundStyle(DesignTokens.Color.primary)
+          .font(laTitle)
+        Spacer()
       }
-      .font(laTitle)
       .padding()
     }
   }
@@ -53,13 +52,13 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
       let couplerTemperature = context.state.couplerTemperature
       
       HStack(alignment: .center) {
-        DokoWidgetIcon(height: laIconFrame)
         HStack {
           Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
             GridRow(alignment: .lastTextBaseline) {
               Image(systemName: "clock")
                 .font(laSymbol)
                 .gridColumnAlignment(.leading)
+                .padding(.trailing, laSymbolSpacing)
               Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
                 .font(laValue.monospacedDigit())
                 .gridColumnAlignment(.trailing)
@@ -73,6 +72,7 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
                 Image(systemName: "batteryblock.stack")
                   .font(laSymbol)
                   .gridColumnAlignment(.leading)
+                  .padding(.trailing, laSymbolSpacing)
                 Text(String(format: "%.0f", batteryTemperature.value))
                   .font(laValue.monospacedDigit())
                   .gridColumnAlignment(.trailing)
@@ -89,6 +89,7 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
                 Image(systemName: "ev.plug.dc.ccs1")
                   .font(laSymbol)
                   .gridColumnAlignment(.leading)
+                  .padding(.trailing, laSymbolSpacing)
                 Text(String(format: "%.0f", couplerTemperature.value))
                   .font(laValue.monospacedDigit())
                   .gridColumnAlignment(.trailing)
@@ -106,6 +107,10 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
             if let batteryVoltage {
               let batteryVoltage = Measurement(value: batteryVoltage, unit: UnitElectricPotentialDifference.volts)
               GridRow(alignment: .lastTextBaseline) {
+                Image(systemName: "directcurrent")
+                  .font(laSymbol)
+                  .gridColumnAlignment(.leading)
+                  .padding(.trailing, laSymbolSpacing)
                 Text(String(format: "%5.1f", batteryVoltage.value))
                   .font(laValue.monospacedDigit())
                   .gridColumnAlignment(.trailing)
@@ -118,6 +123,10 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
             if let batteryCurrent {
               let batteryCurrent = Measurement(value: batteryCurrent, unit: UnitElectricCurrent.amperes)
               GridRow(alignment: .lastTextBaseline) {
+                Image(systemName: "bolt.fill")
+                  .font(laSymbol)
+                  .gridColumnAlignment(.leading)
+                  .padding(.trailing, laSymbolSpacing)
                 Text(String(format: "%5.1f", batteryCurrent.value))
                   .font(laValue.monospacedDigit())
                   .gridColumnAlignment(.trailing)
@@ -130,6 +139,10 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
             if let measuredPower {
               let measuredPower = Measurement(value: measuredPower, unit: UnitPower.kilowatts)
               GridRow(alignment: .lastTextBaseline) {
+                Image(systemName: "bolt.circle.fill")
+                  .font(laSymbol)
+                  .gridColumnAlignment(.leading)
+                  .padding(.trailing, laSymbolSpacing)
                 Text(String(format: "%5.1f", measuredPower.value))
                   .font(laValue.monospacedDigit())
                   .gridColumnAlignment(.trailing)
@@ -158,14 +171,14 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
       let energyAdded = context.state.energy
       let stateOfChargeAdded = context.state.stateOfCharge
       let rangeAdded = context.state.rangeAdded
-      
+      let batteryTemperature = context.state.batteryTemperature
+
       VStack {
         HStack {
-          DokoWidgetIcon(height: laIconFrame)
-          Spacer()
-          Text("Charge Ended")
-            .font(laValue)
+          Text("Charge Complete")
+            .font(laTitle)
             .foregroundStyle(DesignTokens.Color.primary)
+          Spacer()
         }
         
         HStack {
@@ -175,6 +188,7 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
                 .font(laSymbol)
                 .foregroundStyle(DesignTokens.Color.duration)
                 .gridColumnAlignment(.leading)
+                .padding(.trailing, laSymbolSpacing)
               Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
                 .font(laValue.monospacedDigit())
                 .foregroundStyle(DesignTokens.Color.duration)
@@ -188,6 +202,7 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
                 Image(systemName: "road.lanes")
                   .font(laSymbol)
                   .gridColumnAlignment(.leading)
+                  .padding(.trailing, laSymbolSpacing)
                 Text(String(format: "%+5.1f", rangeAdded.value))
                   .font(laValue.monospacedDigit())
                   .gridColumnAlignment(.trailing)
@@ -196,6 +211,23 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
                   .gridColumnAlignment(.leading)
               }
               .foregroundStyle(DesignTokens.Color.rangeAdded)
+            }
+            else if let batteryTemperature {
+              let batteryTemperature = Measurement(value: batteryTemperature, unit: UnitTemperature.celsius)
+                .converted(to: appSettings.metric ? .celsius : .fahrenheit)
+              GridRow(alignment: .lastTextBaseline) {
+                Image(systemName: "batteryblock.stack")
+                  .font(laSymbol)
+                  .gridColumnAlignment(.leading)
+                  .padding(.trailing, laSymbolSpacing)
+                Text(String(format: "%.0f", batteryTemperature.value))
+                  .font(laValue.monospacedDigit())
+                  .gridColumnAlignment(.trailing)
+                Text(batteryTemperature.unit.symbol)
+                  .font(laUnit)
+                  .gridColumnAlignment(.leading)
+              }
+              .foregroundStyle(DesignTokens.Color.batteryTemperature)
             }
           }
           
@@ -208,7 +240,8 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
                 Image(systemName: "battery.75percent")
                   .font(laSymbol)
                   .gridColumnAlignment(.leading)
-                Text(String(format: "%+5.1f", stateOfChargeAdded.value))
+                  .padding(.trailing, laSymbolSpacing)
+                Text(String(format: "%.0f", stateOfChargeAdded.value))
                   .font(laValue.monospacedDigit())
                   .gridColumnAlignment(.trailing)
                 Text(stateOfChargeAdded.unit.symbol)
@@ -224,6 +257,7 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
                 Image(systemName: "bolt")
                   .font(laSymbol)
                   .gridColumnAlignment(.leading)
+                  .padding(.trailing, laSymbolSpacing)
                 Text(String(format: "%+5.1f", energy.value))
                   .font(laValue.monospacedDigit())
                   .gridColumnAlignment(.trailing)

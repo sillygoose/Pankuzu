@@ -61,7 +61,7 @@ extension CarPlayController {
     var items: [CPInformationItem] = []
     if case let .duration(v)?                       = responses[.duration]?.response                { items.append(.init(title: "Duration",           detail: formatDuration(v))) }
     if case let .chargerInputPower(v)?              = responses[.chargerInputPower]?.response       { items.append(.init(title: "Charger Power",      detail: String(format: "%.1f kW", v))) }
-    if case let .chargerInputPeakPower(v)?                      = responses[.chargerInputPeakPower]?.response               { items.append(.init(title: "Peak Power",         detail: String(format: "%.1f kW",  v))) }
+    if case let .chargerInputPeakPower(v)?          = responses[.chargerInputPeakPower]?.response   { items.append(.init(title: "Peak Power",         detail: String(format: "%.1f kW",  v))) }
     if case let .batteryStateOfCharge(v)?           = responses[.batteryStateOfCharge]?.response    { items.append(.init(title: "State of Charge",    detail: String(format: "%.0f%%", v))) }
     if case let .batteryStateOfHealth(v)?           = responses[.batteryStateOfHealth]?.response    { items.append(.init(title: "State of Heallth",   detail: String(format: "%.0f%%", v))) }
     if case let .batteryEnergy(v)?                  = responses[.batteryEnergy]?.response           { items.append(.init(title: "Energy Added",       detail: String(format: "%.3f kWh", v))) }

@@ -15,9 +15,10 @@ export default {
     if (url.pathname === "/trip-start") {
       return handleTripStart(body, env)
     }
+    if (url.pathname === "/charge-start") {
+      return handleChargeStart(body, env)
+    }
     if (url.pathname === "/trip-token") {
-      // Store activity push token for future server-side updates if needed.
-      // For now just acknowledge — the app drives updates via activity.update().
       return new Response(null, { status: 204 })
     }
 
@@ -63,6 +64,70 @@ async function handleTripStart(body, env) {
       alert: {
         title: "Trip Started",
         body: "Pankuzu is tracking your trip"
+      }
+    }
+  }
+
+  const apnsResp = await fetch(
+    `https://${apnsHost}/3/device/${deviceToken}`,
+    {
+      method: "POST",
+      headers: {
+        "authorization": `bearer ${jwt}`,
+        "apns-topic": `${bundleId}.push-type.liveactivity`,
+        "apns-push-type": "liveactivity",
+        "apns-expiration": "0",
+        "apns-priority": "10",
+      },
+      body: JSON.stringify(payload)
+    }
+  )
+
+  if (!apnsResp.ok) {
+    const detail = await apnsResp.text()
+    return new Response("APNs error: " + detail, { status: 502 })
+  }
+
+  return new Response(null, { status: 204 })
+}
+
+async function handleChargeStart(body, env) {
+  const { pushToken, bundleId, apnsEnvironment } = body
+  if (!pushToken || !bundleId) {
+    return new Response(
+      `Missing fields. Got: pushToken=${!!pushToken} bundleId=${!!bundleId} keys=${Object.keys(body).join(",")}`,
+      { status: 400 }
+    )
+  }
+  const deviceToken = pushToken
+  const isProd = apnsEnvironment === "production"
+  const apnsHost = isProd ? "api.push.apple.com" : "api.development.push.apple.com"
+  const apnsKey = isProd ? env.APNS_KEY_PROD : env.APNS_KEY_SANDBOX
+  const apnsKeyId = isProd ? env.APNS_KEY_ID_PROD : env.APNS_KEY_ID_SANDBOX
+
+  let jwt
+  try {
+    jwt = await makeApnsJwt(apnsKey, apnsKeyId, env.APNS_TEAM_ID)
+  } catch (e) {
+    return new Response("JWT signing failed: " + e.message, { status: 500 })
+  }
+
+  const now = Math.floor(Date.now() / 1000)
+  const payload = {
+    aps: {
+      timestamp: now,
+      event: "start",
+      "content-state": {
+        chargeState: { starting: {} },
+        duration: [0, 0]
+      },
+      "attributes-type": "ChargeSessionActivityAttributes",
+      attributes: {
+        chargeID: crypto.randomUUID().toUpperCase()
+      },
+      alert: {
+        title: "Charging Started",
+        body: "Pankuzu is tracking your charge session"
       }
     }
   }
