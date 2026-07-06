@@ -68,7 +68,11 @@ struct AboutView: View {
     ScrollView {
       VStack(alignment: .leading) {
         Section {
+          #if DEBUG
+          Text("\(AppBuildInfo.displayName) \(AppBuildInfo.version).\(AppBuildInfo.build)-dev \(AppBuildInfo.branchName)(\(AppBuildInfo.shortHash))")
+          #else
           Text("\(AppBuildInfo.displayName) \(AppBuildInfo.version).\(AppBuildInfo.build) \(AppBuildInfo.branchName)(\(AppBuildInfo.shortHash))")
+          #endif
         }
         .padding([.bottom], 20)
 
