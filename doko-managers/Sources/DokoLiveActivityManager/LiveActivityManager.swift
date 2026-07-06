@@ -385,7 +385,7 @@ public final class LiveActivityManager {
   private func pushToStartCharge(token: Data) async {
     let tokenString = token.map { String(format: "%02x", $0) }.joined()
     let bundleId = Bundle.main.bundleIdentifier ?? ""
-    let msg = "pushToStartCharge token=\(tokenString) bundle=\(bundleId)"
+    let msg = "pushToStartCharge token=\(tokenString.prefix(8))… bundle=\(bundleId)"
     logger.info("\(msg)")
     DokoLogging.shared.postLoggingResponse(.liveActivity(msg))
     #if DEBUG
@@ -404,7 +404,7 @@ public final class LiveActivityManager {
   private func pushToStartTrip(token: Data) async {
     let tokenString = token.map { String(format: "%02x", $0) }.joined()
     let bundleId = Bundle.main.bundleIdentifier ?? ""
-    let msg = "pushToStartTrip token=\(tokenString) bundle=\(bundleId)"
+    let msg = "pushToStartTrip token=\(tokenString.prefix(8))… bundle=\(bundleId)"
     logger.info("\(msg)")
     DokoLogging.shared.postLoggingResponse(.liveActivity(msg))
     #if DEBUG
