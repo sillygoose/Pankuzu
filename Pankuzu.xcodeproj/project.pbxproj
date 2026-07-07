@@ -73,6 +73,8 @@
 		5692F1A82F09FC9D00D9F0AA /* doko-components */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-components"; sourceTree = "<group>"; };
 		5692F1A92F09FCF800D9F0AA /* doko-vehicle-interface */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-vehicle-interface"; sourceTree = "<group>"; };
 		569BF1B72F3EBC2B001E0A37 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
+		56CF44BB2F3EBC00001E0A37 /* worker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = worker.js; sourceTree = "<group>"; };
+		56CF44CC2F3EBC00001E0A37 /* wrangler.toml */ = {isa = PBXFileReference; lastKnownFileType = text; path = wrangler.toml; sourceTree = "<group>"; };
 		56A31D062F0A000700E4F1B4 /* doko-sharing */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-sharing"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -156,6 +158,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		56CF44AA2F3EBC00001E0A37 /* cloudflare */ = {
+			isa = PBXGroup;
+			children = (
+				56CF44BB2F3EBC00001E0A37 /* worker.js */,
+				56CF44CC2F3EBC00001E0A37 /* wrangler.toml */,
+			);
+			path = cloudflare;
+			sourceTree = "<group>";
+		};
 		566DA71A2F05ACDB0044D201 = {
 			isa = PBXGroup;
 			children = (
@@ -176,6 +187,7 @@
 				56BBBFF82F0A0869008C2BFE /* Frameworks */,
 				566DA7242F05ACDB0044D201 /* Products */,
 				569BF1B72F3EBC2B001E0A37 /* Shared.xcconfig */,
+				56CF44AA2F3EBC00001E0A37 /* cloudflare */,
 			);
 			sourceTree = "<group>";
 		};

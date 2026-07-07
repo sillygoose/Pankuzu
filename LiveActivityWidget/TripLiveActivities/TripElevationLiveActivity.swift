@@ -47,52 +47,10 @@ struct TripElevationLiveActivity: View, DokoLiveActivityFonts {
     @Shared(.appSettings) var appSettings
 
     var body: some View {
-      let distance = context.state.distance
       let elevation = context.state.elevation
-      let efficiency = context.state.efficiency
-      let windSock = context.state.windSock
 
       HStack(alignment: .center) {
         Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
-          GridRow(alignment: .lastTextBaseline) {
-            let distance = Measurement(value: distance, unit: UnitLength.kilometers)
-              .converted(to: appSettings.metric ? .kilometers : .miles)
-            Image(systemName: "road.lanes")
-              .font(laSymbol)
-              .gridColumnAlignment(.leading)
-              .padding(.trailing, laSymbolSpacing)
-            Text(String(format: "%5.1f", distance.value))
-              .font(laValue.monospacedDigit())
-              .gridColumnAlignment(.trailing)
-            Text(distance.unit.symbol)
-              .font(laUnit)
-              .gridColumnAlignment(.leading)
-          }
-          .foregroundStyle(DesignTokens.Color.distance)
-
-          if let efficiency {
-            let metricEfficiency = Measurement(
-              value: efficiency,
-              unit: UnitEnergyEfficiency.kilometersPerKilowattHour
-            )
-            let efficiency = metricEfficiency.converted(
-              to: appSettings.metric ? appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
-            )
-            GridRow(alignment: .lastTextBaseline) {
-              Image(systemName: "ev.charger")
-                .font(laSymbol)
-                .gridColumnAlignment(.leading)
-                .padding(.trailing, laSymbolSpacing)
-              Text(String(format: "%.2f", efficiency.value))
-                .font(laValue.monospacedDigit())
-                .gridColumnAlignment(.trailing)
-              Text(efficiency.unit.symbol)
-                .font(laUnit)
-                .gridColumnAlignment(.leading)
-            }
-            .foregroundStyle(DesignTokens.Color.tripping)
-          }
-
           if let elevation {
             let elevation = Measurement(value: elevation, unit: UnitLength.meters)
               .converted(to: appSettings.metric ? .meters : .feet)
@@ -110,19 +68,6 @@ struct TripElevationLiveActivity: View, DokoLiveActivityFonts {
             }
             .foregroundStyle(DesignTokens.Color.elevation)
           }
-        }
-
-        Spacer()
-
-        if let windSock {
-          WindIndicator(
-            temperature: windSock.temperature,
-            conditions: windSock.conditions,
-            course: windSock.course,
-            windSpeed: windSock.windSpeed,
-            windDirection: windSock.windDirection,
-            windCompassDirection: windSock.windCompassDirection
-          )
         }
       }
       .padding()
