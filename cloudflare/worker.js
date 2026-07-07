@@ -18,6 +18,9 @@ export default {
     if (url.pathname === "/trip-elevation-start") {
       return handleTripElevationStart(body, env)
     }
+    if (url.pathname === "/trip-efficiency-start") {
+      return handleTripEfficiencyStart(body, env)
+    }
     if (url.pathname === "/charge-start") {
       return handleChargeStart(body, env)
     }
@@ -35,6 +38,10 @@ async function handleTripStart(body, env) {
 
 async function handleTripElevationStart(body, env) {
   return handleTripSessionStart(body, env, "TripElevationActivityAttributes")
+}
+
+async function handleTripEfficiencyStart(body, env) {
+  return handleTripSessionStart(body, env, "TripEfficiencyActivityAttributes")
 }
 
 async function handleTripSessionStart(body, env, attributesType) {

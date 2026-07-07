@@ -31,15 +31,17 @@ public final class LiveActivityManager {
 
   private var managedTripWindSock: Activity<TripWindSockActivityAttributes>?
   private var managedTripElevation: Activity<TripElevationActivityAttributes>?
+  private var managedTripEfficiency: Activity<TripEfficiencyActivityAttributes>?
   private var managedCharge: Activity<ChargeSessionActivityAttributes>?
 
-  private var hasAnyTripActivity: Bool { managedTripWindSock != nil || managedTripElevation != nil }
+  private var hasAnyTripActivity: Bool { managedTripWindSock != nil || managedTripElevation != nil || managedTripEfficiency != nil }
   private var hasAnyManagedActivity: Bool { hasAnyTripActivity || managedCharge != nil }
 
   // MARK: - Push-to-Start Tokens
 
   private var tripWindSockPushToStartToken: Data?
   private var tripElevationPushToStartToken: Data?
+  private var tripEfficiencyPushToStartToken: Data?
   private var chargePushToStartToken: Data?
 
   // MARK: - Pending
@@ -61,6 +63,11 @@ public final class LiveActivityManager {
         await activity.end(ActivityContent(state: final, staleDate: nil), dismissalPolicy: .immediate)
         DokoLogging.shared.postLoggingResponse(.liveActivity("ended orphaned tripElevation activity \(activity.id)"))
       }
+      for activity in Activity<TripEfficiencyActivityAttributes>.activities {
+        let final = TripEfficiencyActivityAttributes.ContentState(tripState: .ended)
+        await activity.end(ActivityContent(state: final, staleDate: nil), dismissalPolicy: .immediate)
+        DokoLogging.shared.postLoggingResponse(.liveActivity("ended orphaned tripEfficiency activity \(activity.id)"))
+      }
       for activity in Activity<ChargeSessionActivityAttributes>.activities {
         let final = ChargeSessionActivityAttributes.ContentState(chargeState: .ended)
         await activity.end(ActivityContent(state: final, staleDate: nil), dismissalPolicy: .immediate)
@@ -79,6 +86,11 @@ public final class LiveActivityManager {
       let final = TripElevationActivityAttributes.ContentState(tripState: .ended)
       await activity.end(ActivityContent(state: final, staleDate: nil), dismissalPolicy: .immediate)
       managedTripElevation = nil
+    }
+    if let activity = managedTripEfficiency {
+      let final = TripEfficiencyActivityAttributes.ContentState(tripState: .ended)
+      await activity.end(ActivityContent(state: final, staleDate: nil), dismissalPolicy: .immediate)
+      managedTripEfficiency = nil
     }
     if let activity = managedCharge {
       let final = ChargeSessionActivityAttributes.ContentState(chargeState: .ended)
@@ -99,6 +111,12 @@ public final class LiveActivityManager {
       for await token in Activity<TripElevationActivityAttributes>.pushToStartTokenUpdates {
         tripElevationPushToStartToken = token
         DokoLogging.shared.postLoggingResponse(.liveActivity("tripElevationPushToStartToken updated"))
+      }
+    }
+    Task {
+      for await token in Activity<TripEfficiencyActivityAttributes>.pushToStartTokenUpdates {
+        tripEfficiencyPushToStartToken = token
+        DokoLogging.shared.postLoggingResponse(.liveActivity("tripEfficiencyPushToStartToken updated"))
       }
     }
     Task {
@@ -186,6 +204,17 @@ public final class LiveActivityManager {
           }
         }
       }
+      if let token = tripEfficiencyPushToStartToken {
+        await pushToStartTripEfficiency(token: token)
+        Task {
+          for await activity in Activity<TripEfficiencyActivityAttributes>.activityUpdates {
+            guard self.managedTripEfficiency == nil else { break }
+            self.managedTripEfficiency = activity
+            DokoLogging.shared.postLoggingResponse(.liveActivity(".startTrip efficiency via push-to-start"))
+            break
+          }
+        }
+      }
       pendingActivity = .trip
       return
     }
@@ -210,6 +239,17 @@ public final class LiveActivityManager {
       )
     } catch {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startTrip(elevation) failed: \(error)"))
+    }
+
+    let efficiencyInitial = TripEfficiencyActivityAttributes.ContentState(tripState: .starting)
+    do {
+      managedTripEfficiency = try Activity.request(
+        attributes: TripEfficiencyActivityAttributes(),
+        content: ActivityContent(state: efficiencyInitial, staleDate: now.addingTimeInterval(startActivityStaleDate)),
+        pushType: .token
+      )
+    } catch {
+      DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startTrip(efficiency) failed: \(error)"))
     }
 
     DokoLogging.shared.postLoggingResponse(.liveActivity(".startTrip"))
@@ -283,6 +323,19 @@ public final class LiveActivityManager {
       await activity.update(ActivityContent(state: state, staleDate: staleDate))
     }
 
+    if let activity = managedTripEfficiency {
+      let state = TripEfficiencyActivityAttributes.ContentState(
+        tripState: .active,
+        duration: .seconds(duration),
+        distance: distance,
+        efficiency: tripData.tripEfficiency,
+        elevation: tripData.position?.elevation,
+        rangeConsumed: tripData.batteryDistanceToEmpty,
+        windSock: windSock
+      )
+      await activity.update(ActivityContent(state: state, staleDate: staleDate))
+    }
+
     DokoLogging.shared.postLoggingResponse(.liveActivity(".updateTrip"))
   }
 
@@ -298,8 +351,10 @@ public final class LiveActivityManager {
 
     let windSockToEnd = managedTripWindSock
     let elevationToEnd = managedTripElevation
+    let efficiencyToEnd = managedTripEfficiency
     managedTripWindSock = nil
     managedTripElevation = nil
+    managedTripEfficiency = nil
     pendingActivity = nil
 
     if let activity = windSockToEnd {
@@ -320,6 +375,22 @@ public final class LiveActivityManager {
 
     if let activity = elevationToEnd {
       let state = TripElevationActivityAttributes.ContentState(
+        tripState: .ended,
+        duration: .seconds(duration),
+        distance: distance,
+        energy: tripEnd.batteryEnergy.map { $0 },
+        efficiency: tripEnd.tripEfficiency,
+        rangeConsumed: tripEnd.batteryDistanceToEmpty.map { $0 },
+      )
+      await activity.update(ActivityContent(state: state, staleDate: now.addingTimeInterval(endActivityStaleDate)))
+      Task {
+        try? await Task.sleep(for: .seconds(endActivityStaleDate))
+        await activity.end(ActivityContent(state: state, staleDate: nil), dismissalPolicy: .after(now))
+      }
+    }
+
+    if let activity = efficiencyToEnd {
+      let state = TripEfficiencyActivityAttributes.ContentState(
         tripState: .ended,
         duration: .seconds(duration),
         distance: distance,
@@ -480,6 +551,25 @@ public final class LiveActivityManager {
       "apnsEnvironment": apnsEnvironment
     ]
     await sendWorkerRequest(path: "trip-elevation-start", body: body)
+  }
+
+  private func pushToStartTripEfficiency(token: Data) async {
+    let tokenString = token.map { String(format: "%02x", $0) }.joined()
+    let bundleId = Bundle.main.bundleIdentifier ?? ""
+    let msg = "pushToStartTripEfficiency token=\(tokenString.prefix(8))… bundle=\(bundleId)"
+    logger.info("\(msg)")
+    DokoLogging.shared.postLoggingResponse(.liveActivity(msg))
+    #if DEBUG
+    let apnsEnvironment = "development"
+    #else
+    let apnsEnvironment = "production"
+    #endif
+    let body: [String: String] = [
+      "pushToken": tokenString,
+      "bundleId": bundleId,
+      "apnsEnvironment": apnsEnvironment
+    ]
+    await sendWorkerRequest(path: "trip-efficiency-start", body: body)
   }
 
   private func pushToStartCharge(token: Data) async {

@@ -6,6 +6,7 @@ struct LiveActivityWidgetBundle: WidgetBundle {
   var body: some Widget {
     TripWindSockLiveActivityWidget()
     TripElevationLiveActivityWidget()
+    TripEfficiencyLiveActivityWidget()
     ChargeSessionLiveActivityWidget()
   }
 }
