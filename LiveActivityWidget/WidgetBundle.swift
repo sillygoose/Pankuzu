@@ -5,6 +5,7 @@ import SwiftUI
 struct LiveActivityWidgetBundle: WidgetBundle {
   var body: some Widget {
     TripWindSockLiveActivityWidget()
+    TripElevationLiveActivityWidget()
     ChargeSessionLiveActivityWidget()
   }
 }

@@ -15,6 +15,9 @@ export default {
     if (url.pathname === "/trip-start") {
       return handleTripStart(body, env)
     }
+    if (url.pathname === "/trip-elevation-start") {
+      return handleTripElevationStart(body, env)
+    }
     if (url.pathname === "/charge-start") {
       return handleChargeStart(body, env)
     }
@@ -27,6 +30,14 @@ export default {
 }
 
 async function handleTripStart(body, env) {
+  return handleTripSessionStart(body, env, "TripWindSockActivityAttributes")
+}
+
+async function handleTripElevationStart(body, env) {
+  return handleTripSessionStart(body, env, "TripElevationActivityAttributes")
+}
+
+async function handleTripSessionStart(body, env, attributesType) {
   const { pushToken, bundleId, apnsEnvironment } = body
   if (!pushToken || !bundleId) {
     return new Response(
@@ -57,7 +68,7 @@ async function handleTripStart(body, env) {
         duration: [0, 0],
         distance: 0
       },
-      "attributes-type": "TripWindSockActivityAttributes",
+      "attributes-type": attributesType,
       attributes: {
         tripID: crypto.randomUUID().toUpperCase()
       },

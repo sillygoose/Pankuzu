@@ -9,7 +9,7 @@ public protocol DokoLiveActivityFonts: View {
 
 extension DokoLiveActivityFonts {
   var laSymbol: Font            { activityFamily == .small ? DesignTokens.Font.slaSymbol : DesignTokens.Font.mlaSymbol }
-  var laSymbolSpacing: CGFloat  { activityFamily == .small ? DesignTokens.Spacing.xxs : DesignTokens.Spacing.xxs }
+  var laSymbolSpacing: CGFloat  { activityFamily == .small ? DesignTokens.Spacing.xxs    : DesignTokens.Spacing.xxs    }
   var laValue: Font             { activityFamily == .small ? DesignTokens.Font.slaValue  : DesignTokens.Font.mlaValue  }
   var laUnit: Font              { activityFamily == .small ? DesignTokens.Font.slaUnit   : DesignTokens.Font.mlaUnit   }
   var laTitle: Font             { activityFamily == .small ? DesignTokens.Font.slaTitle  : DesignTokens.Font.mlaTitle  }
