@@ -236,7 +236,7 @@ struct DebuggingView: View {
         Text("Logging")
       }
       
-#if DEBUG
+//#if DEBUG
       DisclosureGroup(
         isExpanded: Binding(
           get: { simulationExpanded },
@@ -296,9 +296,9 @@ struct DebuggingView: View {
         }
         .padding([.top, .bottom], 10)
       } label: {
-        Text("Simulation")
+        Text("Simulator")
       }
-#endif
+//#endif
       
       VStack {
         HStack {
