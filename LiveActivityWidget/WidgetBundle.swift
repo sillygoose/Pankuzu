@@ -8,5 +8,6 @@ struct LiveActivityWidgetBundle: WidgetBundle {
     TripElevationLiveActivityWidget()
     TripEfficiencyLiveActivityWidget()
     ChargeSessionLiveActivityWidget()
+    ChargePowerLiveActivityWidget()
   }
 }

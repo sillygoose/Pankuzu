@@ -24,6 +24,9 @@ export default {
     if (url.pathname === "/charge-start") {
       return handleChargeStart(body, env)
     }
+    if (url.pathname === "/charge-power-start") {
+      return handleChargePowerStart(body, env)
+    }
     if (url.pathname === "/trip-token") {
       return new Response(null, { status: 204 })
     }
@@ -109,7 +112,15 @@ async function handleTripSessionStart(body, env, attributesType) {
   return new Response(null, { status: 204 })
 }
 
+async function handleChargePowerStart(body, env) {
+  return handleChargeSessionStart(body, env, "ChargePowerActivityAttributes")
+}
+
 async function handleChargeStart(body, env) {
+  return handleChargeSessionStart(body, env, "ChargeSessionActivityAttributes")
+}
+
+async function handleChargeSessionStart(body, env, attributesType) {
   const { pushToken, bundleId, apnsEnvironment } = body
   if (!pushToken || !bundleId) {
     return new Response(
@@ -139,7 +150,7 @@ async function handleChargeStart(body, env) {
         chargeState: { starting: {} },
         duration: [0, 0]
       },
-      "attributes-type": "ChargeSessionActivityAttributes",
+      "attributes-type": attributesType,
       attributes: {
         chargeID: crypto.randomUUID().toUpperCase()
       },

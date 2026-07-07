@@ -33,9 +33,11 @@ public final class LiveActivityManager {
   private var managedTripElevation: Activity<TripElevationActivityAttributes>?
   private var managedTripEfficiency: Activity<TripEfficiencyActivityAttributes>?
   private var managedCharge: Activity<ChargeSessionActivityAttributes>?
+  private var managedChargePower: Activity<ChargePowerActivityAttributes>?
 
   private var hasAnyTripActivity: Bool { managedTripWindSock != nil || managedTripElevation != nil || managedTripEfficiency != nil }
-  private var hasAnyManagedActivity: Bool { hasAnyTripActivity || managedCharge != nil }
+  private var hasAnyChargeActivity: Bool { managedCharge != nil || managedChargePower != nil }
+  private var hasAnyManagedActivity: Bool { hasAnyTripActivity || hasAnyChargeActivity }
 
   // MARK: - Push-to-Start Tokens
 
@@ -43,6 +45,7 @@ public final class LiveActivityManager {
   private var tripElevationPushToStartToken: Data?
   private var tripEfficiencyPushToStartToken: Data?
   private var chargePushToStartToken: Data?
+  private var chargePowerPushToStartToken: Data?
 
   // MARK: - Pending
 
@@ -73,6 +76,11 @@ public final class LiveActivityManager {
         await activity.end(ActivityContent(state: final, staleDate: nil), dismissalPolicy: .immediate)
         DokoLogging.shared.postLoggingResponse(.liveActivity("ended orphaned charge activity \(activity.id)"))
       }
+      for activity in Activity<ChargePowerActivityAttributes>.activities {
+        let final = ChargePowerActivityAttributes.ContentState(chargeState: .ended)
+        await activity.end(ActivityContent(state: final, staleDate: nil), dismissalPolicy: .immediate)
+        DokoLogging.shared.postLoggingResponse(.liveActivity("ended orphaned chargePower activity \(activity.id)"))
+      }
     }
   }
 
@@ -96,6 +104,11 @@ public final class LiveActivityManager {
       let final = ChargeSessionActivityAttributes.ContentState(chargeState: .ended)
       await activity.end(ActivityContent(state: final, staleDate: nil), dismissalPolicy: .immediate)
       managedCharge = nil
+    }
+    if let activity = managedChargePower {
+      let final = ChargePowerActivityAttributes.ContentState(chargeState: .ended)
+      await activity.end(ActivityContent(state: final, staleDate: nil), dismissalPolicy: .immediate)
+      managedChargePower = nil
     }
     pendingActivity = nil
   }
@@ -123,6 +136,12 @@ public final class LiveActivityManager {
       for await token in Activity<ChargeSessionActivityAttributes>.pushToStartTokenUpdates {
         chargePushToStartToken = token
         DokoLogging.shared.postLoggingResponse(.liveActivity("chargePushToStartToken updated"))
+      }
+    }
+    Task {
+      for await token in Activity<ChargePowerActivityAttributes>.pushToStartTokenUpdates {
+        chargePowerPushToStartToken = token
+        DokoLogging.shared.postLoggingResponse(.liveActivity("chargePowerPushToStartToken updated"))
       }
     }
   }
@@ -424,23 +443,30 @@ public final class LiveActivityManager {
     let hasActiveScene = UIApplication.shared.connectedScenes
       .contains { $0.activationState == .foregroundActive }
 
-    if !hasActiveScene, let token = chargePushToStartToken {
-      await pushToStartCharge(token: token)
-      Task {
-        for await activity in Activity<ChargeSessionActivityAttributes>.activityUpdates {
-          guard self.managedCharge == nil else { break }
-          self.managedCharge = activity
-          self.pendingActivity = nil
-          DokoLogging.shared.postLoggingResponse(.liveActivity(".startCharge via push-to-start"))
-          break
+    if !hasActiveScene {
+      if let token = chargePushToStartToken {
+        await pushToStartCharge(token: token)
+        Task {
+          for await activity in Activity<ChargeSessionActivityAttributes>.activityUpdates {
+            guard self.managedCharge == nil else { break }
+            self.managedCharge = activity
+            self.pendingActivity = nil
+            DokoLogging.shared.postLoggingResponse(.liveActivity(".startCharge via push-to-start"))
+            break
+          }
         }
       }
-      pendingActivity = .charge
-      return
-    }
-
-    guard hasActiveScene else {
-      DokoLogging.shared.postLoggingResponse(.liveActivity("startCharge: no active scene and no push-to-start token, deferring"))
+      if let token = chargePowerPushToStartToken {
+        await pushToStartChargePower(token: token)
+        Task {
+          for await activity in Activity<ChargePowerActivityAttributes>.activityUpdates {
+            guard self.managedChargePower == nil else { break }
+            self.managedChargePower = activity
+            DokoLogging.shared.postLoggingResponse(.liveActivity(".startCharge power via push-to-start"))
+            break
+          }
+        }
+      }
       pendingActivity = .charge
       return
     }
@@ -454,63 +480,114 @@ public final class LiveActivityManager {
       )
     } catch {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startCharge failed: \(error)"))
-      return
     }
+
+    let powerInitial = ChargePowerActivityAttributes.ContentState(chargeState: .starting)
+    do {
+      managedChargePower = try Activity.request(
+        attributes: ChargePowerActivityAttributes(),
+        content: ActivityContent(state: powerInitial, staleDate: now.addingTimeInterval(startActivityStaleDate)),
+        pushType: .token
+      )
+    } catch {
+      DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startCharge(power) failed: \(error)"))
+    }
+
     DokoLogging.shared.postLoggingResponse(.liveActivity(".startCharge"))
   }
 
   public func updateCharge(chargeData: DokoResponsePacket) async {
     if pendingActivity == .charge { return }
-    guard let activity = managedCharge else {
+    guard hasAnyChargeActivity else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.updateCharge: no activity"))
       return
     }
     guard let duration = chargeData.duration else { return }
 
-    let state = ChargeSessionActivityAttributes.ContentState(
-      chargeState: .active,
-      duration: .seconds(duration),
-      stateOfCharge: chargeData.batteryStateOfCharge,
-      rangeAdded: nil,
-      measuredPower: chargeData.batteryPower.map { $0 },
-      batteryVoltage: chargeData.batteryVoltage.map { $0 },
-      batteryCurrent: chargeData.batteryCurrent.map { $0 },
-      batteryTemperature: chargeData.batteryTemperature.map { $0 },
-      couplerTemperature: chargeData.couplerTemperature.map { $0 },
-    )
-
     @Dependency(\.date.now) var now
-    await activity.update(ActivityContent(state: state, staleDate: now.addingTimeInterval(60)))
+    let staleDate = now.addingTimeInterval(60)
+
+    if let activity = managedCharge {
+      let state = ChargeSessionActivityAttributes.ContentState(
+        chargeState: .active,
+        duration: .seconds(duration),
+        stateOfCharge: chargeData.batteryStateOfCharge,
+        rangeAdded: nil,
+        measuredPower: chargeData.batteryPower.map { $0 },
+        batteryVoltage: chargeData.batteryVoltage.map { $0 },
+        batteryCurrent: chargeData.batteryCurrent.map { $0 },
+        batteryTemperature: chargeData.batteryTemperature.map { $0 },
+        couplerTemperature: chargeData.couplerTemperature.map { $0 },
+      )
+      await activity.update(ActivityContent(state: state, staleDate: staleDate))
+    }
+
+    if let activity = managedChargePower {
+      let state = ChargePowerActivityAttributes.ContentState(
+        chargeState: .active,
+        duration: .seconds(duration),
+        stateOfCharge: chargeData.batteryStateOfCharge,
+        rangeAdded: nil,
+        measuredPower: chargeData.batteryPower.map { $0 },
+        batteryVoltage: chargeData.batteryVoltage.map { $0 },
+        batteryCurrent: chargeData.batteryCurrent.map { $0 },
+        batteryTemperature: chargeData.batteryTemperature.map { $0 },
+        couplerTemperature: chargeData.couplerTemperature.map { $0 },
+      )
+      await activity.update(ActivityContent(state: state, staleDate: staleDate))
+    }
+
     DokoLogging.shared.postLoggingResponse(.liveActivity(".updateCharge"))
   }
 
   public func endCharge(chargeData: DokoResponsePacket) async {
     if pendingActivity == .charge { pendingActivity = nil; return }
-    guard let activity = managedCharge else {
+    guard hasAnyChargeActivity else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.endCharge: no activity"))
       return
     }
     guard let duration = chargeData.duration else { return }
 
-    let state = ChargeSessionActivityAttributes.ContentState(
-      chargeState: .ended,
-      duration: .seconds(duration),
-      stateOfCharge: chargeData.batteryStateOfCharge,
-      energy: chargeData.batteryEnergy,
-      rangeAdded: chargeData.batteryDistanceToEmpty,
-      batteryTemperature: chargeData.batteryTemperature,
-    )
-
     @Dependency(\.date.now) var now
+    let chargeToEnd = managedCharge
+    let chargePowerToEnd = managedChargePower
     managedCharge = nil
+    managedChargePower = nil
     pendingActivity = nil
-    let endedState = ChargeSessionActivityAttributes.ContentState(chargeState: .ended)
-    await activity.update(ActivityContent(state: state, staleDate: now.addingTimeInterval(endActivityStaleDate)))
-    DokoLogging.shared.postLoggingResponse(.liveActivity(".endCharge"))
-    Task {
-      try? await Task.sleep(for: .seconds(30))
-      await activity.end(ActivityContent(state: endedState, staleDate: nil), dismissalPolicy: .after(now.addingTimeInterval(endActivityStaleDate)))
+
+    if let activity = chargeToEnd {
+      let state = ChargeSessionActivityAttributes.ContentState(
+        chargeState: .ended,
+        duration: .seconds(duration),
+        stateOfCharge: chargeData.batteryStateOfCharge,
+        energy: chargeData.batteryEnergy,
+        rangeAdded: chargeData.batteryDistanceToEmpty,
+        batteryTemperature: chargeData.batteryTemperature,
+      )
+      await activity.update(ActivityContent(state: state, staleDate: now.addingTimeInterval(endActivityStaleDate)))
+      Task {
+        try? await Task.sleep(for: .seconds(endActivityStaleDate))
+        await activity.end(ActivityContent(state: state, staleDate: nil), dismissalPolicy: .after(now))
+      }
     }
+
+    if let activity = chargePowerToEnd {
+      let state = ChargePowerActivityAttributes.ContentState(
+        chargeState: .ended,
+        duration: .seconds(duration),
+        stateOfCharge: chargeData.batteryStateOfCharge,
+        energy: chargeData.batteryEnergy,
+        rangeAdded: chargeData.batteryDistanceToEmpty,
+        batteryTemperature: chargeData.batteryTemperature,
+      )
+      await activity.update(ActivityContent(state: state, staleDate: now.addingTimeInterval(endActivityStaleDate)))
+      Task {
+        try? await Task.sleep(for: .seconds(endActivityStaleDate))
+        await activity.end(ActivityContent(state: state, staleDate: nil), dismissalPolicy: .after(now))
+      }
+    }
+
+    DokoLogging.shared.postLoggingResponse(.liveActivity(".endCharge"))
   }
 
   // MARK: - Push-to-Start
@@ -570,6 +647,25 @@ public final class LiveActivityManager {
       "apnsEnvironment": apnsEnvironment
     ]
     await sendWorkerRequest(path: "trip-efficiency-start", body: body)
+  }
+
+  private func pushToStartChargePower(token: Data) async {
+    let tokenString = token.map { String(format: "%02x", $0) }.joined()
+    let bundleId = Bundle.main.bundleIdentifier ?? ""
+    let msg = "pushToStartChargePower token=\(tokenString.prefix(8))… bundle=\(bundleId)"
+    logger.info("\(msg)")
+    DokoLogging.shared.postLoggingResponse(.liveActivity(msg))
+    #if DEBUG
+    let apnsEnvironment = "development"
+    #else
+    let apnsEnvironment = "production"
+    #endif
+    let body: [String: String] = [
+      "pushToken": tokenString,
+      "bundleId": bundleId,
+      "apnsEnvironment": apnsEnvironment
+    ]
+    await sendWorkerRequest(path: "charge-power-start", body: body)
   }
 
   private func pushToStartCharge(token: Data) async {
