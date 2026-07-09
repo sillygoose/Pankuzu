@@ -57,6 +57,8 @@
 
 /* Begin PBXFileReference section */
 		564619A52FD33AA700222C26 /* CarPlay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CarPlay.framework; path = System/Library/Frameworks/CarPlay.framework; sourceTree = SDKROOT; };
+		565CADF92FFFDE0200B494B4 /* worker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = worker.js; sourceTree = "<group>"; };
+		565CADFA2FFFDE0200B494B4 /* wrangler.toml */ = {isa = PBXFileReference; lastKnownFileType = text; path = wrangler.toml; sourceTree = "<group>"; };
 		565E9EE72F0A00E400FE33AF /* doko-ui */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-ui"; sourceTree = "<group>"; };
 		566710A52F1FBBD20084A371 /* LiveActivityWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LiveActivityWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		566710A62F1FBBD20084A371 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -156,9 +158,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		565CADFB2FFFDE0200B494B4 /* cloudflare */ = {
+			isa = PBXGroup;
+			children = (
+				565CADF92FFFDE0200B494B4 /* worker.js */,
+				565CADFA2FFFDE0200B494B4 /* wrangler.toml */,
+			);
+			path = cloudflare;
+			sourceTree = "<group>";
+		};
 		566DA71A2F05ACDB0044D201 = {
 			isa = PBXGroup;
 			children = (
+				565CADFB2FFFDE0200B494B4 /* cloudflare */,
 				5692F18B2F09F7DD00D9F0AA /* doko-core */,
 				5692F1A12F09F98B00D9F0AA /* obdlink-core */,
 				56A31D062F0A000700E4F1B4 /* doko-sharing */,
