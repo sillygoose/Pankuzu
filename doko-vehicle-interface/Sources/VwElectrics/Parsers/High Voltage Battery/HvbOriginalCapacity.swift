@@ -1,5 +1,5 @@
 import VehicleCommon
-import DokoDebug
+import DokoSharing
 import DokoLogging
 
 private struct anyBatteryPackParser: Parser {

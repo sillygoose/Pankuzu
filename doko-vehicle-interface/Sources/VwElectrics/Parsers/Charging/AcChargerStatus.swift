@@ -1,5 +1,5 @@
 import VehicleCommon
-import DokoDebug
+import DokoSharing
 
 private struct chargerStatus: Parser {
   func parse(_ input: inout Substring.UTF8View) throws -> Bool {

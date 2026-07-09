@@ -59,6 +59,7 @@
 		564619A52FD33AA700222C26 /* CarPlay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CarPlay.framework; path = System/Library/Frameworks/CarPlay.framework; sourceTree = SDKROOT; };
 		565CADF92FFFDE0200B494B4 /* worker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = worker.js; sourceTree = "<group>"; };
 		565CADFA2FFFDE0200B494B4 /* wrangler.toml */ = {isa = PBXFileReference; lastKnownFileType = text; path = wrangler.toml; sourceTree = "<group>"; };
+		565CAE8C2FFFE12D00B494B4 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		565E9EE72F0A00E400FE33AF /* doko-ui */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-ui"; sourceTree = "<group>"; };
 		566710A52F1FBBD20084A371 /* LiveActivityWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LiveActivityWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		566710A62F1FBBD20084A371 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -68,7 +69,6 @@
 		5692F18B2F09F7DD00D9F0AA /* doko-core */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-core"; sourceTree = "<group>"; };
 		5692F1A12F09F98B00D9F0AA /* obdlink-core */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "obdlink-core"; sourceTree = "<group>"; };
 		5692F1A22F09FA0A00D9F0AA /* doko-logging */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-logging"; sourceTree = "<group>"; };
-		5692F1A32F09FA7700D9F0AA /* doko-debug */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-debug"; sourceTree = "<group>"; };
 		5692F1A42F09FB9E00D9F0AA /* doko-managers */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-managers"; sourceTree = "<group>"; };
 		5692F1A52F09FBD900D9F0AA /* doko-schema */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-schema"; sourceTree = "<group>"; };
 		5692F1A72F09FC6A00D9F0AA /* doko-state-engine */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "doko-state-engine"; sourceTree = "<group>"; };
@@ -161,6 +161,7 @@
 		565CADFB2FFFDE0200B494B4 /* cloudflare */ = {
 			isa = PBXGroup;
 			children = (
+				565CAE8C2FFFE12D00B494B4 /* README.md */,
 				565CADF92FFFDE0200B494B4 /* worker.js */,
 				565CADFA2FFFDE0200B494B4 /* wrangler.toml */,
 			);
@@ -180,7 +181,6 @@
 				5692F1A72F09FC6A00D9F0AA /* doko-state-engine */,
 				5692F1A52F09FBD900D9F0AA /* doko-schema */,
 				5692F1A42F09FB9E00D9F0AA /* doko-managers */,
-				5692F1A32F09FA7700D9F0AA /* doko-debug */,
 				5692F1A22F09FA0A00D9F0AA /* doko-logging */,
 				566DA7252F05ACDB0044D201 /* Pankuzu */,
 				566DA7332F05ACDC0044D201 /* PankuzuTests */,

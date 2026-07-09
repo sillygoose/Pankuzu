@@ -1,5 +1,5 @@
 import VehicleCommon
-import DokoDebug
+import DokoSharing
 
 private struct speedParser: Parser {
   var body: some Parser<Substring.UTF8View, Double> {

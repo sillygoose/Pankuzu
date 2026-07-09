@@ -4,7 +4,7 @@ import OSLog
 import Dependencies
 
 import DokoSharing
-import DokoDebug
+import DokoSharing
 import DokoLogging
 import DokoStateEngine
 import DokoVehicleManager

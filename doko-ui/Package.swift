@@ -20,7 +20,6 @@ let package = Package(
   dependencies: [
     .package(path: "../doko-core"),
     .package(path: "../doko-sharing"),
-    .package(path: "../doko-debug"),
     .package(path: "../doko-logging"),
     .package(path: "../doko-schema"),
     .package(path: "../doko-state-engine"),
@@ -81,7 +80,6 @@ let package = Package(
         "LocationsUI",
         "CommonUI",
         .product(name: "DokoTypes", package: "doko-core"),
-        .product(name: "DokoDebug", package: "doko-debug"),
         .product(name: "DokoLogging", package: "doko-logging"),
         .product(name: "DokoVehicleManager", package: "doko-managers"),
         .product(name: "DokoStateEngine", package: "doko-state-engine"),

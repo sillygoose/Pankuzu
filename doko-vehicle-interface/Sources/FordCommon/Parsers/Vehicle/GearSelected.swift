@@ -1,5 +1,5 @@
 import VehicleCommon
-import DokoDebug
+import DokoSharing
 
 private enum GearSelected: Int {
   case unknown = -1

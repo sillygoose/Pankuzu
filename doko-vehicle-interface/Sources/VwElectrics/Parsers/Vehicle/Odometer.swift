@@ -1,5 +1,5 @@
 import VehicleCommon
-import DokoDebug
+import DokoSharing
 
 #if DEBUG
 nonisolated(unsafe) private var debugOdometer: Double = 10000

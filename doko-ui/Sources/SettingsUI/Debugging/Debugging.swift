@@ -2,7 +2,7 @@ import SwiftUI
 import OSLog
 
 import DokoSharing
-import DokoDebug
+import DokoSharing
 import DokoLogging
 import DokoStateEngine
 import DokoVehicleManager

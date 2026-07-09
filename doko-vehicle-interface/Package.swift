@@ -18,7 +18,6 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../doko-core"),
-    .package(path: "../doko-debug"),
     .package(path: "../doko-schema"),
     .package(path: "../doko-logging"),
     .package(path: "../doko-sharing"),
@@ -45,7 +44,6 @@ let package = Package(
         .product(name: "DokoTypes", package: "doko-core"),
         .product(name: "Vehicles", package: "doko-schema"),
         .product(name: "DokoSharing", package: "doko-sharing"),
-        .product(name: "DokoDebug", package: "doko-debug"),
         .product(name: "DokoLogging", package: "doko-logging"),
       ]
     ),
@@ -61,7 +59,6 @@ let package = Package(
         .product(name: "CoreLocationManager", package: "doko-managers"),
         .product(name: "DokoWeatherManager", package: "doko-managers"),
         .product(name: "DokoSharing", package: "doko-sharing"),
-        .product(name: "DokoDebug", package: "doko-debug"),
         .product(name: "DokoLogging", package: "doko-logging"),
       ]
     ),
@@ -77,7 +74,6 @@ let package = Package(
         .product(name: "CoreLocationManager", package: "doko-managers"),
         .product(name: "DokoWeatherManager", package: "doko-managers"),
         .product(name: "DokoSharing", package: "doko-sharing"),
-        .product(name: "DokoDebug", package: "doko-debug"),
         .product(name: "DokoLogging", package: "doko-logging"),
       ]
     ),
@@ -92,7 +88,6 @@ let package = Package(
         .product(name: "CoreLocationManager", package: "doko-managers"),
         .product(name: "DokoWeatherManager", package: "doko-managers"),
         .product(name: "DokoSharing", package: "doko-sharing"),
-        .product(name: "DokoDebug", package: "doko-debug"),
         .product(name: "DokoLogging", package: "doko-logging"),
       ]
     ),
@@ -111,7 +106,7 @@ let package = Package(
         .product(name: "CoreLocationManager", package: "doko-managers"),
         .product(name: "DokoWeatherManager", package: "doko-managers"),
         .product(name: "DokoLogging", package: "doko-logging"),
-        .product(name: "DokoDebug", package: "doko-debug"),
+        .product(name: "DokoSharing", package: "doko-sharing"),
       ]
     ),
     .testTarget(

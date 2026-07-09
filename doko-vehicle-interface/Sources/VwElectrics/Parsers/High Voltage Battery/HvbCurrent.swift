@@ -1,5 +1,5 @@
 import VehicleCommon
-import DokoDebug
+import DokoSharing
 
 private struct stpxParser: Parser {
   var body: some Parser<Substring.UTF8View, (Double, Double)> {

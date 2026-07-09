@@ -1,5 +1,5 @@
 import VehicleCommon
-import DokoDebug
+import DokoSharing
 
 private enum DcChargerStatus: Int {
   case unknown = 255
