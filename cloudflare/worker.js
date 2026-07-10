@@ -42,7 +42,7 @@ async function handleTripStart(body, env) {
 
   let jwt
   try {
-    jwt = await makeApnsJwt(apnsKey, apnsKeyId, env.APNS_TEAM_ID)
+    jwt = await getCachedApnsJwt(apnsKey, apnsKeyId, env.APNS_TEAM_ID)
   } catch (e) {
     return new Response("JWT signing failed: " + e.message, { status: 500 })
   }
@@ -107,7 +107,7 @@ async function handleChargeStart(body, env) {
 
   let jwt
   try {
-    jwt = await makeApnsJwt(apnsKey, apnsKeyId, env.APNS_TEAM_ID)
+    jwt = await getCachedApnsJwt(apnsKey, apnsKeyId, env.APNS_TEAM_ID)
   } catch (e) {
     return new Response("JWT signing failed: " + e.message, { status: 500 })
   }
@@ -153,6 +153,19 @@ async function handleChargeStart(body, env) {
   }
 
   return new Response(null, { status: 204 })
+}
+
+const jwtCache = new Map()
+
+async function getCachedApnsJwt(p8Key, keyId, teamId) {
+  const now = Math.floor(Date.now() / 1000)
+  const cached = jwtCache.get(keyId)
+  if (cached && (now - cached.generatedAt) < 45 * 60) {
+    return cached.jwt
+  }
+  const jwt = await makeApnsJwt(p8Key, keyId, teamId)
+  jwtCache.set(keyId, { jwt, generatedAt: now })
+  return jwt
 }
 
 async function makeApnsJwt(p8Key, keyId, teamId) {

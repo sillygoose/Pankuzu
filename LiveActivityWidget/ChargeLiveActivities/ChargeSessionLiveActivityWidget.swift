@@ -10,13 +10,11 @@ struct ChargeSessionLiveActivityWidget: Widget {
       ChargeSessionLiveActivity(context: context)
     } dynamicIsland: { context in
       DynamicIsland {
-        DynamicIslandExpandedRegion(.leading) {
-          Image(systemName: "ev.charger")
-            .foregroundStyle(DesignTokens.Color.charging)
-        }
-        DynamicIslandExpandedRegion(.trailing) {
-          Image(systemName: "record.circle")
-            .foregroundStyle(DesignTokens.Color.record)
+        DynamicIslandExpandedRegion(.leading) {}
+        DynamicIslandExpandedRegion(.center) {
+          Text("Charge Starting")
+            .foregroundStyle(DesignTokens.Color.primary)
+            .font(DesignTokens.Font.title)
         }
       } compactLeading: {
         Image(systemName: "ev.charger")

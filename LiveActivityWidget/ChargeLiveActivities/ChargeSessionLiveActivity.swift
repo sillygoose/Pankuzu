@@ -176,10 +176,11 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
       VStack {
         HStack {
           Text("Charge Complete")
-            .font(laTitle)
+            .font(laSubtitle)
             .foregroundStyle(DesignTokens.Color.primary)
           Spacer()
         }
+        .padding(.bottom, 2)
         
         HStack {
           Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {

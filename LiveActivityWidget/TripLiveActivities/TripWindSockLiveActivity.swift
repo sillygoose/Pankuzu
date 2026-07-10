@@ -146,11 +146,12 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
       HStack(alignment: .center) {
         VStack {
           HStack {
-            Text("Trip Ended")
+            Text("Trip Completed")
               .foregroundStyle(DesignTokens.Color.primary)
-              .font(laTitle)
+              .font(laSubtitle)
             Spacer()
           }
+          .padding(.bottom, 2)
           
           HStack {
             Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
@@ -269,7 +270,6 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
       let windSpeed = Measurement(value: windSpeed, unit: UnitSpeed.kilometersPerHour)
         .converted(to: appSettings.metric ? .kilometersPerHour : .milesPerHour)
 
-
       VStack(spacing: 2) {
         HStack(spacing: 4) {
           Image(systemName: conditions)
@@ -352,6 +352,17 @@ extension TripWindSockActivityAttributes.ContentState {
       tripState: .ended,
       duration: .seconds(1000),
       distance: 22.0,
+      energy: 4.1,
+      efficiency: 5.5,
+    )
+  }
+  
+  fileprivate static var endedWithRangeConsumed: TripWindSockActivityAttributes.ContentState {
+    TripWindSockActivityAttributes.ContentState(
+      tripState: .ended,
+      duration: .seconds(1000),
+      distance: 22.0,
+      energy: 4.1,
       efficiency: 5.5,
       rangeConsumed: 20.4,
     )
@@ -365,4 +376,5 @@ extension TripWindSockActivityAttributes.ContentState {
   TripWindSockActivityAttributes.ContentState.tailWind
   TripWindSockActivityAttributes.ContentState.headWind
   TripWindSockActivityAttributes.ContentState.ended
+  TripWindSockActivityAttributes.ContentState.endedWithRangeConsumed
 }

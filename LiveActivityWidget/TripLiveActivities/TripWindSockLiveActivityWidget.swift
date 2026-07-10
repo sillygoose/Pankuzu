@@ -10,13 +10,11 @@ struct TripWindSockLiveActivityWidget: Widget {
       TripWindSockLiveActivity(context: context)
     } dynamicIsland: { context in
       DynamicIsland {
-        DynamicIslandExpandedRegion(.leading) {
-          Image(systemName: "car")
-            .foregroundStyle(DesignTokens.Color.tripping)
-        }
-        DynamicIslandExpandedRegion(.trailing) {
-          Image(systemName: "record.circle")
-            .foregroundStyle(DesignTokens.Color.record)
+        DynamicIslandExpandedRegion(.leading) {}
+        DynamicIslandExpandedRegion(.center) {
+          Text("Trip Starting")
+            .foregroundStyle(DesignTokens.Color.primary)
+            .font(DesignTokens.Font.title)
         }
       } compactLeading: {
         Image(systemName: "car")

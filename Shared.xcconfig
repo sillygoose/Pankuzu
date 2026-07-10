@@ -2,6 +2,7 @@
 // Local overrides go in Local.xcconfig (gitignored). Required keys:
 //   DEVELOPMENT_TEAM       = <your Apple team ID>
 //   ABRP_API_KEY           = <your ABRP API key>
-//   WORKER_BASE_URL        = <your Cloudflare Worker URL for Live Activity push-to-start>
+//   WORKER_BASE_URL        = <production Cloudflare Worker URL — used by release/TestFlight builds>
+//   WORKER_BASE_URL_DEV    = <development Cloudflare Worker URL — used by debug builds>
 
 #include? "Local.xcconfig"

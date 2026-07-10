@@ -7,7 +7,23 @@ This worker receives push-to-start requests from the Pankuzu app and forwards th
 | File | Purpose |
 |------|---------|
 | `worker.js` | Cloudflare Worker — handles `/trip-start` and `/charge-start` routes |
-| `wrangler.toml` | Wrangler configuration — worker name and entry point |
+| `wrangler.toml` | Wrangler configuration — worker name, entry point, and environments |
+
+## Environments
+
+Two worker deployments are maintained — one for development builds and one for production.
+
+| Environment | Worker name | Used by |
+|-------------|-------------|---------|
+| production (default) | `pankuzu-trip-la` | Release / TestFlight builds |
+| development | `pankuzu-trip-la-dev` | Debug builds from Xcode |
+
+The app selects the correct worker URL at compile time via `#if DEBUG`. Set the URLs in `Local.xcconfig` (gitignored):
+
+```xcconfig
+WORKER_BASE_URL     = https://<worker-name>.<subdomain>.workers.dev
+WORKER_BASE_URL_DEV = https://<worker-name-dev>.<subdomain>.workers.dev
+```
 
 ## Routes
 
@@ -28,7 +44,7 @@ This worker receives push-to-start requests from the Pankuzu app and forwards th
 
 ## Environment variables
 
-Set these in the Cloudflare dashboard under **Workers > pankuzu-trip-la > Settings > Variables**.
+Set these in the Cloudflare dashboard under **Workers > [worker name] > Settings > Variables**. Each worker environment has its own set of secrets.
 
 | Variable | Description |
 |----------|-------------|
@@ -40,10 +56,16 @@ Set these in the Cloudflare dashboard under **Workers > pankuzu-trip-la > Settin
 
 APNs keys are created in the Apple Developer portal under **Certificates, Identifiers & Profiles > Keys**. Each key must have the **Apple Push Notifications service (APNs)** capability enabled.
 
+The development worker typically only needs the sandbox keys; the production worker only needs the production keys. Both sets can be configured in each environment for flexibility.
+
 ## Deploying
 
 ```bash
+# Deploy to production
 wrangler deploy --config cloudflare/wrangler.toml
+
+# Deploy to development
+wrangler deploy --config cloudflare/wrangler.toml --env development
 ```
 
 Run from the repository root. Requires `wrangler` to be installed (`npm install -g wrangler`) and authenticated (`wrangler login`).

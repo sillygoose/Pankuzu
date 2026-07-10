@@ -6,6 +6,8 @@
 	<string>$(ABRP_API_KEY)</string>
 	<key>WorkerBaseURL</key>
 	<string>$(WORKER_BASE_URL)</string>
+	<key>WorkerBaseURLDev</key>
+	<string>$(WORKER_BASE_URL_DEV)</string>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.unchan.pankuzu.daily-pruning</string>
