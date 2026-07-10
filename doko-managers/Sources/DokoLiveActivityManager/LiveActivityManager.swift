@@ -97,10 +97,7 @@ public final class LiveActivityManager {
   }
 
   private func startForegroundObservation() {
-    let names: [Notification.Name] = [
-      UIApplication.didBecomeActiveNotification,
-      UIScene.didActivateNotification,
-    ]
+    let names: [Notification.Name] = [UIApplication.didBecomeActiveNotification, UIScene.didActivateNotification]
     for name in names {
       Task {
         for await _ in NotificationCenter.default.notifications(named: name) {
@@ -427,6 +424,7 @@ public final class LiveActivityManager {
     let base = Bundle.main.object(forInfoDictionaryKey: "WorkerBaseURL") as? String ?? ""
     #endif
     logger.info("WorkerBaseURL: '\(base)' path: '\(path)'")
+    DokoLogging.shared.postLoggingResponse(.liveActivity("WorkerBaseURL: '\(base)' path: '\(path)'"), debugPacket: true)
     guard let url = URL(string: "\(base)/\(path)") else { return }
     var request = URLRequest(url: url)
     request.httpMethod = "POST"

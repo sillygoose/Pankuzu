@@ -13,6 +13,12 @@ extension SharedKey where Self == InMemoryKey<Deque<DokoLoggingPacket>>.Default 
 }
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
+  public static var logDebugPackets: Self {
+    Self[.appStorage("DokoLogging-LogDebugPackets"), default: false]
+  }
+}
+
+extension SharedKey where Self == AppStorageKey<Bool>.Default {
   public static var logObdPackets: Self {
     Self[.appStorage("DokoLogging-LogObdPackets"), default: false]
   }

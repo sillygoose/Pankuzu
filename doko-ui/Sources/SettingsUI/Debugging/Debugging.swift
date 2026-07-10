@@ -33,6 +33,7 @@ class DebuggingModel {
   var accessoryIsConnected: Bool { accessoryName != nil }
   
   @ObservationIgnored @Shared(.responseHistory) var responseHistory
+  @ObservationIgnored @Shared(.logDebugPackets) var logDebugPackets
   @ObservationIgnored @Shared(.logObdPackets) var logObdPackets
   @ObservationIgnored @Shared(.logDokoPackets) var logDokoPackets
   
@@ -225,6 +226,13 @@ struct DebuggingView: View {
             isOn: Binding(
               get: { model.logDatabasePackets },
               set: { isOn, _ in model.$logDatabasePackets.withLock { $0 = isOn } }
+            )
+          )
+          Toggle(
+            "Debug",
+            isOn: Binding(
+              get: { model.logDebugPackets },
+              set: { isOn, _ in model.$logDebugPackets.withLock { $0 = isOn } }
             )
           )
         } footer: {

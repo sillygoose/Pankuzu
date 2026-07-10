@@ -62,8 +62,9 @@ public final class DokoLogging: Sendable {
   
   private init() {}
   
-  private func postResponse(_ response: DokoLoggingPacket) {
+  private func postResponse(_ response: DokoLoggingPacket, debugPacket: Bool) {
     @Shared(.responseHistory) var responseHistory
+    @Shared(.logDebugPackets) var logDebugPackets
     @Shared(.logObdPackets) var logObdPackets
     @Shared(.logDokoPackets) var logDokoPackets
     @Shared(.logInfoPackets) var logInfoPackets
@@ -92,20 +93,26 @@ public final class DokoLogging: Sendable {
       case .database: shouldLog = logDatabasePackets
       }
       if shouldLog {
-        $responseHistory.withLock { $0.prepend(response) }
+        if !debugPacket || logDebugPackets {
+          $responseHistory.withLock { $0.prepend(response) }
+        }
       }
     case .obd:
       if logObdPackets {
-        $responseHistory.withLock { $0.prepend(response) }
+        if !debugPacket || logDebugPackets {
+          $responseHistory.withLock { $0.prepend(response) }
+        }
       }
     case .doko:
       if logDokoPackets {
-        $responseHistory.withLock { $0.prepend(response) }
+        if !debugPacket || logDebugPackets {
+          $responseHistory.withLock { $0.prepend(response) }
+        }
       }
     }
   }
 
-  public func postLoggingResponse(_ responsePacket: LoggingPacketType) {
-    postResponse(.logging(LoggingResponsePacket(type: responsePacket)))
+  public func postLoggingResponse(_ responsePacket: LoggingPacketType, debugPacket: Bool = false) {
+    postResponse(.logging(LoggingResponsePacket(type: responsePacket)), debugPacket: debugPacket)
   }
 }
