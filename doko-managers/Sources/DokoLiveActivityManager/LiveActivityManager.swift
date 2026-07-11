@@ -121,11 +121,23 @@ public final class LiveActivityManager {
         if Task.isCancelled { break }
         guard oldAccessoryName != newAccessoryName else { continue }
         if newAccessoryName == nil {
-          guard let activity = self.managedActivity else { continue }
-          DokoLogging.shared.postLoggingResponse(.liveActivity("ending activity due to disconnect"))
-          await activity.endImmediately()
-          self.managedActivity = nil
-          self.pendingActivity = nil
+          if let activity = self.managedActivity {
+            DokoLogging.shared.postLoggingResponse(.liveActivity("ending activity due to disconnect"))
+            await activity.endImmediately()
+            self.managedActivity = nil
+            self.pendingActivity = nil
+          } else {
+            for activity in Activity<TripWindSockActivityAttributes>.activities {
+              let final = TripWindSockActivityAttributes.ContentState(tripState: .ended)
+              await activity.end(ActivityContent(state: final, staleDate: nil), dismissalPolicy: .immediate)
+            }
+            for activity in Activity<ChargeSessionActivityAttributes>.activities {
+              let final = ChargeSessionActivityAttributes.ContentState(chargeState: .ended)
+              await activity.end(ActivityContent(state: final, staleDate: nil), dismissalPolicy: .immediate)
+            }
+            DokoLogging.shared.postLoggingResponse(.liveActivity("ending orphaned activities due to disconnect"))
+            self.pendingActivity = nil
+          }
         }
         oldAccessoryName = newAccessoryName
       }
@@ -143,9 +155,7 @@ public final class LiveActivityManager {
       await currentActivity.endImmediately()
     }
 
-    let hasActiveScene = UIApplication.shared.connectedScenes
-      .contains { $0.activationState == .foregroundActive }
-
+    let hasActiveScene = UIApplication.shared.connectedScenes.contains { $0.activationState == .foregroundActive }
     if !hasActiveScene, let token = tripPushToStartToken {
       await pushToStartTrip(token: token)
       Task {
@@ -424,7 +434,6 @@ public final class LiveActivityManager {
     let base = Bundle.main.object(forInfoDictionaryKey: "WorkerBaseURL") as? String ?? ""
     #endif
     logger.info("WorkerBaseURL: '\(base)' path: '\(path)'")
-    DokoLogging.shared.postLoggingResponse(.liveActivity("WorkerBaseURL: '\(base)' path: '\(path)'"), debugPacket: true)
     guard let url = URL(string: "\(base)/\(path)") else { return }
     var request = URLRequest(url: url)
     request.httpMethod = "POST"

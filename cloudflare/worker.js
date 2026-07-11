@@ -52,6 +52,7 @@ async function handleTripStart(body, env) {
     aps: {
       timestamp: now,
       event: "start",
+      "dismissal-date": now + (2 * 60),
       "content-state": {
         tripState: { starting: {} },
         duration: [0, 0],
@@ -117,6 +118,7 @@ async function handleChargeStart(body, env) {
     aps: {
       timestamp: now,
       event: "start",
+      "dismissal-date": now + (2 * 60),
       "content-state": {
         chargeState: { starting: {} },
         duration: [0, 0]
