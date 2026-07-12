@@ -95,6 +95,7 @@ let package = Package(
       name: "VehicleCommon",
       dependencies: [
         .product(name: "Parsing", package: "swift-parsing"),
+        .product(name: "DokoTypes", package: "doko-core"),
       ]
     ),
     .target(

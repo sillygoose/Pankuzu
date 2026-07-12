@@ -197,6 +197,7 @@ extension FordTranslating {
     if let efficiency15min = vehicleEfficiency.efficiency15min {
       dokoResponses[.tripEfficiency15Minute] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency15Minute(efficiency15min))
     }
+    dokoResponses[.tripEfficiencyMovingAverage] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiencyMovingAverage(vehicleEfficiency.efficiencyMovingAverage))
 
     if let batteryDistanceToEmpty = responsePacket.batteryDistanceToEmpty {
       dokoResponses[.batteryDistanceToEmpty] = DokoCommandResponse(command: dokoCommand, response: .batteryDistanceToEmpty(batteryDistanceToEmpty))

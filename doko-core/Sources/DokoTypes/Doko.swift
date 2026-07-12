@@ -3,6 +3,17 @@ import CoreLocation
 
 import OrderedCollections
 
+public struct EfficiencyPoint: Equatable, Identifiable, Hashable, Codable, Sendable {
+  public let timestamp: Date
+  public let efficiency: Double
+  public var id: Date { timestamp }
+
+  public init(timestamp: Date, efficiency: Double) {
+    self.timestamp = timestamp
+    self.efficiency = efficiency
+  }
+}
+
 public struct DokoCurrentWeather: Equatable, Hashable, Codable, Sendable {
   public var timestamp: Date
   public let temperature: Double
@@ -214,7 +225,7 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
   case speed
   
   case tripEfficiency
-  case tripEfficiency5Minute, tripEfficiency10Minute, tripEfficiency15Minute
+  case tripEfficiency5Minute, tripEfficiency10Minute, tripEfficiency15Minute, tripEfficiencyMovingAverage
 
   case batteryStateOfCharge
   case batteryStateOfHealth
@@ -336,6 +347,8 @@ public enum DokoCommand: Equatable, Hashable, Sendable {
         return ".tripEfficiency10Minute"
       case .tripEfficiency15Minute:
         return ".tripEfficiency15Minute"
+      case .tripEfficiencyMovingAverage:
+        return ".tripEfficiencyMovingAverage"
 
       case .batteryStateOfCharge:
         return ".batteryStateOfCharge"
@@ -424,6 +437,7 @@ public enum DokoResponse: Equatable, Sendable {
   
   case tripEfficiency(Double)
   case tripEfficiency5Minute(Double), tripEfficiency10Minute(Double), tripEfficiency15Minute(Double)
+  case tripEfficiencyMovingAverage([EfficiencyPoint])
 
   case batteryStateOfCharge(Double)
   case batteryStateOfHealth(Double)
@@ -493,6 +507,8 @@ public enum DokoResponse: Equatable, Sendable {
         return String(format: ".tripEfficiency10Minute(%.1fkm/kWh)", efficiency)
       case .tripEfficiency15Minute(let efficiency):
         return String(format: ".tripEfficiency15Minute(%.1fkm/kWh)", efficiency)
+      case .tripEfficiencyMovingAverage(let efficiencyMovingAverage):
+        return String(format: ".tripEfficiencyMovingAverage(\(efficiencyMovingAverage.count))")
 
       case .batteryStateOfCharge(let soc):
         return String(format: ".batteryStateOfCharge(%.1f%)", soc)
@@ -608,6 +624,11 @@ extension DokoResponsePacket {
 
   public var tripEfficiency10Minute: Double? {
     guard case let .tripEfficiency10Minute(v)? = responses[.tripEfficiency10Minute]?.response else { return nil }
+    return v
+  }
+
+  public var tripEfficiencyMovingAverage: [EfficiencyPoint]? {
+    guard case let .tripEfficiencyMovingAverage(v)? = responses[.tripEfficiencyMovingAverage]?.response else { return nil }
     return v
   }
 

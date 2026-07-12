@@ -44,14 +44,6 @@ extension TripWindSockActivityAttributes.ContentState {
       duration: .seconds(0),
       distance: 0,
       rangeConsumed: 0,
-      windSock: WindSock(
-        course: 90,
-        temperature: 15,
-        conditions: "cloud.fill",
-        windSpeed: 20,
-        windDirection: 180,
-        windCompassDirection: "S"
-      )
     )
   }
 

@@ -152,7 +152,6 @@ extension Trip {
         latitude: position.latitude, longitude: position.longitude, elevation: position.elevation,
         sharedLocation: false
       )
-
       tripDraft.latitudeEnd = position.latitude
       tripDraft.longitudeEnd = position.longitude
       tripDraft.elevationEnd = position.elevation

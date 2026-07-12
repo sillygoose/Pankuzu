@@ -15,7 +15,7 @@ public func parseHvbCurrent(_ input: String) throws -> Double {
   @Shared(.simAcCharge) var simAcCharge
   @Shared(.simDcCharge) var simDcCharge
   if simIdle {
-    if simTrip { return -80 }
+    if simTrip { return -50 }
     if simAcCharge { return 28 }
     if simDcCharge { return 300 }
     return -4

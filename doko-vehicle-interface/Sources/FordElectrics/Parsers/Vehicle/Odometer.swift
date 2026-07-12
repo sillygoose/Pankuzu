@@ -16,7 +16,7 @@ public func parseOdometer(_ input: String) throws -> Double {
 #if DEBUG
   @Shared(.simIdle) var simIdle
   if simIdle {
-    debugOdometer += 0.1
+    defer { debugOdometer += 0.3 }
     return debugOdometer
   }
 #endif

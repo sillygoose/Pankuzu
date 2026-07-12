@@ -6,8 +6,7 @@ import OSLog
 import Dependencies
 @_exported import DokoDesignTokens
 @_exported import DokoExtensions
-
-import DokoTypes
+@_exported import DokoTypes
 import DokoLogging
 import DokoSharing
 
@@ -205,10 +204,14 @@ public final class LiveActivityManager {
     let duration = tripData.duration ?? 0
     let distance = tripData.distance ?? 0
 
-#if DEBUG
-    let course = tripData.position?.course ?? 0
-    let windSock: WindSock? = if let weather = tripData.weather {
-      WindSock(
+    let windSock: WindSock? = {
+      guard let weather = tripData.weather else { return nil }
+      #if DEBUG
+      let course = tripData.position?.course ?? 0
+      #else
+      guard let course = tripData.position?.course else { return nil }
+      #endif
+      return WindSock(
         course: course,
         temperature: weather.temperature,
         conditions: weather.conditionSymbol,
@@ -216,23 +219,7 @@ public final class LiveActivityManager {
         windDirection: weather.windDirection,
         windCompassDirection: weather.windCompassDirection
       )
-    } else {
-      nil
-    }
-#else
-    let windSock: WindSock? = if let course = tripData.position?.course, let weather = tripData.weather {
-      WindSock(
-        course: course,
-        temperature: weather.temperature,
-        conditions: weather.conditionSymbol,
-        windSpeed: weather.windSpeed,
-        windDirection: weather.windDirection,
-        windCompassDirection: weather.windCompassDirection
-      )
-    } else {
-      nil
-    }
-#endif
+    }()
     
     let state = TripWindSockActivityAttributes.ContentState(
       tripState: .active,
@@ -241,7 +228,8 @@ public final class LiveActivityManager {
       efficiency: tripData.tripEfficiency,
       elevation: tripData.position?.elevation,
       rangeConsumed: tripData.batteryDistanceToEmpty,
-      windSock: windSock
+      windSock: windSock,
+      efficiencyMovingAverage: tripData.tripEfficiencyMovingAverage
     )
 
     @Dependency(\.date.now) var now

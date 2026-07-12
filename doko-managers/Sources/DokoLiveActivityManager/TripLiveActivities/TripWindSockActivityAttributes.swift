@@ -55,7 +55,8 @@ public struct TripWindSockActivityAttributes: ActivityAttributes, Sendable {
     public let elevation: Double?
     public let rangeConsumed: Double?
     public let windSock: WindSock?
-
+    public let efficiencyMovingAverage: [EfficiencyPoint]?
+    
     public init(
       tripState: TripState,
       duration: Duration = .seconds(0),
@@ -64,7 +65,8 @@ public struct TripWindSockActivityAttributes: ActivityAttributes, Sendable {
       efficiency: Double? = nil,
       elevation: Double? = nil,
       rangeConsumed: Double? = nil,
-      windSock: WindSock? = nil
+      windSock: WindSock? = nil,
+      efficiencyMovingAverage: [EfficiencyPoint]? = nil
     ) {
       self.tripState = tripState
       self.duration = duration
@@ -74,6 +76,7 @@ public struct TripWindSockActivityAttributes: ActivityAttributes, Sendable {
       self.elevation = elevation
       self.rangeConsumed = rangeConsumed
       self.windSock = windSock
+      self.efficiencyMovingAverage = efficiencyMovingAverage
     }
   }
 }

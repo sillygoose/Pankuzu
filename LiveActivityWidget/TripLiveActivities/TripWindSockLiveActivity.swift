@@ -1,4 +1,5 @@
 @preconcurrency import ActivityKit
+import Charts
 import SwiftUI
 import WidgetKit
 
@@ -40,6 +41,54 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
   }
 
   private struct ActiveView: View, DokoLiveActivityFonts {
+    let context: ActivityViewContext<TripWindSockActivityAttributes>
+
+    @Environment(\.activityFamily) var activityFamily
+
+    @Shared(.appSettings) var appSettings
+
+    var body: some View {
+      let points = context.state.efficiencyMovingAverage ?? []
+      let targetUnit: UnitEnergyEfficiency = appSettings.metric
+        ? (appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour)
+        : .milesPerKilowattHour
+      let (yMax, yStride): (Double, Double) = appSettings.metric
+        ? (appSettings.kWhPer100km ? (40, 10) : (8, 2))
+        : (5, 1)
+
+      let newest = points.last?.timestamp ?? Date()
+      let domainStart = newest.addingTimeInterval(-15 * 60)
+
+      Chart(points) { point in
+        let converted = Measurement(value: point.efficiency, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
+          .converted(to: targetUnit)
+        BarMark(
+          x: .value("Time", point.timestamp),
+          y: .value("Efficiency", converted.value)
+        )
+      }
+      .foregroundStyle(.green)
+      .chartXScale(domain: domainStart...newest)
+      .chartYScale(domain: 0...yMax)
+      .chartXAxis(.hidden)
+      .chartYAxis {
+        AxisMarks(position: .trailing, values: .stride(by: yStride)) { value in
+          AxisValueLabel {
+            if let v = value.as(Double.self) {
+              Text(Int(v).description)
+                .font(.system(size: 16))
+                .foregroundStyle(.white)
+                .padding(.leading, 6)
+            }
+          }
+        }
+      }
+      .chartPlotStyle { $0.frame(maxWidth: .infinity, maxHeight: .infinity) }
+      .padding()
+    }
+  }
+
+  private struct ActiveViewOld: View, DokoLiveActivityFonts {
     let context: ActivityViewContext<TripWindSockActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily
@@ -310,6 +359,40 @@ extension TripWindSockActivityAttributes.ContentState {
     TripWindSockActivityAttributes.ContentState(tripState: .starting)
   }
 
+  fileprivate static var partialActiveEfficiency: TripWindSockActivityAttributes.ContentState {
+    let now = Date()
+    let count = 31  // 5 min at 10s intervals — 0..30 spans exactly 300s
+    let points: [EfficiencyPoint] = (0..<count).map { i in
+      let timestamp = now.addingTimeInterval(TimeInterval(i - count + 1) * 10)
+      let raw = 4.0 + sin(Double(i) * 0.15) * 4.0 + sin(Double(i) * 0.04) * 1.0
+      return EfficiencyPoint(timestamp: timestamp, efficiency: max(0, min(8, raw)))
+    }
+    return TripWindSockActivityAttributes.ContentState(
+      tripState: .active,
+      duration: .seconds(600),
+      distance: 22.0,
+      efficiency: points.last?.efficiency,
+      efficiencyMovingAverage: points
+    )
+  }
+
+  fileprivate static var activeEfficiency: TripWindSockActivityAttributes.ContentState {
+    let now = Date()
+    let count = 91  // 15 min at 10s intervals — 0..90 spans exactly 900s
+    let points: [EfficiencyPoint] = (0..<count).map { i in
+      let timestamp = now.addingTimeInterval(TimeInterval(i - count + 1) * 10)
+      let raw = 4.0 + sin(Double(i) * 0.15) * 4.0 + sin(Double(i) * 0.04) * 1.0
+      return EfficiencyPoint(timestamp: timestamp, efficiency: max(0, min(8, raw)))
+    }
+    return TripWindSockActivityAttributes.ContentState(
+      tripState: .active,
+      duration: .seconds(1000),
+      distance: 22.0,
+      efficiency: points.last?.efficiency,
+      efficiencyMovingAverage: points
+    )
+  }
+
   fileprivate static var headWind: TripWindSockActivityAttributes.ContentState {
     TripWindSockActivityAttributes.ContentState(
       tripState: .active,
@@ -373,6 +456,8 @@ extension TripWindSockActivityAttributes.ContentState {
   TripWindSockLiveActivityWidget()
 } contentStates: {
   TripWindSockActivityAttributes.ContentState.starting
+  TripWindSockActivityAttributes.ContentState.partialActiveEfficiency
+  TripWindSockActivityAttributes.ContentState.activeEfficiency
   TripWindSockActivityAttributes.ContentState.tailWind
   TripWindSockActivityAttributes.ContentState.headWind
   TripWindSockActivityAttributes.ContentState.ended
