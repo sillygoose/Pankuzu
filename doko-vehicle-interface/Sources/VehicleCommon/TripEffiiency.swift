@@ -10,7 +10,7 @@ public struct TripEfficiency<C: Clock>: Sendable where C.Instant.Duration == Dur
   }
 
   private let clock: C
-  private let movingAverageWindow: Int = 30
+  private let movingAverageWindow: Int = 60
   private var samples: [EfficiencySample] = []
 
   public private(set) var efficiency: Double = 0
@@ -41,19 +41,20 @@ public struct TripEfficiency<C: Clock>: Sendable where C.Instant.Duration == Dur
   @discardableResult
   public mutating func updateEfficiency(_ distance: Double, _ energy: Double) -> Double {
     let now = clock.now
+    let previousDistance = samples.last?.distance
     samples.append(EfficiencySample(timestamp: now, distance: distance, energy: energy))
 
     let cutoff15 = now.advanced(by: .seconds(-15 * 60))
-    while samples.count > 1 && samples[1].timestamp <= cutoff15 {
-      samples.removeFirst()
-    }
+    while samples.count > 1 && samples[1].timestamp <= cutoff15 { samples.removeFirst() }
 
     efficiency = energy == 0 ? 0 : distance / energy
     efficiency5min  = windowEfficiency(secondsAgo: fiveMinutesPrior, distance: distance, energy: energy, now: now)
     efficiency10min = windowEfficiency(secondsAgo: tenMinutesPrior, distance: distance, energy: energy, now: now)
     efficiency15min = windowEfficiency(secondsAgo: fifteenMinutesPrior, distance: distance, energy: energy, now: now)
 
-    if let movingAverage = windowEfficiency(secondsAgo: movingAverageWindow, distance: distance, energy: energy, now: now) {
+    let distanceChanged = previousDistance.map { distance != $0 } ?? true
+    if distanceChanged,
+       let movingAverage = windowEfficiency(secondsAgo: movingAverageWindow, distance: distance, energy: energy, now: now, allowNegative: true) {
       efficiencyMovingAverage.append(EfficiencyPoint(timestamp: Date(), efficiency: movingAverage))
       let dateCutoff15 = Date(timeIntervalSinceNow: -15 * 60)
       while efficiencyMovingAverage.count > 1 && efficiencyMovingAverage[0].timestamp <= dateCutoff15 {
@@ -63,11 +64,13 @@ public struct TripEfficiency<C: Clock>: Sendable where C.Instant.Duration == Dur
     return efficiency
   }
 
-  private func windowEfficiency(secondsAgo: Int, distance: Double, energy: Double, now: C.Instant) -> Double? {
+  private func windowEfficiency(secondsAgo: Int, distance: Double, energy: Double, now: C.Instant, allowNegative: Bool = false) -> Double? {
     let cutoff = now.advanced(by: .seconds(-secondsAgo))
     guard let baseline = samples.last(where: { $0.timestamp <= cutoff }) else { return nil }
     let deltaEnergy = energy - baseline.energy
-    guard deltaEnergy > 0 else { return 0 }
+    // Net regen (or flat) over the window: no meaningful km/kWh ratio to compute.
+    // Callers charting this value treat negative as "very efficient" and clip it high.
+    guard deltaEnergy > 0 else { return allowNegative ? -1 : 0 }
     return (distance - baseline.distance) / deltaEnergy
   }
 }

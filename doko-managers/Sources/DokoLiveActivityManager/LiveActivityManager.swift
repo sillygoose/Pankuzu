@@ -103,7 +103,7 @@ public final class LiveActivityManager {
           guard let pending = self.pendingActivity else { continue }
           self.pendingActivity = nil
           switch pending {
-          case .trip: await self.startTrip()
+          case .trip: await self.startTrip(true)
           case .charge: await self.startCharge()
           }
         }
@@ -143,7 +143,9 @@ public final class LiveActivityManager {
     }
   }
 
-  public func startTrip() async {
+  public func startTrip(_ fromPushToStart: Bool = false) async {
+    DokoLogging.shared.postLoggingResponse(.liveActivity(".startTrip(\(fromPushToStart)"))
+    
     @Dependency(\.date.now) var now
     guard ActivityAuthorizationInfo().areActivitiesEnabled else {
       DokoLogging.shared.postLoggingResponse(.error("LiveActivityManager.startTrip: Live Activities not enabled"))
@@ -190,7 +192,7 @@ public final class LiveActivityManager {
       return
     }
     self.managedActivity = .trip(activity)
-    DokoLogging.shared.postLoggingResponse(.liveActivity(".startTrip"))
+    DokoLogging.shared.postLoggingResponse(.liveActivity(".startTrip completed"))
   }
 
   public func updateTrip(tripData: DokoResponsePacket) async {
@@ -221,6 +223,7 @@ public final class LiveActivityManager {
       )
     }()
     
+    DokoLogging.shared.postLoggingResponse(.liveActivity(tripData.tripEfficiencyMovingAverage.description), debugPacket: true)
     let state = TripWindSockActivityAttributes.ContentState(
       tripState: .active,
       duration: .seconds(duration),

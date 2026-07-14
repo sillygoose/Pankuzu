@@ -5,7 +5,7 @@ public enum DesignTokens {
 
   public enum Color {
     // Core
-    public static let primary = SwiftUI.Color.accentColor
+    public static let primary = SwiftUI.Color.primary
     public static let secondary = SwiftUI.Color.secondary
     public static let secondaryText = SwiftUI.Color.secondary
     public static let background = SwiftUI.Color(.systemBackground)
@@ -68,6 +68,7 @@ public enum DesignTokens {
     public static let mlaTitle = SwiftUI.Font.system(size: 36)
     public static let mlaSubtitle = SwiftUI.Font.system(size: 30)
     public static let mlaLabel = SwiftUI.Font.system(size: 20)
+    public static let mlaAxisLabel = SwiftUI.Font.system(size: 12)
 
     // Small Live Activity (Dynamic Island compact / minimal)
     public static let slaSymbol = SwiftUI.Font.system(size: 8)
@@ -76,6 +77,17 @@ public enum DesignTokens {
     public static let slaTitle = SwiftUI.Font.system(size: 14)
     public static let slaSubtitle = SwiftUI.Font.system(size: 10)
     public static let slaLabel = SwiftUI.Font.system(size: 9)
+    public static let slaAxisLabel = SwiftUI.Font.system(size: 6)
+  }
+
+  public enum LineWidth {
+    public static let mlaThinLine: CGFloat = 2
+    public static let mlaLine: CGFloat = 3
+    public static let mlaThickLine: CGFloat = 4
+
+    public static let slaThinLine: CGFloat = 0.5
+    public static let slaLine: CGFloat = 1.0
+    public static let slaThickLine: CGFloat = 1.5
   }
 
   public enum Spacing {

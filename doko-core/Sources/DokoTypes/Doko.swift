@@ -627,8 +627,8 @@ extension DokoResponsePacket {
     return v
   }
 
-  public var tripEfficiencyMovingAverage: [EfficiencyPoint]? {
-    guard case let .tripEfficiencyMovingAverage(v)? = responses[.tripEfficiencyMovingAverage]?.response else { return nil }
+  public var tripEfficiencyMovingAverage: [EfficiencyPoint] {
+    guard case let .tripEfficiencyMovingAverage(v)? = responses[.tripEfficiencyMovingAverage]?.response else { return [] }
     return v
   }
 
