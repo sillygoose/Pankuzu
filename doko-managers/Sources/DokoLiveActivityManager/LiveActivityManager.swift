@@ -24,6 +24,7 @@ public final class LiveActivityManager {
     startAccessoryNameObservation()
     startForegroundObservation()
     startPushToStartTokenObservation()
+    startActivityUpdatesObservation()
   }
 
   private func endOrphanedActivities() {
@@ -95,6 +96,104 @@ public final class LiveActivityManager {
     }
   }
 
+  // `tripPushToStartToken`/`chargePushToStartToken` are populated by the long-lived Tasks above,
+  // but those Tasks are scheduled asynchronously — there's no guarantee they've delivered a value
+  // yet by the time startTrip()/startCharge() runs synchronously right after LiveActivityManager
+  // is first constructed (e.g. from a background accessory-wake launch). Rather than sampling a
+  // possibly-still-nil variable, wait briefly on the live stream itself as a fallback.
+  private func resolveTripPushToStartToken() async -> Data? {
+    if let tripPushToStartToken { return tripPushToStartToken }
+    return await withTaskGroup(of: Data?.self) { group in
+      group.addTask {
+        for await token in Activity<TripWindSockActivityAttributes>.pushToStartTokenUpdates {
+          return token
+        }
+        return nil
+      }
+      group.addTask {
+        try? await Task.sleep(for: .seconds(2))
+        return nil
+      }
+      let result = await group.next() ?? nil
+      group.cancelAll()
+      return result
+    }
+  }
+
+  private func resolveChargePushToStartToken() async -> Data? {
+    if let chargePushToStartToken { return chargePushToStartToken }
+    return await withTaskGroup(of: Data?.self) { group in
+      group.addTask {
+        for await token in Activity<ChargeSessionActivityAttributes>.pushToStartTokenUpdates {
+          return token
+        }
+        return nil
+      }
+      group.addTask {
+        try? await Task.sleep(for: .seconds(2))
+        return nil
+      }
+      let result = await group.next() ?? nil
+      group.cancelAll()
+      return result
+    }
+  }
+
+  // Persistent for the app's lifetime — this is what actually reconciles `managedActivity`
+  // with reality for push-to-start. A push-to-start activity is created by the system (via
+  // APNs), possibly while this process is backgrounded or not running at all, so adoption
+  // can't rely on a one-shot Task tied to the specific `startTrip()`/`startCharge()` call that
+  // triggered the push: that call may have long since been suspended or killed by the time the
+  // activity actually appears. Subscribing here, once, for the life of the app guarantees we
+  // see it whenever it shows up — including activities that already existed when this process
+  // launched, since `activityUpdates` replays current activities to a new subscriber.
+  private func startActivityUpdatesObservation() {
+    Task {
+      for await activity in Activity<TripWindSockActivityAttributes>.activityUpdates {
+        switch activity.activityState {
+        case .active, .stale:
+          if case .trip = self.managedActivity {
+            // already tracking a trip; ignore
+          } else {
+            self.managedActivity = .trip(activity)
+            self.pendingActivity = nil
+            DokoLogging.shared.postLoggingResponse(.liveActivity("captured trip via activityUpdates"))
+          }
+        case .ended, .dismissed:
+          if case .trip(let managed) = self.managedActivity, managed.id == activity.id {
+            self.managedActivity = nil
+          }
+        case .pending:
+          break
+        @unknown default:
+          break
+        }
+      }
+    }
+    Task {
+      for await activity in Activity<ChargeSessionActivityAttributes>.activityUpdates {
+        switch activity.activityState {
+        case .active, .stale:
+          if case .charge = self.managedActivity {
+            // already tracking a charge; ignore
+          } else {
+            self.managedActivity = .charge(activity)
+            self.pendingActivity = nil
+            DokoLogging.shared.postLoggingResponse(.liveActivity("captured charge via activityUpdates"))
+          }
+        case .ended, .dismissed:
+          if case .charge(let managed) = self.managedActivity, managed.id == activity.id {
+            self.managedActivity = nil
+          }
+        case .pending:
+          break
+        @unknown default:
+          break
+        }
+      }
+    }
+  }
+
   private func startForegroundObservation() {
     let names: [Notification.Name] = [UIApplication.didBecomeActiveNotification, UIScene.didActivateNotification]
     for name in names {
@@ -103,8 +202,10 @@ public final class LiveActivityManager {
           guard let pending = self.pendingActivity else { continue }
           self.pendingActivity = nil
           switch pending {
-          case .trip: await self.startTrip(true)
-          case .charge: await self.startCharge()
+          case .trip: await
+            self.startTrip(true)
+          case .charge:
+            await self.startCharge()
           }
         }
       }
@@ -157,23 +258,14 @@ public final class LiveActivityManager {
     }
 
     let hasActiveScene = UIApplication.shared.connectedScenes.contains { $0.activationState == .foregroundActive }
-    if !hasActiveScene, let token = tripPushToStartToken {
-      await pushToStartTrip(token: token)
-      Task {
-        for await activity in Activity<TripWindSockActivityAttributes>.activityUpdates {
-          guard case .trip(_) = self.managedActivity else {
-            self.managedActivity = .trip(activity)
-            self.pendingActivity = nil
-            DokoLogging.shared.postLoggingResponse(.liveActivity(".startTrip via push-to-start"))
-            break
-          }
-        }
+    if !hasActiveScene {
+      if let token = await resolveTripPushToStartToken() {
+        await pushToStartTrip(token: token)
+        // Adoption happens in startActivityUpdatesObservation(), which stays subscribed for the
+        // app's lifetime and doesn't depend on this call still being alive when the push lands.
+        pendingActivity = .trip
+        return
       }
-      pendingActivity = .trip
-      return
-    }
-
-    guard hasActiveScene else {
       DokoLogging.shared.postLoggingResponse(.liveActivity("startTrip: no active scene and no push-to-start token, deferring"))
       pendingActivity = .trip
       return
@@ -284,23 +376,14 @@ public final class LiveActivityManager {
     let hasActiveScene = UIApplication.shared.connectedScenes
       .contains { $0.activationState == .foregroundActive }
 
-    if !hasActiveScene, let token = chargePushToStartToken {
-      await pushToStartCharge(token: token)
-      Task {
-        for await activity in Activity<ChargeSessionActivityAttributes>.activityUpdates {
-          guard case .charge(_) = self.managedActivity else {
-            self.managedActivity = .charge(activity)
-            self.pendingActivity = nil
-            DokoLogging.shared.postLoggingResponse(.liveActivity(".startCharge via push-to-start"))
-            break
-          }
-        }
+    if !hasActiveScene {
+      if let token = await resolveChargePushToStartToken() {
+        await pushToStartCharge(token: token)
+        // Adoption happens in startActivityUpdatesObservation(), which stays subscribed for the
+        // app's lifetime and doesn't depend on this call still being alive when the push lands.
+        pendingActivity = .charge
+        return
       }
-      pendingActivity = .charge
-      return
-    }
-
-    guard hasActiveScene else {
       DokoLogging.shared.postLoggingResponse(.liveActivity("startCharge: no active scene and no push-to-start token, deferring"))
       pendingActivity = .charge
       return

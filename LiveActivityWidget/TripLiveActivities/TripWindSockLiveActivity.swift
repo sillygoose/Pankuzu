@@ -62,10 +62,6 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
             .font(laValue)
           Text(convertedEfficiency.unit.symbol)
             .font(laUnit)
-//          Spacer()
-//          Text("Last 15 min")
-//            .font(laUnit)
-//          Spacer()
         }
         .foregroundStyle(DesignTokens.Color.primary)
         

@@ -56,7 +56,8 @@ async function handleTripStart(body, env) {
       "content-state": {
         tripState: { starting: {} },
         duration: [0, 0],
-        distance: 0
+        distance: 0,
+        efficiencyMovingAverage: []
       },
       "attributes-type": "TripWindSockActivityAttributes",
       attributes: {
