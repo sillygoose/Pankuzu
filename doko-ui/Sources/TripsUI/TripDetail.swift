@@ -216,7 +216,7 @@ public struct TripDetailView: View {
             value: String(format: "%.1f", energyUsed.value),
             units: energyUsed.unit.symbol,
             symbolName: "bolt.circle.fill",
-            title: "Energy Used"
+            title: "Energy"
           ) {
             model.destination = .energyUsedChart
           }
