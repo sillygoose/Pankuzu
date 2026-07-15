@@ -289,15 +289,17 @@ public struct TripsView: View {
             }
 
             if let energy = model.tripStats.energy {
+              let targetUnit: UnitEnergyEfficiency = model.appSettings.metric
+              ? (model.appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour)
+                    : .milesPerKilowattHour
+              let efficiencyFormat = targetUnit == .kilowattHoursPer100Kilometers ? "%.1f" : "%.2f"
+              
               let energyKWh = Measurement(value: energy, unit: UnitEnergy.kilowattHours)
-              let metricEfficiency = Measurement(
+              let energyEfficiency = Measurement(
                 value: energyKWh.value == 0.0 ? 0.0 : metricDistance.value / energyKWh.value,
                 unit: UnitEnergyEfficiency.kilometersPerKilowattHour
-              )
-              let energyEfficiency = metricEfficiency
-                .converted(
-                  to: model.appSettings.metric ? model.appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
-                )
+              ).converted(to: targetUnit)
+
               GridRow {
                 GridValue(
                   color: .red,
@@ -309,7 +311,7 @@ public struct TripsView: View {
 
                 GridValue(
                   color: .green,
-                  value: String(format: "%.1f", energyEfficiency.value),
+                  value: String(format: efficiencyFormat, energyEfficiency.value),
                   units: energyEfficiency.unit.symbol,
                   symbolName: "powermeter",
                   title: "Efficiency"

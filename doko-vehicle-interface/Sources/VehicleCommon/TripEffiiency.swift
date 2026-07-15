@@ -15,13 +15,16 @@ public struct TripEfficiency<C: Clock>: Sendable where C.Instant.Duration == Dur
   /// resolution varies, so what smooths well for one may not for another; needs to be tried on
   /// an actual vehicle to dial in.
   private let movingAverageWindow: Double
+  
   /// How far back (in distance) `distanceSamples` retains history — independent of and larger
   /// than `movingAverageWindow`, mirroring how `samples` retains 15 minutes regardless of the
   /// smaller 5/10-minute stat windows.
   private let distanceSampleRetention: Double = 15
-  private var timeSamples: [EfficiencySample] = []
   private var distanceSamples: [EfficiencySample] = []
 
+  private let timeSampleRetention: Double = 15
+  private var timeSamples: [EfficiencySample] = []
+  
   public private(set) var efficiency: Double = 0
   public private(set) var efficiency5min: Double?
   public private(set) var efficiency10min: Double?
@@ -58,8 +61,8 @@ public struct TripEfficiency<C: Clock>: Sendable where C.Instant.Duration == Dur
     // baseline anchor for the 5/10/15-minute windows instead of an empty one.
     if efficiency != 0 || !timeSamples.isEmpty {
       timeSamples.append(EfficiencySample(timestamp: now, distance: distance, energy: energy))
-      let cutoff15 = now.advanced(by: .seconds(-15 * 60))
-      while timeSamples.count > 1 && timeSamples[1].timestamp <= cutoff15 { timeSamples.removeFirst() }
+      let timeCutoff = now.advanced(by: .seconds(-timeSampleRetention * 60))
+      while timeSamples.count > 1 && timeSamples[1].timestamp <= timeCutoff { timeSamples.removeFirst() }
     }
 
     efficiency5min  = windowEfficiency(secondsAgo: fiveMinutesPrior, distance: distance, energy: energy, now: now)

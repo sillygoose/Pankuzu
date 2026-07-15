@@ -51,16 +51,15 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
       let targetUnit: UnitEnergyEfficiency = appSettings.metric
       ? (appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour)
       : .milesPerKilowattHour
-      let efficiency = context.state.efficiency ?? 0.0
-      let convertedEfficiency = Measurement(value: efficiency, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
+      let efficiency = Measurement(value: context.state.efficiency ?? 0.0, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
         .converted(to: targetUnit)
       let efficiencyFormat = targetUnit == .kilowattHoursPer100Kilometers ? "%.1f" : "%.2f"
 
       HStack(alignment: .center) {
         VStack(alignment: .leading) {
-          Text(String(format: efficiencyFormat, convertedEfficiency.value))
+          Text(String(format: efficiencyFormat, efficiency.value))
             .font(laValue)
-          Text(convertedEfficiency.unit.symbol)
+          Text(efficiency.unit.symbol)
             .font(laUnit)
         }
         .foregroundStyle(DesignTokens.Color.primary)
@@ -83,8 +82,8 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
     
     var body: some View {
       let distance = context.state.distance
-      let elevation = context.state.elevation
-      let efficiency = context.state.efficiency
+//      let elevation = context.state.elevation
+//      let metricEfficiency = context.state.efficiency
       let windSock = context.state.windSock
       
       HStack(alignment: .center) {
@@ -105,20 +104,21 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
           }
           .foregroundStyle(DesignTokens.Color.distance)
           
-          if let efficiency {
-            let metricEfficiency = Measurement(
-              value: efficiency,
-              unit: UnitEnergyEfficiency.kilometersPerKilowattHour
-            )
-            let efficiency = metricEfficiency.converted(
-              to: appSettings.metric ? appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
-            )
+          if let rawEfficiency = context.state.efficiency {
+            let targetUnit: UnitEnergyEfficiency = appSettings.metric
+            ? (appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour)
+            : .milesPerKilowattHour
+            let efficiencyFormat = targetUnit == .kilowattHoursPer100Kilometers ? "%.1f" : "%.2f"
+
+            let efficiency = Measurement(value: rawEfficiency, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
+              .converted(to: targetUnit)
+
             GridRow(alignment: .lastTextBaseline) {
               Image(systemName: "ev.charger")
                 .font(laSymbol)
                 .gridColumnAlignment(.leading)
                 .padding(.trailing, laSymbolSpacing)
-              Text(String(format: "%.2f", efficiency.value))
+              Text(String(format: efficiencyFormat, efficiency.value))
                 .font(laValue.monospacedDigit())
                 .gridColumnAlignment(.trailing)
               Text(efficiency.unit.symbol)
@@ -128,9 +128,10 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
             .foregroundStyle(DesignTokens.Color.tripping)
           }
           
-          if let elevation {
-            let elevation = Measurement(value: elevation, unit: UnitLength.meters)
+          if let rawElevation = context.state.elevation {
+            let elevation = Measurement(value: rawElevation, unit: UnitLength.meters)
               .converted(to: appSettings.metric ? .meters : .feet)
+            
             GridRow(alignment: .lastTextBaseline) {
               Image(systemName: "mountain.2")
                 .font(laSymbol)
@@ -229,14 +230,19 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
               }
               
               if let efficiency {
+                let targetUnit: UnitEnergyEfficiency = appSettings.metric
+                ? (appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour)
+                : .milesPerKilowattHour
+                let efficiencyFormat = targetUnit == .kilowattHoursPer100Kilometers ? "%5.1f" : "%5.2f"
+                
                 let tripEfficiency = Measurement(value: efficiency, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
-                  .converted(to: appSettings.metric ? appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour)
+                  .converted(to: targetUnit)
                 GridRow(alignment: .lastTextBaseline) {
                   Image(systemName: "ev.charger")
                     .font(laSymbol)
                     .gridColumnAlignment(.leading)
                     .padding(.trailing, laSymbolSpacing)
-                  Text(String(format: "%.1f", tripEfficiency.value))
+                  Text(String(format: efficiencyFormat, tripEfficiency.value))
                     .font(laValue.monospacedDigit())
                     .gridColumnAlignment(.trailing)
                   Text(tripEfficiency.unit.symbol)
@@ -328,9 +334,19 @@ private struct EfficiencyChartView: View, DokoLiveActivityFonts {
     let targetUnit: UnitEnergyEfficiency = appSettings.metric
     ? (appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour)
     : .milesPerKilowattHour
-    let yMax: Double = appSettings.metric
-      ? (appSettings.kWhPer100km ? 40 : 8)
-      : 5
+    
+    let yMax: Double = {
+      switch targetUnit {
+      case .kilometersPerKilowattHour:
+        return 15
+      case .kilowattHoursPer100Kilometers:
+        return 50
+      case .milesPerKilowattHour:
+        return 10
+      default:
+        return 5
+      }
+    }()
     let yMid = yMax / 2
     
     let domainEnd = points.last?.timestamp ?? Date()
@@ -490,7 +506,7 @@ extension TripWindSockActivityAttributes.ContentState {
       tripState: .ended,
       duration: .seconds(1000),
       distance: 22.0,
-      energy: 4.1,
+      energy: -4.1,
       efficiency: 5.5,
     )
   }
@@ -500,7 +516,7 @@ extension TripWindSockActivityAttributes.ContentState {
       tripState: .ended,
       duration: .seconds(1000),
       distance: 22.0,
-      energy: 4.1,
+      energy: -4.1,
       efficiency: 5.5,
       rangeConsumed: 20.4,
     )

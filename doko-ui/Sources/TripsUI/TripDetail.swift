@@ -203,14 +203,17 @@ public struct TripDetailView: View {
         )
 
         if let energy = trip.energy {
+          let targetUnit: UnitEnergyEfficiency = model.appSettings.metric
+          ? (model.appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour)
+                : .milesPerKilowattHour
+          let efficiencyFormat = targetUnit == .kilowattHoursPer100Kilometers ? "%.1f" : "%.2f"
+
           let energyUsed = Measurement(value: energy, unit: UnitEnergy.kilowattHours)
-          let metricEfficiency = Measurement(
+          let efficiency = Measurement(
             value: energyUsed.value == 0.0 ? 0.0 : rawDistance.value / energyUsed.value,
             unit: UnitEnergyEfficiency.kilometersPerKilowattHour
-          )
-          let efficiency = metricEfficiency.converted(
-            to: model.appSettings.metric ? model.appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour : .milesPerKilowattHour
-          )
+          ).converted(to: targetUnit)
+
           GridValueButton(
             color: .red,
             value: String(format: "%.1f", energyUsed.value),
@@ -222,7 +225,7 @@ public struct TripDetailView: View {
           }
           GridValue(
             color: .green,
-            value: String(format: "%.1f", efficiency.value),
+            value: String(format: efficiencyFormat, efficiency.value),
             units: efficiency.unit.symbol,
             symbolName: "ev.charger",
             title: "Efficiency"
