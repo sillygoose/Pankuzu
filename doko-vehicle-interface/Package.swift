@@ -96,6 +96,8 @@ let package = Package(
       dependencies: [
         .product(name: "Parsing", package: "swift-parsing"),
         .product(name: "DokoTypes", package: "doko-core"),
+        .product(name: "ObdLinkCore", package: "obdlink-core"),
+        .product(name: "DokoLogging", package: "doko-logging"),
       ]
     ),
     .target(

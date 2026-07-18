@@ -154,6 +154,9 @@ public final class LiveActivityManager {
         case .active, .stale:
           if case .trip = self.managedActivity {
             // already tracking a trip; ignore
+          } else if activity.content.state.tripState == .ended {
+            // Still technically .active/.stale during endTrip()'s grace window (content already
+            // says .ended, but the delayed .end() call hasn't fired yet) — not a new trip to adopt.
           } else {
             self.managedActivity = .trip(activity)
             self.pendingActivity = nil
@@ -176,6 +179,9 @@ public final class LiveActivityManager {
         case .active, .stale:
           if case .charge = self.managedActivity {
             // already tracking a charge; ignore
+          } else if activity.content.state.chargeState == .ended {
+            // Still technically .active/.stale during endCharge()'s grace window (content already
+            // says .ended, but the delayed .end() call hasn't fired yet) — not a new charge to adopt.
           } else {
             self.managedActivity = .charge(activity)
             self.pendingActivity = nil

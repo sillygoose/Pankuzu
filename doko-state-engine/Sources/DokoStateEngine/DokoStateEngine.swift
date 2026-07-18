@@ -31,6 +31,9 @@ public final class DokoStateEngine {
   var dokoSchedulerTask: Task<Void, Never>?
 
   @Shared(.vehicleState) var vehicleState
+  @Shared(.connectedAccessoryName) var accessoryName
+  @Shared(.activeSession) var activeSession
+  @Shared(.appSettings) var appSettings
 
   var tripInProgress: Trip.Draft?
   var chargeInProgress: Charge.Draft?
@@ -101,8 +104,6 @@ public final class DokoStateEngine {
   private func dokoResponseProcessing() -> Task<Void, Never> {
     Task {
       @Shared(.connectedVehicleInterface) var connectedVehicle
-      @Shared(.activeSession) var activeSession
-      @Shared(.appSettings) var appSettings
       @Shared(.chargeUpdateResponses) var chargeUpdateResponses
       @Shared(.tripUpdateResponses) var tripUpdateResponses
 
@@ -177,7 +178,9 @@ public final class DokoStateEngine {
             $vehicleState.withLock { $0 = nextState }
             
           case .tripInProgress:
-            guard case .tripInProgress = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
+            guard case .tripInProgress = vehicleState else {
+              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
+            }
             let nextState = dokoResponsePacket.nextState ?? .tripInProgress
             if nextState != self.vehicleState {
               await CoreLocationManager.shared.stopPacketUpdates()
@@ -185,7 +188,9 @@ public final class DokoStateEngine {
             }
 
           case .tripUpdate:
-            guard case .tripInProgress = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
+            guard case .tripInProgress = vehicleState else {
+              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
+            }
             guard let tripDraft = self.tripInProgress else { throw StateEngineError.tripDraftError }
             ABRPManager.shared.sendTripTelemetry(packet: dokoResponsePacket)
             do {
@@ -199,7 +204,9 @@ public final class DokoStateEngine {
             }
 
           case .tripEnding:
-            guard case .tripEnding = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)}
+            guard case .tripEnding = vehicleState else {
+              throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type)
+            }
             guard let tripDraft = self.tripInProgress else { throw StateEngineError.tripDraftError }
             var nextState = dokoResponsePacket.nextState ?? .tripEnding
             if nextState == .idle {
@@ -388,13 +395,13 @@ public final class DokoStateEngine {
 
 extension DokoStateEngine {
   public func accessoryNameObservation() {
-    @Shared(.connectedAccessoryName) var observedAccessoryName
-    @Shared(.activeSession) var activeSession
+//    @Shared(.connectedAccessoryName) var observedAccessoryName
+//    @Shared(.activeSession) var activeSession
     DokoLogging.shared.postLoggingResponse(.info("SE.accessoryNameObservation"))
     Task { [weak self] in
       guard let self else { return }
       var oldAccessoryName: String? = nil
-      for await newAccessoryName in $observedAccessoryName.publisher.values {
+      for await newAccessoryName in $accessoryName.publisher.values {
         if Task.isCancelled { break }
         if oldAccessoryName == newAccessoryName { continue }
         self.logger.info("\(timestamp()) SE: accessory changed from \(oldAccessoryName ?? "nil") to \(newAccessoryName ?? "nil")")
@@ -455,8 +462,6 @@ extension DokoStateEngine {
       DokoLogging.shared.postLoggingResponse(.error("SE.vehicleStateObservation: already started"))
       return
     }
-    @Shared(.vehicleState) var vehicleState
-    @Shared(.connectedAccessoryName) var accessoryName
     @Shared(.connectedVehicleInterface) var connectedVehicleInterface
     DokoLogging.shared.postLoggingResponse(.info("SE.vehicleStateObservation"))
     vehicleStateObservationTask = Task { [weak self] in
@@ -478,6 +483,7 @@ extension DokoStateEngine {
           continue
         }
         self.dokoSchedulerTask = createScheduler(schedules: schedules)
+        DokoLogging.shared.postLoggingResponse(.info("SE.vehicleStateObservation(schedulaer created))"))
       }
     }
   }

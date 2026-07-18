@@ -1,6 +1,5 @@
 import OSLog
 
-import DokoLogging
 import DokoTypes
 import ObdLinkCore
 import DokoWeatherManager

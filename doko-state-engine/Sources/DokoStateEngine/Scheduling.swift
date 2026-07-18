@@ -61,6 +61,8 @@ extension DokoStateEngine {
 
         for await _ in group { }
       }
+      self.logger.debug("\(timestamp()) SE.createScheduler.task killed")
+      DokoLogging.shared.postLoggingResponse(.schedulers("scheduler task killed"))
     }
   }
 }

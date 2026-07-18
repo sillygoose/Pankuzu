@@ -1,9 +1,7 @@
 import OSLog
+
 import DokoTypes
 import DokoLogging
-import ObdLinkCore
-
-// MARK: - Schedule constants
 
 let vehicleCustomizationDokoCommandSchedule: StateEngineDokoSchedule = [
   StateEngineDokoCommandPacket(schedulerType: .oneShotWithDelay(1), packetType: .vehicleCustomization),
@@ -58,8 +56,6 @@ let dcChargeInProgressDokoCommandSchedule: StateEngineDokoSchedule = [
 let dcChargeEndingDokoCommandSchedule: StateEngineDokoSchedule = [
   StateEngineDokoCommandPacket(schedulerType: .oneShot, packetType: .dcChargeEnding),
 ]
-
-// MARK: - Protocol extension
 
 extension FordTranslating {
   public func createStateScheduler(for state: VehicleState) async -> StateEngineDokoSchedule? {

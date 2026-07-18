@@ -82,9 +82,6 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
     
     var body: some View {
       let distance = context.state.distance
-//      let elevation = context.state.elevation
-//      let metricEfficiency = context.state.efficiency
-      let windSock = context.state.windSock
       
       HStack(alignment: .center) {
         Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
@@ -149,7 +146,9 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
         }
         
         Spacer()
-        if let windSock { WindSockChartView(windSock: windSock) }
+        if let windSock = context.state.windSock {
+          WindSockChartView(windSock: windSock)
+        }
       }
       .padding()
     }
@@ -338,11 +337,11 @@ private struct EfficiencyChartView: View, DokoLiveActivityFonts {
     let yMax: Double = {
       switch targetUnit {
       case .kilometersPerKilowattHour:
-        return 15
+        return 40 //###
       case .kilowattHoursPer100Kilometers:
         return 50
       case .milesPerKilowattHour:
-        return 10
+        return 20 //###
       default:
         return 5
       }
@@ -350,7 +349,7 @@ private struct EfficiencyChartView: View, DokoLiveActivityFonts {
     let yMid = yMax / 2
     
     let domainEnd = points.last?.timestamp ?? Date()
-    let domainStart = domainEnd.addingTimeInterval(-15 * 60)
+    let domainStart = domainEnd.addingTimeInterval(-10 * 60)
 
     VStack(spacing: 2) {
       Chart(points) { point in
