@@ -27,7 +27,7 @@ public struct WindSock: Codable, Hashable, Sendable {
   }
 }
 
-public struct TripWindSockActivityAttributes: ActivityAttributes, Sendable {
+public struct TripOverviewActivityAttributes: ActivityAttributes, Sendable {
   public let tripID: UUID
 
   public init(tripID: UUID = UUID()) {
@@ -37,7 +37,6 @@ public struct TripWindSockActivityAttributes: ActivityAttributes, Sendable {
   public struct ContentState: Codable, Hashable, Sendable {
     public enum TripState: Codable, Hashable, Sendable {
       case starting, active, ended
-
       public var description: String {
         switch self {
         case .starting: return "Starting trip"

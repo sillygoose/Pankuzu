@@ -12,6 +12,13 @@ public struct EfficiencyPoint: Equatable, Identifiable, Hashable, Codable, Senda
     self.timestamp = timestamp
     self.efficiency = efficiency
   }
+
+  // Short keys: this gets encoded once per point in efficiencyMovingAverage, and that array is
+  // the dominant contributor to ContentState's size against ActivityKit's 4KB limit.
+  enum CodingKeys: String, CodingKey {
+    case timestamp = "t"
+    case efficiency = "e"
+  }
 }
 
 public struct DokoCurrentWeather: Equatable, Hashable, Codable, Sendable {

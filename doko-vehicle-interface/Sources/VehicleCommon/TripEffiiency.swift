@@ -86,11 +86,16 @@ public struct TripEfficiency<C: Clock>: Sendable where C.Instant.Duration == Dur
         // -100 is a sentinel distinct from any real (if unusual) negative regen ratio — the
         // chart treats any negative value as "very efficient" and clips it to the top.
         let movingAverageEfficiency = deltaEnergy == 0 ? -100 : deltaDistance / deltaEnergy
-        efficiencyMovingAverage.append(EfficiencyPoint(timestamp: Date(), efficiency: movingAverageEfficiency))
+        // Rounding keeps the JSON encoding of each point short (no 15-17 digit floating-point
+        // noise) — this array is the dominant contributor to ContentState's size against
+        // ActivityKit's 4KB limit, and the chart doesn't need sub-second/sub-milli precision.
+        let roundedTimestamp = Date() //###Date(timeIntervalSince1970: Date().timeIntervalSince1970.rounded())
+        let roundedEfficiency = (movingAverageEfficiency * 1000).rounded() / 1000
+        efficiencyMovingAverage.append(EfficiencyPoint(timestamp: roundedTimestamp, efficiency: roundedEfficiency))
         DokoLogging.shared.postLoggingResponse(.liveActivity("baseline(\(String(format: "%.1f", baseline.distance)), \(String(format: "%.3f", baseline.energy)))"), debugPacket: true)
         DokoLogging.shared.postLoggingResponse(.liveActivity("efficiencyMovingAverage(\(String(format: "%.2f", movingAverageEfficiency)))"), debugPacket: true)
-        let dateCutoff10 = Date(timeIntervalSinceNow: -10 * 60)
-        while efficiencyMovingAverage.count > 1 && efficiencyMovingAverage[0].timestamp <= dateCutoff10 {
+        let dateCutoff15 = Date(timeIntervalSinceNow: -15 * 60)
+        while efficiencyMovingAverage.count > 1 && efficiencyMovingAverage[0].timestamp <= dateCutoff15 {
           efficiencyMovingAverage.removeFirst()
         }
       }

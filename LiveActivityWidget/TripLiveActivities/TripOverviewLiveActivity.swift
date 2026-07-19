@@ -6,8 +6,8 @@ import WidgetKit
 import DokoSharing
 import DokoLiveActivityManager
 
-struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
-  let context: ActivityViewContext<TripWindSockActivityAttributes>
+struct TripOverviewLiveActivity: View, DokoLiveActivityFonts {
+  let context: ActivityViewContext<TripOverviewActivityAttributes>
   @Environment(\.activityFamily) var activityFamily
   
   var body: some View {
@@ -26,7 +26,7 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
   }
   
   private struct StartingView: View, DokoLiveActivityFonts {
-    let context: ActivityViewContext<TripWindSockActivityAttributes>
+    let context: ActivityViewContext<TripOverviewActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily
     
@@ -42,7 +42,7 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
   }
   
   private struct ActiveView: View, DokoLiveActivityFonts {
-    let context: ActivityViewContext<TripWindSockActivityAttributes>
+    let context: ActivityViewContext<TripOverviewActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily
     @Shared(.appSettings) var appSettings
@@ -55,12 +55,26 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
         .converted(to: targetUnit)
       let efficiencyFormat = targetUnit == .kilowattHoursPer100Kilometers ? "%.1f" : "%.2f"
 
-      HStack(alignment: .center) {
+      HStack(alignment: .bottom) {
         VStack(alignment: .leading) {
           Text(String(format: efficiencyFormat, efficiency.value))
             .font(laValue)
           Text(efficiency.unit.symbol)
             .font(laUnit)
+          
+          if let rangeConsumed = context.state.rangeConsumed {
+            let tripRangeConsumed = Measurement(value: rangeConsumed, unit: UnitLength.kilometers)
+              .converted(to: appSettings.metric ? .kilometers : .miles)
+            Spacer()
+            HStack(alignment: .bottom) {
+              Text(String(format: "%.0f", tripRangeConsumed.value))
+                .font(laValue)
+                .foregroundStyle(.red)
+              Text(tripRangeConsumed.unit.symbol)
+                .font(laUnit)
+                .foregroundStyle(.red)
+            }
+          }
         }
         .foregroundStyle(DesignTokens.Color.primary)
         
@@ -74,7 +88,7 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
   }
   
   private struct ActiveViewOld: View, DokoLiveActivityFonts {
-    let context: ActivityViewContext<TripWindSockActivityAttributes>
+    let context: ActivityViewContext<TripOverviewActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily
     
@@ -155,7 +169,7 @@ struct TripWindSockLiveActivity: View, DokoLiveActivityFonts {
   }
   
   private struct EndedView : View, DokoLiveActivityFonts {
-    let context: ActivityViewContext<TripWindSockActivityAttributes>
+    let context: ActivityViewContext<TripOverviewActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily
     
@@ -341,7 +355,7 @@ private struct EfficiencyChartView: View, DokoLiveActivityFonts {
       case .kilowattHoursPer100Kilometers:
         return 50
       case .milesPerKilowattHour:
-        return 20 //###
+        return 5 //###
       default:
         return 5
       }
@@ -349,7 +363,7 @@ private struct EfficiencyChartView: View, DokoLiveActivityFonts {
     let yMid = yMax / 2
     
     let domainEnd = points.last?.timestamp ?? Date()
-    let domainStart = domainEnd.addingTimeInterval(-10 * 60)
+    let domainStart = domainEnd.addingTimeInterval(-15 * 60)
 
     VStack(spacing: 2) {
       Chart(points) { point in
@@ -392,26 +406,26 @@ private struct EfficiencyChartView: View, DokoLiveActivityFonts {
   }
 }
 
-extension TripWindSockActivityAttributes {
-  fileprivate static var preview: TripWindSockActivityAttributes {
-    TripWindSockActivityAttributes()
+extension TripOverviewActivityAttributes {
+  fileprivate static var preview: TripOverviewActivityAttributes {
+    TripOverviewActivityAttributes()
   }
 }
 
-extension TripWindSockActivityAttributes.ContentState {
-  fileprivate static var starting: TripWindSockActivityAttributes.ContentState {
-    TripWindSockActivityAttributes.ContentState(tripState: .starting)
+extension TripOverviewActivityAttributes.ContentState {
+  fileprivate static var starting: TripOverviewActivityAttributes.ContentState {
+    TripOverviewActivityAttributes.ContentState(tripState: .starting)
   }
   
-  fileprivate static var emptyActiveEfficiency: TripWindSockActivityAttributes.ContentState {
-    return TripWindSockActivityAttributes.ContentState(
+  fileprivate static var emptyActiveEfficiency: TripOverviewActivityAttributes.ContentState {
+    return TripOverviewActivityAttributes.ContentState(
       tripState: .active,
       efficiency: 5,
       efficiencyMovingAverage: []
     )
   }
   
-  fileprivate static var partialActiveEfficiency: TripWindSockActivityAttributes.ContentState {
+  fileprivate static var partialActiveEfficiency: TripOverviewActivityAttributes.ContentState {
     let now = Date()
     let raw: [(TimeInterval, Double)] = [
       (0,   0.758), (11,  0.836), (21,  1.360), (31,  2.323), (41,  8.862),
@@ -425,14 +439,15 @@ extension TripWindSockActivityAttributes.ContentState {
       (413, 0.0),   (423, 8.967), (434, 1.277),
     ]
     let points = raw.map { EfficiencyPoint(timestamp: now.addingTimeInterval($0 - 434), efficiency: $1) }
-    return TripWindSockActivityAttributes.ContentState(
+    return TripOverviewActivityAttributes.ContentState(
       tripState: .active,
       efficiency: 5,
+      rangeConsumed: -15,
       efficiencyMovingAverage: points
     )
   }
   
-  fileprivate static var activeEfficiency: TripWindSockActivityAttributes.ContentState {
+  fileprivate static var activeEfficiency: TripOverviewActivityAttributes.ContentState {
     let now = Date()
     // Real trip data. Offsets are seconds from the first sample; last sample (891s) anchored at now.
     let raw: [(TimeInterval, Double)] = [
@@ -456,15 +471,15 @@ extension TripWindSockActivityAttributes.ContentState {
       (881, 6.652), (891, 3.623),
     ]
     let points = raw.map { EfficiencyPoint(timestamp: now.addingTimeInterval($0 - 891), efficiency: $1) }
-    return TripWindSockActivityAttributes.ContentState(
+    return TripOverviewActivityAttributes.ContentState(
       tripState: .active,
       efficiency: 5,
       efficiencyMovingAverage: points
     )
   }
   
-  fileprivate static var headWind: TripWindSockActivityAttributes.ContentState {
-    TripWindSockActivityAttributes.ContentState(
+  fileprivate static var headWind: TripOverviewActivityAttributes.ContentState {
+    TripOverviewActivityAttributes.ContentState(
       tripState: .active,
       duration: .seconds(1000),
       distance: 22.0,
@@ -482,8 +497,8 @@ extension TripWindSockActivityAttributes.ContentState {
     )
   }
   
-  fileprivate static var tailWind: TripWindSockActivityAttributes.ContentState {
-    TripWindSockActivityAttributes.ContentState(
+  fileprivate static var tailWind: TripOverviewActivityAttributes.ContentState {
+    TripOverviewActivityAttributes.ContentState(
       tripState: .active,
       duration: .seconds(1000),
       distance: 22.0,
@@ -500,8 +515,8 @@ extension TripWindSockActivityAttributes.ContentState {
     )
   }
   
-  fileprivate static var ended: TripWindSockActivityAttributes.ContentState {
-    TripWindSockActivityAttributes.ContentState(
+  fileprivate static var ended: TripOverviewActivityAttributes.ContentState {
+    TripOverviewActivityAttributes.ContentState(
       tripState: .ended,
       duration: .seconds(1000),
       distance: 22.0,
@@ -510,8 +525,8 @@ extension TripWindSockActivityAttributes.ContentState {
     )
   }
   
-  fileprivate static var endedWithRangeConsumed: TripWindSockActivityAttributes.ContentState {
-    TripWindSockActivityAttributes.ContentState(
+  fileprivate static var endedWithRangeConsumed: TripOverviewActivityAttributes.ContentState {
+    TripOverviewActivityAttributes.ContentState(
       tripState: .ended,
       duration: .seconds(1000),
       distance: 22.0,
@@ -522,30 +537,30 @@ extension TripWindSockActivityAttributes.ContentState {
   }
 }
 
-#Preview("Starting", as: .content, using: TripWindSockActivityAttributes.preview) {
-  TripWindSockLiveActivityWidget()
+#Preview("Starting", as: .content, using: TripOverviewActivityAttributes.preview) {
+  TripOverviewLiveActivityWidget()
 } contentStates: {
-  TripWindSockActivityAttributes.ContentState.starting
+  TripOverviewActivityAttributes.ContentState.starting
 }
 
-#Preview("Efficiency", as: .content, using: TripWindSockActivityAttributes.preview) {
-  TripWindSockLiveActivityWidget()
+#Preview("Efficiency", as: .content, using: TripOverviewActivityAttributes.preview) {
+  TripOverviewLiveActivityWidget()
 } contentStates: {
-  TripWindSockActivityAttributes.ContentState.emptyActiveEfficiency
-  TripWindSockActivityAttributes.ContentState.partialActiveEfficiency
-  TripWindSockActivityAttributes.ContentState.activeEfficiency
+  TripOverviewActivityAttributes.ContentState.emptyActiveEfficiency
+  TripOverviewActivityAttributes.ContentState.partialActiveEfficiency
+  TripOverviewActivityAttributes.ContentState.activeEfficiency
 }
 
-#Preview("WindSock", as: .content, using: TripWindSockActivityAttributes.preview) {
-  TripWindSockLiveActivityWidget()
+#Preview("WindSock", as: .content, using: TripOverviewActivityAttributes.preview) {
+  TripOverviewLiveActivityWidget()
 } contentStates: {
-  TripWindSockActivityAttributes.ContentState.tailWind
-  TripWindSockActivityAttributes.ContentState.headWind
+  TripOverviewActivityAttributes.ContentState.tailWind
+  TripOverviewActivityAttributes.ContentState.headWind
 }
 
-#Preview("Ending", as: .content, using: TripWindSockActivityAttributes.preview) {
-  TripWindSockLiveActivityWidget()
+#Preview("Ending", as: .content, using: TripOverviewActivityAttributes.preview) {
+  TripOverviewLiveActivityWidget()
 } contentStates: {
-  TripWindSockActivityAttributes.ContentState.ended
-  TripWindSockActivityAttributes.ContentState.endedWithRangeConsumed
+  TripOverviewActivityAttributes.ContentState.ended
+  TripOverviewActivityAttributes.ContentState.endedWithRangeConsumed
 }

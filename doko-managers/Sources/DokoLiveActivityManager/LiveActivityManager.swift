@@ -29,8 +29,8 @@ public final class LiveActivityManager {
 
   private func endOrphanedActivities() {
     Task {
-      for activity in Activity<TripWindSockActivityAttributes>.activities {
-        let final = TripWindSockActivityAttributes.ContentState(tripState: .ended)
+      for activity in Activity<TripOverviewActivityAttributes>.activities {
+        let final = TripOverviewActivityAttributes.ContentState(tripState: .ended)
         let content = ActivityContent(state: final, staleDate: nil)
         await activity.end(content, dismissalPolicy: .immediate)
         DokoLogging.shared.postLoggingResponse(.liveActivity("ended orphaned trip activity \(activity.id)"))
@@ -45,7 +45,7 @@ public final class LiveActivityManager {
   }
 
   private enum AnyManagedActivity {
-    case trip(Activity<TripWindSockActivityAttributes>)
+    case trip(Activity<TripOverviewActivityAttributes>)
     case charge(Activity<ChargeSessionActivityAttributes>)
 
     var id: String {
@@ -58,7 +58,7 @@ public final class LiveActivityManager {
     func endImmediately() async {
       switch self {
       case .trip(let activity):
-        let final = TripWindSockActivityAttributes.ContentState(tripState: .ended)
+        let final = TripOverviewActivityAttributes.ContentState(tripState: .ended)
         let content = ActivityContent(state: final, staleDate: nil)
         await activity.end(content, dismissalPolicy: .immediate)
 
@@ -83,7 +83,7 @@ public final class LiveActivityManager {
 
   private func startPushToStartTokenObservation() {
     Task {
-      for await token in Activity<TripWindSockActivityAttributes>.pushToStartTokenUpdates {
+      for await token in Activity<TripOverviewActivityAttributes>.pushToStartTokenUpdates {
         tripPushToStartToken = token
         DokoLogging.shared.postLoggingResponse(.liveActivity("tripPushToStartToken updated"))
       }
@@ -105,7 +105,7 @@ public final class LiveActivityManager {
     if let tripPushToStartToken { return tripPushToStartToken }
     return await withTaskGroup(of: Data?.self) { group in
       group.addTask {
-        for await token in Activity<TripWindSockActivityAttributes>.pushToStartTokenUpdates {
+        for await token in Activity<TripOverviewActivityAttributes>.pushToStartTokenUpdates {
           return token
         }
         return nil
@@ -149,7 +149,7 @@ public final class LiveActivityManager {
   // launched, since `activityUpdates` replays current activities to a new subscriber.
   private func startActivityUpdatesObservation() {
     Task {
-      for await activity in Activity<TripWindSockActivityAttributes>.activityUpdates {
+      for await activity in Activity<TripOverviewActivityAttributes>.activityUpdates {
         switch activity.activityState {
         case .active, .stale:
           if case .trip = self.managedActivity {
@@ -233,8 +233,8 @@ public final class LiveActivityManager {
             self.managedActivity = nil
             self.pendingActivity = nil
           } else {
-            for activity in Activity<TripWindSockActivityAttributes>.activities {
-              let final = TripWindSockActivityAttributes.ContentState(tripState: .ended)
+            for activity in Activity<TripOverviewActivityAttributes>.activities {
+              let final = TripOverviewActivityAttributes.ContentState(tripState: .ended)
               await activity.end(ActivityContent(state: final, staleDate: nil), dismissalPolicy: .immediate)
             }
             for activity in Activity<ChargeSessionActivityAttributes>.activities {
@@ -277,11 +277,11 @@ public final class LiveActivityManager {
       return
     }
 
-    let initial = TripWindSockActivityAttributes.ContentState(tripState: .starting)
-    let activity: Activity<TripWindSockActivityAttributes>
+    let initial = TripOverviewActivityAttributes.ContentState(tripState: .starting)
+    let activity: Activity<TripOverviewActivityAttributes>
     do {
       activity = try Activity.request(
-        attributes: TripWindSockActivityAttributes(),
+        attributes: TripOverviewActivityAttributes(),
         content: ActivityContent(state: initial, staleDate: now.addingTimeInterval(startActivityStaleDate)),
         pushType: .token
       )
@@ -322,7 +322,7 @@ public final class LiveActivityManager {
     }()
     
     DokoLogging.shared.postLoggingResponse(.liveActivity(tripData.tripEfficiencyMovingAverage.description), debugPacket: true)
-    let state = TripWindSockActivityAttributes.ContentState(
+    let state = TripOverviewActivityAttributes.ContentState(
       tripState: .active,
       duration: .seconds(duration),
       distance: distance,
@@ -348,7 +348,7 @@ public final class LiveActivityManager {
     }
     guard let duration = tripEnd.duration, let distance = tripEnd.distance else { return }
 
-    let state = TripWindSockActivityAttributes.ContentState(
+    let state = TripOverviewActivityAttributes.ContentState(
       tripState: .ended,
       duration: .seconds(duration),
       distance: distance,
