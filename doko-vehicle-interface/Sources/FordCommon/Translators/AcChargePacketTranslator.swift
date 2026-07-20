@@ -101,7 +101,8 @@ extension FordTranslating {
   }
 
   public func acChargeUpdateResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
-    DokoResponsePacket(type: .acChargeUpdate, responses: responseCache)
+    let dokoPacket: DokoPacketType = .acChargeUpdate
+    return DokoResponsePacket(type: dokoPacket, responses: responseCache)
   }
 
   public func acChargeEnergyResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
