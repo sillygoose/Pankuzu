@@ -126,9 +126,11 @@ extension VwElectrics {
       dokoResponses[.error] = DokoCommandResponse(command: dokoCommand, response: .error("arguments"))
       return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
     }
-    defer { responseCache.merge(dokoResponses) { _, new in new } }
-    
     dokoResponses[.position] = DokoCommandResponse(command: dokoCommand, response: .position(position))
+    // Merge before building the return value (not deferred) — this function intentionally
+    // returns the full responseCache, not just this call's own dokoResponses, so the cache
+    // must already include this call's contribution by the time it's read below.
+    responseCache.merge(dokoResponses) { _, new in new }
     return DokoResponsePacket(type: dokoPacket, responses: responseCache)
   }
 

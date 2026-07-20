@@ -94,8 +94,8 @@ extension FordTranslating {
     dokoResponses[.couplerTemperature] = DokoCommandResponse(command: dokoCommand, response: .couplerTemperature(couplerTemperature))
     dokoResponses[.primaryCouplerTemperature] = DokoCommandResponse(command: dokoCommand, response: .primaryCouplerTemperature(couplerTemperature))
 
-    if let e = hvBatteryEnergy.energy {
-      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergy(e))
+    if let energy = hvBatteryEnergy.energy {
+      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergy(energy))
     }
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
@@ -175,12 +175,24 @@ extension FordTranslating {
       dokoResponses[.batteryChargeCurrentRequested] = DokoCommandResponse(command: dokoCommand, response: .batteryChargeCurrentRequested(v))
     }
 
-    if let p = hvBatteryEnergy.power { dokoResponses[.batteryPower] = DokoCommandResponse(command: dokoCommand, response: .batteryPower(p)) }
-    if let e = hvBatteryEnergy.energy { dokoResponses[.batteryEnergy] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergy(e)) }
-    if let p = chargerInputEnergy.power { dokoResponses[.chargerInputPower] = DokoCommandResponse(command: dokoCommand, response: .chargerInputPower(p)) }
-    if let e = chargerInputEnergy.energy { dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: dokoCommand, response: .chargerInputEnergy(e)) }
-    if let p = chargerOutputEnergy.power { dokoResponses[.chargerOutputPower] = DokoCommandResponse(command: dokoCommand, response: .chargerOutputPower(p)) }
-    if let e = chargerOutputEnergy.energy { dokoResponses[.chargerOutputEnergy] = DokoCommandResponse(command: dokoCommand, response: .chargerOutputEnergy(e)) }
+    if let power = hvBatteryEnergy.power {
+      dokoResponses[.batteryPower] = DokoCommandResponse(command: dokoCommand, response: .batteryPower(power))
+    }
+    if let energy = hvBatteryEnergy.energy {
+      dokoResponses[.batteryEnergy] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergy(energy))
+    }
+    if let power = chargerInputEnergy.power {
+      dokoResponses[.chargerInputPower] = DokoCommandResponse(command: dokoCommand, response: .chargerInputPower(power))
+    }
+    if let energy = chargerInputEnergy.energy {
+      dokoResponses[.chargerInputEnergy] = DokoCommandResponse(command: dokoCommand, response: .chargerInputEnergy(energy))
+    }
+    if let power = chargerOutputEnergy.power {
+      dokoResponses[.chargerOutputPower] = DokoCommandResponse(command: dokoCommand, response: .chargerOutputPower(power))
+    }
+    if let energy = chargerOutputEnergy.energy {
+      dokoResponses[.chargerOutputEnergy] = DokoCommandResponse(command: dokoCommand, response: .chargerOutputEnergy(energy))
+    }
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
 }
