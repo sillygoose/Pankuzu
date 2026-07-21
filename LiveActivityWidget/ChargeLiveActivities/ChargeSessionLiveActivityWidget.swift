@@ -4,10 +4,10 @@ import WidgetKit
 
 import DokoLiveActivityManager
 
-struct ChargeSessionLiveActivityWidget: Widget {
+struct ChargeOverviewLiveActivityWidget: Widget {
   var body: some WidgetConfiguration {
-    ActivityConfiguration(for: ChargeSessionActivityAttributes.self) { context in
-      ChargeSessionLiveActivity(context: context)
+    ActivityConfiguration(for: ChargeOverviewActivityAttributes.self) { context in
+      ChargeOverviewLiveActivity(context: context)
     } dynamicIsland: { context in
       DynamicIsland {
         DynamicIslandExpandedRegion(.leading) {}
@@ -31,54 +31,54 @@ struct ChargeSessionLiveActivityWidget: Widget {
   }
 }
 
-extension ChargeSessionActivityAttributes {
-  fileprivate static var preview: ChargeSessionActivityAttributes {
-    ChargeSessionActivityAttributes()
+extension ChargeOverviewActivityAttributes {
+  fileprivate static var preview: ChargeOverviewActivityAttributes {
+    ChargeOverviewActivityAttributes()
   }
 }
 
- extension ChargeSessionActivityAttributes.ContentState {
-   fileprivate static var starting: ChargeSessionActivityAttributes.ContentState {
-     ChargeSessionActivityAttributes.ContentState(
+ extension ChargeOverviewActivityAttributes.ContentState {
+   fileprivate static var starting: ChargeOverviewActivityAttributes.ContentState {
+     ChargeOverviewActivityAttributes.ContentState(
        chargeState: .starting,
      )
    }
 
-   fileprivate static var active: ChargeSessionActivityAttributes.ContentState {
-     ChargeSessionActivityAttributes.ContentState(
+   fileprivate static var active: ChargeOverviewActivityAttributes.ContentState {
+     ChargeOverviewActivityAttributes.ContentState(
       chargeState: .active,
        duration: .seconds(3661),
      )
    }
 
-   fileprivate static var ended: ChargeSessionActivityAttributes.ContentState {
-     ChargeSessionActivityAttributes.ContentState(
+   fileprivate static var ended: ChargeOverviewActivityAttributes.ContentState {
+     ChargeOverviewActivityAttributes.ContentState(
       chargeState: .ended,
        duration: .seconds(7200),
      )
    }
  }
 
- #Preview("Dynamic Island: Minimal", as: .dynamicIsland(.minimal), using: ChargeSessionActivityAttributes.preview) {
-   ChargeSessionLiveActivityWidget()
+ #Preview("Dynamic Island: Minimal", as: .dynamicIsland(.minimal), using: ChargeOverviewActivityAttributes.preview) {
+   ChargeOverviewLiveActivityWidget()
  } contentStates: {
-   ChargeSessionActivityAttributes.ContentState.starting
-   ChargeSessionActivityAttributes.ContentState.active
-   ChargeSessionActivityAttributes.ContentState.ended
+   ChargeOverviewActivityAttributes.ContentState.starting
+   ChargeOverviewActivityAttributes.ContentState.active
+   ChargeOverviewActivityAttributes.ContentState.ended
  }
 
- #Preview("Dynamic Island: Compact", as: .dynamicIsland(.compact), using: ChargeSessionActivityAttributes.preview) {
-   ChargeSessionLiveActivityWidget()
+ #Preview("Dynamic Island: Compact", as: .dynamicIsland(.compact), using: ChargeOverviewActivityAttributes.preview) {
+   ChargeOverviewLiveActivityWidget()
  } contentStates: {
-   ChargeSessionActivityAttributes.ContentState.starting
-   ChargeSessionActivityAttributes.ContentState.active
-   ChargeSessionActivityAttributes.ContentState.ended
+   ChargeOverviewActivityAttributes.ContentState.starting
+   ChargeOverviewActivityAttributes.ContentState.active
+   ChargeOverviewActivityAttributes.ContentState.ended
  }
 
- #Preview("Dynamic Island: Expanded", as: .dynamicIsland(.expanded), using: ChargeSessionActivityAttributes.preview) {
-   ChargeSessionLiveActivityWidget()
+ #Preview("Dynamic Island: Expanded", as: .dynamicIsland(.expanded), using: ChargeOverviewActivityAttributes.preview) {
+   ChargeOverviewLiveActivityWidget()
  } contentStates: {
-   ChargeSessionActivityAttributes.ContentState.starting
-   ChargeSessionActivityAttributes.ContentState.active
-   ChargeSessionActivityAttributes.ContentState.ended
+   ChargeOverviewActivityAttributes.ContentState.starting
+   ChargeOverviewActivityAttributes.ContentState.active
+   ChargeOverviewActivityAttributes.ContentState.ended
  }

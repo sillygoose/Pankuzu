@@ -12,10 +12,13 @@ export default {
       return new Response("Invalid JSON", { status: 400 })
     }
 
-    if (url.pathname === "/trip-start") {
+    if (url.pathname === "/trip-overview-start") {
       return handleTripStart(body, env)
     }
-    if (url.pathname === "/charge-start") {
+    if (url.pathname === "/trip-efficiency-start") {
+      return handleTripEfficiencyStart(body, env)
+    }
+    if (url.pathname === "/charge-overview-start") {
       return handleChargeStart(body, env)
     }
     if (url.pathname === "/trip-token") {
@@ -56,10 +59,76 @@ async function handleTripStart(body, env) {
       "content-state": {
         tripState: { starting: {} },
         duration: [0, 0],
+        distance: 0
+      },
+      "attributes-type": "TripOverviewActivityAttributes",
+      attributes: {
+        tripID: crypto.randomUUID().toUpperCase()
+      },
+      alert: {
+        title: "Trip Started",
+        body: "Pankuzu is tracking your trip"
+      }
+    }
+  }
+
+  const apnsResp = await fetch(
+    `https://${apnsHost}/3/device/${deviceToken}`,
+    {
+      method: "POST",
+      headers: {
+        "authorization": `bearer ${jwt}`,
+        "apns-topic": `${bundleId}.push-type.liveactivity`,
+        "apns-push-type": "liveactivity",
+        "apns-expiration": "0",
+        "apns-priority": "10",
+      },
+      body: JSON.stringify(payload)
+    }
+  )
+
+  if (!apnsResp.ok) {
+    const detail = await apnsResp.text()
+    return new Response("APNs error: " + detail, { status: 502 })
+  }
+
+  return new Response(null, { status: 204 })
+}
+
+async function handleTripEfficiencyStart(body, env) {
+  const { pushToken, bundleId, apnsEnvironment } = body
+  if (!pushToken || !bundleId) {
+    return new Response(
+      `Missing fields. Got: pushToken=${!!pushToken} bundleId=${!!bundleId} keys=${Object.keys(body).join(",")}`,
+      { status: 400 }
+    )
+  }
+  const deviceToken = pushToken
+  const isProd = apnsEnvironment === "production"
+  const apnsHost = isProd ? "api.push.apple.com" : "api.development.push.apple.com"
+  const apnsKey = isProd ? env.APNS_KEY_PROD : env.APNS_KEY_SANDBOX
+  const apnsKeyId = isProd ? env.APNS_KEY_ID_PROD : env.APNS_KEY_ID_SANDBOX
+
+  let jwt
+  try {
+    jwt = await getCachedApnsJwt(apnsKey, apnsKeyId, env.APNS_TEAM_ID)
+  } catch (e) {
+    return new Response("JWT signing failed: " + e.message, { status: 500 })
+  }
+
+  const now = Math.floor(Date.now() / 1000)
+  const payload = {
+    aps: {
+      timestamp: now,
+      event: "start",
+      "dismissal-date": now + (2 * 60),
+      "content-state": {
+        tripState: { starting: {} },
+        duration: [0, 0],
         distance: 0,
         efficiencyMovingAverage: []
       },
-      "attributes-type": "TripOverviewActivityAttributes",
+      "attributes-type": "TripEfficiencyActivityAttributes",
       attributes: {
         tripID: crypto.randomUUID().toUpperCase()
       },
@@ -124,7 +193,7 @@ async function handleChargeStart(body, env) {
         chargeState: { starting: {} },
         duration: [0, 0]
       },
-      "attributes-type": "ChargeSessionActivityAttributes",
+      "attributes-type": "ChargeOverviewActivityAttributes",
       attributes: {
         chargeID: crypto.randomUUID().toUpperCase()
       },

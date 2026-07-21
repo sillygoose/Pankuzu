@@ -57,7 +57,7 @@ extension CarPlayController {
     return template
   }
 
-  func makeChargeSessionItems(from responses: DokoResponseDictionary) -> [CPInformationItem] {
+  func makeChargeOverviewItems(from responses: DokoResponseDictionary) -> [CPInformationItem] {
     var items: [CPInformationItem] = []
     if case let .duration(v)?                       = responses[.duration]?.response                { items.append(.init(title: "Duration",           detail: formatDuration(v))) }
     if case let .chargerInputPower(v)?              = responses[.chargerInputPower]?.response       { items.append(.init(title: "Charger Power",      detail: String(format: "%.1f kW", v))) }

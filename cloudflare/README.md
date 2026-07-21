@@ -6,7 +6,7 @@ This worker receives push-to-start requests from the Pankuzu app and forwards th
 
 | File | Purpose |
 |------|---------|
-| `worker.js` | Cloudflare Worker — handles `/trip-start` and `/charge-start` routes |
+| `worker.js` | Cloudflare Worker — handles `/trip-overview-start` and `/charge-overview-start` routes |
 | `wrangler.toml` | Wrangler configuration — worker name, entry point, and environments |
 
 ## Environments
@@ -29,8 +29,8 @@ WORKER_BASE_URL_DEV = https://<worker-name-dev>.<subdomain>.workers.dev
 
 | Route | Description |
 |-------|-------------|
-| `POST /trip-start` | Start a trip Live Activity via APNs push-to-start |
-| `POST /charge-start` | Start a charge Live Activity via APNs push-to-start |
+| `POST /trip-overview-start` | Start a trip Live Activity via APNs push-to-start |
+| `POST /charge-overview-start` | Start a charge Live Activity via APNs push-to-start |
 
 ### Request body
 

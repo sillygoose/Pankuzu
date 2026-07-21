@@ -22,6 +22,10 @@ extension DokoLiveActivityFonts {
   var laLine: CGFloat           { activityFamily == .small ? DesignTokens.LineWidth.slaLine : DesignTokens.LineWidth.mlaLine  }
   var laThickLine: CGFloat      { activityFamily == .small ? DesignTokens.LineWidth.slaThickLine : DesignTokens.LineWidth.mlaThickLine  }
 
+  var laSmallPoint: CGFloat     { activityFamily == .small ? DesignTokens.PointSize.slaSmallPoint : DesignTokens.PointSize.mlaSmallPoint  }
+  var laMediumPoint: CGFloat    { activityFamily == .small ? DesignTokens.PointSize.slaMediumPoint : DesignTokens.PointSize.mlaMediumPoint  }
+  var laLargePoint: CGFloat     { activityFamily == .small ? DesignTokens.PointSize.slaLargePoint : DesignTokens.PointSize.mlaLargePoint  }
+
   var laIconFrame: Double       { activityFamily == .small ? 16 : 36 }
   var laArrowFrame: Double      { activityFamily == .small ? 36 : 60 }
 }

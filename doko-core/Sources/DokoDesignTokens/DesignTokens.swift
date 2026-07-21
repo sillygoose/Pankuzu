@@ -62,18 +62,18 @@ public enum DesignTokens {
     public static let headlineRounded = SwiftUI.Font.headline.weight(.bold)
 
     // Medium Live Activity (Dynamic Island expanded / Lock Screen)
-    public static let mlaSymbol = SwiftUI.Font.system(size: 18)
-    public static let mlaValue = SwiftUI.Font.system(size: 30)
-    public static let mlaUnit = SwiftUI.Font.system(size: 16)
+    public static let mlaSymbol = SwiftUI.Font.system(size: 24)
+    public static let mlaValue = SwiftUI.Font.system(size: 36)
+    public static let mlaUnit = SwiftUI.Font.system(size: 18)
     public static let mlaTitle = SwiftUI.Font.system(size: 36)
     public static let mlaSubtitle = SwiftUI.Font.system(size: 30)
     public static let mlaLabel = SwiftUI.Font.system(size: 20)
     public static let mlaAxisLabel = SwiftUI.Font.system(size: 12)
 
     // Small Live Activity (Dynamic Island compact / minimal)
-    public static let slaSymbol = SwiftUI.Font.system(size: 8)
-    public static let slaValue = SwiftUI.Font.system(size: 13)
-    public static let slaUnit = SwiftUI.Font.system(size: 7)
+    public static let slaSymbol = SwiftUI.Font.system(size: 10)
+    public static let slaValue = SwiftUI.Font.system(size: 15)
+    public static let slaUnit = SwiftUI.Font.system(size: 8)
     public static let slaTitle = SwiftUI.Font.system(size: 14)
     public static let slaSubtitle = SwiftUI.Font.system(size: 10)
     public static let slaLabel = SwiftUI.Font.system(size: 9)
@@ -90,7 +90,17 @@ public enum DesignTokens {
     public static let slaThickLine: CGFloat = 1.5
   }
 
-  public enum Spacing {
+  public enum PointSize {
+    public static let mlaSmallPoint: CGFloat = 80
+    public static let mlaMediumPoint: CGFloat = 120
+    public static let mlaLargePoint: CGFloat = 160
+
+    public static let slaSmallPoint: CGFloat = 20
+    public static let slaMediumPoint: CGFloat = 40
+    public static let slaLargePoint: CGFloat = 60
+  }
+
+public enum Spacing {
     public static let xxs: CGFloat = 2
     public static let xs: CGFloat = 4
     public static let sm: CGFloat = 8

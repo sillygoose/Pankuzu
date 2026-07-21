@@ -5,8 +5,8 @@ import WidgetKit
 import DokoSharing
 import DokoLiveActivityManager
 
-struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
-  let context: ActivityViewContext<ChargeSessionActivityAttributes>
+struct ChargeOverviewLiveActivity: View, DokoLiveActivityFonts {
+  let context: ActivityViewContext<ChargeOverviewActivityAttributes>
   
   @Environment(\.activityFamily) var activityFamily
   
@@ -22,7 +22,7 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
   }
   
   private struct StartingView: View, DokoLiveActivityFonts {
-    let context: ActivityViewContext<ChargeSessionActivityAttributes>
+    let context: ActivityViewContext<ChargeOverviewActivityAttributes>
     @Environment(\.activityFamily) var activityFamily
     
     var body: some View {
@@ -37,7 +37,7 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
   }
   
   private struct ActiveView: View, DokoLiveActivityFonts {
-    let context: ActivityViewContext<ChargeSessionActivityAttributes>
+    let context: ActivityViewContext<ChargeOverviewActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily
     
@@ -160,7 +160,7 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
   }
   
   private struct EndedView: View, DokoLiveActivityFonts {
-    let context: ActivityViewContext<ChargeSessionActivityAttributes>
+    let context: ActivityViewContext<ChargeOverviewActivityAttributes>
     
     @Environment(\.activityFamily) var activityFamily
     
@@ -276,19 +276,19 @@ struct ChargeSessionLiveActivity: View, DokoLiveActivityFonts {
   }
 }
 
-extension ChargeSessionActivityAttributes {
-  fileprivate static var preview: ChargeSessionActivityAttributes {
-    ChargeSessionActivityAttributes()
+extension ChargeOverviewActivityAttributes {
+  fileprivate static var preview: ChargeOverviewActivityAttributes {
+    ChargeOverviewActivityAttributes()
   }
 }
 
-extension ChargeSessionActivityAttributes.ContentState {
-  fileprivate static var starting: ChargeSessionActivityAttributes.ContentState {
-    ChargeSessionActivityAttributes.ContentState(chargeState: .starting)
+extension ChargeOverviewActivityAttributes.ContentState {
+  fileprivate static var starting: ChargeOverviewActivityAttributes.ContentState {
+    ChargeOverviewActivityAttributes.ContentState(chargeState: .starting)
   }
   
-  fileprivate static var active: ChargeSessionActivityAttributes.ContentState {
-    ChargeSessionActivityAttributes.ContentState(
+  fileprivate static var active: ChargeOverviewActivityAttributes.ContentState {
+    ChargeOverviewActivityAttributes.ContentState(
       chargeState: .active,
       duration: .seconds(1200),
       measuredPower: 10.4,
@@ -299,8 +299,8 @@ extension ChargeSessionActivityAttributes.ContentState {
     )
   }
   
-  fileprivate static var ended: ChargeSessionActivityAttributes.ContentState {
-    ChargeSessionActivityAttributes.ContentState(
+  fileprivate static var ended: ChargeOverviewActivityAttributes.ContentState {
+    ChargeOverviewActivityAttributes.ContentState(
       chargeState: .ended,
       duration: .seconds(1200),
       stateOfCharge: 47.5,
@@ -310,11 +310,11 @@ extension ChargeSessionActivityAttributes.ContentState {
   }
 }
 
-#Preview("Charge Live Activity", as: .content, using: ChargeSessionActivityAttributes.preview) {
-  ChargeSessionLiveActivityWidget()
+#Preview("Charge Live Activity", as: .content, using: ChargeOverviewActivityAttributes.preview) {
+  ChargeOverviewLiveActivityWidget()
 } contentStates: {
-  ChargeSessionActivityAttributes.ContentState.starting
-  ChargeSessionActivityAttributes.ContentState.active
-  ChargeSessionActivityAttributes.ContentState.ended
+  ChargeOverviewActivityAttributes.ContentState.starting
+  ChargeOverviewActivityAttributes.ContentState.active
+  ChargeOverviewActivityAttributes.ContentState.ended
 }
 

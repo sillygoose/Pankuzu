@@ -97,7 +97,7 @@ final class CarPlayController {
           }
         }
 
-        chargeSessionTemplate?.items = makeChargeSessionItems(from: chargeResponses)
+        chargeSessionTemplate?.items = makeChargeOverviewItems(from: chargeResponses)
         chargeInputTemplate?.items   = makeChargeInputItems(from: chargeResponses)
         chargeOutputTemplate?.items  = makeChargeOutputItems(from: chargeResponses)
         chargeBatteryTemplate?.items = makeChargeBatteryItems(from: chargeResponses)

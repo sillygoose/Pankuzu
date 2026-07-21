@@ -89,7 +89,7 @@ public struct TripEfficiency<C: Clock>: Sendable where C.Instant.Duration == Dur
         // Rounding keeps the JSON encoding of each point short (no 15-17 digit floating-point
         // noise) — this array is the dominant contributor to ContentState's size against
         // ActivityKit's 4KB limit, and the chart doesn't need sub-second/sub-milli precision.
-        let roundedTimestamp = Date() //###Date(timeIntervalSince1970: Date().timeIntervalSince1970.rounded())
+        let roundedTimestamp = Date()
         let roundedEfficiency = (movingAverageEfficiency * 1000).rounded() / 1000
         efficiencyMovingAverage.append(EfficiencyPoint(timestamp: roundedTimestamp, efficiency: roundedEfficiency))
         DokoLogging.shared.postLoggingResponse(.liveActivity("baseline(\(String(format: "%.1f", baseline.distance)), \(String(format: "%.3f", baseline.energy)))"), debugPacket: true)

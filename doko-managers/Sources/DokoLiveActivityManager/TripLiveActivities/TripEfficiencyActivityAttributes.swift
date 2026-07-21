@@ -1,33 +1,7 @@
-import ActivityKit
-import WeatherKit
 import Foundation
+import ActivityKit
 
-public struct WindSock: Codable, Hashable, Sendable {
-  public let course: Double
-  public let temperature: Double
-  public let conditions: String
-  public let windSpeed: Double
-  public let windDirection: Double
-  public let windCompassDirection: String
-
-  public init(
-    course: Double,
-    temperature: Double,
-    conditions: String,
-    windSpeed: Double,
-    windDirection: Double,
-    windCompassDirection: String
-  ) {
-    self.course = course
-    self.temperature = temperature
-    self.conditions = conditions
-    self.windSpeed = windSpeed
-    self.windDirection = windDirection
-    self.windCompassDirection = windCompassDirection
-  }
-}
-
-public struct TripOverviewActivityAttributes: ActivityAttributes, Sendable {
+public struct TripEfficiencyActivityAttributes: ActivityAttributes, Sendable {
   public let tripID: UUID
 
   public init(tripID: UUID = UUID()) {
@@ -51,9 +25,9 @@ public struct TripOverviewActivityAttributes: ActivityAttributes, Sendable {
     public let distance: Double
     public let energy: Double?
     public let efficiency: Double?
-    public let elevation: Double?
+    public let pastEfficiency: Double?
     public let rangeConsumed: Double?
-    public let windSock: WindSock?
+    public let efficiencyMovingAverage: [EfficiencyPoint]
     
     public init(
       tripState: TripState,
@@ -61,18 +35,18 @@ public struct TripOverviewActivityAttributes: ActivityAttributes, Sendable {
       distance: Double = 0.0,
       energy: Double? = nil,
       efficiency: Double? = nil,
-      elevation: Double? = nil,
+      pastEfficiency: Double? = nil,
       rangeConsumed: Double? = nil,
-      windSock: WindSock? = nil,
+      efficiencyMovingAverage: [EfficiencyPoint] = []
     ) {
       self.tripState = tripState
       self.duration = duration
       self.distance = distance
       self.energy = energy
       self.efficiency = efficiency
-      self.elevation = elevation
+      self.pastEfficiency = pastEfficiency
       self.rangeConsumed = rangeConsumed
-      self.windSock = windSock
+      self.efficiencyMovingAverage = efficiencyMovingAverage
     }
   }
 }
