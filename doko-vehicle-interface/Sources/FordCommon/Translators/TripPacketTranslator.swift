@@ -17,7 +17,6 @@ extension FordTranslating {
       dokoResponses[.error] = DokoCommandResponse(command: dokoCommand, response: .error("arguments"))
       return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
     }
-    defer { responseCache = [:]; responseCache.merge(dokoResponses) { _, new in new } }
 
     vehicleMeanTemperature.reset()
     hvBatteryEnergy.reset()
@@ -44,6 +43,8 @@ extension FordTranslating {
     if let batteryDistanceToEmpty = responsePacket.batteryDistanceToEmpty {
       dokoResponses[.batteryDistanceToEmpty] = DokoCommandResponse(command: dokoCommand, response: .batteryDistanceToEmpty(batteryDistanceToEmpty))
     }
+
+    responseCache.merge(dokoResponses) { _, new in new }
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
 
@@ -57,13 +58,14 @@ extension FordTranslating {
       dokoResponses[.error] = DokoCommandResponse(command: dokoCommand, response: .error("arguments"))
       return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
     }
-    defer { responseCache.merge(dokoResponses) { _, new in new } }
 
     vehicleDuration.update()
     dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
 
     let nextState: VehicleState = gearSelected ? .tripInProgress : .tripEnding
     dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(nextState))
+    
+    responseCache.merge(dokoResponses) { _, new in new }
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
 
@@ -81,7 +83,6 @@ extension FordTranslating {
       dokoResponses[.error] = DokoCommandResponse(command: dokoCommand, response: .error("arguments"))
       return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
     }
-    defer { responseCache.merge(dokoResponses) { _, new in new } }
 
     vehicleDuration.update()
     vehicleOdometer.updateOdometer(with: odometer)
@@ -130,10 +131,6 @@ extension FordTranslating {
       return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
     }
     dokoResponses[.position] = DokoCommandResponse(command: dokoCommand, response: .position(position))
-    
-    // Merge before building the return value (not deferred) — this function intentionally
-    // returns the full responseCache, not just this call's own dokoResponses, so the cache
-    // must already include this call's contribution by the time it's read below.
     responseCache.merge(dokoResponses) { _, new in new }
     return DokoResponsePacket(type: dokoPacket, responses: responseCache)
   }
@@ -149,7 +146,6 @@ extension FordTranslating {
       dokoResponses[.error] = DokoCommandResponse(command: dokoCommand, response: .error("arguments"))
       return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
     }
-    defer { responseCache.merge(dokoResponses) { _, new in new } }
 
     vehicleDuration.update()
     dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
@@ -160,6 +156,8 @@ extension FordTranslating {
       dokoResponses[.batteryPower] = DokoCommandResponse(command: dokoCommand, response: .batteryPower(batteryPower))
       dokoResponses[.batteryEnergy] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergy(batteryEnergy))
     }
+    
+    responseCache.merge(dokoResponses) { _, new in new }
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
 
@@ -176,7 +174,6 @@ extension FordTranslating {
       dokoResponses[.error] = DokoCommandResponse(command: dokoCommand, response: .error("arguments"))
       return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
     }
-    defer { responseCache.merge(dokoResponses) { _, new in new } }
 
     vehicleDuration.update()
     dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
@@ -208,6 +205,8 @@ extension FordTranslating {
     if let e = hvBatteryEnergy.energy {
       dokoResponses[.batteryEnergy] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergy(e))
     }
+    
+    responseCache.merge(dokoResponses) { _, new in new }
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
 
@@ -221,7 +220,6 @@ extension FordTranslating {
       dokoResponses[.error] = DokoCommandResponse(command: dokoCommand, response: .error("arguments"))
       return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
     }
-    defer { responseCache.merge(dokoResponses) { _, new in new } }
 
     vehicleDuration.update()
     dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
@@ -229,6 +227,8 @@ extension FordTranslating {
     let newMeanTemperature = vehicleMeanTemperature.updateMeanTemperature(with: weather.temperature)
     dokoResponses[.meanTemperature] = DokoCommandResponse(command: dokoCommand, response: .meanTemperature(newMeanTemperature))
     dokoResponses[.weather] = DokoCommandResponse(command: dokoCommand, response: .weather(weather))
+
+    responseCache.merge(dokoResponses) { _, new in new }
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
 }
