@@ -274,7 +274,7 @@ public struct TripDetailWeatherView: View {
   NavigationStack {
     TripDetailView(
       model: TripDetailModel(
-        destination: .weatherChart,
+        destination: .tripWeatherChart,
         tripID: trips.first!.id
       )
     )

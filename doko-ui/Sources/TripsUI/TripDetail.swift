@@ -21,36 +21,24 @@ public final class TripDetailModel {
     case editLocationForm(Location)
     case editVehicleForm(Vehicle)
     case tripMap
-    case elevationChart
-    case weatherChart
-    case energyUsedChart
-    case stateOfChargeChart
-    case batteryTemperatureChart
-    case stateOfHealthChart
-    case rangeEfficiencyChart
-    
+    case tripElevationChart
+    case tripWeatherChart
+    case tripEnergyUsedChart
+    case tripStateOfChargeChart
+    case tripBatteryTemperatureChart
+    case tripStateOfHealthChart
+    case tripRangeEfficiencyChart
+    case tripSpeedMap
+    case tripEfficiencyMap
+
     public var id: String {
       switch self {
       case .editLocationForm(let location):
         return "editLocationForm-\(location.id)"
       case .editVehicleForm(let vehicle):
         return "editVehicleForm-\(vehicle.id)"
-      case .tripMap:
-        return "tripMap"
-      case .elevationChart:
-        return "elevationChart"
-      case .weatherChart:
-        return "weatherChart"
-      case .energyUsedChart:
-        return "energyUsedChart"
-      case .stateOfChargeChart:
-        return "stateOfChargeChart"
-      case .batteryTemperatureChart:
-        return "batteryTemperatureChart"
-      case .stateOfHealthChart:
-        return "stateOfHealthChart"
-      case .rangeEfficiencyChart:
-        return "rangeConsumedChart"
+      default:
+        return String(describing: self)
       }
     }
   }
@@ -105,7 +93,7 @@ public struct TripDetailView: View {
             symbolName: "mountain.2.fill",
             title: "Elevation"
           ) {
-            model.destination = .elevationChart
+            model.destination = .tripElevationChart
           }
           
           GridButton(
@@ -152,7 +140,7 @@ public struct TripDetailView: View {
           endConditionSymbol: weatherConditionsEnd,
           title: "Trip Conditions"
         ) {
-          model.destination = .weatherChart
+          model.destination = .tripWeatherChart
         }
       }
       
@@ -194,13 +182,16 @@ public struct TripDetailView: View {
           title: "Distance"
         )
         
-        GridValue(
+        GridValueButton(
           color: .orange,
           value: String(format: "%.0f", averageSpeed.value),
           units: averageSpeed.unit.symbol,
           symbolName: "powermeter",
           title: "Speed"
-        )
+        ) {
+          model.destination = .tripSpeedMap
+        }
+
 
         if let energy = trip.energy {
           let targetUnit: UnitEnergyEfficiency = model.appSettings.metric
@@ -221,15 +212,18 @@ public struct TripDetailView: View {
             symbolName: "bolt.circle.fill",
             title: "Energy"
           ) {
-            model.destination = .energyUsedChart
+            model.destination = .tripEnergyUsedChart
           }
-          GridValue(
+          
+          GridValueButton(
             color: .green,
             value: String(format: efficiencyFormat, efficiency.value),
             units: efficiency.unit.symbol,
             symbolName: "ev.charger",
             title: "Efficiency"
-          )
+          ) {
+            model.destination = .tripEfficiencyMap
+          }
         }
 
         if let rawStateOfChargeEnd = trip.stateOfChargeEnd {
@@ -248,7 +242,7 @@ public struct TripDetailView: View {
             symbolName: stateOfChargeEndIcon,
             title: "State of Charge"
           ) {
-            model.destination = .stateOfChargeChart
+            model.destination = .tripStateOfChargeChart
           }
         }
 
@@ -267,7 +261,7 @@ public struct TripDetailView: View {
             symbolName: batteryTempEndIcon,
             title: "Temperature"
           ) {
-            model.destination = .batteryTemperatureChart
+            model.destination = .tripBatteryTemperatureChart
           }
         }
 
@@ -282,7 +276,7 @@ public struct TripDetailView: View {
             symbolName: "road.lanes.curved.right",
             title: "Range Efficiency"
           ) {
-            model.destination = .rangeEfficiencyChart
+            model.destination = .tripRangeEfficiencyChart
           }
         }
 
@@ -300,7 +294,7 @@ public struct TripDetailView: View {
             symbolName: "batteryblock.stack.fill",
             title: "State of Health"
           ) {
-            model.destination = .stateOfHealthChart
+            model.destination = .tripStateOfHealthChart
           }
         }
       }
@@ -314,103 +308,65 @@ public struct TripDetailView: View {
       switch destination {
       case .editLocationForm(let location):
         NavigationStack {
-          LocationFormView(
-            model: LocationFormModel(
-              location: Location.Draft(location)
-            )
-          )
+          LocationFormView(model: LocationFormModel(location: Location.Draft(location)))
           .presentationDetents([.large])
         }
-        
       case .editVehicleForm(let vehicle):
         NavigationStack {
-          VehicleFormView(
-            model: VehicleFormModel(
-              vehicle: Vehicle.Draft(vehicle)
-            )
-          )
+          VehicleFormView(model: VehicleFormModel(vehicle: Vehicle.Draft(vehicle)))
           .presentationDetents([.medium])
         }
-        
       case .tripMap:
         NavigationStack {
-          TripDetailMapView(
-            model: TripDetailMapModel(
-              trip: trip
-            )
-          )
+          TripDetailMapView(model: TripDetailMapModel(trip: trip))
           .presentationDetents([.large])
         }
-        
-      case .elevationChart:
+      case .tripElevationChart:
         NavigationStack {
-          TripDetailElevationView(
-            model: TripDetailElevationModel(
-              trip: trip
-            )
-          )
+          TripDetailElevationView(model: TripDetailElevationModel(trip: trip))
           .presentationDetents([.medium])
         }
-        
-      case .weatherChart:
+      case .tripWeatherChart:
         NavigationStack {
-          TripDetailWeatherView(
-            model: TripDetailWeatherModel(
-              trip: trip
-            )
-          )
+          TripDetailWeatherView(model: TripDetailWeatherModel(trip: trip))
           .presentationDetents([.large])
         }
-      case .energyUsedChart:
+      case .tripEnergyUsedChart:
         NavigationStack {
-          TripDetailEnergyView(
-            model: TripDetailEnergyModel(
-              trip: trip
-            )
-          )
+          TripDetailEnergyView(model: TripDetailEnergyModel(trip: trip))
           .presentationDetents([.medium])
         }
-        
-      case .stateOfChargeChart:
+      case .tripStateOfChargeChart:
         NavigationStack {
-          TripDetailStateOfChargeView(
-            model: TripDetailStateOfChargeModel(
-              trip: trip
-            )
-          )
+          TripDetailStateOfChargeView(model: TripDetailStateOfChargeModel(trip: trip))
           .presentationDetents([.medium])
         }
-        
-      case .batteryTemperatureChart:
+      case .tripBatteryTemperatureChart:
         NavigationStack {
-          TripDetailBatteryTemperatureView(
-            model: TripDetailBatteryTemperatureModel(
-              trip: trip
-            )
-          )
+          TripDetailBatteryTemperatureView(model: TripDetailBatteryTemperatureModel(trip: trip))
           .presentationDetents([.medium])
         }
-        
-      case .stateOfHealthChart:
+      case .tripStateOfHealthChart:
         NavigationStack {
-          StateOfHealthHistoryView(
-            model: StateOfHealthHistoryModel(
-              vehicleID: trip.vehicleID,
-              currentID: trip.id
-            )
-          )
+          StateOfHealthHistoryView(model: StateOfHealthHistoryModel(vehicleID: trip.vehicleID, currentID: trip.id))
           .presentationDetents([.medium])
         }
-        
-      case .rangeEfficiencyChart:
+      case .tripRangeEfficiencyChart:
         NavigationStack {
-          TripDetailRangeEfficiencyView(
-            model: TripDetailRangeEfficiencyModel(
-              trip: trip
-            )
-          )
+          TripDetailRangeEfficiencyView(model: TripDetailRangeEfficiencyModel(trip: trip))
           .presentationDetents([.medium])
         }
+      case .tripSpeedMap:
+        NavigationStack {
+          TripDetailSpeedMapView(model: TripDetailSpeedMapModel(trip: trip))
+          .presentationDetents([.large])
+        }
+      case .tripEfficiencyMap:
+        NavigationStack {
+          TripDetailEfficiencyMapView(model: TripDetailEfficiencyMapModel(trip: trip))
+          .presentationDetents([.large])
+        }
+
       }
     }
   }

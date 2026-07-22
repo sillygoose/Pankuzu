@@ -211,7 +211,7 @@ public struct TripDetailElevationView: View {
   NavigationStack {
     TripDetailView(
       model: TripDetailModel(
-        destination: .elevationChart,
+        destination: .tripElevationChart,
         tripID: trips.first!.id
       )
     )

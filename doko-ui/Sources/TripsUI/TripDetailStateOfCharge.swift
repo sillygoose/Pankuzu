@@ -254,7 +254,7 @@ public struct TripDetailStateOfChargeView: View {
   NavigationStack {
     TripDetailView(
       model: TripDetailModel(
-        destination: .stateOfChargeChart,
+        destination: .tripStateOfChargeChart,
         tripID: trips.first!.id
       )
     )

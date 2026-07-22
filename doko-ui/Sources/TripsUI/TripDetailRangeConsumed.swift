@@ -252,7 +252,7 @@ public struct TripDetailRangeEfficiencyView: View {
   NavigationStack {
     TripDetailView(
       model: TripDetailModel(
-        destination: .rangeEfficiencyChart,
+        destination: .tripRangeEfficiencyChart,
         tripID: trips.first!.id
       )
     )

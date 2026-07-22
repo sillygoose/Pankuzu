@@ -231,7 +231,7 @@ public struct TripDetailBatteryTemperatureView: View {
   NavigationStack {
     TripDetailView(
       model: TripDetailModel(
-        destination: .batteryTemperatureChart,
+        destination: .tripBatteryTemperatureChart,
         tripID: trips.first!.id
       )
     )

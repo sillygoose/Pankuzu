@@ -241,7 +241,7 @@ public struct TripDetailEnergyView: View {
   NavigationStack {
     TripDetailView(
       model: TripDetailModel(
-        destination: .energyUsedChart,
+        destination: .tripEnergyUsedChart,
         tripID: trips.first!.id
       )
     )
