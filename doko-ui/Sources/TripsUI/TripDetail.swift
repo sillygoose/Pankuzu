@@ -192,7 +192,6 @@ public struct TripDetailView: View {
           model.destination = .tripSpeedMap
         }
 
-
         if let energy = trip.energy {
           let targetUnit: UnitEnergyEfficiency = model.appSettings.metric
           ? (model.appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour)
