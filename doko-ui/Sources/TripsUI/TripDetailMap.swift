@@ -194,10 +194,8 @@ public struct TripDetailMapView: View {
           Image(systemName: appSettings.tripMapStyle == .satellite ? "globe" : "car")
         }
       }
-      if appSettings.tripMapStyle == .satellite {
-        ToolbarItem(placement: .topBarLeading) {
-          Button(appSettings.tripMap3D ? "2D" : "3D") { toggle3D() }
-        }
+      ToolbarItem(placement: .topBarLeading) {
+        Button(appSettings.tripMap3D ? "2D" : "3D") { toggle3D() }
       }
       ToolbarItem {
         Button("Done") { dismiss() }

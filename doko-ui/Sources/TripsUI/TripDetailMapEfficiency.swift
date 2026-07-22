@@ -10,10 +10,8 @@ public final class TripDetailEfficiencyMapModel {
   var trip: Trip
 
   @ObservationIgnored @FetchOne(TripPosition.none) var tripPositions
-  @ObservationIgnored @FetchOne(TripElevation.none) var tripElevations
 
   var tripPath: [CLLocationCoordinate2D] = []
-  var elevationPath: [CLLocationCoordinate2D] = []
   var coordinateRegion: MKCoordinateRegion = MKCoordinateRegion()
 
   public init(
@@ -44,18 +42,6 @@ public final class TripDetailEfficiencyMapModel {
         latitude: position.latitude,
         longitude: position.longitude
       )
-    }
-
-    _tripElevations = FetchOne(TripElevation.find(trip.id))
-    if let tripElevations, !path.isEmpty {
-      self.elevationPath = tripElevations.elevations.compactMap { elevation in
-        let closest = path.min { a, b in
-          abs(a.timestamp.timeIntervalSince(elevation.timestamp)) <
-          abs(b.timestamp.timeIntervalSince(elevation.timestamp))
-        }
-        guard let closest else { return nil }
-        return CLLocationCoordinate2D(latitude: closest.latitude, longitude: closest.longitude)
-      }
     }
   }
 }
@@ -120,34 +106,14 @@ public struct TripDetailEfficiencyMapView: View {
           )
         )
         .tint(.cyan)
-
-        if appSettings.tripMapPolyline {
-          MapPolyline(
-            MKPolyline(
-              coordinates: model.tripPath,
-              count: model.tripPath.count
-            )
+        
+        MapPolyline(
+          MKPolyline(
+            coordinates: model.tripPath,
+            count: model.tripPath.count
           )
-          .stroke(.blue, lineWidth: appSettings.tripMapStyle == .satellite ? 2 : 3)
-        } else {
-          ForEach(Array(model.tripPath.enumerated()), id: \.offset) { _, coord in
-            Annotation("", coordinate: coord) {
-              Circle()
-                .fill(Color.blue)
-                .frame(width: 6, height: 6)
-            }
-          }
-        }
-
-        if appSettings.showElevationOnPath {
-          ForEach(Array(model.elevationPath.enumerated()), id: \.offset) { _, coord in
-            Annotation("", coordinate: coord) {
-              Circle()
-                .fill(Color.green)
-                .frame(width: 8, height: 8)
-            }
-          }
-        }
+        )
+        .stroke(.blue, lineWidth: appSettings.tripMapStyle == .satellite ? 2 : 3)
       }
       .mapStyle(appSettings.tripMapStyle.mapStyle)
       .onMapCameraChange(frequency: .continuous) { context in currentCamera = context.camera }
@@ -194,10 +160,8 @@ public struct TripDetailEfficiencyMapView: View {
           Image(systemName: appSettings.tripMapStyle == .satellite ? "globe" : "car")
         }
       }
-      if appSettings.tripMapStyle == .satellite {
-        ToolbarItem(placement: .topBarLeading) {
-          Button(appSettings.tripMap3D ? "2D" : "3D") { toggle3D() }
-        }
+      ToolbarItem(placement: .topBarLeading) {
+        Button(appSettings.tripMap3D ? "2D" : "3D") { toggle3D() }
       }
       ToolbarItem {
         Button("Done") { dismiss() }
@@ -220,36 +184,10 @@ public struct TripDetailEfficiencyMapView: View {
   return NavigationStack {
     TripDetailView(
       model: TripDetailModel(
-        destination: .tripMap,
+        destination: .tripEfficiencyMap,
         tripID: tripID
       )
     )
     .preferredColorScheme(.dark)
   }
 }
-
-#Preview {
-  let _ = prepareDependencies {
-    try? $0.bootstrapDatabase()
-    try? $0.defaultDatabase.seedPreviews()
-  }
-  struct PreviewTripsLoader {
-    @FetchAll var trips: [Trip]
-    init() { _trips = FetchAll() }
-  }
-  let loader = PreviewTripsLoader()
-  @Shared(.appSettings) var appSettings
-  $appSettings.tripMapPolyline.withLock { $0 = false }
-  $appSettings.showElevationOnPath.withLock { $0 = true }
-  let tripID = loader.trips.first?.id ?? Trip.ID()
-  return NavigationStack {
-    TripDetailView(
-      model: TripDetailModel(
-        destination: .tripMap,
-        tripID: tripID
-      )
-    )
-    .preferredColorScheme(.dark)
-  }
-}
-

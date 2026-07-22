@@ -4,6 +4,40 @@ import MapKit
 import DokoSharing
 import DokoSchema
 
+public enum SpeedBin {
+  case stopped
+  case low
+  case moderate
+  case high
+
+  public init(kilometersPerHour speed: Double, metric: Bool) {
+    let value = metric ? speed : speed * 0.621371
+    let thresholds = metric ? (20.0, 50.0, 100.0) : (15.0, 30.0, 60.0)
+    switch value {
+    case ..<thresholds.0: self = .stopped
+    case ..<thresholds.1: self = .low
+    case ..<thresholds.2: self = .moderate
+    default: self = .high
+    }
+  }
+
+  public var color: Color {
+    switch self {
+    case .stopped: return .red
+    case .low: return .orange
+    case .moderate: return .green
+    case .high: return .blue
+    }
+  }
+}
+
+public struct SpeedSegment: Identifiable {
+  public let id = UUID()
+  public let start: CLLocationCoordinate2D
+  public let end: CLLocationCoordinate2D
+  public let speedKilometersPerHour: Double
+}
+
 @MainActor
 @Observable
 public final class TripDetailSpeedMapModel {
@@ -11,8 +45,8 @@ public final class TripDetailSpeedMapModel {
 
   @ObservationIgnored @FetchOne(TripPosition.none) var tripPositions
 
-  var tripPath: [CLLocationCoordinate2D] = []
   var positions: [VehiclePosition] = []
+  var speedSegments: [SpeedSegment] = []
   var coordinateRegion: MKCoordinateRegion = MKCoordinateRegion()
 
   public init(
@@ -38,13 +72,14 @@ public final class TripDetailSpeedMapModel {
       longitudeDelta: abs(maxLongitude - minLongitude) * 1.5
     )
     self.coordinateRegion = MKCoordinateRegion(center: mapCenter, span: mapSpan)
-    self.tripPath = path.map { position in
-      CLLocationCoordinate2D(
-        latitude: position.latitude,
-        longitude: position.longitude
+    self.positions = path
+    self.speedSegments = zip(path, path.dropFirst()).map { start, end in
+      SpeedSegment(
+        start: CLLocationCoordinate2D(latitude: start.latitude, longitude: start.longitude),
+        end: CLLocationCoordinate2D(latitude: end.latitude, longitude: end.longitude),
+        speedKilometersPerHour: ((start.speed ?? 0) + (end.speed ?? 0)) / 2
       )
     }
-    self.positions = path
   }
 }
 
@@ -54,7 +89,6 @@ public struct TripDetailSpeedMapView: View {
   @State var mapCameraPosition: MapCameraPosition
   @State var showStylePicker = false
   @State var currentCamera: MapCamera?
-  @State var selectedPositionID: Date?
 
   @Shared(.appSettings) var appSettings
   @Environment(\.dismiss) var dismiss
@@ -110,40 +144,12 @@ public struct TripDetailSpeedMapView: View {
         )
         .tint(.cyan)
 
-        if appSettings.tripMapPolyline {
-          MapPolyline(
-            MKPolyline(
-              coordinates: model.tripPath,
-              count: model.tripPath.count
+        ForEach(model.speedSegments) { segment in
+          MapPolyline(coordinates: [segment.start, segment.end])
+            .stroke(
+              SpeedBin(kilometersPerHour: segment.speedKilometersPerHour, metric: appSettings.metric).color,
+              lineWidth: appSettings.tripMapStyle == .satellite ? 4 : 5
             )
-          )
-          .stroke(.blue, lineWidth: appSettings.tripMapStyle == .satellite ? 2 : 3)
-        } else {
-          ForEach(model.positions) { position in
-            let coord = CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
-            let speed = Measurement(value: position.speed ?? 0, unit: UnitSpeed.kilometersPerHour)
-              .converted(to: appSettings.metric ? .kilometersPerHour : .milesPerHour)
-            let elevation = Measurement(value: position.elevation ?? 0, unit: UnitLength.meters)
-              .converted(to: appSettings.metric ? .meters : .feet)
-            Annotation("", coordinate: coord) {
-              VStack(spacing: 1) {
-                Circle()
-                  .fill(Color.blue)
-                  .frame(width: 16, height: 16)
-                if selectedPositionID == position.id {
-                  Text("\(String(format: "%.0f", speed.value)) \(speed.unit.symbol)")
-                  Text("\(String(format: "%.0f", elevation.value)) \(elevation.unit.symbol)")
-                }
-              }
-              .font(.system(size: 18))
-              .foregroundStyle(.primary)
-              .contentShape(Rectangle())
-              .padding(6)
-              .onTapGesture {
-                selectedPositionID = selectedPositionID == position.id ? nil : position.id
-              }
-            }
-          }
         }
       }
       .mapStyle(appSettings.tripMapStyle.mapStyle)
@@ -169,7 +175,6 @@ public struct TripDetailSpeedMapView: View {
         }
       }
       .onAppear {
-        $appSettings.tripMapPolyline.withLock { $0 = false }
         guard appSettings.tripMap3D else { return }
         let span = model.coordinateRegion.span
         let distance = max(span.latitudeDelta, span.longitudeDelta) * 111_000 * 2.5
@@ -192,10 +197,8 @@ public struct TripDetailSpeedMapView: View {
           Image(systemName: appSettings.tripMapStyle == .satellite ? "globe" : "car")
         }
       }
-      if appSettings.tripMapStyle == .satellite {
-        ToolbarItem(placement: .topBarLeading) {
-          Button(appSettings.tripMap3D ? "2D" : "3D") { toggle3D() }
-        }
+      ToolbarItem(placement: .topBarLeading) {
+        Button(appSettings.tripMap3D ? "2D" : "3D") { toggle3D() }
       }
       ToolbarItem {
         Button("Done") { dismiss() }
@@ -214,13 +217,11 @@ public struct TripDetailSpeedMapView: View {
     init() { _trips = FetchAll() }
   }
   let loader = PreviewTripsLoader()
-  @Shared(.appSettings) var appSettings
-  $appSettings.showElevationOnPath.withLock { $0 = false }
   let tripID = loader.trips.first?.id ?? Trip.ID()
   return NavigationStack {
     TripDetailView(
       model: TripDetailModel(
-        destination: .tripMap,
+        destination: .tripSpeedMap,
         tripID: tripID
       )
     )
