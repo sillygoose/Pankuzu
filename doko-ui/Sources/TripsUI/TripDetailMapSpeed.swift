@@ -4,13 +4,13 @@ import MapKit
 import DokoSharing
 import DokoSchema
 
-public enum SpeedBin {
+private enum SpeedBin {
   case stopped
   case low
   case moderate
   case high
 
-  public init(kilometersPerHour speed: Double, metric: Bool) {
+  init(kilometersPerHour speed: Double, metric: Bool) {
     let value = metric ? speed : speed * 0.621371
     let thresholds = metric ? (20.0, 50.0, 100.0) : (15.0, 30.0, 60.0)
     switch value {
@@ -21,7 +21,7 @@ public enum SpeedBin {
     }
   }
 
-  public var color: Color {
+  var color: Color {
     switch self {
     case .stopped: return .red
     case .low: return .orange
@@ -31,11 +31,11 @@ public enum SpeedBin {
   }
 }
 
-public struct SpeedSegment: Identifiable {
-  public let id = UUID()
-  public let start: CLLocationCoordinate2D
-  public let end: CLLocationCoordinate2D
-  public let speedKilometersPerHour: Double
+private struct SpeedSegment: Identifiable {
+  let id = UUID()
+  let start: CLLocationCoordinate2D
+  let end: CLLocationCoordinate2D
+  let speedKilometersPerHour: Double
 }
 
 @MainActor
@@ -45,8 +45,7 @@ public final class TripDetailSpeedMapModel {
 
   @ObservationIgnored @FetchOne(TripPosition.none) var tripPositions
 
-  var positions: [VehiclePosition] = []
-  var speedSegments: [SpeedSegment] = []
+  fileprivate var speedSegments: [SpeedSegment] = []
   var coordinateRegion: MKCoordinateRegion = MKCoordinateRegion()
 
   public init(
@@ -72,7 +71,6 @@ public final class TripDetailSpeedMapModel {
       longitudeDelta: abs(maxLongitude - minLongitude) * 1.5
     )
     self.coordinateRegion = MKCoordinateRegion(center: mapCenter, span: mapSpan)
-    self.positions = path
     self.speedSegments = zip(path, path.dropFirst()).map { start, end in
       SpeedSegment(
         start: CLLocationCoordinate2D(latitude: start.latitude, longitude: start.longitude),
