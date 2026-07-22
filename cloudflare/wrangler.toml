@@ -1,6 +1,9 @@
-name = "pankuzu-trip-la"
+name = "pankuzu-trip-la-unset"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 
 [env.development]
 name = "pankuzu-trip-la-dev"
+
+[env.production]
+name = "pankuzu-trip-la"

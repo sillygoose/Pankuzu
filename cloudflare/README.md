@@ -6,17 +6,18 @@ This worker receives push-to-start requests from the Pankuzu app and forwards th
 
 | File | Purpose |
 |------|---------|
-| `worker.js` | Cloudflare Worker — handles `/trip-overview-start` and `/charge-overview-start` routes |
+| `worker.js` | Cloudflare Worker — handles `/trip-overview-start`, `/trip-efficiency-start`, and `/charge-overview-start` routes |
 | `wrangler.toml` | Wrangler configuration — worker name, entry point, and environments |
 
 ## Environments
 
-Two worker deployments are maintained — one for development builds and one for production.
+Two worker deployments are maintained — one for development builds and one for production. Both are named environments; there is no default. The top-level (unnamed) config in `wrangler.toml` intentionally points at an inert, unused worker name (`pankuzu-trip-la-unset`) so that a `wrangler deploy` run without `--env` — e.g. a forgotten flag — can never silently touch development or production.
 
 | Environment | Worker name | Used by |
 |-------------|-------------|---------|
-| production (default) | `pankuzu-trip-la` | Release / TestFlight builds |
+| production | `pankuzu-trip-la` | Release / TestFlight builds |
 | development | `pankuzu-trip-la-dev` | Debug builds from Xcode |
+| _(none — top-level)_ | `pankuzu-trip-la-unset` | Not used; exists only to make a forgotten `--env` harmless |
 
 The app selects the correct worker URL at compile time via `#if DEBUG`. Set the URLs in `Local.xcconfig` (gitignored):
 
@@ -29,7 +30,8 @@ WORKER_BASE_URL_DEV = https://<worker-name-dev>.<subdomain>.workers.dev
 
 | Route | Description |
 |-------|-------------|
-| `POST /trip-overview-start` | Start a trip Live Activity via APNs push-to-start |
+| `POST /trip-overview-start` | Start the trip overview Live Activity via APNs push-to-start |
+| `POST /trip-efficiency-start` | Start the trip efficiency-chart Live Activity via APNs push-to-start |
 | `POST /charge-overview-start` | Start a charge Live Activity via APNs push-to-start |
 
 ### Request body
@@ -60,12 +62,14 @@ The development worker typically only needs the sandbox keys; the production wor
 
 ## Deploying
 
-```bash
-# Deploy to production
-wrangler deploy --config cloudflare/wrangler.toml
+`--env` is required — both environments are named, and there is no default (see [Environments](#environments)).
 
+```bash
 # Deploy to development
 wrangler deploy --config cloudflare/wrangler.toml --env development
+
+# Deploy to production
+wrangler deploy --config cloudflare/wrangler.toml --env production
 ```
 
 Run from the repository root. Requires `wrangler` to be installed (`npm install -g wrangler`) and authenticated (`wrangler login`).
