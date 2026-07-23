@@ -4,45 +4,30 @@ import MapKit
 import DokoSharing
 import DokoSchema
 
-private enum SpeedBin: CaseIterable, Hashable {
-  case stopped
-  case low
-  case moderate
-  case high
+private enum SpeedScale {
+  static let anchorColors: [Color] = [.red, .orange, .green, .blue]
 
-  private static func thresholds(metric: Bool) -> (Double, Double, Double) {
-    metric ? (20.0, 50.0, 100.0) : (15.0, 30.0, 60.0)
+  static func maxSpeed(metric: Bool) -> Double {
+    metric ? 160.0 : 100.0
   }
 
-  init(kilometersPerHour speed: Double, metric: Bool) {
+  static func color(kilometersPerHour speed: Double, metric: Bool) -> Color {
     let value = metric ? speed : speed * 0.621371
-    let thresholds = Self.thresholds(metric: metric)
-    switch value {
-    case ..<thresholds.0: self = .stopped
-    case ..<thresholds.1: self = .low
-    case ..<thresholds.2: self = .moderate
-    default: self = .high
+    let max = maxSpeed(metric: metric)
+    let step = max / Double(anchorColors.count - 1)
+    let stops: [(value: Double, color: Color)] = anchorColors.enumerated().map { index, color in
+      (Double(index) * step, color)
     }
-  }
-
-  var color: Color {
-    switch self {
-    case .stopped: return .red
-    case .low: return .orange
-    case .moderate: return .green
-    case .high: return .blue
+    if value <= stops.first!.value { return stops.first!.color }
+    if value >= stops.last!.value { return stops.last!.color }
+    for i in 1..<stops.count {
+      guard value <= stops[i].value else { continue }
+      let lower = stops[i - 1]
+      let upper = stops[i]
+      let fraction = (value - lower.value) / (upper.value - lower.value)
+      return lower.color.mix(with: upper.color, by: fraction)
     }
-  }
-
-  func label(metric: Bool) -> String {
-    let thresholds = Self.thresholds(metric: metric)
-    let unit = metric ? "km/h" : "mph"
-    switch self {
-    case .stopped: return "0-\(Int(thresholds.0)) \(unit)"
-    case .low: return "\(Int(thresholds.0))-\(Int(thresholds.1)) \(unit)"
-    case .moderate: return "\(Int(thresholds.1))-\(Int(thresholds.2)) \(unit)"
-    case .high: return "\(Int(thresholds.2))+ \(unit)"
-    }
+    return stops.last!.color
   }
 }
 
@@ -160,7 +145,7 @@ public struct TripDetailSpeedMapView: View {
         ForEach(model.speedSegments) { segment in
           MapPolyline(coordinates: [segment.start, segment.end])
             .stroke(
-              SpeedBin(kilometersPerHour: segment.speedKilometersPerHour, metric: appSettings.metric).color,
+              SpeedScale.color(kilometersPerHour: segment.speedKilometersPerHour, metric: appSettings.metric),
               lineWidth: appSettings.tripMapStyle == .satellite ? 4 : 5
             )
         }
@@ -199,17 +184,31 @@ public struct TripDetailSpeedMapView: View {
         ))
       }
       .overlay(alignment: .bottomTrailing) {
+        let unit = appSettings.metric ? "kph" : "mph"
+        let maxSpeed = SpeedScale.maxSpeed(metric: appSettings.metric)
+        let ticks = Array(stride(from: 0.0, through: maxSpeed, by: 20.0))
+        let legendWidth: CGFloat = 200
         VStack(alignment: .leading, spacing: 4) {
-          ForEach(SpeedBin.allCases, id: \.self) { bin in
-            HStack(spacing: 6) {
-              Circle()
-                .fill(bin.color)
-                .frame(width: 8, height: 8)
-              Text(bin.label(metric: appSettings.metric))
+          Text("Speed (\(unit))")
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+          LinearGradient(
+            colors: SpeedScale.anchorColors,
+            startPoint: .leading,
+            endPoint: .trailing
+          )
+          .frame(width: legendWidth, height: 8)
+          .clipShape(Capsule())
+          HStack(spacing: 0) {
+            ForEach(Array(ticks.enumerated()), id: \.offset) { index, tick in
+              Text("\(Int(tick))")
+                .font(.caption2)
+              if index != ticks.count - 1 { Spacer() }
             }
           }
+          .frame(width: legendWidth)
         }
-        .font(.caption)
+        .fixedSize()
         .padding(8)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
         .padding(12)
