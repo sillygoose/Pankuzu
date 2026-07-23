@@ -38,7 +38,17 @@ public final class LocationFormModel: Identifiable {
     isDismissed = true
   }
 
+  private func trimmed(_ string: String?) -> String? {
+    guard let trimmed = string?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty else { return nil }
+    return trimmed
+  }
+
   func saveButtonTapped() {
+    location.name = trimmed(location.name)
+    location.street = trimmed(location.street)
+    location.city = trimmed(location.city)
+    location.stateProv = trimmed(location.stateProv)
+    location.region = trimmed(location.region)
     do {
       try database.write { db in
         let _ =

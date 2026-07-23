@@ -31,7 +31,13 @@ public final class VehicleFormModel: Identifiable {
     isDismissed = true
   }
 
+  private func trimmed(_ string: String?) -> String? {
+    guard let trimmed = string?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty else { return nil }
+    return trimmed
+  }
+
   func saveButtonTapped() {
+    vehicle.name = trimmed(vehicle.name)
     do {
       try database.write { db in
         let _ = try Vehicle
