@@ -4,15 +4,19 @@ import MapKit
 import DokoSharing
 import DokoSchema
 
-private enum SpeedBin {
+private enum SpeedBin: CaseIterable, Hashable {
   case stopped
   case low
   case moderate
   case high
 
+  private static func thresholds(metric: Bool) -> (Double, Double, Double) {
+    metric ? (20.0, 50.0, 100.0) : (15.0, 30.0, 60.0)
+  }
+
   init(kilometersPerHour speed: Double, metric: Bool) {
     let value = metric ? speed : speed * 0.621371
-    let thresholds = metric ? (20.0, 50.0, 100.0) : (15.0, 30.0, 60.0)
+    let thresholds = Self.thresholds(metric: metric)
     switch value {
     case ..<thresholds.0: self = .stopped
     case ..<thresholds.1: self = .low
@@ -27,6 +31,17 @@ private enum SpeedBin {
     case .low: return .orange
     case .moderate: return .green
     case .high: return .blue
+    }
+  }
+
+  func label(metric: Bool) -> String {
+    let thresholds = Self.thresholds(metric: metric)
+    let unit = metric ? "km/h" : "mph"
+    switch self {
+    case .stopped: return "0-\(Int(thresholds.0)) \(unit)"
+    case .low: return "\(Int(thresholds.0))-\(Int(thresholds.1)) \(unit)"
+    case .moderate: return "\(Int(thresholds.1))-\(Int(thresholds.2)) \(unit)"
+    case .high: return "\(Int(thresholds.2))+ \(unit)"
     }
   }
 }
@@ -182,6 +197,22 @@ public struct TripDetailSpeedMapView: View {
           heading: 0,
           pitch: 50
         ))
+      }
+      .overlay(alignment: .bottomTrailing) {
+        VStack(alignment: .leading, spacing: 4) {
+          ForEach(SpeedBin.allCases, id: \.self) { bin in
+            HStack(spacing: 6) {
+              Circle()
+                .fill(bin.color)
+                .frame(width: 8, height: 8)
+              Text(bin.label(metric: appSettings.metric))
+            }
+          }
+        }
+        .font(.caption)
+        .padding(8)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .padding(12)
       }
     }
     .confirmationDialog("Map Style", isPresented: $showStylePicker) {

@@ -4,14 +4,51 @@ import MapKit
 import DokoSharing
 import DokoSchema
 
+private enum EfficiencyBin: CaseIterable, Hashable {
+  case regen, power
+
+  init(
+    energyKilowattHours: Double
+  ) {
+    guard energyKilowattHours > 0 else {
+      self = .regen
+      return
+    }
+    self = .power
+  }
+
+  var color: Color {
+    switch self {
+    case .regen: return .green
+    case .power: return .red
+    }
+  }
+
+  var label: String {
+    switch self {
+    case .regen: return "Regen"
+    case .power: return "Power"
+    }
+  }
+}
+
+private struct EfficiencySegment: Identifiable {
+  let id = UUID()
+  let start: CLLocationCoordinate2D
+  let end: CLLocationCoordinate2D
+  let distanceKilometers: Double
+  let energyKilowattHours: Double
+}
+
 @MainActor
 @Observable
 public final class TripDetailEfficiencyMapModel {
   var trip: Trip
 
   @ObservationIgnored @FetchOne(TripPosition.none) var tripPositions
+  @ObservationIgnored @FetchOne(TripData.none) var tripData
 
-  var tripPath: [CLLocationCoordinate2D] = []
+  fileprivate var efficiencySegments: [EfficiencySegment] = []
   var coordinateRegion: MKCoordinateRegion = MKCoordinateRegion()
 
   public init(
@@ -20,8 +57,12 @@ public final class TripDetailEfficiencyMapModel {
     self.trip = trip
     _tripPositions = FetchOne(TripPosition.find(trip.id))
     guard let tripPositions else { return }
+    _tripData = FetchOne(TripData.find(trip.id))
+    guard let tripData else { return }
 
     let path = tripPositions.path
+    guard path.count > 1 else { return }
+
     let minLatitude = path.min(by: { $0.latitude < $1.latitude })?.latitude ?? min(trip.latitudeStart, trip.latitudeEnd)
     let maxLatitude = path.max(by: { $0.latitude < $1.latitude })?.latitude ?? max(trip.latitudeStart, trip.latitudeEnd)
     let minLongitude = path.min(by: { $0.longitude < $1.longitude })?.longitude ?? min(trip.longitudeStart, trip.longitudeEnd)
@@ -37,12 +78,22 @@ public final class TripDetailEfficiencyMapModel {
       longitudeDelta: abs(maxLongitude - minLongitude) * 1.5
     )
     self.coordinateRegion = MKCoordinateRegion(center: mapCenter, span: mapSpan)
-    self.tripPath = path.map { position in
-      CLLocationCoordinate2D(
-        latitude: position.latitude,
-        longitude: position.longitude
+
+    func nearest(_ points: [DokoDataPoint], to timestamp: Date) -> Double {
+      points.min { abs($0.timestamp.timeIntervalSince(timestamp)) < abs($1.timestamp.timeIntervalSince(timestamp)) }?.datapoint ?? 0
+    }
+    let odometerAtPath = path.map { nearest(tripData.odometer, to: $0.timestamp) }
+    let energyAtPath = path.map { nearest(tripData.batteryEnergy, to: $0.timestamp) }
+
+    self.efficiencySegments = (0..<(path.count - 1)).map { i in
+      EfficiencySegment(
+        start: CLLocationCoordinate2D(latitude: path[i].latitude, longitude: path[i].longitude),
+        end: CLLocationCoordinate2D(latitude: path[i + 1].latitude, longitude: path[i + 1].longitude),
+        distanceKilometers: odometerAtPath[i + 1] - odometerAtPath[i],
+        energyKilowattHours: energyAtPath[i] - energyAtPath[i + 1]
       )
     }
+    print(self.efficiencySegments)
   }
 }
 
@@ -107,13 +158,13 @@ public struct TripDetailEfficiencyMapView: View {
         )
         .tint(.cyan)
         
-        MapPolyline(
-          MKPolyline(
-            coordinates: model.tripPath,
-            count: model.tripPath.count
-          )
-        )
-        .stroke(.blue, lineWidth: appSettings.tripMapStyle == .satellite ? 2 : 3)
+        ForEach(model.efficiencySegments) { segment in
+          MapPolyline(coordinates: [segment.start, segment.end])
+            .stroke(
+              EfficiencyBin(energyKilowattHours: segment.energyKilowattHours).color,
+              lineWidth: appSettings.tripMapStyle == .satellite ? 4 : 5
+            )
+        }
       }
       .mapStyle(appSettings.tripMapStyle.mapStyle)
       .onMapCameraChange(frequency: .continuous) { context in currentCamera = context.camera }
@@ -147,6 +198,22 @@ public struct TripDetailEfficiencyMapView: View {
           heading: 0,
           pitch: 50
         ))
+      }
+      .overlay(alignment: .bottomTrailing) {
+        VStack(alignment: .leading, spacing: 4) {
+          ForEach(EfficiencyBin.allCases, id: \.self) { bin in
+            HStack(spacing: 6) {
+              Circle()
+                .fill(bin.color)
+                .frame(width: 8, height: 8)
+              Text(bin.label)
+            }
+          }
+        }
+        .font(.caption)
+        .padding(8)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .padding(12)
       }
     }
     .confirmationDialog("Map Style", isPresented: $showStylePicker) {

@@ -1,5 +1,5 @@
 {
-  "originHash" : "f969cda7c605810f01c3f01578b37d494077ed9625de39c4b9df9df8d674403f",
+  "originHash" : "607438a2a9f9026538aa05bca3a98867a39d9c679b5a9da1152efd18078e5679",
   "pins" : [
     {
       "identity" : "combine-schedulers",
@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-parsing",
       "state" : {
-        "revision" : "3432cb81164dd3d69a75d0d63205be5fbae2c34b",
-        "version" : "0.14.1"
+        "revision" : "42161b785368386648af8bc595d51aed9d316320",
+        "version" : "0.15.0"
       }
     },
     {
