@@ -90,7 +90,7 @@ private enum SpeedScale {
   }
 
   private static func color(fraction: Double) -> Color {
-    let scaled = fraction * Double(data.count - 1)
+    let scaled = (1.0 - fraction) * Double(data.count - 1)
     let a = Int(scaled)
     let b = min(data.count - 1, a + 1)
     let f = scaled - Double(a)
@@ -104,9 +104,7 @@ private enum SpeedScale {
   }
 
   static var legendGradientColors: [Color] {
-    stride(from: 0, to: data.count, by: 16).map { i in
-      Color(red: data[i].0, green: data[i].1, blue: data[i].2)
-    } + [color(fraction: 1.0)]
+    stride(from: 0.0, through: 1.0, by: 1.0 / 16.0).map { color(fraction: $0) }
   }
 }
 
