@@ -29,6 +29,52 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
   }
 }
 
+private enum RestoreOutcome: Equatable {
+  case success
+  case failure(String)
+}
+
+private struct RestoreProgressView: View {
+  let outcome: RestoreOutcome?
+  let onClose: () -> Void
+
+  var body: some View {
+    VStack(spacing: 16) {
+      switch outcome {
+      case nil:
+        ProgressView()
+          .controlSize(.large)
+        Text("Restoring database…")
+          .font(.headline)
+
+      case .success:
+        Image(systemName: "checkmark.circle.fill")
+          .font(.system(size: 48))
+          .foregroundStyle(.green)
+        Text("Restore complete")
+          .font(.headline)
+        Button("Close", action: onClose)
+          .buttonStyle(.borderedProminent)
+
+      case .failure(let message):
+        Image(systemName: "xmark.circle.fill")
+          .font(.system(size: 48))
+          .foregroundStyle(.red)
+        Text("Restore failed")
+          .font(.headline)
+        Text(message)
+          .font(.caption)
+          .foregroundStyle(.secondary)
+          .multilineTextAlignment(.center)
+        Button("Close", action: onClose)
+          .buttonStyle(.borderedProminent)
+      }
+    }
+    .padding(32)
+    .presentationDetents([.fraction(0.3)])
+  }
+}
+
 @MainActor @Observable class DatabaseSettingsModel {
   @ObservationIgnored @FetchAll(
     Trip
@@ -154,6 +200,8 @@ struct DatabaseSettingsView: View {
   @State var showFileExporter: Bool = false
   @State var showBackupOptions: Bool = false
   @State var showRestoreOptions: Bool = false
+  @State private var showRestoreProgress: Bool = false
+  @State private var restoreOutcome: RestoreOutcome? = nil
 
   @State private var jsonDocument = JSONDocument(initialModel: DatabaseBackup())
   @State private var backupFilename: String?
@@ -313,6 +361,7 @@ struct DatabaseSettingsView: View {
       guard let _ = backupFilename else { return }
       do {
         jsonDocument.backupModel = try backupDatabase(options: backupOptions)
+        jsonDocument.prettyPrint = backupOptions.prettyPrint
         showFileExporter = true
       } catch {
         model.destination = .alert(.databaseBackup(error.localizedDescription))
@@ -328,15 +377,25 @@ struct DatabaseSettingsView: View {
         self.restoreFileURL = nil
       }
       do {
-        let data = try Data(contentsOf: restoreFileURL)
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        self.jsonDocument.backupModel = try decoder.decode(DatabaseBackup.self, from: data)
-        try restoreDatabase(from: self.jsonDocument.backupModel, options: restoreOptions)
-        model.destination = .alert(.databaseRestore())
+        let restoreOptions = restoreOptions
+        // Runs off the main actor so the progress sheet can actually render and
+        // animate while the (potentially slow) decode and database write happen.
+        let (backupModel, restoredSettings) = try await Task {
+          let data = try Data(contentsOf: restoreFileURL)
+          let decoder = JSONDecoder()
+          decoder.dateDecodingStrategy = .iso8601
+          let backupModel = try decoder.decode(DatabaseBackup.self, from: data)
+          let restoredSettings = try restoreDatabase(from: backupModel, options: restoreOptions)
+          return (backupModel, restoredSettings)
+        }.value
+        self.jsonDocument.backupModel = backupModel
+        if let restoredSettings {
+          $appSettings.withLock { $0 = restoredSettings }
+        }
+        restoreOutcome = .success
       } catch {
         logger.error("Restore failed: \(String(reflecting: error))")
-        model.destination = .alert(.databaseRestore(error.localizedDescription))
+        restoreOutcome = .failure(error.localizedDescription)
       }
     }
     .sheet(isPresented: $showBackupOptions) {
@@ -351,6 +410,12 @@ struct DatabaseSettingsView: View {
       RestoreOptionsView(options: $restoreOptions) {
         showFileImporter = true
       }
+    }
+    .sheet(isPresented: $showRestoreProgress) {
+      RestoreProgressView(outcome: restoreOutcome) {
+        showRestoreProgress = false
+      }
+      .interactiveDismissDisabled(restoreOutcome == nil)
     }
     .fileExporter(
       isPresented: $showFileExporter,
@@ -373,6 +438,8 @@ struct DatabaseSettingsView: View {
     ) { result in
       do {
         self.restoreFileURL = try result.get().first
+        restoreOutcome = nil
+        showRestoreProgress = true
       } catch {
         model.destination = .alert(.databaseRestore(error.localizedDescription))
       }
@@ -511,7 +578,7 @@ extension AlertState where Action == DatabaseSettingsModel.AlertAction {
   }
 }
 
-#Preview("Database Deletion") {
+#Preview("Database Clear") {
   let _ = prepareDependencies {
     try? $0.bootstrapDatabase()
     try? $0.defaultDatabase.seedPreviews()

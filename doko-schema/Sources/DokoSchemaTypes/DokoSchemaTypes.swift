@@ -6,10 +6,37 @@ public struct DokoDataPoint: Identifiable, Hashable, Equatable, Codable, Sendabl
   public let timestamp: Date
   public let datapoint: Double
   public var id: Date { timestamp }
-  
+
   public init(timestamp: Date, double: Double) {
     self.timestamp = timestamp
     self.datapoint = double
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case timestamp = "t"
+    case datapoint = "d"
+  }
+
+  private enum LegacyCodingKeys: String, CodingKey {
+    case timestamp, datapoint
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    if container.contains(.timestamp) {
+      timestamp = try container.decode(Date.self, forKey: .timestamp)
+      datapoint = try container.decode(Double.self, forKey: .datapoint)
+    } else {
+      let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
+      timestamp = try legacy.decode(Date.self, forKey: .timestamp)
+      datapoint = try legacy.decode(Double.self, forKey: .datapoint)
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(timestamp, forKey: .timestamp)
+    try container.encode(datapoint, forKey: .datapoint)
   }
 }
 
@@ -54,6 +81,53 @@ public struct DokoWeather: Identifiable, Hashable, Equatable, Codable, Sendable 
     self.windCompassDirection = currentWeather.windCompassDirection
     self.conditionSymbol = currentWeather.conditionSymbol
   }
+
+  private enum CodingKeys: String, CodingKey {
+    case timestamp = "t"
+    case temperature = "tp"
+    case windSpeed = "ws"
+    case windGust = "wg"
+    case windDirection = "wd"
+    case windCompassDirection = "wc"
+    case conditionSymbol = "cs"
+  }
+
+  private enum LegacyCodingKeys: String, CodingKey {
+    case timestamp, temperature, windSpeed, windGust, windDirection, windCompassDirection, conditionSymbol
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    if container.contains(.timestamp) {
+      timestamp = try container.decode(Date.self, forKey: .timestamp)
+      temperature = try container.decode(Double.self, forKey: .temperature)
+      windSpeed = try container.decode(Double.self, forKey: .windSpeed)
+      windGust = try container.decodeIfPresent(Double.self, forKey: .windGust)
+      windDirection = try container.decode(Double.self, forKey: .windDirection)
+      windCompassDirection = try container.decode(String.self, forKey: .windCompassDirection)
+      conditionSymbol = try container.decode(String.self, forKey: .conditionSymbol)
+    } else {
+      let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
+      timestamp = try legacy.decode(Date.self, forKey: .timestamp)
+      temperature = try legacy.decode(Double.self, forKey: .temperature)
+      windSpeed = try legacy.decode(Double.self, forKey: .windSpeed)
+      windGust = try legacy.decodeIfPresent(Double.self, forKey: .windGust)
+      windDirection = try legacy.decode(Double.self, forKey: .windDirection)
+      windCompassDirection = try legacy.decode(String.self, forKey: .windCompassDirection)
+      conditionSymbol = try legacy.decode(String.self, forKey: .conditionSymbol)
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(timestamp, forKey: .timestamp)
+    try container.encode(temperature, forKey: .temperature)
+    try container.encode(windSpeed, forKey: .windSpeed)
+    try container.encodeIfPresent(windGust, forKey: .windGust)
+    try container.encode(windDirection, forKey: .windDirection)
+    try container.encode(windCompassDirection, forKey: .windCompassDirection)
+    try container.encode(conditionSymbol, forKey: .conditionSymbol)
+  }
 }
 
 public struct VehiclePosition: Identifiable, Equatable, Hashable, Codable, Sendable {
@@ -97,6 +171,57 @@ public struct VehiclePosition: Identifiable, Equatable, Hashable, Codable, Senda
     self.horizontalAccuracy = nil
     self.verticalAccuracy = nil
   }
+
+  private enum CodingKeys: String, CodingKey {
+    case timestamp = "t"
+    case latitude = "la"
+    case longitude = "lo"
+    case elevation = "e"
+    case course = "c"
+    case speed = "s"
+    case horizontalAccuracy = "ha"
+    case verticalAccuracy = "va"
+  }
+
+  private enum LegacyCodingKeys: String, CodingKey {
+    case timestamp, latitude, longitude, elevation, course, speed, horizontalAccuracy, verticalAccuracy
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    if container.contains(.timestamp) {
+      timestamp = try container.decode(Date.self, forKey: .timestamp)
+      latitude = try container.decode(Double.self, forKey: .latitude)
+      longitude = try container.decode(Double.self, forKey: .longitude)
+      elevation = try container.decodeIfPresent(Double.self, forKey: .elevation)
+      course = try container.decodeIfPresent(Double.self, forKey: .course)
+      speed = try container.decodeIfPresent(Double.self, forKey: .speed)
+      horizontalAccuracy = try container.decodeIfPresent(Double.self, forKey: .horizontalAccuracy)
+      verticalAccuracy = try container.decodeIfPresent(Double.self, forKey: .verticalAccuracy)
+    } else {
+      let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
+      timestamp = try legacy.decode(Date.self, forKey: .timestamp)
+      latitude = try legacy.decode(Double.self, forKey: .latitude)
+      longitude = try legacy.decode(Double.self, forKey: .longitude)
+      elevation = try legacy.decodeIfPresent(Double.self, forKey: .elevation)
+      course = try legacy.decodeIfPresent(Double.self, forKey: .course)
+      speed = try legacy.decodeIfPresent(Double.self, forKey: .speed)
+      horizontalAccuracy = try legacy.decodeIfPresent(Double.self, forKey: .horizontalAccuracy)
+      verticalAccuracy = try legacy.decodeIfPresent(Double.self, forKey: .verticalAccuracy)
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(timestamp, forKey: .timestamp)
+    try container.encode(latitude, forKey: .latitude)
+    try container.encode(longitude, forKey: .longitude)
+    try container.encodeIfPresent(elevation, forKey: .elevation)
+    try container.encodeIfPresent(course, forKey: .course)
+    try container.encodeIfPresent(speed, forKey: .speed)
+    try container.encodeIfPresent(horizontalAccuracy, forKey: .horizontalAccuracy)
+    try container.encodeIfPresent(verticalAccuracy, forKey: .verticalAccuracy)
+  }
 }
 
 public struct VehicleElevation: Identifiable, Equatable, Hashable, Codable, Sendable {
@@ -119,5 +244,36 @@ public struct VehicleElevation: Identifiable, Equatable, Hashable, Codable, Send
     self.timestamp = position.timestamp
     self.elevation = position.elevation
     self.verticalAccuracy = nil
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case timestamp = "t"
+    case elevation = "e"
+    case verticalAccuracy = "va"
+  }
+
+  private enum LegacyCodingKeys: String, CodingKey {
+    case timestamp, elevation, verticalAccuracy
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    if container.contains(.timestamp) {
+      timestamp = try container.decode(Date.self, forKey: .timestamp)
+      elevation = try container.decode(Double.self, forKey: .elevation)
+      verticalAccuracy = try container.decodeIfPresent(Double.self, forKey: .verticalAccuracy)
+    } else {
+      let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
+      timestamp = try legacy.decode(Date.self, forKey: .timestamp)
+      elevation = try legacy.decode(Double.self, forKey: .elevation)
+      verticalAccuracy = try legacy.decodeIfPresent(Double.self, forKey: .verticalAccuracy)
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(timestamp, forKey: .timestamp)
+    try container.encode(elevation, forKey: .elevation)
+    try container.encodeIfPresent(verticalAccuracy, forKey: .verticalAccuracy)
   }
 }

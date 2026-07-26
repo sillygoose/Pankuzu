@@ -1,5 +1,7 @@
 import SwiftUI
 
+import DokoSharing
+
 struct RestoreOptionsView: View {
   @Binding var options: RestoreOptions
   let onConfirm: () -> Void
@@ -26,6 +28,7 @@ struct RestoreOptionsView: View {
             onConfirm()
             dismiss()
           }
+          .buttonStyle(.borderedProminent)
           .disabled(!options.includeTrips && !options.includeCharges && !options.includeSettings)
         }
       }
@@ -46,6 +49,7 @@ struct BackupOptionsView: View {
 
   @Environment(\.dismiss) private var dismiss
   @State private var dateRangeMode: DateRangeMode = .all
+  @Shared(.appSettings) var appSettings
 
   var body: some View {
     NavigationStack {
@@ -54,6 +58,22 @@ struct BackupOptionsView: View {
           Toggle("Trips", isOn: $options.includeTrips)
           Toggle("Charges", isOn: $options.includeCharges)
           Toggle("Settings", isOn: $options.includeSettings)
+        }
+
+        Section {
+          Toggle(
+            "Pretty Print Backup",
+            isOn: Binding(
+              get: { options.prettyPrint },
+              set: { newValue in
+                options.prettyPrint = newValue
+                $appSettings.backupPrettyPrint.withLock { $0 = newValue }
+              }
+            )
+          )
+        } footer: {
+          Text("Formats the backup file for human readability. Turning this off produces a smaller file.")
+            .font(.caption)
         }
 
         Section {
@@ -126,6 +146,7 @@ struct BackupOptionsView: View {
             onConfirm()
             dismiss()
           }
+          .buttonStyle(.borderedProminent)
           .disabled(!options.includeTrips && !options.includeCharges && !options.includeSettings)
         }
       }

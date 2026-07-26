@@ -7,7 +7,7 @@ import DokoSchema
 import DokoSharing
 import CommonUI
 
-struct RestoreOptions {
+struct RestoreOptions: Sendable {
   var includeTrips: Bool = true
   var includeCharges: Bool = true
   var includeSettings: Bool = false
@@ -18,6 +18,7 @@ struct BackupOptions {
   var includeCharges: Bool = true
   var includeSettings: Bool = true
   var useDateRange: Bool = false
+  var prettyPrint: Bool
 
   // startDate is always midnight of the selected day.
   private var _startDate: Date
@@ -37,13 +38,15 @@ struct BackupOptions {
   }
 
   init(now: Date = Date()) {
+    @Shared(.appSettings) var appSettings
     let cal = Calendar.current
     _startDate = cal.startOfDay(for: now)
     _endDate = cal.startOfDay(for: cal.date(byAdding: .day, value: 1, to: now) ?? now)
+    prettyPrint = appSettings.backupPrettyPrint
   }
 }
 
-struct DatabaseBackup: Codable {
+struct DatabaseBackup: Codable, Sendable {
   var backupDate: Date = Date()
   var version: String = String()
 
@@ -101,6 +104,7 @@ struct JSONDocument: FileDocument {
   static var writableContentTypes: [UTType] { [.json] }
 
   var backupModel: DatabaseBackup
+  var prettyPrint: Bool = false
 
   init(configuration: ReadConfiguration) throws {
     guard let data = configuration.file.regularFileContents else {
@@ -111,13 +115,16 @@ struct JSONDocument: FileDocument {
     self.backupModel = try decoder.decode(DatabaseBackup.self, from: data)
   }
 
-  init(initialModel: DatabaseBackup) {
+  init(initialModel: DatabaseBackup, prettyPrint: Bool = false) {
     self.backupModel = initialModel
+    self.prettyPrint = prettyPrint
   }
 
   func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
     let encoder = JSONEncoder()
-    encoder.outputFormatting = .prettyPrinted
+    if prettyPrint {
+      encoder.outputFormatting = .prettyPrinted
+    }
     encoder.dateEncodingStrategy = .iso8601
     let data = try encoder.encode(self.backupModel)
     return FileWrapper(regularFileWithContents: data)
@@ -183,12 +190,12 @@ func backupDatabase(options: BackupOptions = BackupOptions()) throws -> Database
   )
 }
 
+@discardableResult
 func restoreDatabase(
   from databaseBackup: DatabaseBackup,
   options: RestoreOptions = RestoreOptions()
-) throws {
+) throws -> AppSettings? {
   @Dependency(\.defaultDatabase) var database
-  @Shared(.appSettings) var appSettings
 
   @FetchAll var vehicles: [Vehicle]
   @FetchAll var locations: [Location]
@@ -281,10 +288,9 @@ func restoreDatabase(
       }
     }
   }
-  if options.includeSettings, let restoredSettings = databaseBackup.appSettings {
-    $appSettings.withLock { $0 = restoredSettings }
-  }
   logger.info("Database restoration complete")
+  guard options.includeSettings else { return nil }
+  return databaseBackup.appSettings
 }
 
 private let logger = Logger(subsystem: "Doko", category: "DatabaseBackupRestore")

@@ -41,6 +41,8 @@ public struct AppSettings: Codable, Equatable, Sendable {
   public var abrpSendTripUpdates: Bool = true
   public var abrpSendChargeUpdates: Bool = true
 
+  public var backupPrettyPrint: Bool = false
+
   public init() {}
 
   public enum CodingKeys: String, CodingKey {
@@ -55,6 +57,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     case tripEfficiencyAverageDuration
     case abrpEnabled, abrpUserToken, abrpVehicleTokens
     case abrpSendTripUpdates, abrpSendChargeUpdates
+    case backupPrettyPrint
   }
 
   public func encode(to encoder: any Encoder) throws {
@@ -84,6 +87,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     try c.encode(abrpVehicleTokens, forKey: .abrpVehicleTokens)
     try c.encode(abrpSendTripUpdates, forKey: .abrpSendTripUpdates)
     try c.encode(abrpSendChargeUpdates, forKey: .abrpSendChargeUpdates)
+    try c.encode(backupPrettyPrint, forKey: .backupPrettyPrint)
   }
 
   // Future-proof decode: new fields added later fall back to defaults;
@@ -115,6 +119,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     abrpVehicleTokens = try c.decodeIfPresent([String: String].self, forKey: .abrpVehicleTokens) ?? [:]
     abrpSendTripUpdates = try c.decodeIfPresent(Bool.self, forKey: .abrpSendTripUpdates) ?? true
     abrpSendChargeUpdates = try c.decodeIfPresent(Bool.self, forKey: .abrpSendChargeUpdates) ?? true
+    backupPrettyPrint = try c.decodeIfPresent(Bool.self, forKey: .backupPrettyPrint) ?? false
   }
 }
 
