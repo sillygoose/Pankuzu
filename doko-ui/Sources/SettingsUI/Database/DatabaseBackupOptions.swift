@@ -28,7 +28,6 @@ struct RestoreOptionsView: View {
             onConfirm()
             dismiss()
           }
-          .buttonStyle(.borderedProminent)
           .disabled(!options.includeTrips && !options.includeCharges && !options.includeSettings)
         }
       }
@@ -146,7 +145,6 @@ struct BackupOptionsView: View {
             onConfirm()
             dismiss()
           }
-          .buttonStyle(.borderedProminent)
           .disabled(!options.includeTrips && !options.includeCharges && !options.includeSettings)
         }
       }
