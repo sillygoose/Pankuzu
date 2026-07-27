@@ -17,6 +17,7 @@ public final class TripDetailStateOfChargeModel {
   var batteryEnergy: [DokoDataPoint] = []
   var minYAxis: Measurement<UnitPercent> = .init(value: 0, unit: .percent)
   var maxYAxis: Measurement<UnitPercent> = .init(value: 100, unit: .percent)
+  var minBatteryEnergy: Double = 0
   var maxBatteryEnergy: Double = 1
   var selectedStateOfChargePoint: DokoDataPoint?
   var selectedEnergyPoint: DokoDataPoint?
@@ -28,17 +29,21 @@ public final class TripDetailStateOfChargeModel {
     guard let tripData, !tripData.stateOfCharge.isEmpty else { return }
     stateOfCharge = downsample(tripData.stateOfCharge, maxPoints: 60)
     batteryEnergy = downsample(tripData.batteryEnergy, maxPoints: 60)
-    if let min = batteryEnergy.map(\.datapoint).min() {
-      maxBatteryEnergy = ceil(-min + 0.5)
+    let displayedEnergy = batteryEnergy.map { -$0.datapoint }
+    if let minValue = displayedEnergy.min(), let maxValue = displayedEnergy.max() {
+      minBatteryEnergy = minValue < 0 ? floor(minValue - 0.5) : 0
+      maxBatteryEnergy = ceil(maxValue + 0.5)
     }
   }
 
   func normalizeBatteryEnergy(_ kWh: Double) -> Double {
-    -kWh / maxBatteryEnergy * 100
+    let range = maxBatteryEnergy - minBatteryEnergy
+    guard range > 0 else { return 0 }
+    return (-kWh - minBatteryEnergy) / range * 100
   }
 
   func kWhFromNormalized(_ normalized: Double) -> Double {
-    normalized / 100 * maxBatteryEnergy
+    minBatteryEnergy + normalized / 100 * (maxBatteryEnergy - minBatteryEnergy)
   }
 
   private func downsample(_ data: [DokoDataPoint], maxPoints: Int) -> [DokoDataPoint] {
@@ -85,7 +90,7 @@ public struct TripDetailStateOfChargeView: View {
     ForEach(model.batteryEnergy) { point in
       LineMark(
         x: .value("Time", point.timestamp),
-        y: .value("SoC", model.normalizeBatteryEnergy(point.datapoint))
+        y: .value("Energy", model.normalizeBatteryEnergy(point.datapoint))
       )
       .foregroundStyle(by: .value("Series", "Energy"))
       .interpolationMethod(.monotone)
@@ -179,7 +184,7 @@ public struct TripDetailStateOfChargeView: View {
           }
           AxisMarks(position: .leading, values: [0, 25, 50, 75, 100] as [Double]) { value in
             if let v = value.as(Double.self) {
-              let fmt = model.maxBatteryEnergy < 2.2 ? "%.1f kWh" : "%.0f kWh"
+              let fmt = (model.maxBatteryEnergy - model.minBatteryEnergy) < 2.2 ? "%.1f kWh" : "%.0f kWh"
               AxisValueLabel(String(format: fmt, model.kWhFromNormalized(v)))
             }
             AxisTick()
