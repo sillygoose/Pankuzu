@@ -126,6 +126,7 @@ struct JSONDocument: FileDocument {
       encoder.outputFormatting = .prettyPrinted
     }
     encoder.dateEncodingStrategy = .iso8601
+    encoder.userInfo[.useLegacyKeys] = prettyPrint
     let data = try encoder.encode(self.backupModel)
     return FileWrapper(regularFileWithContents: data)
   }

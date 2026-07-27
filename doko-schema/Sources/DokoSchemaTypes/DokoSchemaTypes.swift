@@ -2,6 +2,10 @@ import Foundation
 
 import DokoTypes
 
+extension CodingUserInfoKey {
+  public static let useLegacyKeys = CodingUserInfoKey(rawValue: "useLegacyKeys")!
+}
+
 public struct DokoDataPoint: Identifiable, Hashable, Equatable, Codable, Sendable {
   public let timestamp: Date
   public let datapoint: Double
@@ -34,9 +38,15 @@ public struct DokoDataPoint: Identifiable, Hashable, Equatable, Codable, Sendabl
   }
 
   public func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(timestamp, forKey: .timestamp)
-    try container.encode(datapoint, forKey: .datapoint)
+    if (encoder.userInfo[.useLegacyKeys] as? Bool) == true {
+      var container = encoder.container(keyedBy: LegacyCodingKeys.self)
+      try container.encode(timestamp, forKey: .timestamp)
+      try container.encode(datapoint, forKey: .datapoint)
+    } else {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(timestamp, forKey: .timestamp)
+      try container.encode(datapoint, forKey: .datapoint)
+    }
   }
 }
 
@@ -119,14 +129,25 @@ public struct DokoWeather: Identifiable, Hashable, Equatable, Codable, Sendable 
   }
 
   public func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(timestamp, forKey: .timestamp)
-    try container.encode(temperature, forKey: .temperature)
-    try container.encode(windSpeed, forKey: .windSpeed)
-    try container.encodeIfPresent(windGust, forKey: .windGust)
-    try container.encode(windDirection, forKey: .windDirection)
-    try container.encode(windCompassDirection, forKey: .windCompassDirection)
-    try container.encode(conditionSymbol, forKey: .conditionSymbol)
+    if (encoder.userInfo[.useLegacyKeys] as? Bool) == true {
+      var container = encoder.container(keyedBy: LegacyCodingKeys.self)
+      try container.encode(timestamp, forKey: .timestamp)
+      try container.encode(temperature, forKey: .temperature)
+      try container.encode(windSpeed, forKey: .windSpeed)
+      try container.encodeIfPresent(windGust, forKey: .windGust)
+      try container.encode(windDirection, forKey: .windDirection)
+      try container.encode(windCompassDirection, forKey: .windCompassDirection)
+      try container.encode(conditionSymbol, forKey: .conditionSymbol)
+    } else {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(timestamp, forKey: .timestamp)
+      try container.encode(temperature, forKey: .temperature)
+      try container.encode(windSpeed, forKey: .windSpeed)
+      try container.encodeIfPresent(windGust, forKey: .windGust)
+      try container.encode(windDirection, forKey: .windDirection)
+      try container.encode(windCompassDirection, forKey: .windCompassDirection)
+      try container.encode(conditionSymbol, forKey: .conditionSymbol)
+    }
   }
 }
 
@@ -212,15 +233,27 @@ public struct VehiclePosition: Identifiable, Equatable, Hashable, Codable, Senda
   }
 
   public func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(timestamp, forKey: .timestamp)
-    try container.encode(latitude, forKey: .latitude)
-    try container.encode(longitude, forKey: .longitude)
-    try container.encodeIfPresent(elevation, forKey: .elevation)
-    try container.encodeIfPresent(course, forKey: .course)
-    try container.encodeIfPresent(speed, forKey: .speed)
-    try container.encodeIfPresent(horizontalAccuracy, forKey: .horizontalAccuracy)
-    try container.encodeIfPresent(verticalAccuracy, forKey: .verticalAccuracy)
+    if (encoder.userInfo[.useLegacyKeys] as? Bool) == true {
+      var container = encoder.container(keyedBy: LegacyCodingKeys.self)
+      try container.encode(timestamp, forKey: .timestamp)
+      try container.encode(latitude, forKey: .latitude)
+      try container.encode(longitude, forKey: .longitude)
+      try container.encodeIfPresent(elevation, forKey: .elevation)
+      try container.encodeIfPresent(course, forKey: .course)
+      try container.encodeIfPresent(speed, forKey: .speed)
+      try container.encodeIfPresent(horizontalAccuracy, forKey: .horizontalAccuracy)
+      try container.encodeIfPresent(verticalAccuracy, forKey: .verticalAccuracy)
+    } else {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(timestamp, forKey: .timestamp)
+      try container.encode(latitude, forKey: .latitude)
+      try container.encode(longitude, forKey: .longitude)
+      try container.encodeIfPresent(elevation, forKey: .elevation)
+      try container.encodeIfPresent(course, forKey: .course)
+      try container.encodeIfPresent(speed, forKey: .speed)
+      try container.encodeIfPresent(horizontalAccuracy, forKey: .horizontalAccuracy)
+      try container.encodeIfPresent(verticalAccuracy, forKey: .verticalAccuracy)
+    }
   }
 }
 
@@ -271,9 +304,16 @@ public struct VehicleElevation: Identifiable, Equatable, Hashable, Codable, Send
   }
 
   public func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(timestamp, forKey: .timestamp)
-    try container.encode(elevation, forKey: .elevation)
-    try container.encodeIfPresent(verticalAccuracy, forKey: .verticalAccuracy)
+    if (encoder.userInfo[.useLegacyKeys] as? Bool) == true {
+      var container = encoder.container(keyedBy: LegacyCodingKeys.self)
+      try container.encode(timestamp, forKey: .timestamp)
+      try container.encode(elevation, forKey: .elevation)
+      try container.encodeIfPresent(verticalAccuracy, forKey: .verticalAccuracy)
+    } else {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(timestamp, forKey: .timestamp)
+      try container.encode(elevation, forKey: .elevation)
+      try container.encodeIfPresent(verticalAccuracy, forKey: .verticalAccuracy)
+    }
   }
 }
