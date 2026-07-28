@@ -40,9 +40,9 @@ public struct DokoCurrentWeather: Equatable, Hashable, Codable, Sendable {
     conditionSymbol: String
   ) {
     self.timestamp = timestamp
-    self.temperature = temperature
-    self.windSpeed = windSpeed
-    self.windGust = windGust
+    self.temperature = (temperature * 10).rounded() / 10
+    self.windSpeed =  (windSpeed * 10).rounded() / 10
+    self.windGust =  windGust.map { ($0 * 10).rounded() / 10 }
     self.windDirection = windDirection
     self.windCompassDirection = windCompassDirection
     self.conditionSymbol = conditionSymbol
@@ -70,22 +70,22 @@ public struct DokoPosition: Equatable, Hashable, Codable, Sendable {
     verticalAccuracy: Double? = nil
   ) {
     self.timestamp = timestamp
-    self.latitude = latitude
-    self.longitude = longitude
-    self.elevation = elevation
-    self.course = course
-    self.speed = speed
-    self.horizontalAccuracy = horizontalAccuracy
-    self.verticalAccuracy = verticalAccuracy
+    self.latitude = (latitude * 1_000_000).rounded() / 1_000_000
+    self.longitude = (longitude * 1_000_000).rounded() / 1_000_000
+    self.elevation = (elevation * 10).rounded() / 10
+    self.course = course.flatMap { $0 < 0 ? nil : $0.rounded() }
+    self.speed = speed.flatMap { $0 < 0 ? nil : $0.rounded() }
+    self.horizontalAccuracy = horizontalAccuracy.map { $0.rounded() }
+    self.verticalAccuracy = verticalAccuracy.map { $0.rounded() }
   }
 
   public init(position: CLLocation) {
     self.timestamp = position.timestamp
-    self.latitude = position.coordinate.latitude
-    self.longitude = position.coordinate.longitude
-    self.elevation = position.altitude
-    self.course = position.course < 0 ? nil : Double(position.course)
-    self.speed = position.speed < 0 ? nil : Double(position.speed) * 3.6
+    self.latitude = (position.coordinate.latitude * 1_000_000).rounded() / 1_000_000
+    self.longitude = (position.coordinate.longitude * 1_000_000).rounded() / 1_000_000
+    self.elevation = (position.altitude * 10).rounded() / 10
+    self.course = position.course < 0 ? nil : position.course.rounded()
+    self.speed = position.speed < 0 ? nil : (position.speed * 3.6).rounded()
     self.horizontalAccuracy = nil
     self.verticalAccuracy = nil
   }
@@ -601,37 +601,37 @@ extension DokoResponsePacket {
 
   public var duration: Double? {
     guard case let .duration(v)? = responses[.duration]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
 
   public var odometer: Double? {
     guard case let .odometer(v)? = responses[.odometer]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
 
   public var distance: Double? {
     guard case let .distance(v)? = responses[.distance]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
 
   public var speed: Double? {
     guard case let .speed(v)? = responses[.speed]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
 
   public var tripEfficiency: Double? {
     guard case let .tripEfficiency(v)? = responses[.tripEfficiency]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var tripEfficiency5Minute: Double? {
     guard case let .tripEfficiency5Minute(v)? = responses[.tripEfficiency5Minute]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var tripEfficiency10Minute: Double? {
     guard case let .tripEfficiency10Minute(v)? = responses[.tripEfficiency10Minute]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var tripEfficiencyMovingAverage: [EfficiencyPoint] {
@@ -641,7 +641,7 @@ extension DokoResponsePacket {
 
   public var tripEfficiency15Minute: Double? {
     guard case let .tripEfficiency15Minute(v)? = responses[.tripEfficiency15Minute]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var position: DokoPosition? {
@@ -656,66 +656,66 @@ extension DokoResponsePacket {
   
   public var meanTemperature: Double? {
     guard case let .meanTemperature(v)? = responses[.meanTemperature]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
   
   public var batteryDistanceToEmpty: Double? {
     guard case let .batteryDistanceToEmpty(v)? = responses[.batteryDistanceToEmpty]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
 
   public var batteryEnergyToEmpty: Double? {
     guard case let .batteryEnergyToEmpty(v)? = responses[.batteryEnergyToEmpty]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var batteryStateOfCharge: Double? {
     guard case let .batteryStateOfCharge(v)? = responses[.batteryStateOfCharge]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
 
   public var batteryStateOfHealth: Double? {
     guard case let .batteryStateOfHealth(v)? = responses[.batteryStateOfHealth]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
 
   public var batteryTemperature: Double? {
     guard case let .batteryTemperature(v)? = responses[.batteryTemperature]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
 
   public var batteryOriginalCapacity: Double? {
     guard case let .batteryOriginalCapacity(v)? = responses[.batteryOriginalCapacity]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var batteryCurrentCapacity: Double? {
     guard case let .batteryCurrentCapacity(v)? = responses[.batteryCurrentCapacity]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var couplerTemperature: Double? {
     guard case let .couplerTemperature(v)? = responses[.couplerTemperature]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
   
   public var batteryVoltage: Double? {
     guard case let .batteryVoltage(v)? = responses[.batteryVoltage]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var batteryCurrent: Double? {
     guard case let .batteryCurrent(v)? = responses[.batteryCurrent]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var batteryPower: Double? {
     guard case let .batteryPower(v)? = responses[.batteryPower]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var batteryEnergy: Double? {
     guard case let .batteryEnergy(v)? = responses[.batteryEnergy]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 }
