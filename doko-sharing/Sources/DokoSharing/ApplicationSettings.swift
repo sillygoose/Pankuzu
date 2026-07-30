@@ -29,6 +29,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
   public var showElevationOnPath: Bool = false
   public var identicalTripPositionDistance: Double = 10
   public var tripPositionCourseDeviation: Double = 2.0
+  public var tripPositionSpeedDeviation: Double = 5.0 //###
   public var maximumTripPositionDistance: Double = 300
   public var maximumTripElevationDistance: Double = 100
   public var minimumTripElevationChange: Double = 2
@@ -51,7 +52,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     case tripMapStyle, tripMap3D
     case chargeMapStyle, chargeMap3D
     case tripMapPolyline, showElevationOnPath
-    case identicalTripPositionDistance, tripPositionCourseDeviation
+    case identicalTripPositionDistance, tripPositionCourseDeviation, tripPositionSpeedDeviation
     case maximumTripPositionDistance, maximumTripElevationDistance, minimumTripElevationChange
     case deletedRecordRetentionDays
     case tripEfficiencyAverageDuration
@@ -77,6 +78,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     try c.encode(showElevationOnPath, forKey: .showElevationOnPath)
     try c.encode(identicalTripPositionDistance, forKey: .identicalTripPositionDistance)
     try c.encode(tripPositionCourseDeviation, forKey: .tripPositionCourseDeviation)
+    try c.encode(tripPositionSpeedDeviation, forKey: .tripPositionSpeedDeviation)
     try c.encode(maximumTripPositionDistance, forKey: .maximumTripPositionDistance)
     try c.encode(maximumTripElevationDistance, forKey: .maximumTripElevationDistance)
     try c.encode(minimumTripElevationChange, forKey: .minimumTripElevationChange)
@@ -109,6 +111,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     showElevationOnPath = try c.decodeIfPresent(Bool.self, forKey: .showElevationOnPath) ?? false
     identicalTripPositionDistance = try c.decodeIfPresent(Double.self, forKey: .identicalTripPositionDistance) ?? 10
     tripPositionCourseDeviation = try c.decodeIfPresent(Double.self, forKey: .tripPositionCourseDeviation) ?? 2.0
+    tripPositionSpeedDeviation = try c.decodeIfPresent(Double.self, forKey: .tripPositionSpeedDeviation) ?? 5.0 //###
     maximumTripPositionDistance = try c.decodeIfPresent(Double.self, forKey: .maximumTripPositionDistance) ?? 300
     maximumTripElevationDistance = try c.decodeIfPresent(Double.self, forKey: .maximumTripElevationDistance) ?? 100
     minimumTripElevationChange = try c.decodeIfPresent(Double.self, forKey: .minimumTripElevationChange) ?? 2
@@ -163,6 +166,7 @@ extension AppSettings {
     if let v = standard.object(forKey: "ApplicationSettings-showElevationOnPath") as? Bool { s.showElevationOnPath = v }
     if let v = standard.object(forKey: "ApplicationSettings-identicalTripPositionDistance") as? Double { s.identicalTripPositionDistance = v }
     if let v = standard.object(forKey: "ApplicationSettings-positionCourseDeviation") as? Double { s.tripPositionCourseDeviation = v }
+    if let v = standard.object(forKey: "ApplicationSettings-positionSpeedDeviation") as? Double { s.tripPositionSpeedDeviation = v }
     if let v = standard.object(forKey: "ApplicationSettings-maximumTripPositionDistance") as? Double { s.maximumTripPositionDistance = v }
     if let v = standard.object(forKey: "ApplicationSettings-maximumTripElevationDistance") as? Double { s.maximumTripElevationDistance = v }
     if let v = standard.object(forKey: "ApplicationSettings-minimumTripElevationChange") as? Double { s.minimumTripElevationChange = v }

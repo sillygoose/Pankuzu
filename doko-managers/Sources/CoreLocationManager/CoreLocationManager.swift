@@ -31,7 +31,8 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
   private var authorizationContinuation: CheckedContinuation<CLAuthorizationStatus, Never>?
   private var locationUpdatesEnabled: Bool = false
   private var _currentLocation: CLLocation?
-  
+  var lastOutputLocation: CLLocation?
+
   public var packetUpdatesEnabled: Bool = false
 
   public var currentLocation: CLLocation? {

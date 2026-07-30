@@ -63,6 +63,10 @@ class AdvancedSettingsModel {
     $appSettings.tripPositionCourseDeviation.withLock { $0 = course }
   }
 
+  func setPositionSpeedDeviation(_ speed: Double) {
+    $appSettings.tripPositionSpeedDeviation.withLock { $0 = speed }
+  }
+
   func setMaximumTripPositionDistance(_ distance: Double) {
     $appSettings.maximumTripPositionDistance.withLock { $0 = distance }
   }
@@ -322,6 +326,40 @@ struct AdvancedSettingsView: View {
           } footer: {
             Text(
               "Output a position when the course deviates by the threshold from the last recorded position."
+            )
+            .font(.caption)
+            .opacity(DesignTokens.Opacity.muted)
+          }
+
+          Section {
+            HStack {
+              let positionSpeedDeviationRange = 1.0...10.0
+              let positionSpeedDeviationStep = 1.0
+              Slider(
+                value: Binding(
+                  get: { return model.appSettings.tripPositionSpeedDeviation },
+                  set: { model.setPositionSpeedDeviation($0) }
+                ),
+                in: positionSpeedDeviationRange,
+                step: positionSpeedDeviationStep
+              )
+              Spacer()
+              let positionSpeedDeviation = Measurement(value: model.appSettings.tripPositionSpeedDeviation, unit: UnitSpeed.kilometersPerHour)
+              Text(
+                positionSpeedDeviation.formatted(
+                  .measurement(
+                    width: .abbreviated,
+                    usage: .asProvided,
+                    numberFormatStyle: .number.rounded(rule: .towardZero, increment: positionSpeedDeviationStep)
+                  )
+                )
+              )
+            }
+          } header: {
+            Text("Speed Deviation Threshold")
+          } footer: {
+            Text(
+              "Output a position when the speed deviates by the threshold from the last recorded position."
             )
             .font(.caption)
             .opacity(DesignTokens.Opacity.muted)
