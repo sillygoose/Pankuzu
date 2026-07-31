@@ -29,7 +29,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
   public var showElevationOnPath: Bool = false
   public var identicalTripPositionDistance: Double = 10
   public var tripPositionCourseDeviation: Double = 2.0
-  public var tripPositionSpeedDeviation: Double = 5.0 //###
+  public var tripPositionSpeedDeviation: Double = 5.0
   public var maximumTripPositionDistance: Double = 300
   public var maximumTripElevationDistance: Double = 100
   public var minimumTripElevationChange: Double = 2
@@ -111,7 +111,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     showElevationOnPath = try c.decodeIfPresent(Bool.self, forKey: .showElevationOnPath) ?? false
     identicalTripPositionDistance = try c.decodeIfPresent(Double.self, forKey: .identicalTripPositionDistance) ?? 10
     tripPositionCourseDeviation = try c.decodeIfPresent(Double.self, forKey: .tripPositionCourseDeviation) ?? 2.0
-    tripPositionSpeedDeviation = try c.decodeIfPresent(Double.self, forKey: .tripPositionSpeedDeviation) ?? 5.0 //###
+    tripPositionSpeedDeviation = try c.decodeIfPresent(Double.self, forKey: .tripPositionSpeedDeviation) ?? 5.0
     maximumTripPositionDistance = try c.decodeIfPresent(Double.self, forKey: .maximumTripPositionDistance) ?? 300
     maximumTripElevationDistance = try c.decodeIfPresent(Double.self, forKey: .maximumTripElevationDistance) ?? 100
     minimumTripElevationChange = try c.decodeIfPresent(Double.self, forKey: .minimumTripElevationChange) ?? 2

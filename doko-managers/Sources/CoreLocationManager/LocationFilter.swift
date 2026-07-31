@@ -16,17 +16,25 @@ protocol LocationFilter: Actor {
 
 extension CoreLocationManager {
   func filterLocation(_ location: CLLocation) async {
-    let tripPositionChange = await filterTripPositionChange(location)
-    let tripElevationChange = await filterTripElevationChange(location)
-    let tripCourseChange = await filterTripCourseChange(location)
-    let tripSpeedChange = await filterTripSpeedChange(location)
-    
-    if tripPositionChange || tripElevationChange || tripCourseChange || tripSpeedChange {
-      var dokoResponses: DokoResponseDictionary = [:]
-      dokoResponses[.position] = DokoCommandResponse(command: .tripPosition, response: .position(DokoPosition(position: location)))
-      let dokoResponsePacket = DokoResponsePacket(type: .tripCoreElevation, responses: dokoResponses)
-      await DokoPacketManager.shared.appendDokoResponsePacket(dokoResponsePacket)
+    let shouldOutput: Bool
+    if await filterTripPositionChange(location) {
+      shouldOutput = true
+    } else if await filterTripElevationChange(location) {
+      shouldOutput = true
+    } else if await filterTripCourseChange(location) {
+      shouldOutput = true
+    } else if await filterTripSpeedChange(location) {
+      shouldOutput = true
+    } else {
+      shouldOutput = false
     }
+    guard shouldOutput else { return }
+
+    var dokoResponses: DokoResponseDictionary = [:]
+    dokoResponses[.position] = DokoCommandResponse(command: .tripPosition, response: .position(DokoPosition(position: location)))
+    let dokoResponsePacket = DokoResponsePacket(type: .tripCoreElevation, responses: dokoResponses)
+    await DokoPacketManager.shared.appendDokoResponsePacket(dokoResponsePacket)
+    lastOutputLocation = location
   }
 
   func resetLocationFilters() async {
@@ -35,7 +43,7 @@ extension CoreLocationManager {
 }
 
 // MARK: - Accuracy Filter
-
+//### drop actors?
 actor AccuracyFilter: LocationFilter {
   let horizontalAccuracyThreshold: Double = 40
   let verticalAccuracyThreshold: Double = 50
@@ -74,13 +82,13 @@ actor TripPositionChangeFilter: LocationFilter {
   func shouldAccept(_ location: CLLocation, _ previousLocation: CLLocation?) -> Bool {
     guard let last = previousLocation else { return true }
     if location.timestamp == last.timestamp {
-      DokoLogging.shared.postLoggingResponse(.coreLocation("TripPositionChangeFilter.timestamp"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation("TripPositionChangeFilter.timestamp"), debugPacket: true)
       return false
     }
 
     let distance = location.distance(from: last)
     if distance < appSettings.identicalTripPositionDistance {
-      DokoLogging.shared.postLoggingResponse(.coreLocation("TripPositionChangeFilter.distance"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation("TripPositionChangeFilter.distance"), debugPacket: true)
       return false
     }
     return true
@@ -104,7 +112,7 @@ actor TripElevationChangeFilter: LocationFilter {
   func shouldAccept(_ location: CLLocation, _ previousLocation: CLLocation?) -> Bool {
     guard let last = previousLocation else { return true }
     if location.timestamp == last.timestamp {
-      DokoLogging.shared.postLoggingResponse(.coreLocation("TripElevationChangeFilter.timestamp"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation("TripElevationChangeFilter.timestamp"), debugPacket: true)
       return false
     }
 
@@ -112,7 +120,7 @@ actor TripElevationChangeFilter: LocationFilter {
     if distance > appSettings.maximumTripElevationDistance { return true }
 
     if abs(last.altitude - location.altitude) < appSettings.minimumTripElevationChange {
-      DokoLogging.shared.postLoggingResponse(.coreLocation("TripElevationChangeFilter.change"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation("TripElevationChangeFilter.change"), debugPacket: true)
       return false
     }
     return true
@@ -136,7 +144,7 @@ actor TripCourseChangeFilter: LocationFilter {
   func shouldAccept(_ location: CLLocation, _ previousLocation: CLLocation?) -> Bool {
     guard location.course >= 0, let previousLocation else { return false }
     guard abs(location.course - previousLocation.course) > appSettings.tripPositionCourseDeviation else { return false }
-    DokoLogging.shared.postLoggingResponse(.coreLocation("TripCourseChangeFilter.course"))
+    DokoLogging.shared.postLoggingResponse(.coreLocation("TripCourseChangeFilter.course"), debugPacket: true)
     return true
   }
 }
@@ -157,8 +165,8 @@ actor TripSpeedChangeFilter: LocationFilter {
 
   func shouldAccept(_ location: CLLocation, _ previousLocation: CLLocation?) -> Bool {
     guard location.speed >= 0, let previousLocation else { return false }
-    guard (abs(location.speed - previousLocation.speed) * 3.6) > appSettings.tripPositionSpeedDeviation else { return false } //###
-    DokoLogging.shared.postLoggingResponse(.coreLocation("TripSpeedChangeFilter.speed"))
+    guard (abs(location.speed - previousLocation.speed) * 3.6) > appSettings.tripPositionSpeedDeviation else { return false }
+    DokoLogging.shared.postLoggingResponse(.coreLocation("TripSpeedChangeFilter.speed"), debugPacket: true)
     return true
   }
 }
