@@ -6,41 +6,27 @@ import DokoPacketManager
 import DokoLogging
 import DokoSharing
 
+// MARK: - Position Filter Protocol
+
+private protocol PositionFilter: Actor {
+  func shouldAccept(_ location: CLLocation, _ previousPosition: CLLocation?) -> Bool
+}
+
 // MARK: - Horizontal Accuracy Filter
 
 private actor HorizontalAccuracyFilter: PositionFilter {
   let horizontalAccuracyThreshold: Double = 40
 
   func shouldAccept(_ location: CLLocation, _ previousPosition: CLLocation?) -> Bool {
-    guard location.horizontalAccuracy >= 0 else {
+    guard location.horizontalAccuracy > 0 else {
       DokoLogging.shared.postLoggingResponse(.coreLocation("horizontalAccuracyInvalid"))
       return false
     }
-    guard location.horizontalAccuracy < horizontalAccuracyThreshold else {
+    guard location.horizontalAccuracy <= horizontalAccuracyThreshold else {
       DokoLogging.shared.postLoggingResponse(.coreLocation("horizontalAccuracyBounds(\(String(format: "%.0f", location.horizontalAccuracy))"))
       return false
     }
     return true
-  }
-}
-
-extension CoreLocationManager {
-  fileprivate static let horizontalAccuracyFilter = HorizontalAccuracyFilter()
-
-  func filterHorizontalAccuracy(_ location: CLLocation) async -> CLLocation? {
-    guard await Self.horizontalAccuracyFilter.shouldAccept(location, lastOutputPosition) else { return nil }
-    return location
-  }
-  
-  func filterPosition(_ location: CLLocation) async {
-    let shouldOutput: Bool = await filterPositionChange(location)
-    guard shouldOutput else { return }
-
-    var dokoResponses: DokoResponseDictionary = [:]
-    dokoResponses[.position] = DokoCommandResponse(command: .tripPosition, response: .position(DokoPosition(position: location)))
-    let dokoResponsePacket = DokoResponsePacket(type: .tripCorePosition, responses: dokoResponses)
-    await DokoPacketManager.shared.appendDokoResponsePacket(dokoResponsePacket)
-    lastOutputPosition = location
   }
 }
 
@@ -51,41 +37,66 @@ private actor PositionChangeFilter: PositionFilter {
 
   func shouldAccept(_ location: CLLocation, _ previousLocation: CLLocation?) -> Bool {
     guard let previousLocation else {
-      DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.initialPosition"), debugPacket: true)
+      DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.initialPosition"), debugPacket: false)
       return true
     }
     if location.timestamp == previousLocation.timestamp { return false }
 
-    let distance = location.distance(from: previousLocation)
-    guard distance >= appSettings.identicalTripPositionDistance else {
-      DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.distance(\(String(format: "%.1f", distance)))"), debugPacket: true)
+    let distanceChange = location.distance(from: previousLocation)
+    if distanceChange >= appSettings.identicalTripPositionDistance {
+      DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.distance(\(String(format: "%.1f", distanceChange)))"), debugPacket: false)
       return true
     }
     
     if location.course >= 0 {
-      let deltaCourse = abs(location.course - previousLocation.course)
-      if deltaCourse >= appSettings.tripPositionCourseDeviation {
-        DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.course(\(String(format: "%.1f", deltaCourse)))"), debugPacket: true)
-        return true
+      if let courseChange = Self.courseDelta(location.course, previousLocation.course) {
+        if abs(courseChange) >= appSettings.tripPositionCourseDeviation {
+          DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.course(\(String(format: "%.1f", courseChange)))"), debugPacket: false)
+          return true
+        }
       }
     }
 
     if location.speed >= 0 {
-      let deltaSpeed = abs(location.speed - previousLocation.speed) * 3.6
-      if deltaSpeed >= appSettings.tripPositionSpeedDeviation {
-        DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.speed(\(String(format: "%.1f", deltaSpeed)))"), debugPacket: true)
+      let speedChnage = location.speed - previousLocation.speed
+      if abs(speedChnage) >= appSettings.tripPositionSpeedDeviation {
+        DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.speed(\(String(format: "%.1f", speedChnage)))"), debugPacket: false)
         return true
       }
     }
     return false
   }
+
+  // Signed angle (-180...180] from `previous` to `current`: positive is clockwise, negative
+  // is counter-clockwise, accounting for the 0°/360° wraparound.
+  private static func courseDelta(_ current: Double, _ previous: Double) -> Double? {
+    guard current >= 0 && previous >= 0 else { return nil }
+    var diff = (current - previous).truncatingRemainder(dividingBy: 360)
+    if diff > 180 {
+      diff -= 360
+    } else if diff < -180 {
+      diff += 360
+    }
+    return diff
+  }
 }
 
 extension CoreLocationManager {
+  fileprivate static let horizontalAccuracyFilter = HorizontalAccuracyFilter()
   fileprivate static let positionChangeFilter = PositionChangeFilter()
 
-  func filterPositionChange(_ location: CLLocation) async -> Bool {
-    guard await Self.positionChangeFilter.shouldAccept(location, lastOutputPosition) else { return false }
-    return true
+  func filterHorizontalAccuracy(_ location: CLLocation) async -> CLLocation? {
+    guard await Self.horizontalAccuracyFilter.shouldAccept(location, lastOutputPosition) else { return nil }
+    return location
+  }
+  
+  func filterPosition(_ location: CLLocation) async {
+    guard await Self.positionChangeFilter.shouldAccept(location, lastOutputPosition) else { return }
+
+    var dokoResponses: DokoResponseDictionary = [:]
+    dokoResponses[.position] = DokoCommandResponse(command: .tripPosition, response: .position(DokoPosition(position: location)))
+    let dokoResponsePacket = DokoResponsePacket(type: .tripCorePosition, responses: dokoResponses)
+    await DokoPacketManager.shared.appendDokoResponsePacket(dokoResponsePacket)
+    lastOutputPosition = location
   }
 }

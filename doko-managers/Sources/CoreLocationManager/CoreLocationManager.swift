@@ -3,16 +3,6 @@ import OSLog
 
 import DokoLogging
 
-// MARK: - Position Filter Protocol
-
-protocol PositionFilter: Actor {
-  func shouldAccept(_ location: CLLocation, _ previousPosition: CLLocation?) -> Bool
-}
-
-protocol ElevationFilter: Actor {
-  func shouldAccept(_ location: CLLocation, _ previousElevation: CLLocation?) -> Bool
-}
-
 // MARK: - CoreLocationManager
 
 @Observable
@@ -145,6 +135,7 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
 
     // Start classic Core Location updates for background reliability
     locationManager.startUpdatingLocation()
+    
     // async live updates (more efficient in foreground)
     liveUpdatesTask?.cancel()
     liveUpdatesTask = Task { [weak self] in
@@ -155,7 +146,7 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
           if Task.isCancelled || !self.locationUpdatesEnabled { break }
           if let location = update.location {
             DokoLogging.shared.postLoggingResponse(
-              .coreLocation("liveUpdate(\(String(format: "%.0f, %.0f", location.horizontalAccuracy, location.verticalAccuracy)))"),
+              .coreLocation("liveUpdate(\(String(format: "e:%.1f, s:%.1f, c:%.0f", location.altitude, location.speed, location.course)))"),
               debugPacket: true
             )
             if let accurateHorizontalLocation = await filterHorizontalAccuracy(location) {
@@ -194,13 +185,13 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
 //    guard locationUpdatesEnabled, let location = locations.last else { return }
 //    DokoLogging.shared.postLoggingResponse(.coreLocation("didUpdateLocations(\(String(format: "%.1f, %.1f", location.horizontalAccuracy, location.verticalAccuracy)))"))
 //    Task {
-//      if let accurateLocation = await filterHorizontalAccuracy(location) {
-//        await MainActor.run {
-//          self._currentLocation = accurateLocation
-//        }
-//        if packetUpdatesEnabled {
-//          await filterLocation(accurateLocation)
-//        }
+//      if let accurateHorizontalLocation = await filterHorizontalAccuracy(location) {
+//        await MainActor.run { self._currentPosition = accurateHorizontalLocation }
+//        if packetUpdatesEnabled { await filterPosition(accurateHorizontalLocation) }
+//      }
+//      if let accurateVerticalLocation = await filterVerticalAccuracy(location) {
+//        await MainActor.run { self._currentElevation = accurateVerticalLocation }
+//        if packetUpdatesEnabled { await filterElevation(accurateVerticalLocation) }
 //      }
 //    }
 //  }

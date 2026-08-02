@@ -26,6 +26,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
   public var chargeMap3D: Bool = false
 
   public var tripMapPolyline: Bool = true
+  public var showPositionOnPath: Bool = false
   public var showElevationOnPath: Bool = false
   public var identicalTripPositionDistance: Double = 10
   public var tripPositionCourseDeviation: Double = 2.0
@@ -51,7 +52,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     case poiThreshold, duplicateLocationThreshold
     case tripMapStyle, tripMap3D
     case chargeMapStyle, chargeMap3D
-    case tripMapPolyline, showElevationOnPath
+    case tripMapPolyline, showPositiontionOnPath, showElevationOnPath
     case identicalTripPositionDistance, tripPositionCourseDeviation, tripPositionSpeedDeviation
     case maximumTripPositionDistance, maximumTripElevationDistance, minimumTripElevationChange
     case deletedRecordRetentionDays
@@ -75,6 +76,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     try c.encode(chargeMapStyle, forKey: .chargeMapStyle)
     try c.encode(chargeMap3D, forKey: .chargeMap3D)
     try c.encode(tripMapPolyline, forKey: .tripMapPolyline)
+    try c.encode(showPositionOnPath, forKey: .showPositiontionOnPath)
     try c.encode(showElevationOnPath, forKey: .showElevationOnPath)
     try c.encode(identicalTripPositionDistance, forKey: .identicalTripPositionDistance)
     try c.encode(tripPositionCourseDeviation, forKey: .tripPositionCourseDeviation)
@@ -108,6 +110,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     chargeMapStyle = (try? c.decodeIfPresent(DisplayMapStyle.self, forKey: .chargeMapStyle)) ?? .street
     chargeMap3D = try c.decodeIfPresent(Bool.self, forKey: .chargeMap3D) ?? false
     tripMapPolyline = try c.decodeIfPresent(Bool.self, forKey: .tripMapPolyline) ?? true
+    showPositionOnPath = try c.decodeIfPresent(Bool.self, forKey: .showPositiontionOnPath) ?? false
     showElevationOnPath = try c.decodeIfPresent(Bool.self, forKey: .showElevationOnPath) ?? false
     identicalTripPositionDistance = try c.decodeIfPresent(Double.self, forKey: .identicalTripPositionDistance) ?? 10
     tripPositionCourseDeviation = try c.decodeIfPresent(Double.self, forKey: .tripPositionCourseDeviation) ?? 2.0
@@ -163,6 +166,7 @@ extension AppSettings {
     if let v = standard.object(forKey: "ApplicationSettings-poiThreshold") as? Double { s.poiThreshold = v }
     if let v = standard.object(forKey: "ApplicationSettings-duplicateLocationThreshold") as? Double { s.duplicateLocationThreshold = v }
     if let v = standard.object(forKey: "ApplicationSettings-tripMapPolyline") as? Bool { s.tripMapPolyline = v }
+    if let v = standard.object(forKey: "ApplicationSettings-showPositionOnPath") as? Bool { s.showPositionOnPath = v }
     if let v = standard.object(forKey: "ApplicationSettings-showElevationOnPath") as? Bool { s.showElevationOnPath = v }
     if let v = standard.object(forKey: "ApplicationSettings-identicalTripPositionDistance") as? Double { s.identicalTripPositionDistance = v }
     if let v = standard.object(forKey: "ApplicationSettings-positionCourseDeviation") as? Double { s.tripPositionCourseDeviation = v }

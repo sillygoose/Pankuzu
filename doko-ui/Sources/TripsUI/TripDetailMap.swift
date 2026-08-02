@@ -129,7 +129,9 @@ public struct TripDetailMapView: View {
             )
           )
           .stroke(.blue, lineWidth: appSettings.tripMapStyle == .satellite ? 2 : 3)
-        } else {
+        }
+        
+        if appSettings.showPositionOnPath {
           ForEach(Array(model.tripPath.enumerated()), id: \.offset) { _, coord in
             Annotation("", coordinate: coord) {
               Circle()
@@ -144,7 +146,7 @@ public struct TripDetailMapView: View {
             Annotation("", coordinate: coord) {
               Circle()
                 .fill(Color.green)
-                .frame(width: 8, height: 8)
+                .frame(width: 6, height: 6)
             }
           }
         }
