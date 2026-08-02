@@ -3,6 +3,18 @@ import OSLog
 
 import DokoLogging
 
+// MARK: - Position Filter Protocol
+
+protocol PositionFilter: Actor {
+  func shouldAccept(_ location: CLLocation, _ previousPosition: CLLocation?) -> Bool
+}
+
+protocol ElevationFilter: Actor {
+  func shouldAccept(_ location: CLLocation, _ previousElevation: CLLocation?) -> Bool
+}
+
+// MARK: - CoreLocationManager
+
 @Observable
 @MainActor
 public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDelegate {
@@ -126,6 +138,9 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
 
     _currentPosition = nil
     _currentElevation = nil
+    lastOutputPosition = nil
+    lastOutputElevation = nil
+
     locationUpdatesEnabled = true
 
     // Start classic Core Location updates for background reliability
@@ -134,7 +149,6 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
     liveUpdatesTask?.cancel()
     liveUpdatesTask = Task { [weak self] in
       guard let self else { return }
-      await resetLocationFilters()
       DokoLogging.shared.postLoggingResponse(.coreLocation(".liveUpdatesTask started"))
       do {
         for try await update in CLLocationUpdate.liveUpdates(.automotiveNavigation) {
@@ -148,7 +162,7 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
               await MainActor.run { self._currentPosition = accurateHorizontalLocation }
               if packetUpdatesEnabled { await filterPosition(accurateHorizontalLocation) }
             }
-            if let accurateVerticalLocation = await filterHorizontalAccuracy(location) {
+            if let accurateVerticalLocation = await filterVerticalAccuracy(location) {
               await MainActor.run { self._currentElevation = accurateVerticalLocation }
               if packetUpdatesEnabled { await filterElevation(accurateVerticalLocation) }
             }
