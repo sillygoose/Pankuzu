@@ -30,19 +30,35 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
 
   private var authorizationContinuation: CheckedContinuation<CLAuthorizationStatus, Never>?
   private var locationUpdatesEnabled: Bool = false
-  private var _currentLocation: CLLocation?
-  var lastOutputLocation: CLLocation?
+  
+  private var _currentPosition: CLLocation?
+  private var _currentElevation: CLLocation?
+
+  var lastOutputPosition: CLLocation?
+  var lastOutputElevation: CLLocation?
 
   public var packetUpdatesEnabled: Bool = false
 
-  public var currentLocation: CLLocation? {
+  public var currentPosition: CLLocation? {
     if !locationUpdatesEnabled {
-      DokoLogging.shared.postLoggingResponse(.coreLocation("'currentLocation' requested when disabled"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation("currentPosition requested when disabled"))
     }
-    if _currentLocation == nil {
-      DokoLogging.shared.postLoggingResponse(.coreLocation("'currentLocation' is nil"))
+    guard let position = _currentPosition else {
+      DokoLogging.shared.postLoggingResponse(.coreLocation("currentPosition is nil"))
+      return nil
     }
-    return _currentLocation
+    return position
+  }
+
+  public var currentElevation: CLLocation? {
+    if !locationUpdatesEnabled {
+      DokoLogging.shared.postLoggingResponse(.coreLocation("currentElevation requested when disabled"))
+    }
+    guard let elevation = _currentElevation else {
+      DokoLogging.shared.postLoggingResponse(.coreLocation("currentElevation is nil"))
+      return nil
+    }
+    return elevation
   }
 
   private func startAccessoryNameObservation() {
@@ -54,12 +70,8 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
          if Task.isCancelled { break }
          guard oldAccessoryName != newAccessoryName else { continue }
          if newAccessoryName == nil {
-           if packetUpdatesEnabled {
-             stopPacketUpdates()
-           }
-           if locationUpdatesEnabled {
-             stopLocationUpdates()
-           }
+           if packetUpdatesEnabled { stopPacketUpdates() }
+           if locationUpdatesEnabled { stopLocationUpdates() }
          }
          oldAccessoryName = newAccessoryName
        }
@@ -112,7 +124,8 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
     if background == nil { background = CLBackgroundActivitySession() }
     locationManager.allowsBackgroundLocationUpdates = true
 
-    _currentLocation = nil
+    _currentPosition = nil
+    _currentElevation = nil
     locationUpdatesEnabled = true
 
     // Start classic Core Location updates for background reliability
@@ -127,21 +140,24 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
         for try await update in CLLocationUpdate.liveUpdates(.automotiveNavigation) {
           if Task.isCancelled || !self.locationUpdatesEnabled { break }
           if let location = update.location {
-            DokoLogging.shared.postLoggingResponse(.coreLocation("liveUpdate(\(String(format: "%.1f, %.1f", location.horizontalAccuracy, location.verticalAccuracy)))"))
-            if let accurateLocation = await filterAccuracy(location) {
-              await MainActor.run {
-                self._currentLocation = accurateLocation
-              }
-              if packetUpdatesEnabled {
-                await filterLocation(accurateLocation)
-              }
+            DokoLogging.shared.postLoggingResponse(
+              .coreLocation("liveUpdate(\(String(format: "%.0f, %.0f", location.horizontalAccuracy, location.verticalAccuracy)))"),
+              debugPacket: true
+            )
+            if let accurateHorizontalLocation = await filterHorizontalAccuracy(location) {
+              await MainActor.run { self._currentPosition = accurateHorizontalLocation }
+              if packetUpdatesEnabled { await filterPosition(accurateHorizontalLocation) }
+            }
+            if let accurateVerticalLocation = await filterHorizontalAccuracy(location) {
+              await MainActor.run { self._currentElevation = accurateVerticalLocation }
+              if packetUpdatesEnabled { await filterElevation(accurateVerticalLocation) }
             }
           }
         }
         DokoLogging.shared.postLoggingResponse(.coreLocation(".liveUpdatesTask ended"))
       } catch {
-        self.logger.error("\(timestamp()) liveUpdates stream error: \(String(describing: error))")
-        DokoLogging.shared.postLoggingResponse(.coreLocation("liveUpdates stream error: \(String(describing: error))"))
+        self.logger.error("\(timestamp()) liveUpdate stream error: \(String(describing: error))")
+        DokoLogging.shared.postLoggingResponse(.coreLocation("liveUpdate stream error: \(String(describing: error))"))
       }
     }
   }
@@ -152,27 +168,28 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
     liveUpdatesTask = nil
     locationManager.stopUpdatingLocation()
     locationManager.allowsBackgroundLocationUpdates = false
-    _currentLocation = nil
+    _currentPosition = nil
+    _currentElevation = nil
     background?.invalidate()
     background = nil
     logger.debug("\(timestamp()) CLM.stopLocationUpdates completed")
     DokoLogging.shared.postLoggingResponse(.coreLocation(".stopLocationUpdates"))
   }
 
-  public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-    guard locationUpdatesEnabled, let location = locations.last else { return }
-    DokoLogging.shared.postLoggingResponse(.coreLocation("didUpdateLocations(\(String(format: "%.1f, %.1f", location.horizontalAccuracy, location.verticalAccuracy)))"))
-    Task {
-      if let accurateLocation = await filterAccuracy(location) {
-        await MainActor.run {
-          self._currentLocation = accurateLocation
-        }
-        if packetUpdatesEnabled {
-          await filterLocation(accurateLocation)
-        }
-      }
-    }
-  }
+//  public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+//    guard locationUpdatesEnabled, let location = locations.last else { return }
+//    DokoLogging.shared.postLoggingResponse(.coreLocation("didUpdateLocations(\(String(format: "%.1f, %.1f", location.horizontalAccuracy, location.verticalAccuracy)))"))
+//    Task {
+//      if let accurateLocation = await filterHorizontalAccuracy(location) {
+//        await MainActor.run {
+//          self._currentLocation = accurateLocation
+//        }
+//        if packetUpdatesEnabled {
+//          await filterLocation(accurateLocation)
+//        }
+//      }
+//    }
+//  }
 
   public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
     logger.error("\(timestamp()) CLM.locationManager( error:\(String(describing: error)))")

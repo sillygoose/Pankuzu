@@ -12,18 +12,50 @@ protocol LocationFilter: Actor {
   func shouldAccept(_ location: CLLocation, _ previousLocation: CLLocation?) -> Bool
 }
 
-// MARK: - Location Filtering
+// MARK: - Position/Elevation Filtering
 
 extension CoreLocationManager {
-  func filterLocation(_ location: CLLocation) async {
+
+
+  func resetLocationFilters() async {
+    lastOutputPosition = nil
+    lastOutputElevation = nil
+  }
+}
+
+// MARK: - Horizontal Accuracy Filter
+
+actor HorizontalAccuracyFilter: LocationFilter {
+  let horizontalAccuracyThreshold: Double = 40
+
+  func shouldAccept(_ location: CLLocation, _ previousLocation: CLLocation?) -> Bool {
+    guard location.horizontalAccuracy >= 0 else {
+      DokoLogging.shared.postLoggingResponse(.coreLocation("horizontalAccuracyInvalid"))
+      return false
+    }
+    guard location.horizontalAccuracy < horizontalAccuracyThreshold else {
+      DokoLogging.shared.postLoggingResponse(.coreLocation("horizontalAccuracyBounds(\(String(format: "%.0f", location.horizontalAccuracy))"))
+      return false
+    }
+    return true
+  }
+}
+
+extension CoreLocationManager {
+  static let horizontalAccuracyFilter = HorizontalAccuracyFilter()
+
+  func filterHorizontalAccuracy(_ location: CLLocation) async -> CLLocation? {
+    guard await Self.horizontalAccuracyFilter.shouldAccept(location, lastOutputPosition) else { return nil }
+    return location
+  }
+  
+  func filterPosition(_ location: CLLocation) async {
     let shouldOutput: Bool
-    if await filterTripPositionChange(location) {
+    if await filterPositionChange(location) {
       shouldOutput = true
-    } else if await filterTripElevationChange(location) {
+    } else if await filterCourseChange(location) {
       shouldOutput = true
-    } else if await filterTripCourseChange(location) {
-      shouldOutput = true
-    } else if await filterTripSpeedChange(location) {
+    } else if await filterSpeedChange(location) {
       shouldOutput = true
     } else {
       shouldOutput = false
@@ -32,33 +64,24 @@ extension CoreLocationManager {
 
     var dokoResponses: DokoResponseDictionary = [:]
     dokoResponses[.position] = DokoCommandResponse(command: .tripPosition, response: .position(DokoPosition(position: location)))
-    let dokoResponsePacket = DokoResponsePacket(type: .tripCoreElevation, responses: dokoResponses)
+    let dokoResponsePacket = DokoResponsePacket(type: .tripCorePosition, responses: dokoResponses)
     await DokoPacketManager.shared.appendDokoResponsePacket(dokoResponsePacket)
-    lastOutputLocation = location
-  }
-
-  func resetLocationFilters() async {
-    lastOutputLocation = nil
+    lastOutputPosition = location
   }
 }
 
-// MARK: - Accuracy Filter
-//### drop actors?
-actor AccuracyFilter: LocationFilter {
-  let horizontalAccuracyThreshold: Double = 40
+// MARK: - Vertical Accuracy Filter
+
+actor VerticalAccuracyFilter: LocationFilter {
   let verticalAccuracyThreshold: Double = 50
 
   func shouldAccept(_ location: CLLocation, _ previousLocation: CLLocation?) -> Bool {
-    guard location.horizontalAccuracy >= 0 && location.verticalAccuracy >= 0 else {
-      DokoLogging.shared.postLoggingResponse(.coreLocation("AccuracyFilter.invalid"))
-      return false
-    }
-    guard location.horizontalAccuracy < horizontalAccuracyThreshold else {
-      DokoLogging.shared.postLoggingResponse(.coreLocation("AccuracyFilter.horizontalAccuracy(\(String(format: "%.0f", location.horizontalAccuracy))"))
+    guard location.horizontalAccuracy >= 0 else {
+      DokoLogging.shared.postLoggingResponse(.coreLocation("verticalAccuracyInvalid"))
       return false
     }
     guard location.verticalAccuracy < verticalAccuracyThreshold else {
-      DokoLogging.shared.postLoggingResponse(.coreLocation("AccuracyFilter.verticalAccuracy(\(String(format: "%.0f", location.verticalAccuracy))"))
+      DokoLogging.shared.postLoggingResponse(.coreLocation("verticalAccuracyBounds(\(String(format: "%.0f", location.verticalAccuracy))"))
       return false
     }
     return true
@@ -66,11 +89,22 @@ actor AccuracyFilter: LocationFilter {
 }
 
 extension CoreLocationManager {
-  static let accuracyFilter = AccuracyFilter()
+  static let verticalAccuracyFilter = VerticalAccuracyFilter()
 
-  func filterAccuracy(_ location: CLLocation) async -> CLLocation? {
-    guard await Self.accuracyFilter.shouldAccept(location, lastOutputLocation) else { return nil }
+  func filterVerticalAccuracy(_ location: CLLocation) async -> CLLocation? {
+    guard await Self.verticalAccuracyFilter.shouldAccept(location, lastOutputElevation) else { return nil }
     return location
+  }
+  
+  func filterElevation(_ location: CLLocation) async {
+    let shouldOutput: Bool = await filterElevationChange(location)
+    guard shouldOutput else { return }
+
+    var dokoResponses: DokoResponseDictionary = [:]
+    dokoResponses[.position] = DokoCommandResponse(command: .tripPosition, response: .position(DokoPosition(position: location)))
+    let dokoResponsePacket = DokoResponsePacket(type: .tripCoreElevation, responses: dokoResponses)
+    await DokoPacketManager.shared.appendDokoResponsePacket(dokoResponsePacket)
+    lastOutputElevation = location
   }
 }
 
@@ -98,8 +132,8 @@ actor TripPositionChangeFilter: LocationFilter {
 extension CoreLocationManager {
   static let tripPositionChangeFilter = TripPositionChangeFilter()
 
-  func filterTripPositionChange(_ location: CLLocation) async -> Bool {
-    guard await Self.tripPositionChangeFilter.shouldAccept(location, lastOutputLocation) else { return false }
+  func filterPositionChange(_ location: CLLocation) async -> Bool {
+    guard await Self.tripPositionChangeFilter.shouldAccept(location, lastOutputPosition) else { return false }
     return true
   }
 }
@@ -130,8 +164,8 @@ actor TripElevationChangeFilter: LocationFilter {
 extension CoreLocationManager {
   static let tripElevationChangeFilter = TripElevationChangeFilter()
 
-  func filterTripElevationChange(_ location: CLLocation) async -> Bool {
-    guard await Self.tripElevationChangeFilter.shouldAccept(location, lastOutputLocation) else { return false }
+  func filterElevationChange(_ location: CLLocation) async -> Bool {
+    guard await Self.tripElevationChangeFilter.shouldAccept(location, lastOutputPosition) else { return false }
     return true
   }
 }
@@ -152,8 +186,8 @@ actor TripCourseChangeFilter: LocationFilter {
 extension CoreLocationManager {
   static let tripCourseChangeFilter = TripCourseChangeFilter()
 
-  func filterTripCourseChange(_ location: CLLocation) async -> Bool {
-    guard await Self.tripCourseChangeFilter.shouldAccept(location, lastOutputLocation) else { return false }
+  func filterCourseChange(_ location: CLLocation) async -> Bool {
+    guard await Self.tripCourseChangeFilter.shouldAccept(location, lastOutputPosition) else { return false }
     return true
   }
 }
@@ -174,8 +208,8 @@ actor TripSpeedChangeFilter: LocationFilter {
 extension CoreLocationManager {
   static let tripSpeedChangeFilter = TripSpeedChangeFilter()
 
-  func filterTripSpeedChange(_ location: CLLocation) async -> Bool {
-    guard await Self.tripSpeedChangeFilter.shouldAccept(location, lastOutputLocation) else { return false }
+  func filterSpeedChange(_ location: CLLocation) async -> Bool {
+    guard await Self.tripSpeedChangeFilter.shouldAccept(location, lastOutputPosition) else { return false }
     return true
   }
 }

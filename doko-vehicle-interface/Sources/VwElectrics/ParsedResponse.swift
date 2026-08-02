@@ -38,13 +38,13 @@ extension VwElectrics {
         commandResponse = .stpo(response)
 
       case .position:
-        guard let position = await CoreLocationManager.shared.currentLocation else {
+        guard let position = await CoreLocationManager.shared.currentPosition else {
           throw ParsedResponseError.locationUnavailable
         }
         commandResponse = .position(DokoPosition(position: position))
 
       case .weather:
-        guard let position = await CoreLocationManager.shared.currentLocation else {
+        guard let position = await CoreLocationManager.shared.currentPosition else {
           throw ParsedResponseError.locationUnavailable
         }
         guard
