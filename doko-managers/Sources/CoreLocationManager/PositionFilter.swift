@@ -40,18 +40,19 @@ private actor PositionChangeFilter: PositionFilter {
       DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.initialPosition"), debugPacket: false)
       return true
     }
-    if location.timestamp == previousLocation.timestamp { return false }
+    guard location.timestamp != previousLocation.timestamp else { return false }
 
     let distanceChange = location.distance(from: previousLocation)
-    if distanceChange >= appSettings.identicalTripPositionDistance {
-      DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.distance(\(String(format: "%.1f", distanceChange)))"), debugPacket: false)
+    guard distanceChange >= appSettings.identicalTripPositionDistance else { return false }
+    if distanceChange >= appSettings.maximumTripPositionDistance {
+      DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.distance(\(String(format: "%.0f", distanceChange)))"), debugPacket: false)
       return true
     }
     
     if location.course >= 0 {
       if let courseChange = Self.courseDelta(location.course, previousLocation.course) {
         if abs(courseChange) >= appSettings.tripPositionCourseDeviation {
-          DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.course(\(String(format: "%.1f", courseChange)))"), debugPacket: false)
+          DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.course(\(String(format: "%.0f", courseChange)))"), debugPacket: false)
           return true
         }
       }
@@ -60,7 +61,7 @@ private actor PositionChangeFilter: PositionFilter {
     if location.speed >= 0 {
       let speedChnage = location.speed - previousLocation.speed
       if abs(speedChnage) >= appSettings.tripPositionSpeedDeviation {
-        DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.speed(\(String(format: "%.1f", speedChnage)))"), debugPacket: false)
+        DokoLogging.shared.postLoggingResponse(.coreLocation("PositionChange.speed(\(String(format: "%.0f", speedChnage)))"), debugPacket: false)
         return true
       }
     }

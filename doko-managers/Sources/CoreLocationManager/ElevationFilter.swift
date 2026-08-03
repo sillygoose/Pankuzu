@@ -40,11 +40,11 @@ private actor ElevationChangeFilter: ElevationFilter {
       DokoLogging.shared.postLoggingResponse(.coreLocation("ElevationChange.initialElevation"), debugPacket: false)
       return true
     }
-    if location.timestamp == previousElevation.timestamp { return false }
-    
+    guard location.timestamp != previousElevation.timestamp else { return false }
+
     let distanceChange = location.distance(from: previousElevation)
     if distanceChange >= appSettings.maximumTripElevationDistance {
-      DokoLogging.shared.postLoggingResponse(.coreLocation("ElevationChange.distance(\(String(format: "%.1f", distanceChange)))"), debugPacket: false)
+      DokoLogging.shared.postLoggingResponse(.coreLocation("ElevationChange.distance(\(String(format: "%.0f", distanceChange)))"), debugPacket: false)
       return true
     }
     
