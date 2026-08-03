@@ -145,7 +145,7 @@ public struct EditChargeFormView: View {
       durationMinutes = ((totalSeconds % 3600) / 60 / 5) * 5
       let displayOdometer = Measurement(value: model.charge.odometer, unit: UnitLength.kilometers)
         .converted(to: appSettings.metric ? .kilometers : .miles)
-      odometerText = String(format: "%.0f", displayOdometer.value)
+      odometerText = String(format: "%.1f", displayOdometer.value)
       energyText = model.charge.energy.map { String(format: "%.1f", $0) } ?? ""
       socEndText = model.charge.stateOfChargeEnd.map { String(Int($0)) } ?? ""
     }
