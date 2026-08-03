@@ -126,7 +126,7 @@ final class TripEfficiencyChartModel {
   var efficiencyAxisFormat: String {
     switch efficiencyUnit {
     case .kmPerKWh, .milesPerKWh: return "%.1f"
-    case .kWhPer100km: return "%.1f"
+    case .kWhPer100km: return "%.0f"
     }
   }
 
