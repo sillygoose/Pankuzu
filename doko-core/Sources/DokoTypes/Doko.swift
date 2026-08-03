@@ -40,9 +40,9 @@ public struct DokoCurrentWeather: Equatable, Hashable, Codable, Sendable {
     conditionSymbol: String
   ) {
     self.timestamp = timestamp
-    self.temperature = temperature
-    self.windSpeed = windSpeed
-    self.windGust = windGust
+    self.temperature = (temperature * 10).rounded() / 10
+    self.windSpeed =  (windSpeed * 10).rounded() / 10
+    self.windGust =  windGust.map { ($0 * 10).rounded() / 10 }
     self.windDirection = windDirection
     self.windCompassDirection = windCompassDirection
     self.conditionSymbol = conditionSymbol
@@ -59,35 +59,15 @@ public struct DokoPosition: Equatable, Hashable, Codable, Sendable {
   public let horizontalAccuracy: Double?
   public let verticalAccuracy: Double?
 
-  public init(
-    timestamp: Date,
-    latitude: Double,
-    longitude: Double,
-    elevation: Double,
-    course: Double? = nil,
-    speed: Double? = nil,
-    horizontalAccuracy: Double? = nil,
-    verticalAccuracy: Double? = nil
-  ) {
-    self.timestamp = timestamp
-    self.latitude = latitude
-    self.longitude = longitude
-    self.elevation = elevation
-    self.course = course
-    self.speed = speed
-    self.horizontalAccuracy = horizontalAccuracy
-    self.verticalAccuracy = verticalAccuracy
-  }
-
   public init(position: CLLocation) {
     self.timestamp = position.timestamp
-    self.latitude = position.coordinate.latitude
-    self.longitude = position.coordinate.longitude
-    self.elevation = position.altitude
-    self.course = position.course < 0 ? nil : Double(position.course)
-    self.speed = position.speed < 0 ? nil : Double(position.speed) * 3.6
-    self.horizontalAccuracy = nil
-    self.verticalAccuracy = nil
+    self.latitude = (position.coordinate.latitude * 1_000_000).rounded() / 1_000_000
+    self.longitude = (position.coordinate.longitude * 1_000_000).rounded() / 1_000_000
+    self.elevation = (position.altitude * 10).rounded() / 10
+    self.course = position.course < 0 ? nil : position.course.rounded()
+    self.speed = position.speed < 0 ? nil : (position.speed * 3.6).rounded()
+    self.horizontalAccuracy = nil // horizontalAccuracy.flatMap { $0 < 0 ? nil : $0.rounded() }
+    self.verticalAccuracy = nil   // verticalAccuracy.flatMap { $0 < 0 ? nil : $0.rounded() }
   }
 }
 

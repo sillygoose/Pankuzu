@@ -226,15 +226,62 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
     self.batteryTemp = batteryTemp
   }
   
+  private enum CodingKeys: String, CodingKey {
+    case tripID = "tid"
+    case odometer = "od"
+    case stateOfCharge = "soc"
+    case batteryEnergy = "be"
+    case energyToEmpty = "ete"
+    case distanceToEmpty = "dte"
+    case batteryTemp = "bt"
+  }
+
+  private enum LegacyCodingKeys: String, CodingKey {
+    case tripID, odometer, stateOfCharge, batteryEnergy, energyToEmpty, distanceToEmpty, batteryTemp
+  }
+
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    tripID = try container.decode(Trip.ID.self, forKey: .tripID)
-    odometer = try container.decodeIfPresent([DokoDataPoint].self, forKey: .odometer) ?? []
-    stateOfCharge = try container.decodeIfPresent([DokoDataPoint].self, forKey: .stateOfCharge) ?? []
-    batteryEnergy = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryEnergy) ?? []
-    energyToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .energyToEmpty) ?? []
-    distanceToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .distanceToEmpty) ?? []
-    batteryTemp = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryTemp) ?? []
+    if container.contains(.tripID) {
+      tripID = try container.decode(Trip.ID.self, forKey: .tripID)
+      odometer = try container.decodeIfPresent([DokoDataPoint].self, forKey: .odometer) ?? []
+      stateOfCharge = try container.decodeIfPresent([DokoDataPoint].self, forKey: .stateOfCharge) ?? []
+      batteryEnergy = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryEnergy) ?? []
+      energyToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .energyToEmpty) ?? []
+      distanceToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .distanceToEmpty) ?? []
+      batteryTemp = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryTemp) ?? []
+    } else {
+      let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
+      tripID = try legacy.decode(Trip.ID.self, forKey: .tripID)
+      odometer = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .odometer) ?? []
+      stateOfCharge = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .stateOfCharge) ?? []
+      batteryEnergy = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .batteryEnergy) ?? []
+      energyToEmpty = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .energyToEmpty) ?? []
+      distanceToEmpty = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .distanceToEmpty) ?? []
+      batteryTemp = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .batteryTemp) ?? []
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    if (encoder.userInfo[.useLegacyKeys] as? Bool) == true {
+      var container = encoder.container(keyedBy: LegacyCodingKeys.self)
+      try container.encode(tripID, forKey: .tripID)
+      try container.encode(odometer, forKey: .odometer)
+      try container.encode(stateOfCharge, forKey: .stateOfCharge)
+      try container.encode(batteryEnergy, forKey: .batteryEnergy)
+      try container.encode(energyToEmpty, forKey: .energyToEmpty)
+      try container.encode(distanceToEmpty, forKey: .distanceToEmpty)
+      try container.encode(batteryTemp, forKey: .batteryTemp)
+    } else {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(tripID, forKey: .tripID)
+      try container.encode(odometer, forKey: .odometer)
+      try container.encode(stateOfCharge, forKey: .stateOfCharge)
+      try container.encode(batteryEnergy, forKey: .batteryEnergy)
+      try container.encode(energyToEmpty, forKey: .energyToEmpty)
+      try container.encode(distanceToEmpty, forKey: .distanceToEmpty)
+      try container.encode(batteryTemp, forKey: .batteryTemp)
+    }
   }
 }
 

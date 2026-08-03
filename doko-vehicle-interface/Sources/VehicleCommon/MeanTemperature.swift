@@ -17,7 +17,7 @@ public struct MeanTemperature: Sendable {
   public mutating func updateMeanTemperature(with newTemperature: Double) -> Double {
     total += newTemperature
     samples += 1
-    mean = total / Double(samples)
+    mean =  (total / Double(samples) * 10).rounded() / 10
     return mean ?? 0
   }
 }

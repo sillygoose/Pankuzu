@@ -189,15 +189,66 @@ public struct ChargeHistory: Hashable, Identifiable, Codable, Sendable {
     self.distanceToEmpty = distanceToEmpty
   }
 
+  private enum CodingKeys: String, CodingKey {
+    case chargeID = "cid"
+    case batteryPower = "bp"
+    case stateOfCharge = "soc"
+    case batteryEnergy = "be"
+    case energyToEmpty = "ete"
+    case batteryTemp = "bt"
+    case couplerTemp = "ct"
+    case distanceToEmpty = "dte"
+  }
+
+  private enum LegacyCodingKeys: String, CodingKey {
+    case chargeID, batteryPower, stateOfCharge, batteryEnergy, energyToEmpty, batteryTemp, couplerTemp, distanceToEmpty
+  }
+
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    chargeID = try container.decode(Charge.ID.self, forKey: .chargeID)
-    batteryPower = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryPower) ?? []
-    stateOfCharge = try container.decodeIfPresent([DokoDataPoint].self, forKey: .stateOfCharge) ?? []
-    batteryEnergy = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryEnergy) ?? []
-    energyToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .energyToEmpty) ?? []
-    batteryTemp = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryTemp) ?? []
-    couplerTemp = try container.decodeIfPresent([DokoDataPoint].self, forKey: .couplerTemp) ?? []
-    distanceToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .distanceToEmpty) ?? []
+    if container.contains(.chargeID) {
+      chargeID = try container.decode(Charge.ID.self, forKey: .chargeID)
+      batteryPower = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryPower) ?? []
+      stateOfCharge = try container.decodeIfPresent([DokoDataPoint].self, forKey: .stateOfCharge) ?? []
+      batteryEnergy = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryEnergy) ?? []
+      energyToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .energyToEmpty) ?? []
+      batteryTemp = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryTemp) ?? []
+      couplerTemp = try container.decodeIfPresent([DokoDataPoint].self, forKey: .couplerTemp) ?? []
+      distanceToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .distanceToEmpty) ?? []
+    } else {
+      let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
+      chargeID = try legacy.decode(Charge.ID.self, forKey: .chargeID)
+      batteryPower = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .batteryPower) ?? []
+      stateOfCharge = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .stateOfCharge) ?? []
+      batteryEnergy = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .batteryEnergy) ?? []
+      energyToEmpty = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .energyToEmpty) ?? []
+      batteryTemp = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .batteryTemp) ?? []
+      couplerTemp = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .couplerTemp) ?? []
+      distanceToEmpty = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .distanceToEmpty) ?? []
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    if (encoder.userInfo[.useLegacyKeys] as? Bool) == true {
+      var container = encoder.container(keyedBy: LegacyCodingKeys.self)
+      try container.encode(chargeID, forKey: .chargeID)
+      try container.encode(batteryPower, forKey: .batteryPower)
+      try container.encode(stateOfCharge, forKey: .stateOfCharge)
+      try container.encode(batteryEnergy, forKey: .batteryEnergy)
+      try container.encode(energyToEmpty, forKey: .energyToEmpty)
+      try container.encode(batteryTemp, forKey: .batteryTemp)
+      try container.encode(couplerTemp, forKey: .couplerTemp)
+      try container.encode(distanceToEmpty, forKey: .distanceToEmpty)
+    } else {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(chargeID, forKey: .chargeID)
+      try container.encode(batteryPower, forKey: .batteryPower)
+      try container.encode(stateOfCharge, forKey: .stateOfCharge)
+      try container.encode(batteryEnergy, forKey: .batteryEnergy)
+      try container.encode(energyToEmpty, forKey: .energyToEmpty)
+      try container.encode(batteryTemp, forKey: .batteryTemp)
+      try container.encode(couplerTemp, forKey: .couplerTemp)
+      try container.encode(distanceToEmpty, forKey: .distanceToEmpty)
+    }
   }
 }

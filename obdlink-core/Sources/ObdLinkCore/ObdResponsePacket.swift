@@ -117,67 +117,67 @@ extension ObdResponsePacket {
   
   public var odometer: Double? {
     guard case let .odometer(v)? = responses[.odometer]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
 
   public var speed: Double? {
     guard case let .speed(v)? = responses[.speed]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
 
   public var batteryStateOfCharge: Double? {
     guard case let .batteryStateOfCharge(v)? = responses[.batteryStateOfCharge]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
   
   public var batteryEnergyToEmpty: Double? {
     guard case let .batteryEnergyToEmpty(v)? = responses[.batteryEnergyToEmpty]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
   
   public var batteryStateOfHealth: Double? {
     guard case let .batteryStateOfHealth(v)? = responses[.batteryStateOfHealth]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
 
   public var batteryOriginalCapacity: Double? {
     guard case let .batteryOriginalCapacity(v)? = responses[.batteryOriginalCapacity]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var batteryCurrentCapacity: Double? {
     guard case let .batteryCurrentCapacity(v)? = responses[.batteryCurrentCapacity]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var batteryVoltage: Double? {
     guard case let .batteryVoltage(v)? = responses[.batteryVoltage]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var batteryCurrent: Double? {
     guard case let .batteryCurrent(v)? = responses[.batteryCurrent]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
   
   public var batteryChargeVoltageRequested: Double? {
     guard case let .batteryChargeVoltageRequested(v)? = responses[.batteryChargeVoltageRequested]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
 
   public var batteryChargeCurrentRequested: Double? {
     guard case let .batteryChargeCurrentRequested(v)? = responses[.batteryChargeCurrentRequested]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
   
   public var batteryDistanceToEmpty: Double? {
     guard case let .batteryDistanceToEmpty(v)? = responses[.batteryDistanceToEmpty]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
   
   public var batteryTemperature: Double? {
     guard case let .batteryTemperature(v)? = responses[.batteryTemperature]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
   
   public var acChargerStatus: Bool? {
@@ -187,27 +187,27 @@ extension ObdResponsePacket {
   
   public var acChargerCouplerTemperature: Double? {
     guard case let .acChargerCouplerTemperature(v)? = responses[.acChargerCouplerTemperature]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
   
   public var chargerInputVoltage: Double? {
     guard case let .chargerInputVoltage(v)? = responses[.chargerInputVoltage]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
   
   public var chargerInputCurrent: Double? {
     guard case let .chargerInputCurrent(v)? = responses[.chargerInputCurrent]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
   
   public var chargerOutputVoltage: Double? {
     guard case let .chargerOutputVoltage(v)? = responses[.chargerOutputVoltage]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
   
   public var chargerOutputCurrent: Double? {
     guard case let .chargerOutputCurrent(v)? = responses[.chargerOutputCurrent]?.response else { return nil }
-    return v
+    return (v * 1_000).rounded() / 1_000
   }
   
   public var dcChargerStatus: Bool? {
@@ -217,12 +217,12 @@ extension ObdResponsePacket {
   
   public var dcChargerCouplerTemperature1: Double? {
     guard case let .dcChargerCouplerTemperature1(v)? = responses[.dcChargerCouplerTemperature1]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
   
   public var dcChargerCouplerTemperature3: Double? {
     guard case let .dcChargerCouplerTemperature3(v)? = responses[.dcChargerCouplerTemperature3]?.response else { return nil }
-    return v
+    return (v * 10).rounded() / 10
   }
 
   public var position: DokoPosition? {

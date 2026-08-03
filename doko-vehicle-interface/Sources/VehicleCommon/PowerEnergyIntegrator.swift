@@ -5,7 +5,9 @@ public struct PowerEnergyIntegrator: Sendable {
   public private(set) var current: Double?
   public private(set) var power: Double?
   public private(set) var peakPower: Double = 0
-  public private(set) var energy: Double?
+  public var energy: Double? { rawEnergy.map { ($0 * 1_000).rounded() / 1_000 } }
+
+  private var rawEnergy: Double?
   private var previousPower: Double?
   private var previousUpdate: Date?
 
@@ -16,18 +18,19 @@ public struct PowerEnergyIntegrator: Sendable {
     current = nil
     power = nil
     peakPower = 0
-    energy = nil
+    rawEnergy = nil
     previousPower = nil
     previousUpdate = nil
   }
 
   @discardableResult
   public mutating func integrate(power newPower: Double, at date: Date) -> Double? {
-    power = newPower
-    peakPower = max(peakPower, newPower)
-    if let lastTime = previousUpdate, let lastPower = previousPower {
-      let deltaHours = date.timeIntervalSince(lastTime) / 3600.0
-      energy = (energy ?? 0) + (lastPower + newPower) / 2.0 * deltaHours
+    let roundedPower = (newPower * 1_000).rounded() / 1_000
+    power = roundedPower
+    peakPower = max(peakPower, roundedPower)
+    if let previousUpdate, let previousPower {
+      let deltaHours = date.timeIntervalSince(previousUpdate) / 3600.0
+      rawEnergy = (rawEnergy ?? 0) + (previousPower + newPower) / 2.0 * deltaHours
     }
     previousPower = newPower
     previousUpdate = date
