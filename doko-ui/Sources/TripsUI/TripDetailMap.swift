@@ -120,8 +120,28 @@ public struct TripDetailMapView: View {
           )
         )
         .tint(.cyan)
-
-        if appSettings.tripMapPolyline {
+        
+        if appSettings.showPositionOnPath || appSettings.showElevationOnPath {
+          if appSettings.showPositionOnPath {
+            ForEach(Array(model.tripPath.enumerated()), id: \.offset) { _, coord in
+              Annotation("", coordinate: coord) {
+                Circle()
+                  .fill(Color.blue)
+                  .frame(width: 6, height: 6)
+              }
+            }
+          }
+          
+          if appSettings.showElevationOnPath {
+            ForEach(Array(model.elevationPath.enumerated()), id: \.offset) { _, coord in
+              Annotation("", coordinate: coord) {
+                Circle()
+                  .fill(Color.green)
+                  .frame(width: 6, height: 6)
+              }
+            }
+          }
+        } else {
           MapPolyline(
             MKPolyline(
               coordinates: model.tripPath,
@@ -129,26 +149,6 @@ public struct TripDetailMapView: View {
             )
           )
           .stroke(.blue, lineWidth: appSettings.tripMapStyle == .satellite ? 2 : 3)
-        }
-        
-        if appSettings.showPositionOnPath {
-          ForEach(Array(model.tripPath.enumerated()), id: \.offset) { _, coord in
-            Annotation("", coordinate: coord) {
-              Circle()
-                .fill(Color.blue)
-                .frame(width: 6, height: 6)
-            }
-          }
-        }
-
-        if appSettings.showElevationOnPath {
-          ForEach(Array(model.elevationPath.enumerated()), id: \.offset) { _, coord in
-            Annotation("", coordinate: coord) {
-              Circle()
-                .fill(Color.green)
-                .frame(width: 6, height: 6)
-            }
-          }
         }
       }
       .mapStyle(appSettings.tripMapStyle.mapStyle)
@@ -239,7 +239,6 @@ public struct TripDetailMapView: View {
   }
   let loader = PreviewTripsLoader()
   @Shared(.appSettings) var appSettings
-  $appSettings.tripMapPolyline.withLock { $0 = false }
   $appSettings.showElevationOnPath.withLock { $0 = true }
   let tripID = loader.trips.first?.id ?? Trip.ID()
   return NavigationStack {

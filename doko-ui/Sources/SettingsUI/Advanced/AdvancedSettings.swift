@@ -47,10 +47,6 @@ class AdvancedSettingsModel {
     $appSettings.duplicateLocationThreshold.withLock { $0 = threshold }
   }
 
-  func setTripMapPolylineToggleChanged(isOn: Bool) {
-    $appSettings.tripMapPolyline.withLock { $0 = isOn }
-  }
-
   func setShowPositionOnPathToggleChanged(isOn: Bool) {
     $appSettings.showPositionOnPath.withLock { $0 = isOn }
   }
@@ -222,14 +218,6 @@ struct AdvancedSettingsView: View {
           set: { newValue in $debuggingExpanded.withLock { $0 = newValue } }
         )
       ) {
-        Toggle(
-          "Use polylines for path segments",
-          isOn: Binding(
-            get: { model.appSettings.tripMapPolyline },
-            set: { isOn, _ in model.setTripMapPolylineToggleChanged(isOn: isOn) }
-          )
-        )
-
         Toggle(
           "Show position data on trip path",
           isOn: Binding(
