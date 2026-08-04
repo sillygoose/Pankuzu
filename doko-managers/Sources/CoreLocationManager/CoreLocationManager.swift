@@ -162,7 +162,7 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
         DokoLogging.shared.postLoggingResponse(.coreLocation(".liveUpdatesTask ended"))
       } catch {
         self.logger.error("\(timestamp()) liveUpdate stream error: \(String(describing: error))")
-        DokoLogging.shared.postLoggingResponse(.coreLocation("liveUpdate stream error: \(String(describing: error))"))
+        DokoLogging.shared.postLoggingResponse(.error("liveUpdate stream error: \(String(describing: error))"))
       }
     }
   }
@@ -181,20 +181,23 @@ public final class CoreLocationManager: NSObject, @MainActor CLLocationManagerDe
     DokoLogging.shared.postLoggingResponse(.coreLocation(".stopLocationUpdates"))
   }
 
-//  public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//    guard locationUpdatesEnabled, let location = locations.last else { return }
-//    DokoLogging.shared.postLoggingResponse(.coreLocation("didUpdateLocations(\(String(format: "%.1f, %.1f", location.horizontalAccuracy, location.verticalAccuracy)))"))
-//    Task {
-//      if let accurateHorizontalLocation = await filterHorizontalAccuracy(location) {
-//        await MainActor.run { self._currentPosition = accurateHorizontalLocation }
-//        if packetUpdatesEnabled { await filterPosition(accurateHorizontalLocation) }
-//      }
-//      if let accurateVerticalLocation = await filterVerticalAccuracy(location) {
-//        await MainActor.run { self._currentElevation = accurateVerticalLocation }
-//        if packetUpdatesEnabled { await filterElevation(accurateVerticalLocation) }
-//      }
-//    }
-//  }
+  public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    guard locationUpdatesEnabled, let location = locations.last else { return }
+    DokoLogging.shared.postLoggingResponse(
+      .coreLocation("didUpdateLocations(\(String(format: "e:%.1f, s:%.1f, c:%.0f", location.altitude, location.speed, location.course)))"),
+      debugPacket: true
+    )
+    Task {
+      if let accurateHorizontalLocation = await filterHorizontalAccuracy(location) {
+        await MainActor.run { self._currentPosition = accurateHorizontalLocation }
+        if packetUpdatesEnabled { await filterPosition(accurateHorizontalLocation) }
+      }
+      if let accurateVerticalLocation = await filterVerticalAccuracy(location) {
+        await MainActor.run { self._currentElevation = accurateVerticalLocation }
+        if packetUpdatesEnabled { await filterElevation(accurateVerticalLocation) }
+      }
+    }
+  }
 
   public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
     logger.error("\(timestamp()) CLM.locationManager( error:\(String(describing: error)))")
