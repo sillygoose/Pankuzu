@@ -212,11 +212,11 @@ private struct EfficiencyChartView: View, DokoLiveActivityFonts {
     let yMax: Double = {
       switch targetUnit {
       case .kilometersPerKilowattHour:
-        return 40
-      case .kilowattHoursPer100Kilometers:
-        return 20
-      case .milesPerKilowattHour:
         return 10
+      case .kilowattHoursPer100Kilometers:
+        return 40
+      case .milesPerKilowattHour:
+        return 5
       default:
         return 10
       }
@@ -235,6 +235,19 @@ private struct EfficiencyChartView: View, DokoLiveActivityFonts {
           // treat it as off-the-chart efficient rather than converting it (kWh/100km is a reciprocal unit,
           // so converting a negative raw value wouldn't reliably land above yMax).
           let displayValue = point.efficiency < 0 ? yMax : min(converted.value, yMax)
+          AreaMark(
+            x: .value("Time", point.timestamp),
+            y: .value("Efficiency", displayValue)
+          )
+          .interpolationMethod(.catmullRom)
+          .foregroundStyle(
+            LinearGradient(
+              colors: [Color.green.opacity(0.5), Color.green.opacity(0)],
+              startPoint: .top,
+              endPoint: .bottom
+            )
+          )
+
           LineMark(
             x: .value("Time", point.timestamp),
             y: .value("Efficiency", displayValue)

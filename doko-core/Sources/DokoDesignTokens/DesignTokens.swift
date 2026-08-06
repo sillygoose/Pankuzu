@@ -81,9 +81,9 @@ public enum DesignTokens {
   }
 
   public enum LineWidth {
-    public static let mlaThinLine: CGFloat = 2
-    public static let mlaLine: CGFloat = 3
-    public static let mlaThickLine: CGFloat = 4
+    public static let mlaThinLine: CGFloat = 0.75
+    public static let mlaLine: CGFloat = 1.5
+    public static let mlaThickLine: CGFloat = 2.5
 
     public static let slaThinLine: CGFloat = 0.5
     public static let slaLine: CGFloat = 1.0

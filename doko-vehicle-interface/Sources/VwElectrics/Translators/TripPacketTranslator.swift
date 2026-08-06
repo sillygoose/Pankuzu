@@ -183,8 +183,8 @@ extension VwElectrics {
     dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: dokoCommand, response: .batteryStateOfCharge(batteryStateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: dokoCommand, response: .batteryTemperature(batteryTemperature))
 
-    let efficieency = vehicleEfficiency.updateEfficiency(distance, -(hvBatteryEnergy.energy ?? 0))
-    dokoResponses[.tripEfficiency] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency(efficieency))
+    vehicleEfficiency.updateEfficiency(distance, abs(hvBatteryEnergy.energy ?? 0))
+    dokoResponses[.tripEfficiency] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency(vehicleEfficiency.efficiency))
     if let efficiency5min = vehicleEfficiency.efficiency5min {
       dokoResponses[.tripEfficiency5Minute] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency5Minute(efficiency5min))
     }
