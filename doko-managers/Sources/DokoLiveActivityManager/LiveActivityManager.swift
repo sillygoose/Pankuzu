@@ -474,11 +474,7 @@ public final class LiveActivityManager {
         efficiency: tripEnd.tripEfficiency,
         rangeConsumed: tripEnd.batteryDistanceToEmpty.map { $0 },
       )
-      await activity.update(ActivityContent(state: state, staleDate: now.addingTimeInterval(endActivityStaleDate)))
-      Task {
-        try? await Task.sleep(for: .seconds(endActivityStaleDate))
-        await activity.end(ActivityContent(state: state, staleDate: nil), dismissalPolicy: .after(now))
-      }
+      await activity.end(ActivityContent(state: state, staleDate: nil), dismissalPolicy: .immediate)
     }
     DokoLogging.shared.postLoggingResponse(.liveActivity(".endTrip"))
   }

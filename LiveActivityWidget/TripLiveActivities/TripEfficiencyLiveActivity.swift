@@ -18,7 +18,8 @@ struct TripEfficiencyLiveActivity: View, DokoLiveActivityFonts {
       case .active:
         ActiveView(context: context)
       case .ended:
-        EndedView(context: context)
+        EmptyView()
+//        EndedView(context: context)
       }
     }
     .widgetURL(URL(string: "pankuzu://trip")!)
@@ -92,108 +93,108 @@ struct TripEfficiencyLiveActivity: View, DokoLiveActivityFonts {
     }
   }
   
-  private struct EndedView : View, DokoLiveActivityFonts {
-    let context: ActivityViewContext<TripEfficiencyActivityAttributes>
-    
-    @Environment(\.activityFamily) var activityFamily
-    
-    @Shared(.appSettings) var appSettings
-    
-    var body: some View {
-      let duration = context.state.duration
-      let distance = context.state.distance
-      let energy = context.state.energy
-      let efficiency = context.state.efficiency
-      
-      HStack(alignment: .center) {
-        VStack {
-          HStack {
-            Text("Trip Completed")
-              .foregroundStyle(DesignTokens.Color.primary)
-              .font(laSubtitle)
-            Spacer()
-          }
-          .padding(.bottom, 2)
-          
-          HStack {
-            Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
-              GridRow(alignment: .lastTextBaseline) {
-                Image(systemName: "clock")
-                  .font(laSymbol)
-                  .gridColumnAlignment(.leading)
-                  .padding(.trailing, laSymbolSpacing)
-                Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
-                  .font(laValue.monospacedDigit())
-                  .gridColumnAlignment(.trailing)
-              }
-              .foregroundStyle(DesignTokens.Color.duration)
-              
-              GridRow(alignment: .lastTextBaseline) {
-                let distance = Measurement(value: distance, unit: UnitLength.kilometers)
-                  .converted(to: appSettings.metric ? .kilometers : .miles)
-                Image(systemName: "road.lanes")
-                  .font(laSymbol)
-                  .gridColumnAlignment(.leading)
-                  .padding(.trailing, laSymbolSpacing)
-                Text(String(format: "%5.1f", distance.value))
-                  .font(laValue.monospacedDigit())
-                  .gridColumnAlignment(.trailing)
-                Text(distance.unit.symbol)
-                  .font(laUnit)
-                  .gridColumnAlignment(.leading)
-              }
-              .foregroundStyle(DesignTokens.Color.distance)
-            }
-            
-            Spacer()
-            
-            Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
-              if let energy {
-                let tripEnergy = Measurement(value: -energy, unit: UnitEnergy.kilowattHours)
-                GridRow(alignment: .lastTextBaseline) {
-                  Image(systemName: "bolt.circle.fill")
-                    .font(laSymbol)
-                    .gridColumnAlignment(.leading)
-                    .padding(.trailing, laSymbolSpacing)
-                  Text(String(format: "%.1f", tripEnergy.value))
-                    .font(laValue.monospacedDigit())
-                    .gridColumnAlignment(.trailing)
-                  Text(tripEnergy.unit.symbol)
-                    .font(laUnit)
-                    .gridColumnAlignment(.leading)
-                }
-                .foregroundStyle(DesignTokens.Color.energy)
-              }
-              
-              if let efficiency {
-                let targetUnit: UnitEnergyEfficiency = appSettings.metric
-                ? (appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour)
-                : .milesPerKilowattHour
-                let efficiencyFormat = targetUnit == .kilowattHoursPer100Kilometers ? "%5.1f" : "%5.2f"
-                
-                let tripEfficiency = Measurement(value: efficiency, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
-                  .converted(to: targetUnit)
-                GridRow(alignment: .lastTextBaseline) {
-                  Image(systemName: "ev.charger")
-                    .font(laSymbol)
-                    .gridColumnAlignment(.leading)
-                    .padding(.trailing, laSymbolSpacing)
-                  Text(String(format: efficiencyFormat, tripEfficiency.value))
-                    .font(laValue.monospacedDigit())
-                    .gridColumnAlignment(.trailing)
-                  Text(tripEfficiency.unit.symbol)
-                    .font(laUnit)
-                    .gridColumnAlignment(.leading)
-                }
-                .foregroundStyle(DesignTokens.Color.efficiency)
-              }
-            }
-          }
-        }
-      }
-      .padding()
-    }
-  }
+//  private struct EndedView : View, DokoLiveActivityFonts {
+//    let context: ActivityViewContext<TripEfficiencyActivityAttributes>
+//    
+//    @Environment(\.activityFamily) var activityFamily
+//    
+//    @Shared(.appSettings) var appSettings
+//    
+//    var body: some View {
+//      let duration = context.state.duration
+//      let distance = context.state.distance
+//      let energy = context.state.energy
+//      let efficiency = context.state.efficiency
+//      
+//      HStack(alignment: .center) {
+//        VStack {
+//          HStack {
+//            Text("Trip Completed")
+//              .foregroundStyle(DesignTokens.Color.primary)
+//              .font(laSubtitle)
+//            Spacer()
+//          }
+//          .padding(.bottom, 2)
+//          
+//          HStack {
+//            Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
+//              GridRow(alignment: .lastTextBaseline) {
+//                Image(systemName: "clock")
+//                  .font(laSymbol)
+//                  .gridColumnAlignment(.leading)
+//                  .padding(.trailing, laSymbolSpacing)
+//                Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
+//                  .font(laValue.monospacedDigit())
+//                  .gridColumnAlignment(.trailing)
+//              }
+//              .foregroundStyle(DesignTokens.Color.duration)
+//              
+//              GridRow(alignment: .lastTextBaseline) {
+//                let distance = Measurement(value: distance, unit: UnitLength.kilometers)
+//                  .converted(to: appSettings.metric ? .kilometers : .miles)
+//                Image(systemName: "road.lanes")
+//                  .font(laSymbol)
+//                  .gridColumnAlignment(.leading)
+//                  .padding(.trailing, laSymbolSpacing)
+//                Text(String(format: "%5.1f", distance.value))
+//                  .font(laValue.monospacedDigit())
+//                  .gridColumnAlignment(.trailing)
+//                Text(distance.unit.symbol)
+//                  .font(laUnit)
+//                  .gridColumnAlignment(.leading)
+//              }
+//              .foregroundStyle(DesignTokens.Color.distance)
+//            }
+//            
+//            Spacer()
+//            
+//            Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
+//              if let energy {
+//                let tripEnergy = Measurement(value: -energy, unit: UnitEnergy.kilowattHours)
+//                GridRow(alignment: .lastTextBaseline) {
+//                  Image(systemName: "bolt.circle.fill")
+//                    .font(laSymbol)
+//                    .gridColumnAlignment(.leading)
+//                    .padding(.trailing, laSymbolSpacing)
+//                  Text(String(format: "%.1f", tripEnergy.value))
+//                    .font(laValue.monospacedDigit())
+//                    .gridColumnAlignment(.trailing)
+//                  Text(tripEnergy.unit.symbol)
+//                    .font(laUnit)
+//                    .gridColumnAlignment(.leading)
+//                }
+//                .foregroundStyle(DesignTokens.Color.energy)
+//              }
+//              
+//              if let efficiency {
+//                let targetUnit: UnitEnergyEfficiency = appSettings.metric
+//                ? (appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour)
+//                : .milesPerKilowattHour
+//                let efficiencyFormat = targetUnit == .kilowattHoursPer100Kilometers ? "%5.1f" : "%5.2f"
+//                
+//                let tripEfficiency = Measurement(value: efficiency, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
+//                  .converted(to: targetUnit)
+//                GridRow(alignment: .lastTextBaseline) {
+//                  Image(systemName: "ev.charger")
+//                    .font(laSymbol)
+//                    .gridColumnAlignment(.leading)
+//                    .padding(.trailing, laSymbolSpacing)
+//                  Text(String(format: efficiencyFormat, tripEfficiency.value))
+//                    .font(laValue.monospacedDigit())
+//                    .gridColumnAlignment(.trailing)
+//                  Text(tripEfficiency.unit.symbol)
+//                    .font(laUnit)
+//                    .gridColumnAlignment(.leading)
+//                }
+//                .foregroundStyle(DesignTokens.Color.efficiency)
+//              }
+//            }
+//          }
+//        }
+//      }
+//      .padding()
+//    }
+//  }
 }
 
 private struct EfficiencyChartView: View, DokoLiveActivityFonts {
