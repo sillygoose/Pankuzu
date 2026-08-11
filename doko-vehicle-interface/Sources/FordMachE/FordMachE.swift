@@ -138,6 +138,17 @@ public actor FordMachE: ConnectedVehicleInterface {
         .batteryStateOfHealth;
       }
 
+    case .tripOdometer:
+      return obdCommandPacket(packetType) {
+        .odometer;
+      }
+
+    case .tripEnergy:
+      return obdCommandPacket(packetType) {
+        .batteryVoltage;
+        .batteryCurrent;
+      }
+
     case .tripData:
       return obdCommandPacket(packetType) {
         .odometer;
@@ -187,12 +198,6 @@ public actor FordMachE: ConnectedVehicleInterface {
         .batteryEnergyToEmpty;
         .batteryTemperature;
         packetType == .acChargeHistory ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
-      }
-
-    case .tripEnergy:
-      return obdCommandPacket(packetType) {
-        .batteryVoltage;
-        .batteryCurrent;
       }
 
     case .acChargeEnergy:

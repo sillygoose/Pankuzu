@@ -134,6 +134,12 @@ public actor FordElectrics: ConnectedVehicleInterface {
         .batteryStateOfHealth;
       }
 
+    case .tripOdometer:
+      return obdCommandPacket(packetType) {
+        .odometer;
+        .position;
+      }
+
     case .tripData:
       return obdCommandPacket(packetType) {
         .odometer;
@@ -190,7 +196,7 @@ public actor FordElectrics: ConnectedVehicleInterface {
         .batteryVoltage;
         .batteryCurrent;
       }
-
+      
     case .acChargeEnergy:
       return obdCommandPacket(packetType) {
         .batteryVoltage;

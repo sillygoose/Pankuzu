@@ -115,7 +115,7 @@ public enum DokoPacketType: Equatable, Hashable, Sendable {
   case vehicleCustomization
   case idle
 
-  case tripStarting, tripInProgress, tripEnergy, tripUpdate, tripEnding
+  case tripStarting, tripInProgress, tripOdometer, tripEnergy, tripUpdate, tripEnding
   case tripCorePosition, tripCoreElevation, tripData, tripWeather
 
   case acChargeStarting, acChargeInProgress, acChargeEnergy, acChargeUpdate, acChargeEnding
@@ -137,6 +137,8 @@ public enum DokoPacketType: Equatable, Hashable, Sendable {
       ".tripStarting"
     case .tripInProgress:
       ".tripIP"
+    case .tripOdometer:
+      ".tripOdometer"
     case .tripEnergy:
       ".tripEnergy"
     case .tripUpdate:

@@ -135,6 +135,18 @@ public actor VwElectrics: ConnectedVehicleInterface {
         canbusExtendedAddressing;
       }
 
+    case .tripOdometer:
+      return obdCommandPacket(packetType) {
+        .odometer;
+        .position;
+      }
+
+    case .tripEnergy:
+      return obdCommandPacket(packetType) {
+        .batteryVoltage;
+        .batteryCurrent;
+      }
+
     case .tripData:
       return obdCommandPacket(.tripData) {
         .odometer;
@@ -199,7 +211,13 @@ public actor VwElectrics: ConnectedVehicleInterface {
         canbusExtendedAddressing;
       }
 
-    case .tripEnergy, .acChargeEnergy, .dcChargeEnergy:
+    case .acChargeEnergy:
+      return obdCommandPacket(packetType) {
+        .batteryVoltage;
+        .batteryCurrent;
+      }
+
+    case .dcChargeEnergy:
       return obdCommandPacket(packetType) {
         .batteryVoltage;
         .batteryCurrent;

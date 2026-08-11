@@ -40,6 +40,7 @@ extension VwElectrics {
   ]
   private static let tripInProgressDokoCommandSchedule: StateEngineDokoSchedule = [
     StateEngineDokoCommandPacket(schedulerType: .delaysThenFires(2),   packetType: .tripInProgress),
+    StateEngineDokoCommandPacket(schedulerType: .delaysThenFires(3),   packetType: .tripOdometer),
     StateEngineDokoCommandPacket(schedulerType: .delaysThenFires(2),   packetType: .tripEnergy),
     StateEngineDokoCommandPacket(schedulerType: .delaysThenFires(10),  packetType: .tripUpdate),
     StateEngineDokoCommandPacket(schedulerType: .delaysThenFires(10),  packetType: .tripData),

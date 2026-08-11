@@ -19,7 +19,6 @@ struct TripEfficiencyLiveActivity: View, DokoLiveActivityFonts {
         ActiveView(context: context)
       case .ended:
         EmptyView()
-//        EndedView(context: context)
       }
     }
     .widgetURL(URL(string: "pankuzu://trip")!)
@@ -92,109 +91,6 @@ struct TripEfficiencyLiveActivity: View, DokoLiveActivityFonts {
       .padding()
     }
   }
-  
-//  private struct EndedView : View, DokoLiveActivityFonts {
-//    let context: ActivityViewContext<TripEfficiencyActivityAttributes>
-//    
-//    @Environment(\.activityFamily) var activityFamily
-//    
-//    @Shared(.appSettings) var appSettings
-//    
-//    var body: some View {
-//      let duration = context.state.duration
-//      let distance = context.state.distance
-//      let energy = context.state.energy
-//      let efficiency = context.state.efficiency
-//      
-//      HStack(alignment: .center) {
-//        VStack {
-//          HStack {
-//            Text("Trip Completed")
-//              .foregroundStyle(DesignTokens.Color.primary)
-//              .font(laSubtitle)
-//            Spacer()
-//          }
-//          .padding(.bottom, 2)
-//          
-//          HStack {
-//            Grid(alignment: .leading, horizontalSpacing: 4, verticalSpacing: 2) {
-//              GridRow(alignment: .lastTextBaseline) {
-//                Image(systemName: "clock")
-//                  .font(laSymbol)
-//                  .gridColumnAlignment(.leading)
-//                  .padding(.trailing, laSymbolSpacing)
-//                Text(duration.formatted(.time(pattern: .hourMinute(padHourToLength: 1))))
-//                  .font(laValue.monospacedDigit())
-//                  .gridColumnAlignment(.trailing)
-//              }
-//              .foregroundStyle(DesignTokens.Color.duration)
-//              
-//              GridRow(alignment: .lastTextBaseline) {
-//                let distance = Measurement(value: distance, unit: UnitLength.kilometers)
-//                  .converted(to: appSettings.metric ? .kilometers : .miles)
-//                Image(systemName: "road.lanes")
-//                  .font(laSymbol)
-//                  .gridColumnAlignment(.leading)
-//                  .padding(.trailing, laSymbolSpacing)
-//                Text(String(format: "%5.1f", distance.value))
-//                  .font(laValue.monospacedDigit())
-//                  .gridColumnAlignment(.trailing)
-//                Text(distance.unit.symbol)
-//                  .font(laUnit)
-//                  .gridColumnAlignment(.leading)
-//              }
-//              .foregroundStyle(DesignTokens.Color.distance)
-//            }
-//            
-//            Spacer()
-//            
-//            Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 2) {
-//              if let energy {
-//                let tripEnergy = Measurement(value: -energy, unit: UnitEnergy.kilowattHours)
-//                GridRow(alignment: .lastTextBaseline) {
-//                  Image(systemName: "bolt.circle.fill")
-//                    .font(laSymbol)
-//                    .gridColumnAlignment(.leading)
-//                    .padding(.trailing, laSymbolSpacing)
-//                  Text(String(format: "%.1f", tripEnergy.value))
-//                    .font(laValue.monospacedDigit())
-//                    .gridColumnAlignment(.trailing)
-//                  Text(tripEnergy.unit.symbol)
-//                    .font(laUnit)
-//                    .gridColumnAlignment(.leading)
-//                }
-//                .foregroundStyle(DesignTokens.Color.energy)
-//              }
-//              
-//              if let efficiency {
-//                let targetUnit: UnitEnergyEfficiency = appSettings.metric
-//                ? (appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour)
-//                : .milesPerKilowattHour
-//                let efficiencyFormat = targetUnit == .kilowattHoursPer100Kilometers ? "%5.1f" : "%5.2f"
-//                
-//                let tripEfficiency = Measurement(value: efficiency, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
-//                  .converted(to: targetUnit)
-//                GridRow(alignment: .lastTextBaseline) {
-//                  Image(systemName: "ev.charger")
-//                    .font(laSymbol)
-//                    .gridColumnAlignment(.leading)
-//                    .padding(.trailing, laSymbolSpacing)
-//                  Text(String(format: efficiencyFormat, tripEfficiency.value))
-//                    .font(laValue.monospacedDigit())
-//                    .gridColumnAlignment(.trailing)
-//                  Text(tripEfficiency.unit.symbol)
-//                    .font(laUnit)
-//                    .gridColumnAlignment(.leading)
-//                }
-//                .foregroundStyle(DesignTokens.Color.efficiency)
-//              }
-//            }
-//          }
-//        }
-//      }
-//      .padding()
-//    }
-//  }
 }
 
 private struct EfficiencyChartView: View, DokoLiveActivityFonts {
@@ -213,11 +109,11 @@ private struct EfficiencyChartView: View, DokoLiveActivityFonts {
     let yMax: Double = {
       switch targetUnit {
       case .kilometersPerKilowattHour:
-        return 10
+        return 7
       case .kilowattHoursPer100Kilometers:
-        return 40
+        return 50
       case .milesPerKilowattHour:
-        return 5
+        return 4
       default:
         return 10
       }
@@ -235,7 +131,17 @@ private struct EfficiencyChartView: View, DokoLiveActivityFonts {
           // Negative efficiency is a sentinel for net-regen windows (see TripEfficiency.windowEfficiency);
           // treat it as off-the-chart efficient rather than converting it (kWh/100km is a reciprocal unit,
           // so converting a negative raw value wouldn't reliably land above yMax).
-          let displayValue = point.efficiency < 0 ? yMax : min(converted.value, yMax)
+          let displayValue: Double = {
+            switch targetUnit {
+            case .kilometersPerKilowattHour, .milesPerKilowattHour:
+              return point.efficiency < 0 ? yMax : min(converted.value, yMax)
+            case .kilowattHoursPer100Kilometers:
+              return min(converted.value, point.efficiency)
+            default:
+              return point.efficiency < 0 ? yMax : min(converted.value, yMax)
+            }
+          }()
+
           AreaMark(
             x: .value("Time", point.timestamp),
             y: .value("Efficiency", displayValue)

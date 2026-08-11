@@ -17,6 +17,8 @@ extension FordElectrics {
       return tripInProgressResponsePacket(responsePacket)
     case .tripUpdate:
       return await tripUpdateResponsePacket(responsePacket)
+    case .tripOdometer:
+      return tripOdometerResponsePacket(responsePacket)
     case .tripEnergy:
       return tripEnergyResponsePacket(responsePacket)
     case .tripData:

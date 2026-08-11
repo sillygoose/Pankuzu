@@ -21,18 +21,15 @@ extension VwElectrics {
 
     vehicleMeanTemperature.reset()
     hvBatteryEnergy.reset()
-
-    let duration = vehicleDuration.reset()
-    dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(duration))
-
-    let distance = vehicleOdometer.setOdometer(with: odometer)
-    dokoResponses[.odometer] = DokoCommandResponse(command: dokoCommand, response: .odometer(odometer))
-    dokoResponses[.distance] = DokoCommandResponse(command: dokoCommand, response: .odometer(distance))
-
-    let efficiency = vehicleEfficiency.reset()
-    dokoResponses[.tripEfficiency] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency(efficiency))
+    vehicleDuration.reset()
+    vehicleOdometer.resetTripOdometer(with: odometer, and: position)
+    vehicleEfficiency.reset()
 
     dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(.tripInProgress))
+    dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
+    dokoResponses[.odometer] = DokoCommandResponse(command: dokoCommand, response: .odometer(vehicleOdometer.odometer))
+    dokoResponses[.distance] = DokoCommandResponse(command: dokoCommand, response: .distance(vehicleOdometer.distance))
+    dokoResponses[.tripEfficiency] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency(vehicleEfficiency.efficiency))
     dokoResponses[.position] = DokoCommandResponse(command: dokoCommand, response: .position(position))
     dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: dokoCommand, response: .batteryStateOfCharge(batteryStateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: dokoCommand, response: .batteryTemperature(batteryTemperature))
@@ -81,7 +78,7 @@ extension VwElectrics {
     }
 
     vehicleDuration.update()
-    vehicleOdometer.updateOdometer(with: odometer)
+    vehicleOdometer.updateTripOdometer(with: odometer, and: position)
 
     dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(.idle))
     dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
@@ -134,6 +131,26 @@ extension VwElectrics {
     return DokoResponsePacket(type: dokoPacket, responses: responseCache)
   }
 
+  public func tripOdometerResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
+    let dokoPacket: DokoPacketType = .tripOdometer
+    let dokoCommand: DokoCommand = .odometer
+    var dokoResponses: DokoResponseDictionary = [:]
+    guard
+      let odometer = responsePacket.odometer
+    else {
+      dokoResponses[.error] = DokoCommandResponse(command: dokoCommand, response: .error("arguments"))
+      return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
+    }
+
+    vehicleDuration.update()
+    dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
+
+    //###
+    
+    responseCache.merge(dokoResponses) { _, new in new }
+    return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
+  }
+
   func tripEnergyResponsePacket(_ responsePacket: ObdResponsePacket) -> DokoResponsePacket {
     let dokoPacket: DokoPacketType = .tripEnergy
     let dokoCommand: DokoCommand = .tripEnergy
@@ -176,14 +193,12 @@ extension VwElectrics {
     vehicleDuration.update()
     dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
     
-    let distance = vehicleOdometer.updateOdometer(with: odometer)
-    dokoResponses[.odometer] = DokoCommandResponse(command: dokoCommand, response: .odometer(odometer))
-    dokoResponses[.distance] = DokoCommandResponse(command: dokoCommand, response: .distance(distance))
-
+    dokoResponses[.odometer] = DokoCommandResponse(command: dokoCommand, response: .odometer(vehicleOdometer.odometer))
+    dokoResponses[.distance] = DokoCommandResponse(command: dokoCommand, response: .distance(vehicleOdometer.distance))
     dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: dokoCommand, response: .batteryStateOfCharge(batteryStateOfCharge))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: dokoCommand, response: .batteryTemperature(batteryTemperature))
 
-    vehicleEfficiency.updateEfficiency(distance, abs(hvBatteryEnergy.energy ?? 0))
+    vehicleEfficiency.updateEfficiency(vehicleOdometer.distance, abs(hvBatteryEnergy.energy ?? 0))
     dokoResponses[.tripEfficiency] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency(vehicleEfficiency.efficiency))
     if let efficiency5min = vehicleEfficiency.efficiency5min {
       dokoResponses[.tripEfficiency5Minute] = DokoCommandResponse(command: dokoCommand, response: .tripEfficiency5Minute(efficiency5min))

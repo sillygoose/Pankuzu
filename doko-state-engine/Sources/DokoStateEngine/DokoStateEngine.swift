@@ -244,6 +244,12 @@ public final class DokoStateEngine {
               DokoLogging.shared.postLoggingResponse(.error(".tripCoreElevation: \(String(describing: error))"))
             }
 
+          case .tripOdometer:
+            break
+
+          case .tripEnergy:
+            break
+
           case .tripData:
             guard case .tripInProgress = vehicleState else { throw StateEngineError.unexpectedStatePacket(vehicleState, dokoResponsePacket.type) }
             guard let tripID = self.tripInProgress?.id else { throw StateEngineError.missingTripID }
@@ -357,9 +363,6 @@ public final class DokoStateEngine {
               }
             }
             $vehicleState.withLock { $0 = nextState }
-
-          case .tripEnergy:
-            break
 
           case .acChargeEnergy, .dcChargeEnergy:
             break
