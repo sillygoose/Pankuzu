@@ -146,7 +146,7 @@ public struct TripDetailView: View {
       
       let duration: Duration = .seconds(trip.duration)
       let rawOdometer = Measurement(value: trip.odometerStart, unit: UnitLength.kilometers)
-      let rawDistance = Measurement(value: trip.odometerEnd - trip.odometerStart, unit: UnitLength.kilometers)
+      let rawDistance = Measurement(value: trip.distance, unit: UnitLength.kilometers)
       let rawAverageSpeed = Measurement(
         value: duration == .seconds(0) ? 0 : (rawDistance.value / Double(duration.components.seconds)) * 3600,
         unit: UnitSpeed.kilometersPerHour

@@ -22,23 +22,19 @@ extension FordTranslating {
     hvBatteryEnergy.reset()
     chargerInputEnergy.reset()
     chargerOutputEnergy.reset()
-
-    vehicleOdometer.setOdometer(with: odometer)
-    dokoResponses[.odometer] = DokoCommandResponse(command: dokoCommand, response: .odometer(odometer))
-
     vehicleDuration.reset()
-    dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
+    vehicleOdometer.resetOdometer(with: odometer, and: position)
 
     dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(.acChargeInProgress))
+    dokoResponses[.odometer] = DokoCommandResponse(command: dokoCommand, response: .odometer(odometer))
+    dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
     dokoResponses[.position] = DokoCommandResponse(command: dokoCommand, response: .position(position))
     dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergyToEmpty(batteryEnergyToEmpty))
     dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: dokoCommand, response: .batteryStateOfCharge(batteryStateOfCharge))
     dokoResponses[.batteryStateOfHealth] = DokoCommandResponse(command: dokoCommand, response: .batteryStateOfHealth(batteryStateOfHealth))
     dokoResponses[.batteryTemperature] = DokoCommandResponse(command: dokoCommand, response: .batteryTemperature(batteryTemperature))
-
     dokoResponses[.couplerTemperature] = DokoCommandResponse(command: dokoCommand, response: .couplerTemperature(couplerTemperature))
     dokoResponses[.primaryCouplerTemperature] = DokoCommandResponse(command: dokoCommand, response: .primaryCouplerTemperature(couplerTemperature))
-
     if let weather = responsePacket.weather {
       dokoResponses[.weather] = DokoCommandResponse(command: dokoCommand, response: .weather(weather))
     }

@@ -86,7 +86,8 @@ extension Trip {
   ) throws  -> Trip.Draft {
     guard
       let position = tripEndResponse.position,
-      let odometer = tripEndResponse.odometer
+      let odometer = tripEndResponse.odometer,
+      let distance = tripEndResponse.distance
     else {
       throw TripError.tripArgumentError
     }
@@ -106,7 +107,7 @@ extension Trip {
     tripDraft.duration = tripEndResponse.completedAt.timeIntervalSince(tripDraft.timeStart)
     
     tripDraft.odometerEnd = odometer
-    tripDraft.distance = odometer - tripDraft.odometerStart
+    tripDraft.distance = distance
 
     tripDraft.energyToEmptyEnd = tripEndResponse.batteryEnergyToEmpty
     tripDraft.energy = tripEndResponse.batteryEnergy.map { -$0 }
@@ -160,41 +161,19 @@ extension Trip {
     tripDraft.timeEnd = tripDataResponse.completedAt
     tripDraft.duration = tripDataResponse.completedAt.timeIntervalSince(tripDraft.timeStart)
     
-    if let odometer = tripDataResponse.odometer {
-      tripDraft.odometerEnd = odometer
-    }
-    if let distance = tripDataResponse.distance {
-      tripDraft.distance = distance
-    }
+    if let odometer = tripDataResponse.odometer { tripDraft.odometerEnd = odometer }
+    if let distance = tripDataResponse.distance { tripDraft.distance = distance }
 
-    if let batteryEnergyToEmpty = tripDataResponse.batteryEnergyToEmpty {
-      tripDraft.energyToEmptyEnd = batteryEnergyToEmpty
-    }
-
-    if let batteryEnergy = tripDataResponse.batteryEnergy {
-      tripDraft.energy = -batteryEnergy
-    }
-
-    if let batteryDistanceToEmpty = tripDataResponse.batteryDistanceToEmpty {
-      tripDraft.distanceToEmptyEnd = batteryDistanceToEmpty
-    }
-    
-    if let batteryStateOfCharge = tripDataResponse.batteryStateOfCharge {
-      tripDraft.stateOfChargeEnd = batteryStateOfCharge
-    }
-    if let batteryTemperature = tripDataResponse.batteryTemperature {
-      tripDraft.batteryTempEnd = batteryTemperature
-    }
-
+    if let batteryEnergyToEmpty = tripDataResponse.batteryEnergyToEmpty { tripDraft.energyToEmptyEnd = batteryEnergyToEmpty }
+    if let batteryEnergy = tripDataResponse.batteryEnergy { tripDraft.energy = -batteryEnergy }
+    if let batteryDistanceToEmpty = tripDataResponse.batteryDistanceToEmpty { tripDraft.distanceToEmptyEnd = batteryDistanceToEmpty }
+    if let batteryStateOfCharge = tripDataResponse.batteryStateOfCharge { tripDraft.stateOfChargeEnd = batteryStateOfCharge }
+    if let batteryTemperature = tripDataResponse.batteryTemperature { tripDraft.batteryTempEnd = batteryTemperature }
     if let weather = tripDataResponse.weather {
       tripDraft.weatherTempEnd = weather.temperature
       tripDraft.weatherConditionsEnd = weather.conditionSymbol
-      if tripDraft.weatherTempStart == nil {
-        tripDraft.weatherTempStart = weather.temperature
-      }
-      if tripDraft.weatherConditionsStart == nil {
-        tripDraft.weatherConditionsStart = weather.conditionSymbol
-      }
+      if tripDraft.weatherTempStart == nil { tripDraft.weatherTempStart = weather.temperature }
+      if tripDraft.weatherConditionsStart == nil { tripDraft.weatherConditionsStart = weather.conditionSymbol }
     }
 
     @Dependency(\.defaultDatabase) var database

@@ -23,14 +23,12 @@ extension FordTranslating {
     hvBatteryEnergy.reset()
     chargerInputEnergy.reset()
     chargerOutputEnergy.reset()
-
-    vehicleOdometer.setOdometer(with: odometer)
-    dokoResponses[.odometer] = DokoCommandResponse(command: dokoCommand, response: .odometer(odometer))
-
     vehicleDuration.reset()
-    dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
+    vehicleOdometer.resetOdometer(with: odometer, and: position)
 
     dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(.dcChargeInProgress))
+    dokoResponses[.odometer] = DokoCommandResponse(command: dokoCommand, response: .odometer(odometer))
+    dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
     dokoResponses[.position] = DokoCommandResponse(command: dokoCommand, response: .position(position))
     dokoResponses[.batteryEnergyToEmpty] = DokoCommandResponse(command: dokoCommand, response: .batteryEnergyToEmpty(batteryEnergyToEmpty))
     dokoResponses[.batteryStateOfCharge] = DokoCommandResponse(command: dokoCommand, response: .batteryStateOfCharge(batteryStateOfCharge))

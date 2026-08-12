@@ -24,13 +24,13 @@ private final class ManualClock: Clock, @unchecked Sendable {
 struct TripOdometerTests {
 
   @Test func initialState() {
-    let o = TripOdometer()
+    let o = EnhancedOdometer()
     #expect(o.odometer == 0)
     #expect(o.distance == 0)
   }
 
   @Test func setOdometerInitializesDistance() {
-    var o = TripOdometer()
+    var o = EnhancedOdometer()
     let returned = o.setOdometer(with: 50_000)
     #expect(returned == 0)
     #expect(o.odometer == 50_000)
@@ -38,7 +38,7 @@ struct TripOdometerTests {
   }
 
   @Test func updateOdometerComputesDistance() {
-    var o = TripOdometer()
+    var o = EnhancedOdometer()
     o.setOdometer(with: 50_000)
     let returned = o.updateOdometer(with: 50_010)
     #expect(returned == 10)
@@ -47,7 +47,7 @@ struct TripOdometerTests {
   }
 
   @Test func multipleUpdatesAccumulate() {
-    var o = TripOdometer()
+    var o = EnhancedOdometer()
     o.setOdometer(with: 100)
     o.updateOdometer(with: 105)
     let returned = o.updateOdometer(with: 115)
@@ -56,7 +56,7 @@ struct TripOdometerTests {
   }
 
   @Test func resetViaSetOdometerClearsDistance() {
-    var o = TripOdometer()
+    var o = EnhancedOdometer()
     o.setOdometer(with: 100)
     o.updateOdometer(with: 120)
     o.setOdometer(with: 200)
@@ -65,7 +65,7 @@ struct TripOdometerTests {
   }
 
   @Test func updateWithSameValueYieldsZeroDistance() {
-    var o = TripOdometer()
+    var o = EnhancedOdometer()
     o.setOdometer(with: 500)
     let returned = o.updateOdometer(with: 500)
     #expect(returned == 0)

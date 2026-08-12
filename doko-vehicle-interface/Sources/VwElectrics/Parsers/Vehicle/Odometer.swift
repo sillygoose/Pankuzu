@@ -23,6 +23,6 @@ func parseOdometer(_ input: String) throws -> Double {
   }
 #endif
   var input = input[...].utf8
-  let odometer = try odometerParser().parse(&input)
-  return odometer
+  let rawOdometer = try odometerParser().parse(&input)
+  return floor(rawOdometer)
 }

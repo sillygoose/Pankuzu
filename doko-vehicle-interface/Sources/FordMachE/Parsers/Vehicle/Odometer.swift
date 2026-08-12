@@ -21,6 +21,7 @@ public func parseOdometer(_ input: String) throws -> Double {
   }
 #endif
   var input = input[...].utf8
-  let odometer = try odometerParser().parse(&input)
-  return odometer * 0.1
+  let rawOdometer = try odometerParser().parse(&input)
+  let tenthsOdometer = rawOdometer * 0.1
+  return (tenthsOdometer * 10).rounded() / 10
 }

@@ -21,7 +21,7 @@ extension FordTranslating {
     vehicleMeanTemperature.reset()
     hvBatteryEnergy.reset()
     vehicleDuration.reset()
-    vehicleOdometer.resetTripOdometer(with: odometer, and: position)
+    vehicleOdometer.resetOdometer(with: odometer, and: position)
     vehicleEfficiency.reset()
 
     dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(.tripInProgress))
@@ -82,7 +82,7 @@ extension FordTranslating {
     }
 
     vehicleDuration.update()
-    vehicleOdometer.updateTripOdometer(with: odometer, and: position)
+    vehicleOdometer.updateOdometer(with: odometer, and: position)
 
     dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(.idle))
     dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
@@ -145,7 +145,7 @@ extension FordTranslating {
     }
 
     vehicleDuration.update()
-    vehicleOdometer.updateTripOdometer(with: odometer, and: position)
+    vehicleOdometer.updateOdometer(with: odometer, and: position)
 
     dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
     dokoResponses[.odometer] = DokoCommandResponse(command: dokoCommand, response: .odometer(vehicleOdometer.odometer))
@@ -186,7 +186,6 @@ extension FordTranslating {
     let dokoCommand: DokoCommand = .tripData
     var dokoResponses: DokoResponseDictionary = [:]
     guard
-      let odometer = responsePacket.odometer,
       let batteryEnergyToEmpty = responsePacket.batteryEnergyToEmpty,
       let batteryStateOfCharge = responsePacket.batteryStateOfCharge,
       let batteryTemperature = responsePacket.batteryTemperature

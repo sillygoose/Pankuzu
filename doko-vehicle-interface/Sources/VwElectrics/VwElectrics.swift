@@ -31,7 +31,7 @@ public actor VwElectrics: ConnectedVehicleInterface {
   public var responseCache: DokoResponseDictionary = [:]
   public var hvBatteryEnergy = PowerEnergyIntegrator()
 
-  public var vehicleOdometer = TripOdometer()
+  public var vehicleOdometer = EnhancedOdometer()
   public var vehicleDuration = DurationTracker()
   public var vehicleMeanTemperature = MeanTemperature()
   public var vehicleEfficiency = TripEfficiency()

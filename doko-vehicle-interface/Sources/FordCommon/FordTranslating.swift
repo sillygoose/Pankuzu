@@ -9,7 +9,7 @@ public protocol FordTranslating: Actor {
   var hvBatteryEnergy: PowerEnergyIntegrator { get set }
   var chargerInputEnergy: PowerEnergyIntegrator { get set }
   var chargerOutputEnergy: PowerEnergyIntegrator { get set }
-  var vehicleOdometer: TripOdometer { get set }
+  var vehicleOdometer: EnhancedOdometer { get set }
   var vehicleDuration: DurationTracker { get set }
   var vehicleMeanTemperature: MeanTemperature { get set }
   var vehicleEfficiency: TripEfficiency<ContinuousClock> { get set }

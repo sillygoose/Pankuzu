@@ -34,7 +34,7 @@ public actor FordMachE: ConnectedVehicleInterface {
   public var chargerInputEnergy = PowerEnergyIntegrator()
   public var chargerOutputEnergy = PowerEnergyIntegrator()
 
-  public var vehicleOdometer = TripOdometer()
+  public var vehicleOdometer = EnhancedOdometer()
   public var vehicleDuration = DurationTracker()
   public var vehicleMeanTemperature = MeanTemperature()
   public var vehicleEfficiency = TripEfficiency()

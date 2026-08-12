@@ -44,7 +44,7 @@ public final class DokoStateEngine {
 
   private func startStateEngine() async {
     self.logger.info("\(timestamp()) SE.startStateEngine")
-    DokoLogging.shared.postLoggingResponse(.info("SE.startStateEngine"))
+    DokoLogging.shared.postLoggingResponse(.state("SE.startStateEngine"))
     self.responseProcessingTask = self.dokoResponseProcessing()
   }
 
@@ -54,7 +54,7 @@ public final class DokoStateEngine {
     responseProcessingTask?.cancel()
     responseProcessingTask = nil
     self.logger.info("\(timestamp()) SE.stopStateEngine")
-    DokoLogging.shared.postLoggingResponse(.info("SE.stopStateEngine"))
+    DokoLogging.shared.postLoggingResponse(.state("SE.stopStateEngine"))
     $vehicleState.withLock { $0 = .reset }
   }
 
@@ -270,7 +270,7 @@ public final class DokoStateEngine {
                 tripDraft.weatherTempMeanWeighted = dokoResponsePacket.weather?.temperature
                 tripDraft.weatherConditionsStart = dokoResponsePacket.weather?.conditionSymbol
                 tripDraft.weatherConditionsEnd = dokoResponsePacket.weather?.conditionSymbol
-                DokoLogging.shared.postLoggingResponse(.info(".tripWeather updated tripDraft"))
+                DokoLogging.shared.postLoggingResponse(.state(".tripWeather updated tripDraft"))
               }
               try Trip.postTripWeatherRecord(tripID: tripID, tripWeatherPacket: dokoResponsePacket)
               self.tripInProgress = try Trip.updateTripRecord(tripDraft: tripDraft, tripDataResponse: dokoResponsePacket)
@@ -390,7 +390,7 @@ public final class DokoStateEngine {
           DokoLogging.shared.postLoggingResponse(.error("dokoResponseProcessing: \(String(describing: error))"))
         }
       }
-      DokoLogging.shared.postLoggingResponse(.info("SE.ResponseProcessing ended"))
+      DokoLogging.shared.postLoggingResponse(.state("SE.ResponseProcessing ended"))
       self.logger.info("\(timestamp()) StateEngine.obdResponseProcessing() stopped")
     }
   }
@@ -400,7 +400,7 @@ extension DokoStateEngine {
   public func accessoryNameObservation() {
 //    @Shared(.connectedAccessoryName) var observedAccessoryName
 //    @Shared(.activeSession) var activeSession
-    DokoLogging.shared.postLoggingResponse(.info("SE.accessoryNameObservation"))
+    DokoLogging.shared.postLoggingResponse(.state("SE.accessoryNameObservation"))
     Task { [weak self] in
       guard let self else { return }
       var oldAccessoryName: String? = nil
@@ -431,7 +431,7 @@ extension DokoStateEngine {
       return
     }
     self.logger.info("\(timestamp()) SE.connectedVehicleObservation")
-    DokoLogging.shared.postLoggingResponse(.info("SE.connectedVehicleObservation"))
+    DokoLogging.shared.postLoggingResponse(.state("SE.connectedVehicleObservation"))
     @Shared(.connectedVehicleInterface) var observedConnectedVehicle
     vehicleTypeObservationTask = Task { [weak self] in
       guard let self else { return }
@@ -439,9 +439,9 @@ extension DokoStateEngine {
       for await newConnectedVehicle in $observedConnectedVehicle.publisher.values {
         if Task.isCancelled { break }
         self.logger.info("\(timestamp()) SE.connectedVehicleObservation: connected vehicle changed from \(String(describing: oldConnectedVehicle)) to \(newConnectedVehicle.name)")
-        DokoLogging.shared.postLoggingResponse(.info("SE.connectedVehicleObservation: connected vehicle changed from \(String(describing: oldConnectedVehicle)) to \(newConnectedVehicle.name)"))
+        DokoLogging.shared.postLoggingResponse(.state("SE.connectedVehicleObservation: connected vehicle changed from \(String(describing: oldConnectedVehicle)) to \(newConnectedVehicle.name)"))
         if oldConnectedVehicle == newConnectedVehicle.vehicle {
-          DokoLogging.shared.postLoggingResponse(.info("SE.connectedVehicleObservation: no change in vehicle"))
+          DokoLogging.shared.postLoggingResponse(.state("SE.connectedVehicleObservation: no change in vehicle"))
           continue
         }
         if newConnectedVehicle.vehicle == nil {
@@ -455,7 +455,7 @@ extension DokoStateEngine {
 
   private func stopCVObservation() {
     self.logger.info("\(timestamp()) SE.stopCVObservation")
-    DokoLogging.shared.postLoggingResponse(.info("SE.stopCVObservation"))
+    DokoLogging.shared.postLoggingResponse(.state("SE.stopCVObservation"))
     vehicleTypeObservationTask?.cancel()
     vehicleTypeObservationTask = nil
   }
@@ -466,7 +466,7 @@ extension DokoStateEngine {
       return
     }
     @Shared(.connectedVehicleInterface) var connectedVehicleInterface
-    DokoLogging.shared.postLoggingResponse(.info("SE.vehicleStateObservation"))
+    DokoLogging.shared.postLoggingResponse(.state("SE.vehicleStateObservation"))
     vehicleStateObservationTask = Task { [weak self] in
       guard let self else { return }
       defer {
@@ -474,7 +474,7 @@ extension DokoStateEngine {
         dokoSchedulerTask = nil
       }
       for await newState in $vehicleState.publisher.values {
-        DokoLogging.shared.postLoggingResponse(.info("SE.vehicleStateObservation(\(newState.description)))"))
+        DokoLogging.shared.postLoggingResponse(.state("SE.vehicleStateObservation(\(newState.description)))"))
         dokoSchedulerTask?.cancel()
         dokoSchedulerTask = nil
         if accessoryName == nil {
@@ -486,14 +486,14 @@ extension DokoStateEngine {
           continue
         }
         self.dokoSchedulerTask = createScheduler(schedules: schedules)
-        DokoLogging.shared.postLoggingResponse(.info("SE.vehicleStateObservation(schedulaer created))"))
+        DokoLogging.shared.postLoggingResponse(.state("SE.vehicleStateObservation(schedulaer created))"))
       }
     }
   }
 
   private func stopVehicleStateObservation() {
     self.logger.info("\(timestamp()) SE.stopVehicleStateObservation")
-    DokoLogging.shared.postLoggingResponse(.info("SE.stopVehicleStateObservation"))
+    DokoLogging.shared.postLoggingResponse(.state("SE.stopVehicleStateObservation"))
     vehicleStateObservationTask?.cancel()
     vehicleStateObservationTask = nil
   }

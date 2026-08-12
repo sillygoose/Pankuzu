@@ -22,7 +22,7 @@ extension VwElectrics {
     vehicleMeanTemperature.reset()
     hvBatteryEnergy.reset()
     vehicleDuration.reset()
-    vehicleOdometer.resetTripOdometer(with: odometer, and: position)
+    vehicleOdometer.resetOdometer(with: odometer, and: position)
     vehicleEfficiency.reset()
 
     dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(.tripInProgress))
@@ -78,7 +78,7 @@ extension VwElectrics {
     }
 
     vehicleDuration.update()
-    vehicleOdometer.updateTripOdometer(with: odometer, and: position)
+    vehicleOdometer.updateOdometer(with: odometer, and: position)
 
     dokoResponses[.nextState] = DokoCommandResponse(command: dokoCommand, response: .nextState(.idle))
     dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
@@ -136,6 +136,7 @@ extension VwElectrics {
     let dokoCommand: DokoCommand = .odometer
     var dokoResponses: DokoResponseDictionary = [:]
     guard
+      let position = responsePacket.position,
       let odometer = responsePacket.odometer
     else {
       dokoResponses[.error] = DokoCommandResponse(command: dokoCommand, response: .error("arguments"))
@@ -143,10 +144,12 @@ extension VwElectrics {
     }
 
     vehicleDuration.update()
-    dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
+    vehicleOdometer.updateOdometer(with: odometer, and: position)
 
-    //###
-    
+    dokoResponses[.duration] = DokoCommandResponse(command: dokoCommand, response: .duration(vehicleDuration.duration))
+    dokoResponses[.odometer] = DokoCommandResponse(command: dokoCommand, response: .odometer(vehicleOdometer.odometer))
+    dokoResponses[.distance] = DokoCommandResponse(command: dokoCommand, response: .distance(vehicleOdometer.distance))
+
     responseCache.merge(dokoResponses) { _, new in new }
     return DokoResponsePacket(type: dokoPacket, responses: dokoResponses)
   }
@@ -182,7 +185,6 @@ extension VwElectrics {
     let dokoCommand: DokoCommand = .tripData
     var dokoResponses: DokoResponseDictionary = [:]
     guard
-      let odometer = responsePacket.odometer,
       let batteryStateOfCharge = responsePacket.batteryStateOfCharge,
       let batteryTemperature = responsePacket.batteryTemperature
     else {
