@@ -82,14 +82,14 @@ public final class TripDetailEfficiencyMapModel {
     func nearest(_ points: [DokoDataPoint], to timestamp: Date) -> Double {
       points.min { abs($0.timestamp.timeIntervalSince(timestamp)) < abs($1.timestamp.timeIntervalSince(timestamp)) }?.datapoint ?? 0
     }
-    let odometerAtPath = path.map { nearest(tripData.odometer, to: $0.timestamp) }
+    let distanceAtPath = path.map { nearest(tripData.distance, to: $0.timestamp) }
     let energyAtPath = path.map { nearest(tripData.batteryEnergy, to: $0.timestamp) }
 
     self.efficiencySegments = (0..<(path.count - 1)).map { i in
       EfficiencySegment(
         start: CLLocationCoordinate2D(latitude: path[i].latitude, longitude: path[i].longitude),
         end: CLLocationCoordinate2D(latitude: path[i + 1].latitude, longitude: path[i + 1].longitude),
-        distanceKilometers: odometerAtPath[i + 1] - odometerAtPath[i],
+        distanceKilometers: distanceAtPath[i + 1] - distanceAtPath[i],
         energyKilowattHours: energyAtPath[i] - energyAtPath[i + 1]
       )
     }

@@ -194,6 +194,9 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
   public var odometer: [DokoDataPoint]
 
   @Column(as: [DokoDataPoint].JSONRepresentation.self)
+  public var distance: [DokoDataPoint]
+
+  @Column(as: [DokoDataPoint].JSONRepresentation.self)
   public var stateOfCharge: [DokoDataPoint]
 
   @Column(as: [DokoDataPoint].JSONRepresentation.self)
@@ -211,6 +214,7 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
   public init(
     tripID: Trip.ID,
     odometer: [DokoDataPoint] = [],
+    distance: [DokoDataPoint] = [],
     stateOfCharge: [DokoDataPoint] = [],
     batteryEnergy: [DokoDataPoint] = [],
     energyToEmpty: [DokoDataPoint] = [],
@@ -219,6 +223,7 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
   ) {
     self.tripID = tripID
     self.odometer = odometer
+    self.distance = distance
     self.stateOfCharge = stateOfCharge
     self.batteryEnergy = batteryEnergy
     self.energyToEmpty = energyToEmpty
@@ -229,6 +234,7 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
   private enum CodingKeys: String, CodingKey {
     case tripID = "tid"
     case odometer = "od"
+    case distance = "di"
     case stateOfCharge = "soc"
     case batteryEnergy = "be"
     case energyToEmpty = "ete"
@@ -237,7 +243,7 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
   }
 
   private enum LegacyCodingKeys: String, CodingKey {
-    case tripID, odometer, stateOfCharge, batteryEnergy, energyToEmpty, distanceToEmpty, batteryTemp
+    case tripID, odometer, distance, stateOfCharge, batteryEnergy, energyToEmpty, distanceToEmpty, batteryTemp
   }
 
   public init(from decoder: Decoder) throws {
@@ -245,6 +251,7 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
     if container.contains(.tripID) {
       tripID = try container.decode(Trip.ID.self, forKey: .tripID)
       odometer = try container.decodeIfPresent([DokoDataPoint].self, forKey: .odometer) ?? []
+      distance = try container.decodeIfPresent([DokoDataPoint].self, forKey: .distance) ?? []
       stateOfCharge = try container.decodeIfPresent([DokoDataPoint].self, forKey: .stateOfCharge) ?? []
       batteryEnergy = try container.decodeIfPresent([DokoDataPoint].self, forKey: .batteryEnergy) ?? []
       energyToEmpty = try container.decodeIfPresent([DokoDataPoint].self, forKey: .energyToEmpty) ?? []
@@ -254,6 +261,7 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
       let legacy = try decoder.container(keyedBy: LegacyCodingKeys.self)
       tripID = try legacy.decode(Trip.ID.self, forKey: .tripID)
       odometer = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .odometer) ?? []
+      distance = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .distance) ?? []
       stateOfCharge = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .stateOfCharge) ?? []
       batteryEnergy = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .batteryEnergy) ?? []
       energyToEmpty = try legacy.decodeIfPresent([DokoDataPoint].self, forKey: .energyToEmpty) ?? []
@@ -267,6 +275,7 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
       var container = encoder.container(keyedBy: LegacyCodingKeys.self)
       try container.encode(tripID, forKey: .tripID)
       try container.encode(odometer, forKey: .odometer)
+      try container.encode(distance, forKey: .distance)
       try container.encode(stateOfCharge, forKey: .stateOfCharge)
       try container.encode(batteryEnergy, forKey: .batteryEnergy)
       try container.encode(energyToEmpty, forKey: .energyToEmpty)
@@ -276,6 +285,7 @@ public struct TripData: Hashable, Identifiable, Codable, Sendable {
       var container = encoder.container(keyedBy: CodingKeys.self)
       try container.encode(tripID, forKey: .tripID)
       try container.encode(odometer, forKey: .odometer)
+      try container.encode(distance, forKey: .distance)
       try container.encode(stateOfCharge, forKey: .stateOfCharge)
       try container.encode(batteryEnergy, forKey: .batteryEnergy)
       try container.encode(energyToEmpty, forKey: .energyToEmpty)

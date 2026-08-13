@@ -141,6 +141,7 @@ public func appDatabase() throws -> any DatabaseWriter {
       CREATE TABLE "tripData" (
         "tripID" TEXT NOT NULL PRIMARY KEY REFERENCES "trip"("id") ON DELETE CASCADE,
         "odometer" TEXT NOT NULL,
+        "distance" TEXT NOT NULL,
         "stateOfCharge" TEXT NOT NULL,
         "batteryEnergy" TEXT NOT NULL,
         "energyToEmpty" TEXT NOT NULL,

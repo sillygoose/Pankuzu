@@ -34,6 +34,9 @@ extension Trip {
     
     let timestamp = tripDataPacket.completedAt
     tripData.odometer.append(DokoDataPoint(timestamp: timestamp, double: odometer))
+    if let distance = tripDataPacket.distance {
+      tripData.distance.append(DokoDataPoint(timestamp: timestamp, double: distance))
+    }
     if let batteryStateOfCharge = tripDataPacket.batteryStateOfCharge {
       tripData.stateOfCharge.append(DokoDataPoint(timestamp: timestamp, double: batteryStateOfCharge))
     }

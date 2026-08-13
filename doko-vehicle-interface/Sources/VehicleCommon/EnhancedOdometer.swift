@@ -6,7 +6,7 @@ import DokoLogging
 
 public struct EnhancedOdometer: Sendable {
   public var odometer: Double { (rawOdometer * 10).rounded() / 10 }
-  public var distance: Double { (rawDistance * 10).rounded() / 10 }
+  public var distance: Double { (rawDistance * 1000).rounded() / 1000 }
 
   private(set) var initialOdometer: Double = 0
   private var rawOdometer: Double = 0
