@@ -25,14 +25,6 @@ public struct EnhancedOdometer: Sendable {
 
   public init() {}
 
-//  @discardableResult
-//  public mutating func setOdometer(with newOdometer: Double) -> Double {
-//    initialOdometer = newOdometer
-//    rawOdometer = newOdometer
-//    rawDistance = 0
-//    return distance
-//  }
-
   @discardableResult
   public mutating func resetOdometer(with newOdometer: Double, and newPosition: DokoPosition) -> Double {
     initialOdometer = newOdometer
@@ -45,13 +37,6 @@ public struct EnhancedOdometer: Sendable {
     lastChangeOdometer = newOdometer
     return distance
   }
-
-//  @discardableResult
-//  public mutating func updateOdometer(with newOdometer: Double) -> Double {
-//    rawOdometer = newOdometer
-//    rawDistance = newOdometer - initialOdometer
-//    return distance
-//  }
 
   @discardableResult
   public mutating func updateOdometer(with newOdometer: Double, and newPosition: DokoPosition) -> Double {
