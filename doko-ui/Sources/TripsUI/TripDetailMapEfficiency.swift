@@ -33,6 +33,10 @@ private struct EfficiencySegment: Identifiable {
   let end: CLLocationCoordinate2D
   let distanceKilometers: Double
   let energyKilowattHours: Double
+  
+  var description: String {
+    "(\(start.latitude), \(start.longitude)), (\(end.latitude), \(end.longitude)), \(energyKilowattHours) kWh \(distanceKilometers) km, \(energyKilowattHours) kWh"
+  }
 }
 
 @MainActor
@@ -88,7 +92,9 @@ public final class TripDetailEfficiencyMapModel {
         energyKilowattHours: energyAtPath[i] - energyAtPath[i + 1]
       )
     }
-    //###print(self.efficiencySegments)
+    for segment in self.efficiencySegments {
+      print(segment.description)
+    }
   }
 }
 

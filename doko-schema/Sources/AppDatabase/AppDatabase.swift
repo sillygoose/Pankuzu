@@ -217,6 +217,23 @@ public func appDatabase() throws -> any DatabaseWriter {
     )
     .execute(db)
   }
+  
+  
+  // "distance" was added to the already-shipped "Create tables" migration's CREATE TABLE
+  // statement instead of via a new migration. DatabaseMigrator tracks applied migrations by
+  // name, so on any install that already ran "Create tables", editing its SQL in place never
+  // re-runs it — the live tripData table is stuck without the column, and the eraseOnSchemaChange
+  // debug-only safety net (which papers over exactly this locally) doesn't apply to shipped
+  // installs. This migration backfills the column for those existing databases.
+//  migrator.registerMigration("Add tripData.distance") { db in
+//    try #sql(
+//      """
+//      ALTER TABLE "tripData" ADD COLUMN "distance" TEXT NOT NULL DEFAULT '[]'
+//      """
+//    )
+//    .execute(db)
+//  }
+
   try migrator.migrate(database)
   
   try database.write { db in
