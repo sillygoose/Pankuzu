@@ -7,13 +7,8 @@ import DokoSchema
 private enum EfficiencyBin: CaseIterable, Hashable {
   case regen, power
 
-  init(
-    energyKilowattHours: Double
-  ) {
-    guard energyKilowattHours > 0 else {
-      self = .regen
-      return
-    }
+  init(energyKilowattHours: Double) {
+    guard energyKilowattHours > 0 else { self = .regen;  return }
     self = .power
   }
 
@@ -93,7 +88,7 @@ public final class TripDetailEfficiencyMapModel {
         energyKilowattHours: energyAtPath[i] - energyAtPath[i + 1]
       )
     }
-    print(self.efficiencySegments)
+    //###print(self.efficiencySegments)
   }
 }
 
