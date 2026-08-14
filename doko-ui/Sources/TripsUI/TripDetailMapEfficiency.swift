@@ -29,13 +29,12 @@ private enum EfficiencyBin: CaseIterable, Hashable {
 
 private struct EfficiencySegment: Identifiable {
   let id = UUID()
-  let start: CLLocationCoordinate2D
-  let end: CLLocationCoordinate2D
+  let coordinates: [CLLocationCoordinate2D]
   let distanceKilometers: Double
   let energyKilowattHours: Double
-  
+
   var description: String {
-    "(\(start.latitude), \(start.longitude)), (\(end.latitude), \(end.longitude)), \(energyKilowattHours) kWh \(distanceKilometers) km, \(energyKilowattHours) kWh"
+    "\(coordinates.count) points, \(distanceKilometers) km, \(energyKilowattHours) kWh"
   }
 }
 
@@ -78,18 +77,45 @@ public final class TripDetailEfficiencyMapModel {
     )
     self.coordinateRegion = MKCoordinateRegion(center: mapCenter, span: mapSpan)
 
-    func nearest(_ points: [DokoDataPoint], to timestamp: Date) -> Double {
-      points.min { abs($0.timestamp.timeIntervalSince(timestamp)) < abs($1.timestamp.timeIntervalSince(timestamp)) }?.datapoint ?? 0
-    }
-    let distanceAtPath = path.map { nearest(tripData.distance, to: $0.timestamp) }
-    let energyAtPath = path.map { nearest(tripData.batteryEnergy, to: $0.timestamp) }
+    // distance/batteryEnergy are appended together, once per postTripData call (see
+    // PostTripData.swift), so they're index-aligned pairwise. Trips recorded before that was
+    // true can still have mismatched lengths, so this trims to the shorter of the two rather
+    // than assuming equal counts.
+    let distancePoints = tripData.distance
+    let energyPoints = tripData.batteryEnergy
+    let pairCount = min(distancePoints.count, energyPoints.count)
 
-    self.efficiencySegments = (0..<(path.count - 1)).map { i in
-      EfficiencySegment(
-        start: CLLocationCoordinate2D(latitude: path[i].latitude, longitude: path[i].longitude),
-        end: CLLocationCoordinate2D(latitude: path[i + 1].latitude, longitude: path[i + 1].longitude),
-        distanceKilometers: distanceAtPath[i + 1] - distanceAtPath[i],
-        energyKilowattHours: energyAtPath[i] - energyAtPath[i + 1]
+    struct EfficiencyWindow {
+      let start: Date
+      let end: Date
+      let distanceKilometers: Double
+      let energyKilowattHours: Double
+    }
+    let efficiencyWindows: [EfficiencyWindow] = (0..<max(0, pairCount - 1)).map { i in
+      EfficiencyWindow(
+        start: distancePoints[i].timestamp,
+        end: distancePoints[i + 1].timestamp,
+        distanceKilometers: distancePoints[i + 1].datapoint - distancePoints[i].datapoint,
+        energyKilowattHours: energyPoints[i].datapoint - energyPoints[i + 1].datapoint
+      )
+    }
+    func efficiencyWindow(covering timestamp: Date) -> EfficiencyWindow? {
+      efficiencyWindows.first { $0.start <= timestamp && timestamp <= $0.end }
+        ?? efficiencyWindows.min { abs($0.start.timeIntervalSince(timestamp)) < abs($1.start.timeIntervalSince(timestamp)) }
+    }
+
+    // Geometry always comes from the recorded path itself (one segment per adjacent GPS point,
+    // so the line follows the actual driven route with no gaps); only the color is looked up
+    // from the coarser distance/energy windows above.
+    self.efficiencySegments = (0..<(path.count - 1)).compactMap { i in
+      guard let window = efficiencyWindow(covering: path[i].timestamp) else { return nil }
+      return EfficiencySegment(
+        coordinates: [
+          CLLocationCoordinate2D(latitude: path[i].latitude, longitude: path[i].longitude),
+          CLLocationCoordinate2D(latitude: path[i + 1].latitude, longitude: path[i + 1].longitude),
+        ],
+        distanceKilometers: window.distanceKilometers,
+        energyKilowattHours: window.energyKilowattHours
       )
     }
     for segment in self.efficiencySegments {
@@ -160,7 +186,7 @@ public struct TripDetailEfficiencyMapView: View {
         .tint(.cyan)
         
         ForEach(model.efficiencySegments) { segment in
-          MapPolyline(coordinates: [segment.start, segment.end])
+          MapPolyline(coordinates: segment.coordinates)
             .stroke(
               EfficiencyBin(energyKilowattHours: segment.energyKilowattHours).color,
               lineWidth: appSettings.tripMapStyle == .satellite ? 4 : 5

@@ -14,7 +14,8 @@ extension Trip {
     tripDataPacket: DokoResponsePacket
   ) throws {
     guard
-      let odometer = tripDataPacket.odometer
+      let odometer = tripDataPacket.odometer,
+      let distance = tripDataPacket.distance
     else {
       throw TripError.tripDataArgumentError
     }
@@ -34,14 +35,10 @@ extension Trip {
     
     let timestamp = tripDataPacket.completedAt
     tripData.odometer.append(DokoDataPoint(timestamp: timestamp, double: odometer))
-    if let distance = tripDataPacket.distance {
-      tripData.distance.append(DokoDataPoint(timestamp: timestamp, double: distance))
-    }
+    tripData.distance.append(DokoDataPoint(timestamp: timestamp, double: distance))
+    tripData.batteryEnergy.append(DokoDataPoint(timestamp: timestamp, double: tripDataPacket.batteryEnergy ?? 0))
     if let batteryStateOfCharge = tripDataPacket.batteryStateOfCharge {
       tripData.stateOfCharge.append(DokoDataPoint(timestamp: timestamp, double: batteryStateOfCharge))
-    }
-    if let batteryEnergy = tripDataPacket.batteryEnergy {
-      tripData.batteryEnergy.append(DokoDataPoint(timestamp: timestamp, double: batteryEnergy))
     }
     if let batteryEnergyToEmpty = tripDataPacket.batteryEnergyToEmpty {
       tripData.energyToEmpty.append(DokoDataPoint(timestamp: timestamp, double: batteryEnergyToEmpty))
