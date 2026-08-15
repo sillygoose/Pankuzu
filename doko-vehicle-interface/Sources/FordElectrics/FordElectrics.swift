@@ -140,9 +140,14 @@ public actor FordElectrics: ConnectedVehicleInterface {
         .position;
       }
 
+    case .tripEnergy:
+      return obdCommandPacket(packetType) {
+        .batteryVoltage;
+        .batteryCurrent;
+      }
+
     case .tripData:
       return obdCommandPacket(packetType) {
-        .odometer;
         .batteryStateOfCharge;
         .batteryEnergyToEmpty;
         .batteryTemperature;
@@ -191,12 +196,6 @@ public actor FordElectrics: ConnectedVehicleInterface {
         packetType == .acChargeHistory ? acChargerCouplerTemperature : dcChargerCouplerTemperature;
       }
 
-    case .tripEnergy:
-      return obdCommandPacket(packetType) {
-        .batteryVoltage;
-        .batteryCurrent;
-      }
-      
     case .acChargeEnergy:
       return obdCommandPacket(packetType) {
         .batteryVoltage;

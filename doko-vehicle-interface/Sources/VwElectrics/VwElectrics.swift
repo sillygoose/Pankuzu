@@ -149,7 +149,6 @@ public actor VwElectrics: ConnectedVehicleInterface {
 
     case .tripData:
       return obdCommandPacket(.tripData) {
-        .odometer;
         .batteryStateOfCharge;
         .batteryTemperature;
         canbusNormalAddressing;

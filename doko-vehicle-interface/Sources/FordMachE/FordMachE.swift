@@ -151,7 +151,6 @@ public actor FordMachE: ConnectedVehicleInterface {
 
     case .tripData:
       return obdCommandPacket(packetType) {
-        .odometer;
         .batteryStateOfCharge;
         .batteryEnergyToEmpty;
         .batteryTemperature;
