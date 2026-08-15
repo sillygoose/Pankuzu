@@ -4,37 +4,68 @@ import MapKit
 import DokoSharing
 import DokoSchema
 
-private enum EfficiencyBin: CaseIterable, Hashable {
-  case regen, power
+// Traffic-light gradient: red (worst efficiency) through yellow to green (best efficiency).
+// Segments with energyKilowattHours <= 0 (net regen) are clamped to the green end, since
+// their km/kWh is undefined/unbounded rather than merely large.
+private enum EfficiencyScale {
+  private static let stops: [(location: Double, red: Double, green: Double, blue: Double)] = [
+    (0.00, 0.86, 0.15, 0.15),  // red
+    (0.25, 0.95, 0.55, 0.10),  // orange
+    (0.50, 0.95, 0.80, 0.15),  // yellow
+    (0.75, 0.60, 0.80, 0.15),  // lime
+    (1.00, 0.20, 0.70, 0.25),  // green
+  ]
 
-  init(energyKilowattHours: Double) {
-    guard energyKilowattHours > 0 else { self = .regen;  return }
-    self = .power
+  static let domainMaxKilometersPerKilowattHour: Double = 10
+
+  static func maxValue(metric: Bool) -> Double {
+    metric ? domainMaxKilometersPerKilowattHour : domainMaxKilometersPerKilowattHour * 0.621371
   }
 
-  var color: Color {
-    switch self {
-    case .regen: return .green
-    case .power: return .red
-    }
+  static func color(kilometersPerKilowattHour value: Double) -> Color {
+    color(fraction: value / domainMaxKilometersPerKilowattHour)
   }
 
-  var label: String {
-    switch self {
-    case .regen: return "Regen"
-    case .power: return "Power"
+  private static func color(fraction: Double) -> Color {
+    let clamped = max(0.0, min(1.0, fraction))
+    guard let upperIndex = stops.firstIndex(where: { $0.location >= clamped }), upperIndex > 0 else {
+      let edge = clamped <= 0 ? stops[0] : stops[stops.count - 1]
+      return Color(red: edge.red, green: edge.green, blue: edge.blue)
     }
+    let lower = stops[upperIndex - 1]
+    let upper = stops[upperIndex]
+    let f = (clamped - lower.location) / (upper.location - lower.location)
+    return Color(
+      red: lower.red + (upper.red - lower.red) * f,
+      green: lower.green + (upper.green - lower.green) * f,
+      blue: lower.blue + (upper.blue - lower.blue) * f
+    )
+  }
+
+  static var legendGradientColors: [Color] {
+    stride(from: 0.0, through: 1.0, by: 1.0 / 16.0).map { color(fraction: $0) }
   }
 }
 
 private struct EfficiencySegment: Identifiable {
   let id = UUID()
   let coordinates: [CLLocationCoordinate2D]
-  let distanceKilometers: Double
-  let energyKilowattHours: Double
+  let distance: Double
+  let energy: Double
+  let efficiency: Double
 
+  init(coordinates: [CLLocationCoordinate2D], distanceKilometers: Double, energyKilowattHours: Double) {
+    self.coordinates = coordinates
+    self.distance = distanceKilometers
+    self.energy = energyKilowattHours
+    let colorMapEfficiency: Double = {
+      guard energyKilowattHours > 0 else { return EfficiencyScale.domainMaxKilometersPerKilowattHour }
+      return min(distanceKilometers / energyKilowattHours, EfficiencyScale.domainMaxKilometersPerKilowattHour)
+    }()
+    self.efficiency = colorMapEfficiency
+  }
   var description: String {
-    "\(coordinates.count) points, \(distanceKilometers) km, \(energyKilowattHours) kWh"
+    "\(coordinates.count) points, \(String(format: "%.3f", distance)) km, \(String(format: "%.3f", energy)) kWh, \(String(format: "%.3f", efficiency)) km/kWh"
   }
 }
 
@@ -118,9 +149,9 @@ public final class TripDetailEfficiencyMapModel {
         energyKilowattHours: window.energyKilowattHours
       )
     }
-    for segment in self.efficiencySegments {
-      print(segment.description)
-    }
+//    for segment in self.efficiencySegments {
+//      print(segment.description)
+//    }
   }
 }
 
@@ -188,7 +219,7 @@ public struct TripDetailEfficiencyMapView: View {
         ForEach(model.efficiencySegments) { segment in
           MapPolyline(coordinates: segment.coordinates)
             .stroke(
-              EfficiencyBin(energyKilowattHours: segment.energyKilowattHours).color,
+              EfficiencyScale.color(kilometersPerKilowattHour: segment.efficiency),
               lineWidth: appSettings.tripMapStyle == .satellite ? 4 : 5
             )
         }
@@ -227,17 +258,31 @@ public struct TripDetailEfficiencyMapView: View {
         ))
       }
       .overlay(alignment: .bottomTrailing) {
+        let unit = appSettings.metric ? "km/kWh" : "mi/kWh"
+        let maxValue = EfficiencyScale.maxValue(metric: appSettings.metric)
+        let ticks = Array(stride(from: 0.0, through: maxValue, by: maxValue / 4.0))
+        let legendWidth: CGFloat = 200
         VStack(alignment: .leading, spacing: 4) {
-          ForEach(EfficiencyBin.allCases, id: \.self) { bin in
-            HStack(spacing: 6) {
-              Circle()
-                .fill(bin.color)
-                .frame(width: 8, height: 8)
-              Text(bin.label)
+          Text("Efficiency (\(unit))")
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+          LinearGradient(
+            colors: EfficiencyScale.legendGradientColors,
+            startPoint: .leading,
+            endPoint: .trailing
+          )
+          .frame(width: legendWidth, height: 8)
+          .clipShape(Capsule())
+          HStack(spacing: 0) {
+            ForEach(Array(ticks.enumerated()), id: \.offset) { index, tick in
+              Text(String(format: "%.1f", tick))
+                .font(.caption2)
+              if index != ticks.count - 1 { Spacer() }
             }
           }
+          .frame(width: legendWidth)
         }
-        .font(.caption)
+        .fixedSize()
         .padding(8)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
         .padding(12)
