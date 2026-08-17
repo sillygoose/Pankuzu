@@ -261,7 +261,6 @@ public struct TripDetailEfficiencyMapView: View {
         let unit = appSettings.metric ? "km/kWh" : "mi/kWh"
         let maxValue = EfficiencyScale.maxValue(metric: appSettings.metric)
         let ticks = Array(stride(from: 0.0, through: maxValue, by: maxValue / 4.0))
-        let legendWidth: CGFloat = 200
         VStack(alignment: .leading, spacing: 4) {
           Text("Efficiency (\(unit))")
             .font(.caption2)
@@ -271,7 +270,8 @@ public struct TripDetailEfficiencyMapView: View {
             startPoint: .leading,
             endPoint: .trailing
           )
-          .frame(width: legendWidth, height: 8)
+          .containerRelativeFrame(.horizontal) { width, _ in width * 0.75 }
+          .frame(height: 8)
           .clipShape(Capsule())
           HStack(spacing: 0) {
             ForEach(Array(ticks.enumerated()), id: \.offset) { index, tick in
@@ -280,7 +280,7 @@ public struct TripDetailEfficiencyMapView: View {
               if index != ticks.count - 1 { Spacer() }
             }
           }
-          .frame(width: legendWidth)
+          .containerRelativeFrame(.horizontal) { width, _ in width * 0.75 }
         }
         .fixedSize()
         .padding(8)
