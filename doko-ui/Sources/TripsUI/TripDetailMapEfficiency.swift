@@ -3,6 +3,7 @@ import MapKit
 
 import DokoSharing
 import DokoSchema
+import CommonUI
 
 // Traffic-light gradient: red (worst efficiency) through yellow to green (best efficiency).
 // Segments with energyKilowattHours <= 0 (net regen) are clamped to the green end, since
@@ -18,9 +19,10 @@ private enum EfficiencyScale {
 
   static let domainMaxKilometersPerKilowattHour: Double = 12
 
-  static func maxValue(metric: Bool) -> Double {
-    metric ? domainMaxKilometersPerKilowattHour : domainMaxKilometersPerKilowattHour * 0.621371
-  }
+  // kWh/100km is a reciprocal unit: 0 km/kWh (worst, red end of the domain) converts to an
+  // undefined/infinite kWh/100km rather than merely large, so the legend clamps to this ceiling
+  // the same way the color itself clamps net-regen segments to the green end.
+  static let reciprocalDisplayCeiling: Double = 40
 
   static func color(kilometersPerKilowattHour value: Double) -> Color {
     color(fraction: value / domainMaxKilometersPerKilowattHour)
@@ -258,9 +260,41 @@ public struct TripDetailEfficiencyMapView: View {
         ))
       }
       .overlay(alignment: .bottomTrailing) {
-        let unit = appSettings.metric ? "km/kWh" : "mi/kWh"
-        let maxValue = EfficiencyScale.maxValue(metric: appSettings.metric)
-        let ticks = Array(stride(from: 0.0, through: maxValue, by: maxValue / 4.0))
+        let targetUnit: UnitEnergyEfficiency = appSettings.metric
+          ? (appSettings.kWhPer100km ? .kilowattHoursPer100Kilometers : .kilometersPerKilowattHour)
+          : .milesPerKilowattHour
+        let unit: String = {
+          switch targetUnit {
+          case .kilowattHoursPer100Kilometers: return "kWh/100km"
+          case .milesPerKilowattHour: return "mi/kWh"
+          default: return "km/kWh"
+          }
+        }()
+        let isReciprocal = targetUnit == .kilowattHoursPer100Kilometers
+
+        // Ticks are anchored to evenly-spaced fractions of the (always km/kWh) color domain, so
+        // they stay aligned under the gradient bar regardless of which unit is displayed.
+        let fractions = Array(stride(from: 0.0, through: 1.0, by: 0.25))
+        // Position order always follows the fractions (0 = red/worst, 1 = green/best) — for
+        // km/kWh and mi/kWh that means ascending values left-to-right; for kWh/100km (reciprocal:
+        // lower is better) it means descending values left-to-right, which falls out naturally
+        // from computing 100/kmPerKWh at each anchor, so no reordering step is needed.
+        let tickLabels: [String] = fractions.map { fraction in
+          let kilometersPerKilowattHour = fraction * EfficiencyScale.domainMaxKilometersPerKilowattHour
+          if isReciprocal {
+            // Foundation's Measurement conversion for this unit pair isn't reliable at the
+            // reciprocal's singularity (0 km/kWh), so compute kWh/100km directly instead.
+            let rawValue = kilometersPerKilowattHour > 0 ? 100 / kilometersPerKilowattHour : Double.infinity
+            let capped = min(rawValue, EfficiencyScale.reciprocalDisplayCeiling)
+            return String(format: "%.0f", capped) + (rawValue > EfficiencyScale.reciprocalDisplayCeiling ? "+" : "")
+          }
+          let rawValue = Measurement(value: kilometersPerKilowattHour, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
+            .converted(to: targetUnit)
+            .value
+          let isBestCase = fraction == fractions.last
+          return String(format: "%.0f", rawValue) + (isBestCase ? "+" : "")
+        }
+
         VStack(alignment: .leading, spacing: 4) {
           Text("Efficiency (\(unit))")
             .font(.caption2)
@@ -274,10 +308,10 @@ public struct TripDetailEfficiencyMapView: View {
           .frame(height: 8)
           .clipShape(Capsule())
           HStack(spacing: 0) {
-            ForEach(Array(ticks.enumerated()), id: \.offset) { index, tick in
-              Text(String(format: "%.0f", tick) + (index == ticks.count - 1 ? "+" : ""))
+            ForEach(Array(tickLabels.enumerated()), id: \.offset) { index, label in
+              Text(label)
                 .font(.caption2)
-              if index != ticks.count - 1 { Spacer() }
+              if index != tickLabels.count - 1 { Spacer() }
             }
           }
           .containerRelativeFrame(.horizontal) { width, _ in width * 0.75 }
