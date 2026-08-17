@@ -10,13 +10,13 @@ import DokoSchema
 private enum EfficiencyScale {
   private static let stops: [(location: Double, red: Double, green: Double, blue: Double)] = [
     (0.00, 0.86, 0.15, 0.15),  // red
-    (0.25, 0.95, 0.55, 0.10),  // orange
-    (0.50, 0.95, 0.80, 0.15),  // yellow
-    (0.75, 0.60, 0.80, 0.15),  // lime
-    (1.00, 0.20, 0.70, 0.25),  // green
+    (0.20, 0.95, 0.55, 0.10),  // orange
+    (0.35, 0.95, 0.80, 0.15),  // yellow
+    (0.45, 0.60, 0.80, 0.15),  // lime
+    (0.60, 0.20, 0.70, 0.25),  // green
   ]
 
-  static let domainMaxKilometersPerKilowattHour: Double = 10
+  static let domainMaxKilometersPerKilowattHour: Double = 12
 
   static func maxValue(metric: Bool) -> Double {
     metric ? domainMaxKilometersPerKilowattHour : domainMaxKilometersPerKilowattHour * 0.621371
@@ -275,7 +275,7 @@ public struct TripDetailEfficiencyMapView: View {
           .clipShape(Capsule())
           HStack(spacing: 0) {
             ForEach(Array(ticks.enumerated()), id: \.offset) { index, tick in
-              Text(String(format: "%.1f", tick))
+              Text(String(format: "%.0f", tick) + (index == ticks.count - 1 ? "+" : ""))
                 .font(.caption2)
               if index != ticks.count - 1 { Spacer() }
             }
