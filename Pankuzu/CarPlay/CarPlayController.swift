@@ -146,6 +146,21 @@ extension CarPlayController {
     return String(format: "%.1f %@", d.value, d.unit.symbol)
   }
 
+  func formatRange(_ range: Double) -> String {
+    let r = Measurement(value: range, unit: UnitLength.kilometers)
+      .converted(to: appSettings.metric ? .kilometers : .miles)
+    return String(format: "%.0f %@", r.value, r.unit.symbol)
+  }
+
+  func formatStateOfCharge(_ soc: Double) -> String {
+    return String(format: "%.0f %@", soc, "%")
+  }
+
+  func formatEnergy(_ energy: Double) -> String {
+    let e = Measurement(value: energy, unit: UnitEnergy.kilowattHours)
+    return String(format: "%.1f %@", e.value, e.unit.symbol)
+  }
+
   func formatTripEfficiency(_ efficiency: Double) -> String {
     let e = Measurement(value: efficiency, unit: UnitEnergyEfficiency.kilometersPerKilowattHour)
       .converted(to: appSettings.metric ? .kilometersPerKilowattHour : .milesPerKilowattHour)

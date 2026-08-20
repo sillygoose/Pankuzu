@@ -17,5 +17,5 @@ func parseHvbStateOfCharge(_ input: String) throws -> Double {
 #endif
   var input = input[...].utf8
   let soc = try stpxParser().parse(&input)
-  return soc / 2.5
+  return ((soc / 2.5) * 10).rounded() / 10
 }

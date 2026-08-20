@@ -34,10 +34,11 @@ extension CarPlayController {
 
   func makeTripOverviewItems(from responses: DokoResponseDictionary) -> [CPInformationItem] {
     var items: [CPInformationItem] = []
-    if case let .duration(v)?                       = responses[.duration]?.response                { items.append(.init(title: "Duration",           detail: formatDuration(v))) }
-    if case let .distance(v)?                       = responses[.distance]?.response                { items.append(.init(title: "Distance",           detail: formatDistance(v))) }
-    if case let .batteryStateOfCharge(v)?           = responses[.batteryStateOfCharge]?.response    { items.append(.init(title: "State of Charge",    detail: String(format: "%.0f%%", v))) }
-    if case let .batteryEnergy(v)?                  = responses[.batteryEnergy]?.response           { items.append(.init(title: "Energy Used",        detail: String(format: "%.1f kWh", -v))) }
+    if case let .duration(v)?                       = responses[.duration]?.response                { items.append(.init(title: "Duration",           detail: formatDuration(v)))       }
+    if case let .distance(v)?                       = responses[.distance]?.response                { items.append(.init(title: "Distance",           detail: formatDistance(v)))       }
+    if case let .batteryDistanceToEmpty(v)?         = responses[.batteryDistanceToEmpty]?.response  { items.append(.init(title: "Range",              detail: formatRange(v)))          }
+    if case let .batteryStateOfCharge(v)?           = responses[.batteryStateOfCharge]?.response    { items.append(.init(title: "State of Charge",    detail: formatStateOfCharge(v)))  }
+    if case let .batteryEnergy(v)?                  = responses[.batteryEnergy]?.response           { items.append(.init(title: "Energy Used",        detail: formatEnergy(-v)))        }
     if case let .tripEfficiency(v)?                 = responses[.tripEfficiency]?.response          { items.append(.init(title: "Trip Efficiency",    detail: formatTripEfficiency(v))) }
     return items
   }
